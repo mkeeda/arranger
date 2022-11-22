@@ -13,4 +13,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Arranger"
-include ':sample-android'
+include(":arranger-runtime")
+include(":sample-android")

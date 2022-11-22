@@ -1,4 +1,4 @@
-package dev.mkeeda.arranger.sample.android
+package dev.mkeeda.arranger.runtime
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
