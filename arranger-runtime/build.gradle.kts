@@ -1,6 +1,8 @@
+// Workaround for IntelliJ IDE bug https://youtrack.jetbrains.com/issue/KTIJ-19369
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -8,5 +10,5 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.compose.runtime)
 }

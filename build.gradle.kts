@@ -1,9 +1,11 @@
 import com.android.build.api.dsl.LibraryExtension
 
+// Workaround for IntelliJ IDE bug https://youtrack.jetbrains.com/issue/KTIJ-19369
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.application") version "8.0.0-alpha08" apply false
-    id("com.android.library") version "8.0.0-alpha08" apply false
-    id("org.jetbrains.kotlin.android") version "1.7.20" apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
 }
 
 // TODO Declare plugin
@@ -25,6 +27,12 @@ subprojects {
             compileOptions {
                 sourceCompatibility = JavaVersion.VERSION_1_8
                 targetCompatibility = JavaVersion.VERSION_1_8
+            }
+            buildFeatures {
+                compose = true
+            }
+            composeOptions {
+                kotlinCompilerExtensionVersion = "1.3.2"
             }
         }
     }
