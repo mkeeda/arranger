@@ -11,4 +11,11 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.kotlinx.coroutines.core)
+
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.test.core.ktx)
+    androidTestImplementation(libs.androidx.test.junit.ktx)
+    androidTestImplementation(libs.androidx.test.runner)
+
 }

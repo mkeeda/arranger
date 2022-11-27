@@ -3,6 +3,7 @@ compileSdk = "33"
 minSdk = "21"
 
 kotlin = "1.7.20"
+kotlinxCoroutine = "1.6.4"
 
 androidGradlePlugin = "8.0.0-alpha08"
 
@@ -23,6 +24,19 @@ androidx-activity-compose = "androidx.activity:activity-compose:1.6.1"
 # AndroidX others
 androidx-core-ktx = "androidx.core:core-ktx:1.9.0"
 androidx-lifecycle-runtime-ktx = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+
+# AndroidX test frameworks
+androidx-test-core-ktx = "androidx.test:core-ktx:1.5.0"
+androidx-test-junit-ktx = "androidx.test.ext:junit-ktx:1.1.4"
+androidx-test-runner = "androidx.test:runner:1.5.1"
+
+# Kotlin
+kotlinx-coroutines-core= { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutine" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutine" }
+
+# Common test frameworks
+junit = "junit:junit:4.13.2"
+robolectric = "org.robolectric:robolectric:4.9"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
