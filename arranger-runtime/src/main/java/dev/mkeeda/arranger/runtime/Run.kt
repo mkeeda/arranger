@@ -24,6 +24,7 @@ fun DocumentNode.setContent(
 
 suspend fun CoroutineScope.document(content: @Composable DocumentScope.() -> Unit) {
     val rootNode = GroupNode()
+    // Require MonotonicFrameClock for Recomposer
     val clock = BroadcastFrameClock()
     val composeContext = coroutineContext + clock
     launch(composeContext) {
