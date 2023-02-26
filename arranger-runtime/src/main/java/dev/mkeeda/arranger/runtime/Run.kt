@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
+import dev.mkeeda.arranger.runtime.node.DocumentNode
+import dev.mkeeda.arranger.runtime.node.RootNode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -23,7 +25,7 @@ fun DocumentNode.setContent(
 }
 
 suspend fun CoroutineScope.document(content: @Composable DocumentScope.() -> Unit) {
-    val rootNode = GroupNode()
+    val rootNode = RootNode()
     // Require MonotonicFrameClock for Recomposer
     val clock = BroadcastFrameClock()
     val composeContext = coroutineContext + clock
@@ -31,7 +33,7 @@ suspend fun CoroutineScope.document(content: @Composable DocumentScope.() -> Uni
         while(true) {
             clock.sendFrame(0L)
             println("-------output--------")
-            println(rootNode.render())
+            println(rootNode.toSemanticText())
             println("-------output end--------")
             delay(100)
         }

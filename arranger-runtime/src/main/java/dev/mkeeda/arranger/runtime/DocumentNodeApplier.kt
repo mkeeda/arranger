@@ -1,6 +1,7 @@
 package dev.mkeeda.arranger.runtime
 
 import androidx.compose.runtime.AbstractApplier
+import dev.mkeeda.arranger.runtime.node.DocumentNode
 
 class DocumentNodeApplier(root: DocumentNode) : AbstractApplier<DocumentNode>(root) {
     override fun insertBottomUp(index: Int, instance: DocumentNode) {
