@@ -1,5 +1,8 @@
 package dev.mkeeda.arranger.runtime
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import com.google.common.truth.Truth.assertThat
 import dev.mkeeda.arranger.runtime.node.HeadingLevel
@@ -20,7 +23,7 @@ class SimpleEditorTest {
     }
 
     @Test
-    fun outputSemanticText_atFirst() = runEditorTest { editor ->
+    fun outputSemanticText_static() = runEditorTest { editor ->
         editor.launch {
             Heading(level = HeadingLevel.H1, title = "My profile")
             Paragraph {
@@ -37,13 +40,26 @@ class SimpleEditorTest {
     }
 
     @Test
-    fun outputSemanticText_whenInsert() = runEditorTest {editor ->
-        val hello = "Hello"
-        editor.launch(initialText = hello)
+    fun outputSemanticText_dynamic() = runEditorTest {editor ->
+        var titleIsShown by mutableStateOf(false)
+        editor.launch {
+            if (titleIsShown) {
+                Heading(level = HeadingLevel.H1, title = "My profile")
+            }
+            Paragraph {
+                Text(text = "Hello world.")
+            }
+        }
 
-        assertThat(editor.currentText()).isEqualTo(hello)
+        assertThat(editor.currentText()).isEqualTo("""
+            Hello world.
+        """.trimIndent())
 
-        editor.insert(text = " World", index = hello.length)
-        assertThat(editor.currentText()).isEqualTo("$hello World")
+        titleIsShown = true
+
+        assertThat(editor.currentText()).isEqualTo("""
+            My profile
+            Hello world.
+        """.trimIndent())
     }
 }

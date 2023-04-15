@@ -24,15 +24,8 @@ class SimpleEditor(
             recomposer.runRecomposeAndApplyChanges()
         }
 
-        var applyScheduled = false
         val snapshotHandle = Snapshot.registerGlobalWriteObserver {
-            if (!applyScheduled) {
-                applyScheduled = true
-                editorScope.launch {
-                    applyScheduled = false
-                    Snapshot.sendApplyNotifications()
-                }
-            }
+            Snapshot.sendApplyNotifications()
         }
 
         val scope = object : DocumentScope {}
@@ -54,15 +47,7 @@ class SimpleEditor(
         return rootNode.toSemanticText()
     }
 
-    fun insert(text: String, index: Int) {
-        // TODO
-    }
-
     fun dispose() {
         editorScope.cancel()
     }
-}
-
-suspend fun SimpleEditor.launch(initialText: String) = launch {
-    Text(text = initialText)
 }
