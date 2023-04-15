@@ -19,7 +19,7 @@ class SimpleEditor(
     )
     private val recomposer = Recomposer(editorScope.coroutineContext)
 
-    suspend fun launch(initialDocument: @Composable DocumentScope.() -> Unit) {
+    suspend fun launch(document: @Composable DocumentScope.() -> Unit) {
         val recomposerJob = editorScope.launch {
             recomposer.runRecomposeAndApplyChanges()
         }
@@ -28,9 +28,8 @@ class SimpleEditor(
             Snapshot.sendApplyNotifications()
         }
 
-        val scope = object : DocumentScope {}
         val composition = rootNode.setContent(recomposer) {
-            scope.initialDocument()
+            DocumentScope().document()
         }
 
         recomposerJob.invokeOnCompletion {
