@@ -1,19 +1,14 @@
 package dev.mkeeda.arranger.runtime.node
 
-class ParagraphNode : DocumentNode() {
+class ParagraphNode : MarkupTextNode() {
     override fun toSemanticText(): String =
         children.joinToString(separator = "") { it.toSemanticText() }
+
+    override fun toString(): String {
+        return "ParagraphNode($_children)"
+    }
 }
 
-class TextNode : DocumentNode() {
-    var text: String = ""
-
-    override fun toSemanticText(): String = text
-}
-
-class LinkNode : DocumentNode() {
-    var url: String = ""
-    var text: String = ""
-
-    override fun toSemanticText(): String = text
+fun ParagraphNode(children: List<MarkupTextNode>): ParagraphNode = ParagraphNode().apply {
+    _children.addAll(children)
 }

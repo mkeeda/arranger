@@ -4,21 +4,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import dev.mkeeda.arranger.runtime.node.DocumentNode
 import dev.mkeeda.arranger.runtime.node.HeadingLevel
 import dev.mkeeda.arranger.runtime.node.HeadingNode
 import dev.mkeeda.arranger.runtime.node.LinkNode
+import dev.mkeeda.arranger.runtime.node.MarkupTextNode
 import dev.mkeeda.arranger.runtime.node.ParagraphNode
 import dev.mkeeda.arranger.runtime.node.TextNode
 
 @DslMarker
-annotation class DocumentScopeMarker
+annotation class MarkupTextScopeMarker
 
-@DocumentScopeMarker
-class DocumentScope {
+@MarkupTextScopeMarker
+class MarkupTextScope {
     @Composable
     fun Heading(level: HeadingLevel, title: String) {
-        ComposeNode<HeadingNode, DocumentNodeApplier>(factory = ::HeadingNode) {
+        ComposeNode<HeadingNode, MarkupTextNodeApplier>(factory = ::HeadingNode) {
             set(level) {
                 this.level = it
             }
@@ -30,7 +30,7 @@ class DocumentScope {
 
     @Composable
     fun Paragraph(content: @Composable () -> Unit) {
-        ComposeNode<ParagraphNode, DocumentNodeApplier>(
+        ComposeNode<ParagraphNode, MarkupTextNodeApplier>(
             factory = ::ParagraphNode,
             update = {},
             content = content
@@ -39,7 +39,7 @@ class DocumentScope {
 
     @Composable
     fun Text(text: String) {
-        ComposeNode<TextNode, DocumentNodeApplier>(factory = ::TextNode) {
+        ComposeNode<TextNode, MarkupTextNodeApplier>(factory = ::TextNode) {
             set(text) {
                 this.text = it
             }
@@ -48,7 +48,7 @@ class DocumentScope {
 
     @Composable
     fun Link(text: String, url: String) {
-        ComposeNode<LinkNode, DocumentNodeApplier>(factory = ::LinkNode) {
+        ComposeNode<LinkNode, MarkupTextNodeApplier>(factory = ::LinkNode) {
             set(url) {
                 this.url = url
             }
@@ -59,11 +59,11 @@ class DocumentScope {
     }
 }
 
-fun DocumentNode.setContent(
+internal fun MarkupTextNode.setContent(
     parent: CompositionContext,
     content: @Composable () -> Unit
 ): Composition {
-    return Composition(DocumentNodeApplier(this), parent).apply {
+    return Composition(MarkupTextNodeApplier(this), parent).apply {
         setContent(content)
     }
 }

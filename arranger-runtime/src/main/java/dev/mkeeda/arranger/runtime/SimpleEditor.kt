@@ -16,7 +16,7 @@ class SimpleEditor(
     private val editorScope = CoroutineScope(clock)
     private val recomposer = Recomposer(editorScope.coroutineContext)
 
-    suspend fun launch(document: @Composable DocumentScope.() -> Unit) {
+    suspend fun launch(document: @Composable MarkupTextScope.() -> Unit) {
         val recomposerJob = editorScope.launch {
             recomposer.runRecomposeAndApplyChanges()
         }
@@ -26,7 +26,7 @@ class SimpleEditor(
         }
 
         val composition = rootNode.setContent(recomposer) {
-            DocumentScope().document()
+            MarkupTextScope().document()
         }
 
         recomposerJob.invokeOnCompletion {
