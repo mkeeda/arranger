@@ -25,18 +25,21 @@ subprojects {
                 }
             }
             compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_1_8
-                targetCompatibility = JavaVersion.VERSION_1_8
+                sourceCompatibility = JavaVersion.VERSION_11
+                targetCompatibility = JavaVersion.VERSION_11
             }
             buildFeatures {
                 compose = true
             }
             composeOptions {
-                kotlinCompilerExtensionVersion = "1.3.2"
+                kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
             }
         }
     }
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        kotlinOptions {
+            jvmTarget = "11"
+            freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        }
     }
 }
