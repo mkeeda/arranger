@@ -5,7 +5,7 @@ minSdk = "21"
 kotlin = "1.8.21"
 kotlinxCoroutine = "1.6.4"
 
-androidGradlePlugin = "8.1.0-alpha11"
+androidGradlePlugin = "8.0.1"
 
 androidxComposeCompiler = "1.4.7"
 androidxComposeUi = "1.4.3"
