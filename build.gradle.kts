@@ -1,7 +1,5 @@
 import com.android.build.api.dsl.LibraryExtension
 
-// Workaround for IntelliJ IDE bug https://youtrack.jetbrains.com/issue/KTIJ-19369
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
