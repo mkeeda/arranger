@@ -3,6 +3,7 @@ package dev.mkeeda.arranger.runtime
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import com.google.common.truth.Truth.assertThat
 import dev.mkeeda.arranger.runtime.node.HeadingLevel
@@ -13,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+@OptIn(ExperimentalTestApi::class)
 @RunWith(RobolectricTestRunner::class)
 class SimpleEditorTest {
 
