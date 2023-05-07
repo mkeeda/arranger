@@ -58,4 +58,3 @@ class AstNodeTest {
     }
 }
 
-private data class TestElement(override val name: String) : AstNodeElement

@@ -1,7 +1,7 @@
 package dev.mkeeda.arranger.core.node
 
 internal data class AstNode(
-    val links: AstNodeLinks,
+    val links: AstNodeLinks = AstNodeLinks(),
     val element: AstNodeElement
 ) {
     fun appendChild(newNode: AstNode) {
