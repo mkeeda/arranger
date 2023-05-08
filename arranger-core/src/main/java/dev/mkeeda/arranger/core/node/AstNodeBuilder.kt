@@ -1,10 +1,13 @@
 package dev.mkeeda.arranger.core.node
 
-internal fun AstNodeElement.toNodeWithChildrenOf(vararg childrenElements: AstNodeElement): AstNode {
+internal fun AstNodeElement.node(): AstNode {
+    return AstNode(element = this)
+}
+
+internal fun AstNodeElement.nodeWithChildrenOf(vararg children: AstNode): AstNode {
     val parentNode = AstNode(element = this)
-    for (childElement in childrenElements) {
-        val childNode = AstNode(element = childElement)
-        parentNode.appendChild(childNode)
+    for (child in children) {
+        parentNode.appendChild(child)
     }
     return parentNode
 }

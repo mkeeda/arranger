@@ -4,5 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 internal data class TextElement(
     val text: String,
-    val color: Color
-)
+    val color: Color?
+) : AstNodeElement {
+    override val name: String = "Text"
+}
