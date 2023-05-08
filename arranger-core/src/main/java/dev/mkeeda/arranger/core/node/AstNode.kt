@@ -32,22 +32,6 @@ internal data class AstNodeLinks(
 ) {
     val hasChildren: Boolean
         get() = firstChild != null && lastChild != null
-
-    /**
-     * If all pointers are checked, happens infinite loop.
-     */
-    override fun equals(other: Any?): Boolean {
-        if (other !is AstNodeLinks) {
-            return false
-        }
-        return nextSibling == other.nextSibling && firstChild == other.firstChild
-    }
-
-    override fun hashCode(): Int {
-        var result = nextSibling?.hashCode() ?: 0
-        result = 31 * result + (firstChild?.hashCode() ?: 0)
-        return result
-    }
 }
 
 internal interface AstNodeElement {
