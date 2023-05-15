@@ -19,14 +19,18 @@ class EditorStateTest {
     fun `Type characters consecutively`() {
         val state = EditorState()
 
-        val h = buildAnnotatedString { append("h") }
         state.setText(
-            TextFieldValue(
-                annotatedString = h,
+            currentValue = TextFieldValue(
+                text = "h",
                 selection = TextRange(1)
-            )
+            ),
+            editorStyle = null
         )
-        assertThat(state.richText).isEqualTo(h)
+        assertThat(state.richText).isEqualTo(
+            buildAnnotatedString {
+                append("h")
+            }
+        )
         /**
          * Root
          *   Paragraph
@@ -35,24 +39,26 @@ class EditorStateTest {
         assertThat(state.rootNode).isEqualTo(
             RootElement().nodeWithChildrenOf(
                 ParagraphElement().nodeWithChildrenOf(
-                    TextElement(text = "h", color = null).node()
+                    TextElement(text = "h", editorStyle = null).node()
                 )
             )
         )
 
-        val he = buildAnnotatedString {
-            append("h")
-            withStyle(style = SpanStyle(color = Color.Red)) {
-                append("e")
-            }
-        }
         state.setText(
-            TextFieldValue(
-                annotatedString = he,
+            currentValue = TextFieldValue(
+                text = "he",
                 selection = TextRange(2)
-            )
+            ),
+            editorStyle = ColorStyle(Color.Red)
         )
-        assertThat(state.richText).isEqualTo(he)
+        assertThat(state.richText).isEqualTo(
+            buildAnnotatedString {
+                append("h")
+                withStyle(style = SpanStyle(color = Color.Red)) {
+                    append("e")
+                }
+            }
+        )
         /**
          * Root
          *   Paragraph
@@ -62,8 +68,8 @@ class EditorStateTest {
         assertThat(state.rootNode).isEqualTo(
             RootElement().nodeWithChildrenOf(
                 ParagraphElement().nodeWithChildrenOf(
-                    TextElement(text = "h", color = null).node(),
-                    TextElement(text = "e", color = Color.Red).node(),
+                    TextElement(text = "h", editorStyle = null).node(),
+                    TextElement(text = "e", editorStyle = ColorStyle(Color.Red)).node(),
                 )
             )
         )
