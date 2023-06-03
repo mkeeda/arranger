@@ -1,21 +1,30 @@
 package dev.mkeeda.arranger.core.node
 
+import java.util.UUID
+
 internal data class AstNode(
+    val key: AstNodeKey = AstNodeKey.generate(),
     val element: AstNodeElement,
     val links: AstNodeLinks = AstNodeLinks(),
 ) {
+    init {
+        links.nodeMapStore.nodeMap[key] = this
+    }
+
     fun appendChild(newNode: AstNode) {
-        newNode.links.parent = this
+        newNode.links.parentKey = this.key
 
         if (links.hasChildren) {
-            val prevLastChild = links.lastChild!!
-            prevLastChild.links.nextSibling = newNode
-            newNode.links.prevSibling = prevLastChild
-            links.lastChild = newNode
+            val prevLastChild = links.getLastChildNode()
+            prevLastChild.links.nextSiblingKey = newNode.key
+            newNode.links.prevSiblingKey = prevLastChild.key
+            links.lastChildKey = newNode.key
         } else {
-            links.firstChild = newNode
-            links.lastChild = newNode
+            links.firstChildKey = newNode.key
+            links.lastChildKey = newNode.key
         }
+
+        links.nodeMapStore.nodeMap[newNode.key] = newNode
     }
 
     override fun toString(): String {
@@ -24,22 +33,58 @@ internal data class AstNode(
 }
 
 internal data class AstNodeLinks(
-    var parent: AstNode? = null,
-    var prevSibling: AstNode? = null,
-    var nextSibling: AstNode? = null,
-    var firstChild: AstNode? = null,
-    var lastChild: AstNode? = null
+    var parentKey: AstNodeKey? = null,
+    var prevSiblingKey: AstNodeKey? = null,
+    var nextSiblingKey: AstNodeKey? = null,
+    var firstChildKey: AstNodeKey? = null,
+    var lastChildKey: AstNodeKey? = null,
+    val nodeMapStore: AstNodeMapStore = GlobalAstNodeMapStore
 ) {
     val hasChildren: Boolean
-        get() = firstChild != null && lastChild != null
+        get() = firstChildKey != null && lastChildKey != null
+
+    fun getParentNode(): AstNode {
+        return checkNotNull(nodeMapStore.nodeMap[parentKey])
+    }
+
+    fun getPrevSiblingNode(): AstNode {
+        return checkNotNull(nodeMapStore.nodeMap[prevSiblingKey])
+    }
+
+    fun getNextSiblingNode(): AstNode {
+        return checkNotNull(nodeMapStore.nodeMap[nextSiblingKey])
+    }
+
+    fun getFirstChildNode(): AstNode {
+        return checkNotNull(nodeMapStore.nodeMap[firstChildKey])
+    }
+
+    fun getLastChildNode(): AstNode {
+        return checkNotNull(nodeMapStore.nodeMap[lastChildKey])
+    }
 }
 
 internal interface AstNodeElement {
     val name: String
 }
 
+@JvmInline
+internal value class AstNodeKey(val uuid: String) {
+    companion object {
+        fun generate(): AstNodeKey = AstNodeKey(uuid = UUID.randomUUID().toString())
+    }
+}
+
 internal fun AstNode.appendChildren(vararg children: AstNode) {
     for (child in children) {
         this.appendChild(child)
     }
+}
+
+internal interface AstNodeMapStore {
+    val nodeMap: MutableMap<AstNodeKey, AstNode>
+}
+
+internal object GlobalAstNodeMapStore : AstNodeMapStore {
+    override val nodeMap = mutableMapOf<AstNodeKey, AstNode>()
 }

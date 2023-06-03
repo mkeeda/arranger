@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
 import dev.mkeeda.arranger.core.node.AstNode
+import dev.mkeeda.arranger.core.node.AstNodeKey
 import dev.mkeeda.arranger.core.node.RootElement
 import dev.mkeeda.arranger.core.node.TextElement
 import dev.mkeeda.arranger.core.node.node
@@ -58,3 +59,8 @@ class EditorState internal constructor(
 private fun <T> CharSequence.paragraphMap(transform: (CharSequence) -> T): List<T> {
     TODO()
 }
+
+internal data class CursorPosition(
+    val nodeKey: AstNodeKey,
+    val offset: Int,
+)
