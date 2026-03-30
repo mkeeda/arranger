@@ -12,6 +12,7 @@ java {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.spotless.gradlePlugin)
 }
 
 gradlePlugin {
@@ -23,6 +24,10 @@ gradlePlugin {
         register("androidLibrary") {
             id = "arranger.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidSpotless") {
+            id = "arranger.android.spotless"
+            implementationClass = "AndroidSpotlessConventionPlugin"
         }
     }
 }
