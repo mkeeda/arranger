@@ -23,4 +23,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Arranger"
+includeBuild("build-logic")
 include(":sample-app")
