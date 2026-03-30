@@ -2,7 +2,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "com.mkeeda.arranger.buildlogic"
+group = "dev.mkeeda.arranger.buildlogic"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
