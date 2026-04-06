@@ -1,0 +1,10 @@
+package dev.mkeeda.arranger.core.text
+
+/**
+ * Interface defining a key for attributes held within RichText.
+ * By having a type-safe [defaultValue], it clearly defines the fallback value when an attribute is not set.
+ */
+public interface RichAttributeKey<T> {
+    public val name: String
+    public val defaultValue: T
+}
