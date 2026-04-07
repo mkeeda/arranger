@@ -4,42 +4,6 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
-// ==========================================
-// 1. Definition of dummy attributes (keys) for testing
-// ==========================================
-
-internal enum class TextColor { Red, Blue, Unspecified }
-
-internal object MentionAttributeKey : RichAttributeKey<String> {
-    override val name: String = "Mention"
-    override val defaultValue: String = ""
-}
-
-internal object ColorAttributeKey : RichAttributeKey<TextColor> {
-    override val name: String = "Color"
-    override val defaultValue: TextColor = TextColor.Unspecified
-}
-
-// ==========================================
-// 2. Examples of API operations using extension properties/functions
-// ==========================================
-
-internal val AttributeContainer.mention: String
-    get() = getOrDefault(MentionAttributeKey)
-
-internal val AttributeContainer.textColor: TextColor
-    get() = getOrDefault(ColorAttributeKey)
-
-internal fun AttributeContainer.withMention(username: String): AttributeContainer =
-    with(MentionAttributeKey, username)
-
-internal fun AttributeContainer.withTextColor(color: TextColor): AttributeContainer =
-    with(ColorAttributeKey, color)
-
-// ==========================================
-// 3. Test body
-// ==========================================
-
 class AttributeContainerTest {
     @Test
     fun `stores and retrieves attributes in a type-safe manner`() {
