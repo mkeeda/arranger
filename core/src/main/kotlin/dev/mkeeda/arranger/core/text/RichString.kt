@@ -23,6 +23,10 @@ public class RichString(
      * Returns a new [RichString] with the given attribute applied to the specified [range].
      */
     public fun <T> with(key: RichAttributeKey<T>, value: T, range: IntRange): RichString {
+        require(!range.isEmpty()) { "Range must not be empty: $range" }
+        require(range.first >= 0) { "Range start must not be negative: ${range.first}" }
+        require(range.last < text.length) { "Range end must be within text bounds: ${range.last} >= ${text.length}" }
+
         val newSpan =
             RichSpan(
                 range = range,

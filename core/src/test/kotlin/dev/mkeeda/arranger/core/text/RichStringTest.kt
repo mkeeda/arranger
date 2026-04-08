@@ -1,5 +1,6 @@
 package dev.mkeeda.arranger.core.text
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -71,5 +72,47 @@ class RichStringTest {
             }
         mentionSpan.range shouldBe 7..11
         mentionSpan.attributes.getOrNull(MentionAttributeKey) shouldBe "@user"
+    }
+
+    @Test
+    fun `throws IllegalArgumentException when applying to a negative range`() {
+        val richString = RichString(text = "Hello, World!")
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                richString.with(ColorAttributeKey, TextColor.Red, range = -1..3)
+            }
+        exception.message shouldBe "Range start must not be negative: -1"
+    }
+
+    @Test
+    fun `throws IllegalArgumentException when range exceeds text length`() {
+        val richString = RichString(text = "Hello")
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                richString.with(ColorAttributeKey, TextColor.Red, range = 0..5)
+            }
+        exception.message shouldBe "Range end must be within text bounds: 5 >= 5"
+    }
+
+    @Test
+    fun `throws IllegalArgumentException when range is reversed or empty`() {
+        val richString = RichString(text = "Hello, World!")
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                richString.with(ColorAttributeKey, TextColor.Red, range = 5..3)
+            }
+        exception.message shouldBe "Range must not be empty: 5..3"
+    }
+
+    @Test
+    fun `successfully applies an attribute to a 1-character range`() {
+        val richString =
+            RichString(text = "Hello")
+                .with(ColorAttributeKey, TextColor.Blue, range = 3..3)
+
+        val spans = richString.getSpans()
+        spans shouldHaveSize 1
+        spans[0].range shouldBe 3..3
+        spans[0].attributes.getOrNull(ColorAttributeKey) shouldBe TextColor.Blue
     }
 }
