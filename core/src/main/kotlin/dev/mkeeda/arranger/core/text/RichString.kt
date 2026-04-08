@@ -32,7 +32,7 @@ public class RichString(
                 range = range,
                 attributes = AttributeContainer.empty().with(key, value),
             )
-        return RichString(text = text, spans = spans + newSpan)
+        return RichString(text = text, spans = mergeSpans(spans, newSpan))
     }
 
     /**

@@ -38,6 +38,31 @@ public class AttributeContainer private constructor(
         return AttributeContainer(newAttributes)
     }
 
+    /**
+     * Returns a new [AttributeContainer] containing all attributes from this and the [other].
+     * If keys collide, values from [other] take precedence (overwrite).
+     */
+    public operator fun plus(other: AttributeContainer): AttributeContainer {
+        if (other.attributes.isEmpty()) return this
+        if (this.attributes.isEmpty()) return other
+        val newAttributes = attributes.toMutableMap()
+        newAttributes.putAll(other.attributes)
+        return AttributeContainer(newAttributes)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as AttributeContainer
+
+        return attributes == other.attributes
+    }
+
+    override fun hashCode(): Int {
+        return attributes.hashCode()
+    }
+
     public companion object {
         private val EMPTY = AttributeContainer(emptyMap())
 
