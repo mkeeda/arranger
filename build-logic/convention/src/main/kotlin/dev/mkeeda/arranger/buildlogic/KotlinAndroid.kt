@@ -24,14 +24,14 @@ private fun Project.configureKotlin() {
     // Java Toolchain による Kotlin/Java バージョン固定
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(17))
+            languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(21))
         }
     }
 
     // Kotlin コンパイルタスク共通の設定
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_21)
             freeCompilerArgs.addAll(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
