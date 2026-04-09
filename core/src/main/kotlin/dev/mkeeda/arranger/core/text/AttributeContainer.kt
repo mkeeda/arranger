@@ -29,13 +29,13 @@ public class AttributeContainer private constructor(
     }
 
     /**
-     * Returns a new [AttributeContainer] containing the specified key and value.
-     * If a key with the same name already exists, it is overwritten with the new value.
+     * Returns a new [AttributeContainer] with the specified [key] mapped to the [value].
      */
-    public fun <T> with(key: RichAttributeKey<T>, value: T): AttributeContainer {
-        val newAttributes = attributes.toMutableMap()
-        newAttributes[key] = value
-        return AttributeContainer(newAttributes)
+    public fun <T> with(
+        key: RichAttributeKey<T>,
+        value: T,
+    ): AttributeContainer {
+        return AttributeContainer(attributes = attributes + (key to value))
     }
 
     /**
@@ -45,9 +45,7 @@ public class AttributeContainer private constructor(
     public operator fun plus(other: AttributeContainer): AttributeContainer {
         if (other.attributes.isEmpty()) return this
         if (this.attributes.isEmpty()) return other
-        val newAttributes = attributes.toMutableMap()
-        newAttributes.putAll(other.attributes)
-        return AttributeContainer(newAttributes)
+        return AttributeContainer(attributes = attributes + other.attributes)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -64,7 +62,7 @@ public class AttributeContainer private constructor(
     }
 
     public companion object {
-        private val EMPTY = AttributeContainer(emptyMap())
+        private val EMPTY = AttributeContainer(attributes = emptyMap())
 
         /**
          * Gets an empty [AttributeContainer].

@@ -28,14 +28,16 @@ internal fun mergeSpans(existingSpans: List<RichSpan>, newSpan: RichSpan): List<
     if (existingSpans.isEmpty()) return listOf(newSpan)
 
     // 1. Extract boundaries and sort uniquely
-    val boundaries = mutableListOf<Int>()
-    boundaries.add(newSpan.range.first)
-    boundaries.add(newSpan.range.last + 1)
+    val boundaries =
+        buildList {
+            add(newSpan.range.first)
+            add(newSpan.range.last + 1)
 
-    for (span in existingSpans) {
-        boundaries.add(span.range.first)
-        boundaries.add(span.range.last + 1)
-    }
+            for (span in existingSpans) {
+                add(span.range.first)
+                add(span.range.last + 1)
+            }
+        }
 
     val sortedBoundaries = boundaries.distinct().sorted()
 
