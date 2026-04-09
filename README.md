@@ -21,7 +21,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ### Pure Kotlin Core (Data Structures)
 * **`RichTextBuffer`**: An abstraction interface for the underlying string storage. The MVP will use a simple implementation, but it is designed to be replaceable with advanced structures (like Rope or Piece Table) for handling massive documents in the future.
-* **`RichAttributeKey<T>`**: Defines the data type of an attribute.
+* **`AttributeKey<T>`**: Defines the data type of an attribute.
 * **`RichString` & `RichRun`**: Immutable representations of text and its semantic chunks.
 * **`AttributeRangedTree`**: An internal data structure (like an Interval Tree) to manage attributes by range, independent of string indices.
 
@@ -31,7 +31,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 * **`ArrangerEditor`**: A simple, declarative Composable wrapping `BasicTextField` with our state and transformation.
 
 ## Roadmap
-* **The Core (Pure Kotlin):** Build the `RichTextBuffer` abstraction, `AttributeRangedTree`, and `RichAttributeKey` infrastructure.
+* **The Core (Pure Kotlin):** Build the `RichTextBuffer` abstraction, `AttributeRangedTree`, and `AttributeKey` infrastructure.
 * **Runs API:** Implement logic to chunk strings into semantic `RichRun` iterators.
 * **Compose Integration:** Hook into `TextFieldBuffer` changes to shift/update the attribute tree indices reliably.
 * **Formatting Constraints:** Implement clipboard parsing and filtering using `InputTransformation`.
