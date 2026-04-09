@@ -4,14 +4,14 @@ package dev.mkeeda.arranger.core.text
  * An immutable container that holds attribute keys and their values in a type-safe manner.
  */
 public class AttributeContainer private constructor(
-    private val attributes: Map<RichAttributeKey<*>, Any?>,
+    private val attributes: Map<AttributeKey<*>, Any?>,
 ) {
     /**
      * Retrieves the attribute value for the specified key.
-     * If not set, it returns the [RichAttributeKey.defaultValue] defined in the key.
+     * If not set, it returns the [AttributeKey.defaultValue] defined in the key.
      */
     @Suppress("UNCHECKED_CAST")
-    public fun <T> getOrDefault(key: RichAttributeKey<T>): T {
+    public fun <T> getOrDefault(key: AttributeKey<T>): T {
         return if (attributes.containsKey(key)) {
             attributes[key] as T
         } else {
@@ -24,7 +24,7 @@ public class AttributeContainer private constructor(
      * If not set, it returns null.
      */
     @Suppress("UNCHECKED_CAST")
-    public fun <T> getOrNull(key: RichAttributeKey<T>): T? {
+    public fun <T> getOrNull(key: AttributeKey<T>): T? {
         return attributes[key] as T?
     }
 
@@ -32,7 +32,7 @@ public class AttributeContainer private constructor(
      * Returns a new [AttributeContainer] with the specified [key] mapped to the [value].
      */
     public fun <T> with(
-        key: RichAttributeKey<T>,
+        key: AttributeKey<T>,
         value: T,
     ): AttributeContainer {
         return AttributeContainer(attributes = attributes + (key to value))

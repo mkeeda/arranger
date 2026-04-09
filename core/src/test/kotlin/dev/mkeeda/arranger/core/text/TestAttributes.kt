@@ -4,12 +4,12 @@ package dev.mkeeda.arranger.core.text
 
 internal enum class TextColor { Red, Blue, Unspecified }
 
-internal object MentionAttributeKey : RichAttributeKey<String> {
+internal object MentionAttributeKey : AttributeKey<String> {
     override val name: String = "Mention"
     override val defaultValue: String = ""
 }
 
-internal object ColorAttributeKey : RichAttributeKey<TextColor> {
+internal object ColorAttributeKey : AttributeKey<TextColor> {
     override val name: String = "Color"
     override val defaultValue: TextColor = TextColor.Unspecified
 }
