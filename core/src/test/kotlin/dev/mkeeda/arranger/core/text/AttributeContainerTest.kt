@@ -9,9 +9,10 @@ class AttributeContainerTest {
     @Test
     fun `stores and retrieves attributes in a type-safe manner`() {
         val container =
-            AttributeContainer.empty()
-                .plus(MentionAttributeKey, "@mkeeda")
-                .plus(ColorAttributeKey, TextColor.Red)
+            attributeContainerOf(
+                MentionAttributeKey to "@mkeeda",
+                ColorAttributeKey to TextColor.Red,
+            )
 
         val mention: String? = container.getOrNull(MentionAttributeKey)
         val color: TextColor? = container.getOrNull(ColorAttributeKey)
@@ -23,9 +24,10 @@ class AttributeContainerTest {
     @Test
     fun `provides intuitive and type-safe access using extension functions and properties`() {
         val container =
-            AttributeContainer.empty()
-                .plusMention("@mkeeda")
-                .plusTextColor(TextColor.Blue)
+            attributeContainerOf(
+                MentionAttributeKey to "@mkeeda",
+                ColorAttributeKey to TextColor.Blue,
+            )
 
         container.mention shouldBe "@mkeeda"
         container.textColor shouldBe TextColor.Blue
@@ -33,7 +35,7 @@ class AttributeContainerTest {
 
     @Test
     fun `returns defaultValue or null when retrieving an unset attribute`() {
-        val emptyContainer = AttributeContainer.empty()
+        val emptyContainer = attributeContainerOf()
 
         // getOrDefault
         emptyContainer.getOrDefault(MentionAttributeKey) shouldBe ""
@@ -47,16 +49,17 @@ class AttributeContainerTest {
     @Test
     fun `retains the newly set value when overwriting an attribute with the same name`() {
         val container =
-            AttributeContainer.empty()
-                .plusTextColor(TextColor.Red)
-                .plusTextColor(TextColor.Blue)
+            attributeContainerOf(
+                ColorAttributeKey to TextColor.Red,
+                ColorAttributeKey to TextColor.Blue,
+            )
 
         container.textColor shouldBe TextColor.Blue
     }
 
     @Test
     fun `plus returns new container maintaining immutability`() {
-        val c1 = AttributeContainer.empty()
+        val c1 = attributeContainerOf()
         val c2 = c1.plus(MentionAttributeKey, "@all")
         val c3 = c2.plus(ColorAttributeKey, TextColor.Red)
 
@@ -71,8 +74,8 @@ class AttributeContainerTest {
 
     @Test
     fun `plus operator merges two containers properly`() {
-        val c1 = AttributeContainer.empty().plusMention("@mkeeda")
-        val c2 = AttributeContainer.empty().plusTextColor(TextColor.Blue)
+        val c1 = attributeContainerOf(MentionAttributeKey to "@mkeeda")
+        val c2 = attributeContainerOf(ColorAttributeKey to TextColor.Blue)
 
         val merged = c1 + c2
 
@@ -82,16 +85,16 @@ class AttributeContainerTest {
 
     @Test
     fun `isEmpty correctly reports empty state`() {
-        val empty = AttributeContainer.empty()
+        val empty = attributeContainerOf()
         empty.isEmpty() shouldBe true
 
-        val notEmpty = empty.plusMention("@user")
+        val notEmpty = empty + (MentionAttributeKey to "@user")
         notEmpty.isEmpty() shouldBe false
     }
 
     @Test
     fun `minus correctly removes attribute and maintains immutability`() {
-        val c1 = AttributeContainer.empty().plusMention("@user").plusTextColor(TextColor.Red)
+        val c1 = attributeContainerOf(MentionAttributeKey to "@user", ColorAttributeKey to TextColor.Red)
 
         val c2 = c1 - ColorAttributeKey
 
@@ -102,9 +105,26 @@ class AttributeContainerTest {
 
     @Test
     fun `minus on missing key returns same instance`() {
-        val c1 = AttributeContainer.empty().plusMention("@user")
+        val c1 = attributeContainerOf(MentionAttributeKey to "@user")
         val c2 = c1 - ColorAttributeKey
 
         c2 shouldBeSameInstanceAs c1
+    }
+
+    @Test
+    fun `attributeContainerOf factory functions create correct containers type-safely`() {
+        val empty = attributeContainerOf()
+        empty.isEmpty() shouldBe true
+
+        val onePair = attributeContainerOf(MentionAttributeKey to "@user")
+        onePair.getOrNull(MentionAttributeKey) shouldBe "@user"
+
+        val twoPairs =
+            attributeContainerOf(
+                MentionAttributeKey to "@mkeeda",
+                ColorAttributeKey to TextColor.Red,
+            )
+        twoPairs.getOrNull(MentionAttributeKey) shouldBe "@mkeeda"
+        twoPairs.getOrNull(ColorAttributeKey) shouldBe TextColor.Red
     }
 }

@@ -21,9 +21,3 @@ internal val AttributeContainer.mention: String
 
 internal val AttributeContainer.textColor: TextColor
     get() = getOrDefault(ColorAttributeKey)
-
-internal fun AttributeContainer.plusMention(username: String): AttributeContainer =
-    plus(MentionAttributeKey, username)
-
-internal fun AttributeContainer.plusTextColor(color: TextColor): AttributeContainer =
-    plus(ColorAttributeKey, color)

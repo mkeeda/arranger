@@ -88,3 +88,42 @@ public class AttributeContainer private constructor(
         public fun empty(): AttributeContainer = EMPTY
     }
 }
+
+/**
+ * Returns an empty [AttributeContainer].
+ */
+public fun attributeContainerOf(): AttributeContainer = AttributeContainer.empty()
+
+/**
+ * Returns a new [AttributeContainer] containing the specified key-value [p1].
+ */
+public fun <T> attributeContainerOf(
+    p1: Pair<AttributeKey<T>, T>,
+): AttributeContainer = AttributeContainer.empty() + p1
+
+/**
+ * Returns a new [AttributeContainer] containing the specified key-value pairs.
+ */
+public fun <T1, T2> attributeContainerOf(
+    p1: Pair<AttributeKey<T1>, T1>,
+    p2: Pair<AttributeKey<T2>, T2>,
+): AttributeContainer = AttributeContainer.empty() + p1 + p2
+
+/**
+ * Returns a new [AttributeContainer] containing the specified key-value pairs.
+ */
+public fun <T1, T2, T3> attributeContainerOf(
+    p1: Pair<AttributeKey<T1>, T1>,
+    p2: Pair<AttributeKey<T2>, T2>,
+    p3: Pair<AttributeKey<T3>, T3>,
+): AttributeContainer = AttributeContainer.empty() + p1 + p2 + p3
+
+/**
+ * Returns a new [AttributeContainer] containing the specified key-value pairs.
+ */
+public fun <T1, T2, T3, T4> attributeContainerOf(
+    p1: Pair<AttributeKey<T1>, T1>,
+    p2: Pair<AttributeKey<T2>, T2>,
+    p3: Pair<AttributeKey<T3>, T3>,
+    p4: Pair<AttributeKey<T4>, T4>,
+): AttributeContainer = AttributeContainer.empty() + p1 + p2 + p3 + p4
