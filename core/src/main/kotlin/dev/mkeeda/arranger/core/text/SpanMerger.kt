@@ -24,14 +24,14 @@ internal fun List<RichSpan>.transformSpans(
     transform: (AttributeContainer) -> AttributeContainer,
 ): List<RichSpan> {
     if (this.isEmpty() && targetRange.isEmpty()) return emptyList()
-    val nonEmptytargetRange = if (targetRange.isEmpty()) null else targetRange
+    val nonEmptyTargetRange = if (targetRange.isEmpty()) null else targetRange
 
     // 1. Extract boundaries and sort uniquely
     val boundaries =
         buildList {
-            if (nonEmptytargetRange != null) {
-                add(nonEmptytargetRange.first)
-                add(nonEmptytargetRange.last + 1)
+            if (nonEmptyTargetRange != null) {
+                add(nonEmptyTargetRange.first)
+                add(nonEmptyTargetRange.last + 1)
             }
 
             for (span in this@transformSpans) {
@@ -58,7 +58,7 @@ internal fun List<RichSpan>.transformSpans(
             currentSpanIndex++
         }
 
-        val isInsideTarget = nonEmptytargetRange != null && chunkStart >= nonEmptytargetRange.first && chunkEnd <= nonEmptytargetRange.last
+        val isInsideTarget = nonEmptyTargetRange != null && chunkStart >= nonEmptyTargetRange.first && chunkEnd <= nonEmptyTargetRange.last
 
         val isInsideExistingSpan =
             currentSpanIndex < this.size &&
@@ -107,7 +107,7 @@ internal fun List<RichSpan>.transformSpans(
  * Convenience extension that wraps [transformSpans].
  */
 internal fun List<RichSpan>.mergeSpan(newSpan: RichSpan): List<RichSpan> {
-    return transformSpans(newSpan.range) { existingAttributes ->
+    return transformSpans(targetRange = newSpan.range) { existingAttributes ->
         existingAttributes + newSpan.attributes
     }
 }

@@ -21,7 +21,7 @@ public class RichString(
             if (text.isEmpty() || initialAttributes.isEmpty()) {
                 emptyList()
             } else {
-                listOf(RichSpan(text.indices, initialAttributes))
+                listOf(RichSpan(range = text.indices, attributes = initialAttributes))
             },
     )
 
@@ -39,7 +39,7 @@ public class RichString(
         // Isolate the requested attribute, allowing `transformSpans` to automatically
         // drop spans where it is absent and coalesce contiguous spans where the value is identical.
         val isolatedSpans =
-            spans.transformSpans(text.indices) { attributes ->
+            spans.transformSpans(targetRange = text.indices) { attributes ->
                 val value = attributes.getOrNull(key)
                 if (value != null) {
                     AttributeContainer.empty().plus(key, value)

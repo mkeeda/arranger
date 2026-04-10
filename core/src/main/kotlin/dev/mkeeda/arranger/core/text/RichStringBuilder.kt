@@ -20,7 +20,7 @@ public class RichStringBuilder internal constructor(
     ) {
         checkRange(range)
         currentSpans =
-            currentSpans.transformSpans(range) { attributes ->
+            currentSpans.transformSpans(targetRange = range) { attributes ->
                 attributes.plus(key, value)
             }
     }
@@ -34,7 +34,7 @@ public class RichStringBuilder internal constructor(
     ) {
         checkRange(range)
         currentSpans =
-            currentSpans.transformSpans(range) { attributes ->
+            currentSpans.transformSpans(targetRange = range) { attributes ->
                 attributes - key
             }
     }
