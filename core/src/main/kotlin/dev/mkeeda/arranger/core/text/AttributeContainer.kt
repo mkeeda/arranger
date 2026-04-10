@@ -49,14 +49,6 @@ public class AttributeContainer private constructor(
     public operator fun <T> plus(pair: Pair<AttributeKey<T>, T>): AttributeContainer = plus(pair.first, pair.second)
 
     /**
-     * Returns a new [AttributeContainer] with the specified [key] removed.
-     */
-    public operator fun <T> minus(key: AttributeKey<T>): AttributeContainer {
-        if (!attributes.containsKey(key)) return this
-        return AttributeContainer(attributes = attributes - key)
-    }
-
-    /**
      * Returns a new [AttributeContainer] containing all attributes from this and the [other].
      * If keys collide, values from [other] take precedence (overwrite).
      */
@@ -64,6 +56,14 @@ public class AttributeContainer private constructor(
         if (other.attributes.isEmpty()) return this
         if (this.attributes.isEmpty()) return other
         return AttributeContainer(attributes = attributes + other.attributes)
+    }
+
+    /**
+     * Returns a new [AttributeContainer] with the specified [key] removed.
+     */
+    public operator fun <T> minus(key: AttributeKey<T>): AttributeContainer {
+        if (!attributes.containsKey(key)) return this
+        return AttributeContainer(attributes = attributes - key)
     }
 
     override fun equals(other: Any?): Boolean {
