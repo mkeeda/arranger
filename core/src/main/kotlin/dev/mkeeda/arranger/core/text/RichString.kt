@@ -13,30 +13,58 @@ public class RichString(
     private val spans: List<RichSpan> = emptyList(),
 ) {
     /**
-     * Returns a new [RichString] with the given attribute applied to the entire text.
+     * Creates a new [RichString] having the given [initialAttributes] applied to the entire text.
      */
-    public fun <T> with(key: AttributeKey<T>, value: T): RichString {
-        return with(key, value, range = text.indices)
-    }
-
-    /**
-     * Returns a new [RichString] with the given attribute applied to the specified [range].
-     */
-    public fun <T> with(key: AttributeKey<T>, value: T, range: IntRange): RichString {
-        require(!range.isEmpty()) { "Range must not be empty: $range" }
-        require(range.first >= 0) { "Range start must not be negative: ${range.first}" }
-        require(range.last < text.length) { "Range end must be within text bounds: ${range.last} >= ${text.length}" }
-
-        val newSpan =
-            RichSpan(
-                range = range,
-                attributes = AttributeContainer.empty().with(key, value),
-            )
-        return RichString(text = text, spans = mergeSpans(spans, newSpan))
-    }
+    public constructor(text: String, initialAttributes: AttributeContainer) : this(
+        text = text,
+        spans =
+            if (text.isEmpty() || initialAttributes.isEmpty()) {
+                emptyList()
+            } else {
+                listOf(RichSpan(text.indices, initialAttributes))
+            },
+    )
 
     /**
      * Returns a snapshot of all [RichSpan]s currently held by this [RichString].
      */
     public fun getSpans(): List<RichSpan> = spans
+
+    /**
+     * Retrieves all contiguous runs of the requested attribute [key], merging internally split spans.
+     * Adjacent internal spans that possess the EXACT SAME attribute value for [key] will be combined
+     * into a single [RichRun], ignoring differences in other attributes.
+     */
+    public fun <T> runs(key: AttributeKey<T>): List<RichRun<T>> {
+        // Isolate the requested attribute, allowing `transformSpans` to automatically
+        // drop spans where it is absent and coalesce contiguous spans where the value is identical.
+        val isolatedSpans =
+            spans.transformSpans(text.indices) { attributes ->
+                val value = attributes.getOrNull(key)
+                if (value != null) {
+                    AttributeContainer.empty().plus(key, value)
+                } else {
+                    AttributeContainer.empty()
+                }
+            }
+
+        return isolatedSpans.map { span ->
+            @Suppress("UNCHECKED_CAST")
+            RichRun(
+                text = text.substring(span.range),
+                range = span.range,
+                value = span.attributes.getOrNull(key) as T,
+            )
+        }
+    }
+
+    /**
+     * Executes the given [block] on a [RichStringBuilder] scoped to this [RichString],
+     * and returns a completely new [RichString] carrying the modifications.
+     */
+    public fun edit(block: RichStringBuilder.() -> Unit): RichString {
+        val builder = RichStringBuilder(currentSpans = spans, textLength = text.length)
+        builder.block()
+        return builder.build(text = text)
+    }
 }

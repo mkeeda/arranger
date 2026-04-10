@@ -29,13 +29,31 @@ public class AttributeContainer private constructor(
     }
 
     /**
+     * Returns true if this container contains no attributes.
+     */
+    public fun isEmpty(): Boolean = attributes.isEmpty()
+
+    /**
      * Returns a new [AttributeContainer] with the specified [key] mapped to the [value].
      */
-    public fun <T> with(
+    public fun <T> plus(
         key: AttributeKey<T>,
         value: T,
     ): AttributeContainer {
         return AttributeContainer(attributes = attributes + (key to value))
+    }
+
+    /**
+     * Returns a new [AttributeContainer] with the specified key-value [pair].
+     */
+    public operator fun <T> plus(pair: Pair<AttributeKey<T>, T>): AttributeContainer = plus(pair.first, pair.second)
+
+    /**
+     * Returns a new [AttributeContainer] with the specified [key] removed.
+     */
+    public operator fun <T> minus(key: AttributeKey<T>): AttributeContainer {
+        if (!attributes.containsKey(key)) return this
+        return AttributeContainer(attributes = attributes - key)
     }
 
     /**
