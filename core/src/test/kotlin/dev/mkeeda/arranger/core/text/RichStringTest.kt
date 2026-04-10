@@ -52,8 +52,10 @@ class RichStringTest {
     fun `applies multiple different attributes to different ranges`() {
         val richString =
             RichString(text = "Hello, World!")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4) }
-                .edit { setAttribute(MentionAttributeKey, "@user", range = 7..11) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4)
+                    setAttribute(MentionAttributeKey, "@user", range = 7..11)
+                }
 
         richString.text shouldBe "Hello, World!"
         val spans = richString.getSpans()
@@ -125,8 +127,10 @@ class RichStringTest {
         // [11..15] Mention=@user
         val richString =
             RichString("1234567890123456")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..10) }
-                .edit { setAttribute(MentionAttributeKey, "@user", range = 5..15) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..10)
+                    setAttribute(MentionAttributeKey, "@user", range = 5..15)
+                }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 3
@@ -153,8 +157,10 @@ class RichStringTest {
         // [8..10] Color=Red
         val richString =
             RichString("12345678901")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..10) }
-                .edit { setAttribute(MentionAttributeKey, "@user", range = 3..7) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..10)
+                    setAttribute(MentionAttributeKey, "@user", range = 3..7)
+                }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 3
@@ -176,8 +182,10 @@ class RichStringTest {
     fun `overwrites completely when same attribute key is applied over existing span`() {
         val richString =
             RichString("12345678901")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..10) }
-                .edit { setAttribute(ColorAttributeKey, TextColor.Blue, range = 0..10) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..10)
+                    setAttribute(ColorAttributeKey, TextColor.Blue, range = 0..10)
+                }
 
         // It should perfectly replace the attribute and optimize back to 1 span
         val spans = richString.getSpans()
@@ -199,9 +207,11 @@ class RichStringTest {
         // [11..12] Color=Red
         val richString =
             RichString("1234567890123")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4) }
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 8..12) }
-                .edit { setAttribute(MentionAttributeKey, "@user", range = 2..10) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4)
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 8..12)
+                    setAttribute(MentionAttributeKey, "@user", range = 2..10)
+                }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 5
@@ -226,8 +236,10 @@ class RichStringTest {
     fun `merges adjacent spans when attributes are perfectly identical`() {
         val richString =
             RichString("12345678901")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4) }
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 5..10) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4)
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 5..10)
+                }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 1
@@ -243,11 +255,13 @@ class RichStringTest {
         // [16..19] Mention=@other_user
         val richString =
             RichString("12345678901234567890")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4) }
-                .edit { setAttribute(MentionAttributeKey, "@user", range = 5..9) }
-                .edit { setAttribute(MentionAttributeKey, "@user", range = 10..15) }
-                .edit { setAttribute(ColorAttributeKey, TextColor.Blue, range = 10..15) }
-                .edit { setAttribute(MentionAttributeKey, "@other_user", range = 16..19) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..4)
+                    setAttribute(MentionAttributeKey, "@user", range = 5..9)
+                    setAttribute(MentionAttributeKey, "@user", range = 10..15)
+                    setAttribute(ColorAttributeKey, TextColor.Blue, range = 10..15)
+                    setAttribute(MentionAttributeKey, "@other_user", range = 16..19)
+                }
 
         // There should be 4 internal spans: [0..4], [5..9], [10..15], [16..19]
         richString.getSpans() shouldHaveSize 4
@@ -271,9 +285,11 @@ class RichStringTest {
     fun `runs handles gaps correctly and only returns regions with the attribute`() {
         val richString =
             RichString("01234567890123456789") // length 20
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 2..4) }
-                .edit { setAttribute(ColorAttributeKey, TextColor.Blue, range = 8..10) }
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 15..19) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 2..4)
+                    setAttribute(ColorAttributeKey, TextColor.Blue, range = 8..10)
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 15..19)
+                }
 
         val colorRuns = richString.runs(ColorAttributeKey)
 
@@ -293,8 +309,10 @@ class RichStringTest {
     fun `edit block allows building new RichString with multiple operations safely`() {
         val original =
             RichString("12345678901234567890")
-                .edit { setAttribute(ColorAttributeKey, TextColor.Red, range = 0..9) }
-                .edit { setAttribute(ColorAttributeKey, TextColor.Blue, range = 10..19) }
+                .edit {
+                    setAttribute(ColorAttributeKey, TextColor.Red, range = 0..9)
+                    setAttribute(ColorAttributeKey, TextColor.Blue, range = 10..19)
+                }
 
         val edited =
             original.edit {
@@ -331,7 +349,7 @@ class RichStringTest {
 
     @Test
     fun `edit block handles empty spans and no-op correctly`() {
-        val original = RichString("hello").edit { setAttribute(ColorAttributeKey, TextColor.Red) }
+        val original = RichString("hello", attributeContainerOf(ColorAttributeKey to TextColor.Red))
         val edited =
             original.edit {
                 // Do nothing
