@@ -32,8 +32,42 @@ class RichTextState(initialText: RichString) {
     internal fun updateRichString(buffer: TextFieldBuffer) {
         if (buffer.changes.changeCount == 0) return
 
-        // TODO: In subsequent steps, shift spans based on buffer.changes
-        // Sub-step 1: Just allow simple insertion, spans remain unchanged (or handled naively)
-        // Since Sub-step 1 is without attributes, doing nothing to `spans` is actually correct for now.
+        var newSpans = spans
+
+        for (i in 0 until buffer.changes.changeCount) {
+            val originalRange = buffer.changes.getOriginalRange(i)
+            val range = buffer.changes.getRange(i)
+
+            // Sub-step 2 handles basic insertions: originalRange is empty, range is not empty
+            if (originalRange.collapsed && !range.collapsed) {
+                val insertPos = originalRange.start
+                val length = range.length
+
+                newSpans =
+                    newSpans.map { span ->
+                        val spanStart = span.range.first
+                        val spanEnd = span.range.last
+
+                        when {
+                            insertPos <= spanStart -> {
+                                // Inserted before or exactly at the start of the span
+                                // Shift the entire span to the right
+                                span.copy(range = (spanStart + length)..(spanEnd + length))
+                            }
+                            insertPos <= spanEnd -> {
+                                // Inserted inside the span or exactly at its end
+                                // Expand the span
+                                span.copy(range = spanStart..(spanEnd + length))
+                            }
+                            else -> {
+                                // Inserted after the span
+                                span
+                            }
+                        }
+                    }
+            }
+        }
+
+        this.spans = newSpans
     }
 }

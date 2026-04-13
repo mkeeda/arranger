@@ -2,11 +2,17 @@ package dev.mkeeda.arranger.ui.state
 
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.insert
+import dev.mkeeda.arranger.core.text.AttributeKey
 import dev.mkeeda.arranger.core.text.RichString
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
 class RichTextStateTest {
+    private object BoldAttributeKey : AttributeKey<Unit> {
+        override val name: String = "Bold"
+        override val defaultValue: Unit = Unit
+    }
+
     @Test
     fun `inserts simple text without attributes`() {
         val state = RichTextState(initialText = RichString(text = "Hello World"))
@@ -17,6 +23,63 @@ class RichTextStateTest {
 
         state.textFieldState.text.toString() shouldBe "Hello My World"
         state.richString.text shouldBe "Hello My World"
+    }
+
+    @Test
+    fun `inserts text before an attribute range`() {
+        val initialText =
+            RichString(text = "Hello World").edit {
+                setAttribute(BoldAttributeKey, Unit, range = 6..10)
+            }
+        val state = RichTextState(initialText = initialText)
+
+        state.simulateTextEdit {
+            insert(0, "Oh, ")
+        }
+
+        val spans = state.richString.getSpans()
+        spans.size shouldBe 1
+        spans.first().range shouldBe 10..14
+
+        state.richString.text shouldBe "Oh, Hello World"
+    }
+
+    @Test
+    fun `inserts text inside an attribute range`() {
+        val initialText =
+            RichString(text = "Hello World").edit {
+                setAttribute(BoldAttributeKey, Unit, range = 6..10)
+            }
+        val state = RichTextState(initialText = initialText)
+
+        state.simulateTextEdit {
+            insert(9, "!")
+        }
+
+        val spans = state.richString.getSpans()
+        spans.size shouldBe 1
+        spans.first().range shouldBe 6..11
+
+        state.richString.text shouldBe "Hello Wor!ld"
+    }
+
+    @Test
+    fun `inserts text after an attribute range`() {
+        val initialText =
+            RichString(text = "Hello World").edit {
+                setAttribute(BoldAttributeKey, Unit, range = 0..4)
+            }
+        val state = RichTextState(initialText = initialText)
+
+        state.simulateTextEdit {
+            insert(11, "!")
+        }
+
+        val spans = state.richString.getSpans()
+        spans.size shouldBe 1
+        spans.first().range shouldBe 0..4
+
+        state.richString.text shouldBe "Hello World!"
     }
 }
 
