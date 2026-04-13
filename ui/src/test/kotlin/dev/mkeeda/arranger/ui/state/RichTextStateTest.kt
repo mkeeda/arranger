@@ -16,133 +16,185 @@ class RichTextStateTest {
 
     @Test
     fun `inserts simple text without attributes`() {
-        val state = RichTextState(initialText = RichString(text = "Hello World"))
+        val initialText = "Hello World"
+        val state = RichTextState(initialText = RichString(text = initialText))
 
         state.simulateTextEdit {
-            insert(5, " My")
+            insertAfter(substring = "Hello", textToInsert = " My")
         }
 
-        state.textFieldState.text.toString() shouldBe "Hello My World"
-        state.richString.text shouldBe "Hello My World"
+        val expectedText = "Hello My World"
+        state.textFieldState.text.toString() shouldBe expectedText
+        state.richString.text shouldBe expectedText
     }
 
     @Test
     fun `inserts text before an attribute range`() {
-        val initialText =
-            RichString(text = "Hello World").edit {
-                setAttribute(BoldAttributeKey, Unit, range = 6..10)
-            }
-        val state = RichTextState(initialText = initialText)
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                    },
+            )
 
         state.simulateTextEdit {
-            insert(0, "Oh, ")
+            insertBefore(substring = "Hello", textToInsert = "Oh, ")
         }
+
+        val expectedText = "Oh, Hello World"
+        state.richString.text shouldBe expectedText
 
         val spans = state.richString.getSpans()
         spans.size shouldBe 1
-        spans.first().range shouldBe 10..14
-
-        state.richString.text shouldBe "Oh, Hello World"
+        spans.first().range shouldBe expectedText.rangeOf("World")
     }
 
     @Test
     fun `inserts text inside an attribute range`() {
-        val initialText =
-            RichString(text = "Hello World").edit {
-                setAttribute(BoldAttributeKey, Unit, range = 6..10)
-            }
-        val state = RichTextState(initialText = initialText)
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                    },
+            )
 
         state.simulateTextEdit {
-            insert(9, "!")
+            insertAfter(substring = "Wor", textToInsert = "!")
         }
+
+        val expectedText = "Hello Wor!ld"
+        state.richString.text shouldBe expectedText
 
         val spans = state.richString.getSpans()
         spans.size shouldBe 1
-        spans.first().range shouldBe 6..11
-
-        state.richString.text shouldBe "Hello Wor!ld"
+        spans.first().range shouldBe expectedText.rangeOf("Wor!ld")
     }
 
     @Test
     fun `inserts text after an attribute range`() {
-        val initialText =
-            RichString(text = "Hello World").edit {
-                setAttribute(BoldAttributeKey, Unit, range = 0..4)
-            }
-        val state = RichTextState(initialText = initialText)
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("Hello"))
+                    },
+            )
 
         state.simulateTextEdit {
-            insert(11, "!")
+            insertAfter(substring = "World", textToInsert = "!")
         }
+
+        val expectedText = "Hello World!"
+        state.richString.text shouldBe expectedText
 
         val spans = state.richString.getSpans()
         spans.size shouldBe 1
-        spans.first().range shouldBe 0..4
-
-        state.richString.text shouldBe "Hello World!"
+        spans.first().range shouldBe expectedText.rangeOf("Hello")
     }
 
     @Test
     fun `deletes text before an attribute range`() {
-        val initialText =
-            RichString(text = "Oh, Hello World").edit {
-                setAttribute(BoldAttributeKey, Unit, range = 10..14)
-            }
-        val state = RichTextState(initialText = initialText)
+        val initialText = "Oh, Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                    },
+            )
 
         state.simulateTextEdit {
-            delete(0, 4) // Deletes "Oh, "
+            deleteSubstring("Oh, ")
         }
+
+        val expectedText = "Hello World"
+        state.richString.text shouldBe expectedText
 
         val spans = state.richString.getSpans()
         spans.size shouldBe 1
-        spans.first().range shouldBe 6..10
-
-        state.richString.text shouldBe "Hello World"
+        spans.first().range shouldBe expectedText.rangeOf("World")
     }
 
     @Test
     fun `deletes text inside an attribute range`() {
-        val initialText =
-            RichString(text = "Hello Wor!ld").edit {
-                setAttribute(BoldAttributeKey, Unit, range = 6..11)
-            }
-        val state = RichTextState(initialText = initialText)
+        val initialText = "Hello Wor!ld"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("Wor!ld"))
+                    },
+            )
 
         state.simulateTextEdit {
-            delete(9, 10) // Deletes "!"
+            deleteSubstring("!")
         }
+
+        val expectedText = "Hello World"
+        state.richString.text shouldBe expectedText
 
         val spans = state.richString.getSpans()
         spans.size shouldBe 1
-        spans.first().range shouldBe 6..10
-
-        state.richString.text shouldBe "Hello World"
+        spans.first().range shouldBe expectedText.rangeOf("World")
     }
 
     @Test
     fun `deletes entire text of an attribute range`() {
-        val initialText =
-            RichString(text = "Hello World").edit {
-                setAttribute(BoldAttributeKey, Unit, range = 6..10)
-            }
-        val state = RichTextState(initialText = initialText)
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                    },
+            )
 
         state.simulateTextEdit {
-            delete(6, 11) // Deletes "World"
+            deleteSubstring("World")
         }
+
+        val expectedText = "Hello "
+        state.richString.text shouldBe expectedText
 
         val spans = state.richString.getSpans()
         spans.isEmpty() shouldBe true
-
-        state.richString.text shouldBe "Hello "
     }
 }
+
+// --- Test Helpers ---
 
 internal fun RichTextState.simulateTextEdit(block: TextFieldBuffer.() -> Unit) {
     textFieldState.edit {
         block()
         updateRichString(this)
     }
+}
+
+private fun String.rangeOf(substring: String): IntRange {
+    val startIndex = this.indexOf(substring)
+    require(startIndex >= 0) { "Substring '$substring' not found in '$this'" }
+    return startIndex until (startIndex + substring.length)
+}
+
+private fun TextFieldBuffer.insertAfter(substring: String, textToInsert: String) {
+    val index = originalText.indexOf(substring)
+    require(index >= 0) { "Substring '$substring' not found in '$originalText'" }
+    insert(index + substring.length, textToInsert)
+}
+
+private fun TextFieldBuffer.insertBefore(substring: String, textToInsert: String) {
+    val index = originalText.indexOf(substring)
+    require(index >= 0) { "Substring '$substring' not found in '$originalText'" }
+    insert(index, textToInsert)
+}
+
+private fun TextFieldBuffer.deleteSubstring(substring: String) {
+    val index = originalText.indexOf(substring)
+    require(index >= 0) { "Substring '$substring' not found in '$originalText'" }
+    delete(index, index + substring.length)
 }
