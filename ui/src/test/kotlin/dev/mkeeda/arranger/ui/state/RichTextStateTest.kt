@@ -1,6 +1,7 @@
 package dev.mkeeda.arranger.ui.state
 
 import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
 import dev.mkeeda.arranger.core.text.AttributeKey
 import dev.mkeeda.arranger.core.text.RichString
@@ -80,6 +81,62 @@ class RichTextStateTest {
         spans.first().range shouldBe 0..4
 
         state.richString.text shouldBe "Hello World!"
+    }
+
+    @Test
+    fun `deletes text before an attribute range`() {
+        val initialText =
+            RichString(text = "Oh, Hello World").edit {
+                setAttribute(BoldAttributeKey, Unit, range = 10..14)
+            }
+        val state = RichTextState(initialText = initialText)
+
+        state.simulateTextEdit {
+            delete(0, 4) // Deletes "Oh, "
+        }
+
+        val spans = state.richString.getSpans()
+        spans.size shouldBe 1
+        spans.first().range shouldBe 6..10
+
+        state.richString.text shouldBe "Hello World"
+    }
+
+    @Test
+    fun `deletes text inside an attribute range`() {
+        val initialText =
+            RichString(text = "Hello Wor!ld").edit {
+                setAttribute(BoldAttributeKey, Unit, range = 6..11)
+            }
+        val state = RichTextState(initialText = initialText)
+
+        state.simulateTextEdit {
+            delete(9, 10) // Deletes "!"
+        }
+
+        val spans = state.richString.getSpans()
+        spans.size shouldBe 1
+        spans.first().range shouldBe 6..10
+
+        state.richString.text shouldBe "Hello World"
+    }
+
+    @Test
+    fun `deletes entire text of an attribute range`() {
+        val initialText =
+            RichString(text = "Hello World").edit {
+                setAttribute(BoldAttributeKey, Unit, range = 6..10)
+            }
+        val state = RichTextState(initialText = initialText)
+
+        state.simulateTextEdit {
+            delete(6, 11) // Deletes "World"
+        }
+
+        val spans = state.richString.getSpans()
+        spans.isEmpty() shouldBe true
+
+        state.richString.text shouldBe "Hello "
     }
 }
 

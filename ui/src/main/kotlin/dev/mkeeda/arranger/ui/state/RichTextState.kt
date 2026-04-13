@@ -32,42 +32,68 @@ class RichTextState(initialText: RichString) {
     internal fun updateRichString(buffer: TextFieldBuffer) {
         if (buffer.changes.changeCount == 0) return
 
-        var newSpans = spans
+        this.spans =
+            (0 until buffer.changes.changeCount).fold(spans) { currentSpans, i ->
+                val originalRange = buffer.changes.getOriginalRange(i)
+                val range = buffer.changes.getRange(i)
 
-        for (i in 0 until buffer.changes.changeCount) {
-            val originalRange = buffer.changes.getOriginalRange(i)
-            val range = buffer.changes.getRange(i)
+                val editStart = originalRange.min
+                val editEnd = originalRange.max
+                val offsetDiff = range.length - originalRange.length
 
-            // Sub-step 2 handles basic insertions: originalRange is empty, range is not empty
-            if (originalRange.collapsed && !range.collapsed) {
-                val insertPos = originalRange.start
-                val length = range.length
+                currentSpans.mapNotNull { span ->
+                    shiftSpan(
+                        span = span,
+                        editStart = editStart,
+                        editEnd = editEnd,
+                        newLength = range.length,
+                        offsetDiff = offsetDiff,
+                    )
+                }
+            }
+    }
 
-                newSpans =
-                    newSpans.map { span ->
-                        val spanStart = span.range.first
-                        val spanEnd = span.range.last
+    private fun shiftSpan(
+        span: RichSpan,
+        editStart: Int,
+        editEnd: Int,
+        newLength: Int,
+        offsetDiff: Int,
+    ): RichSpan? {
+        val spanStart = span.range.first
+        val spanEnd = span.range.last
 
-                        when {
-                            insertPos <= spanStart -> {
-                                // Inserted before or exactly at the start of the span
-                                // Shift the entire span to the right
-                                span.copy(range = (spanStart + length)..(spanEnd + length))
-                            }
-                            insertPos <= spanEnd -> {
-                                // Inserted inside the span or exactly at its end
-                                // Expand the span
-                                span.copy(range = spanStart..(spanEnd + length))
-                            }
-                            else -> {
-                                // Inserted after the span
-                                span
-                            }
-                        }
+        return when {
+            editEnd <= spanStart -> {
+                // Edit happens entirely before the span. Shift it securely.
+                span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff))
+            }
+            editStart > spanEnd -> {
+                // Edit happens entirely after the span. Unaffected.
+                span
+            }
+            else -> {
+                // Edit overlaps with the span.
+                val newStart =
+                    when {
+                        spanStart < editStart -> spanStart
+                        spanStart >= editEnd -> spanStart + offsetDiff
+                        else -> editStart
                     }
+
+                val newEnd =
+                    when {
+                        spanEnd < editStart -> spanEnd
+                        spanEnd >= editEnd -> spanEnd + offsetDiff
+                        else -> editStart + newLength - 1
+                    }
+
+                if (newStart > newEnd) {
+                    null
+                } else {
+                    span.copy(range = newStart..newEnd)
+                }
             }
         }
-
-        this.spans = newSpans
     }
 }
