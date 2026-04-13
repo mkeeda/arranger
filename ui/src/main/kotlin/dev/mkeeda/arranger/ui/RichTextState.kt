@@ -1,4 +1,4 @@
-package dev.mkeeda.arranger.ui.state
+package dev.mkeeda.arranger.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.input.TextFieldBuffer
