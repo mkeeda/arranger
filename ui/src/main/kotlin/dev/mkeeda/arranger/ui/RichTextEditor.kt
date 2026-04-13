@@ -39,12 +39,17 @@ private class RichTextOutputTransformation(
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
         for (span in state.richString.getSpans()) {
-            val style = styleResolver.resolve(span.attributes)
-            if (style != null) {
-                // Determine boundaries avoiding out of bounds in case of race conditions or text shrinkage mid-frame.
-                val start = span.range.first.coerceIn(0, length)
-                val end = (span.range.last + 1).coerceIn(0, length)
-                if (start < end) {
+            val resolved = styleResolver.resolve(span.attributes)
+
+            // Determine boundaries avoiding out of bounds in case of race conditions or text shrinkage mid-frame.
+            val start = span.range.first.coerceIn(0, length)
+            val end = (span.range.last + 1).coerceIn(0, length)
+
+            if (start < end) {
+                resolved.spanStyle?.let { style ->
+                    addStyle(style, start, end)
+                }
+                resolved.paragraphStyle?.let { style ->
                     addStyle(style, start, end)
                 }
             }

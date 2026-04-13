@@ -44,8 +44,8 @@ class RichTextEditorTest {
 
         val resolver =
             AttributeStyleResolver {
-                resolve(BoldAttributeKey) { SpanStyle(fontWeight = FontWeight.Bold) }
-                resolve(ColorAttributeKey) { color -> SpanStyle(color = color) }
+                spanStyle(BoldAttributeKey) { SpanStyle(fontWeight = FontWeight.Bold) }
+                spanStyle(ColorAttributeKey) { color -> SpanStyle(color = color) }
             }
 
         composeTestRule.setContent {

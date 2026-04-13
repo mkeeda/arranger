@@ -1,18 +1,28 @@
 package dev.mkeeda.arranger.ui
 
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import dev.mkeeda.arranger.core.text.AttributeContainer
 import dev.mkeeda.arranger.core.text.AttributeKey
 
 /**
- * Resolves an [AttributeContainer] to a Compose [SpanStyle] for rendering rich text.
+ * A container representing the resolved visual styles for a set of attributes.
+ */
+public class ResolvedRichStyle(
+    public val spanStyle: SpanStyle? = null,
+    public val paragraphStyle: ParagraphStyle? = null,
+)
+
+/**
+ * Resolves an [AttributeContainer] to Compose styles ([SpanStyle] and/or [ParagraphStyle])
+ * for rendering rich text.
  */
 public fun interface AttributeStyleResolver {
-    public fun resolve(attributes: AttributeContainer): SpanStyle?
+    public fun resolve(attributes: AttributeContainer): ResolvedRichStyle
 }
 
 /**
- * Creates an [AttributeStyleResolver] using a DSL.
+ * Creates an [AttributeStyleResolver] using a declarative DSL.
  */
 public fun AttributeStyleResolver(
     builder: AttributeStyleBuilder.() -> Unit,
@@ -24,14 +34,32 @@ public fun AttributeStyleResolver(
  * Builder for creating custom [AttributeStyleResolver] instances.
  */
 public class AttributeStyleBuilder internal constructor() {
-    private val resolvers = mutableListOf<(AttributeContainer) -> SpanStyle?>()
+    private val spanResolvers = mutableListOf<(AttributeContainer) -> SpanStyle?>()
+    private val paragraphResolvers = mutableListOf<(AttributeContainer) -> ParagraphStyle?>()
 
     /**
-     * Registers a mapping for a specific [AttributeKey].
+     * Registers a [SpanStyle] mapping for a specific [AttributeKey].
      * When the [AttributeContainer] contains this key, the [mapper] is invoked with the key's value.
      */
-    public fun <T> resolve(key: AttributeKey<T>, mapper: (T) -> SpanStyle?) {
-        resolvers.add { container ->
+    public fun <T> spanStyle(
+        key: AttributeKey<T>,
+        mapper: (T) -> SpanStyle,
+    ) {
+        spanResolvers.add { container ->
+            val value = container.getOrNull(key)
+            if (value != null) mapper(value) else null
+        }
+    }
+
+    /**
+     * Registers a [ParagraphStyle] mapping for a specific [AttributeKey].
+     * When the [AttributeContainer] contains this key, the [mapper] is invoked with the key's value.
+     */
+    public fun <T> paragraphStyle(
+        key: AttributeKey<T>,
+        mapper: (T) -> ParagraphStyle,
+    ) {
+        paragraphResolvers.add { container ->
             val value = container.getOrNull(key)
             if (value != null) mapper(value) else null
         }
@@ -39,13 +67,25 @@ public class AttributeStyleBuilder internal constructor() {
 
     internal fun build(): AttributeStyleResolver =
         AttributeStyleResolver { attributes ->
-            var mergedStyle: SpanStyle? = null
-            for (resolver in resolvers) {
+            var mergedSpan: SpanStyle? = null
+            for (resolver in spanResolvers) {
                 val style = resolver(attributes)
                 if (style != null) {
-                    mergedStyle = mergedStyle?.merge(style) ?: style
+                    mergedSpan = mergedSpan?.merge(style) ?: style
                 }
             }
-            mergedStyle
+
+            var mergedParagraph: ParagraphStyle? = null
+            for (resolver in paragraphResolvers) {
+                val style = resolver(attributes)
+                if (style != null) {
+                    mergedParagraph = mergedParagraph?.merge(style) ?: style
+                }
+            }
+
+            ResolvedRichStyle(
+                spanStyle = mergedSpan,
+                paragraphStyle = mergedParagraph,
+            )
         }
 }
