@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
 import dev.mkeeda.arranger.core.text.AttributeKey
 import dev.mkeeda.arranger.core.text.RichString
+import dev.mkeeda.arranger.core.text.rangeOf
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
@@ -173,12 +174,6 @@ internal fun RichTextState.simulateTextEdit(block: TextFieldBuffer.() -> Unit) {
         block()
         updateRichString(this)
     }
-}
-
-private fun String.rangeOf(substring: String): IntRange {
-    val startIndex = this.indexOf(substring)
-    require(startIndex >= 0) { "Substring '$substring' not found in '$this'" }
-    return startIndex until (startIndex + substring.length)
 }
 
 private fun TextFieldBuffer.insertAfter(substring: String, textToInsert: String) {
