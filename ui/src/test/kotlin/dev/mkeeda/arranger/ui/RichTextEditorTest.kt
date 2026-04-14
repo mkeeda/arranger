@@ -32,8 +32,6 @@ class RichTextEditorTest {
         override val defaultValue: Color = Color.Unspecified
     }
 
-    // Testing that visual logic doesn't crash is inherently covered by other interactions.
-
     @Test
     fun `spans shift synchronously when user edits text within RichTextEditor`() {
         val initialText = "Welcome to Arranger!"

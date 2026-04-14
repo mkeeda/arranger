@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.ApplicationExtension
+import dev.mkeeda.arranger.buildlogic.configureAndroidLint
 import dev.mkeeda.arranger.buildlogic.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -14,13 +15,11 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
+                configureAndroidLint()
                 defaultConfig.targetSdk = 36
                 defaultConfig.minSdk = 26
                 
-                // アプリケーションモジュール向けの共通Lint設定
                 lint {
-                    warningsAsErrors = true
-                    abortOnError = true
                     checkReleaseBuilds = false
                 }
             }

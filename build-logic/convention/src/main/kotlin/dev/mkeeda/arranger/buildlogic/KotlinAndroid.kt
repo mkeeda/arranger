@@ -21,14 +21,14 @@ internal fun Project.configureKotlinAndroid(
 }
 
 private fun Project.configureKotlin() {
-    // Java Toolchain による Kotlin/Java バージョン固定
+    // Lock Kotlin/Java versions via Java Toolchain
     extensions.configure<JavaPluginExtension> {
         toolchain {
             languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(21))
         }
     }
 
-    // Kotlin コンパイルタスク共通の設定
+    // Common configurations for Kotlin compilation tasks
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
