@@ -10,21 +10,21 @@ import dev.mkeeda.arranger.core.text.RichSpan
 import dev.mkeeda.arranger.core.text.RichString
 import dev.mkeeda.arranger.core.text.RichStringBuilder
 
-class RichTextState(initialText: RichString) {
+public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
 
     // The Single Source of Truth for spans
     private var spans: List<RichSpan> by mutableStateOf(initialText.getSpans())
 
     // Computed property representing the complete rich text state
-    val richString: RichString
+    public val richString: RichString
         get() =
             RichString(
                 text = textFieldState.text.toString(),
                 spans = spans,
             )
 
-    fun edit(block: RichStringBuilder.() -> Unit) {
+    public fun edit(block: RichStringBuilder.() -> Unit) {
         spans = richString.edit(block).getSpans()
     }
 

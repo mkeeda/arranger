@@ -4,6 +4,7 @@ import dev.mkeeda.arranger.buildlogic.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -17,6 +18,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 configureKotlinAndroid(this)
                 configureAndroidLint()
                 defaultConfig.minSdk = 26
+            }
+            
+            extensions.configure<KotlinAndroidProjectExtension> {
+                explicitApi()
             }
 
         }
