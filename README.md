@@ -102,3 +102,5 @@ fun ArrangerExample() {
     * Seamlessly align with `TextFieldState`'s native Undo/Redo to accurately restore historical attribute ranges.
 - [ ] **8. Performance Tuning**
     * Optimize internal data structures to production-grade performance variants (e.g., Rope or Piece Table) for large text handling.
+- [ ] **9. Kotlin Multiplatform (KMP) Support**
+    * Ensure the core data structures, state management, and formatting logic are fully platform-agnostic to support Compose Multiplatform distribution (iOS, Desktop, Web).
