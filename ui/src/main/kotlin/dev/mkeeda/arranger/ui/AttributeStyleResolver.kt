@@ -8,7 +8,7 @@ import dev.mkeeda.arranger.core.text.AttributeKey
 /**
  * A container representing the resolved visual styles for a set of attributes.
  */
-public class ResolvedRichStyle(
+public data class ResolvedRichStyle(
     public val spanStyle: SpanStyle? = null,
     public val paragraphStyle: ParagraphStyle? = null,
 )
@@ -67,21 +67,17 @@ public class AttributeStyleBuilder internal constructor() {
 
     internal fun build(): AttributeStyleResolver =
         AttributeStyleResolver { attributes ->
-            var mergedSpan: SpanStyle? = null
-            for (resolver in spanResolvers) {
-                val style = resolver(attributes)
-                if (style != null) {
-                    mergedSpan = mergedSpan?.merge(style) ?: style
+            val mergedSpan =
+                spanResolvers.fold(null as SpanStyle?) { acc, resolver ->
+                    val style = resolver(attributes)
+                    if (style != null) acc?.merge(style) ?: style else acc
                 }
-            }
 
-            var mergedParagraph: ParagraphStyle? = null
-            for (resolver in paragraphResolvers) {
-                val style = resolver(attributes)
-                if (style != null) {
-                    mergedParagraph = mergedParagraph?.merge(style) ?: style
+            val mergedParagraph =
+                paragraphResolvers.fold(null as ParagraphStyle?) { acc, resolver ->
+                    val style = resolver(attributes)
+                    if (style != null) acc?.merge(style) ?: style else acc
                 }
-            }
 
             ResolvedRichStyle(
                 spanStyle = mergedSpan,

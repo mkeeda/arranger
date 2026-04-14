@@ -27,39 +27,44 @@ class AttributeStyleResolverTest {
         override val defaultValue: TextAlign = TextAlign.Unspecified
     }
 
-    @Test
-    fun `resolver maps matching attributes and merges them`() {
-        val resolver =
-            AttributeStyleResolver {
-                spanStyle(BoldAttributeKey) { SpanStyle(fontWeight = FontWeight.Bold) }
-                spanStyle(ColorAttributeKey) { color -> SpanStyle(color = color) }
-                paragraphStyle(AlignAttributeKey) { align -> ParagraphStyle(textAlign = align) }
-            }
+    private val resolver =
+        AttributeStyleResolver {
+            spanStyle(BoldAttributeKey) { SpanStyle(fontWeight = FontWeight.Bold) }
+            spanStyle(ColorAttributeKey) { color -> SpanStyle(color = color) }
+            paragraphStyle(AlignAttributeKey) { align -> ParagraphStyle(textAlign = align) }
+        }
 
-        // Test with multiple attributes for span and paragraph
-        val container1 =
+    @Test
+    fun `resolve returns merged styles when multiple attributes match`() {
+        val container =
             attributeContainerOf(
                 BoldAttributeKey to Unit,
                 ColorAttributeKey to Color.Red,
                 AlignAttributeKey to TextAlign.Center,
             )
 
-        val resolved = resolver.resolve(container1)
+        val resolved = resolver.resolve(container)
         resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold
         resolved.spanStyle?.color shouldBe Color.Red
         resolved.paragraphStyle?.textAlign shouldBe TextAlign.Center
+    }
 
-        // Test with single attribute
-        val container2 = attributeContainerOf(BoldAttributeKey to Unit)
-        val singleResolved = resolver.resolve(container2)
-        singleResolved.spanStyle?.fontWeight shouldBe FontWeight.Bold
-        singleResolved.spanStyle?.color shouldBe Color.Unspecified
-        singleResolved.paragraphStyle.shouldBeNull()
+    @Test
+    fun `resolve returns matching style when only single attribute matches`() {
+        val container = attributeContainerOf(BoldAttributeKey to Unit)
+        val resolved = resolver.resolve(container)
 
-        // Test with missing attributes
+        resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold
+        resolved.spanStyle?.color shouldBe Color.Unspecified
+        resolved.paragraphStyle.shouldBeNull()
+    }
+
+    @Test
+    fun `resolve returns nulls when attributes are empty`() {
         val emptyContainer = attributeContainerOf()
-        val emptyResolved = resolver.resolve(emptyContainer)
-        emptyResolved.spanStyle.shouldBeNull()
-        emptyResolved.paragraphStyle.shouldBeNull()
+        val resolved = resolver.resolve(emptyContainer)
+
+        resolved.spanStyle.shouldBeNull()
+        resolved.paragraphStyle.shouldBeNull()
     }
 }
