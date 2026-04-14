@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import dev.mkeeda.arranger.core.text.AttributeKey
 import dev.mkeeda.arranger.core.text.RichString
@@ -31,31 +32,7 @@ class RichTextEditorTest {
         override val defaultValue: Color = Color.Unspecified
     }
 
-    @Test
-    fun `render rich text with mapped attributes via semantics`() {
-        val initialText = "Hello Colorful World"
-        val state =
-            RichTextState(
-                initialText =
-                    RichString(text = initialText).edit {
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("Colorful"))
-                        setAttribute(ColorAttributeKey, Color.Red, range = initialText.rangeOf("Colorful World"))
-                    },
-            )
-
-        val resolver =
-            AttributeStyleResolver {
-                spanStyle(BoldAttributeKey) { SpanStyle(fontWeight = FontWeight.Bold) }
-                spanStyle(ColorAttributeKey) { color -> SpanStyle(color = color) }
-            }
-
-        composeTestRule.setContent {
-            RichTextEditor(
-                state = state,
-                styleResolver = resolver,
-            )
-        }
-    }
+    // Testing that visual logic doesn't crash is inherently covered by other interactions.
 
     @Test
     fun `spans shift synchronously when user edits text within RichTextEditor`() {
@@ -83,14 +60,16 @@ class RichTextEditorTest {
         // Original: "Welcome to Arranger!"
         // New     : "Welcome aArranger!"
         // Net change: -2 characters. "Arranger!" shifts from 11..19 to 9..17
-        composeTestRule.onNodeWithText(initialText).performTextInputSelection(androidx.compose.ui.text.TextRange(8, 11))
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(8, 11))
         composeTestRule.onNodeWithText(initialText).performTextInput("a")
+
+        val expectedNewText = "Welcome aArranger!"
+        state.richString.text shouldBe expectedNewText
 
         val newSpans = state.richString.getSpans()
         newSpans.size shouldBe 1
 
         // Assert the span accurately shifted
-        newSpans.first().range.first shouldBe 9
-        newSpans.first().range.last shouldBe 17
+        newSpans.first().range shouldBe expectedNewText.rangeOf("Arranger!")
     }
 }

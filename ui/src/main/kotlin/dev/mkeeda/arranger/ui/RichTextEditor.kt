@@ -1,6 +1,7 @@
 package dev.mkeeda.arranger.ui
 
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.runtime.Composable
@@ -28,9 +29,7 @@ public fun RichTextEditor(
 
     val inputTransformation =
         remember(state) {
-            androidx.compose.foundation.text.input.InputTransformation {
-                state.updateRichString(this)
-            }
+            RichTextInputTransformation(state)
         }
 
     BasicTextField(
@@ -62,5 +61,13 @@ private class RichTextOutputTransformation(
                 }
             }
         }
+    }
+}
+
+private class RichTextInputTransformation(
+    private val state: RichTextState,
+) : InputTransformation {
+    override fun TextFieldBuffer.transformInput() {
+        state.updateRichString(this)
     }
 }
