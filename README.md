@@ -82,7 +82,7 @@ fun ArrangerExample() {
 }
 ```
 
-### Development Roadmap
+## Development Roadmap
 
 - [x] **1. Core Data Structures (The Core)**
     * Implementation of a range-based data structure (e.g., Interval Tree) to manage attributes by range rather than character indices.
