@@ -3,11 +3,14 @@ package dev.mkeeda.arranger.ui
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import dev.mkeeda.arranger.core.text.AttributeKey
 import dev.mkeeda.arranger.core.text.RichString
 import dev.mkeeda.arranger.core.text.rangeOf
+import io.kotest.matchers.shouldBe
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,14 +55,42 @@ class RichTextEditorTest {
                 styleResolver = resolver,
             )
         }
+    }
 
-        // TODO: Verify visual styles emitted by OutputTransformation
-        // In Compose 1.7+, OutputTransformation modifies the text purely at the visual layer.
-        // Because of this, the applied SpanStyles don't appear in the `SemanticsProperties.EditableText`
-        // property, and extracting them via `GetTextLayoutResult` hits Kotlin generic type inference
-        // issues in UI tests.
-        // For now, the styling mapping logic is thoroughly tested in AttributeStyleResolverTest,
-        // , and this test ensures the component renders without crashing.
-        composeTestRule.onNodeWithText("Hello Colorful World").assertExists()
+    @Test
+    fun `spans shift synchronously when user edits text within RichTextEditor`() {
+        val initialText = "Welcome to Arranger!"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        // "Arranger!" is length 9, at index 11
+                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("Arranger!"))
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                styleResolver =
+                    AttributeStyleResolver {
+                        spanStyle(BoldAttributeKey) { SpanStyle(fontWeight = FontWeight.Bold) }
+                    },
+            )
+        }
+
+        // Test editing: Replace "to " (length 3, indices 8..11) with "a" (length 1)
+        // Original: "Welcome to Arranger!"
+        // New     : "Welcome aArranger!"
+        // Net change: -2 characters. "Arranger!" shifts from 11..19 to 9..17
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(androidx.compose.ui.text.TextRange(8, 11))
+        composeTestRule.onNodeWithText(initialText).performTextInput("a")
+
+        val newSpans = state.richString.getSpans()
+        newSpans.size shouldBe 1
+
+        // Assert the span accurately shifted
+        newSpans.first().range.first shouldBe 9
+        newSpans.first().range.last shouldBe 17
     }
 }

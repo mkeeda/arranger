@@ -26,9 +26,17 @@ public fun RichTextEditor(
             RichTextOutputTransformation(state, styleResolver)
         }
 
+    val inputTransformation =
+        remember(state) {
+            androidx.compose.foundation.text.input.InputTransformation {
+                state.updateRichString(this)
+            }
+        }
+
     BasicTextField(
         state = state.textFieldState,
         modifier = modifier,
+        inputTransformation = inputTransformation,
         outputTransformation = outputTransformation,
     )
 }
