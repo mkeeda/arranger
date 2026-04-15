@@ -25,5 +25,5 @@ dependencyResolutionManagement {
 rootProject.name = "Arranger"
 includeBuild("build-logic")
 include(":sample-app")
-include(":core")
-include(":ui")
+include(":richtext")
+include(":richtext-editor")

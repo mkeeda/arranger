@@ -21,13 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.mkeeda.arranger.core.text.AttributeKey
-import dev.mkeeda.arranger.core.text.RichString
-import dev.mkeeda.arranger.core.text.rangeOf
+import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
+import dev.mkeeda.arranger.richtext.editor.RichTextEditor
+import dev.mkeeda.arranger.richtext.editor.RichTextState
+import dev.mkeeda.arranger.richtext.rangeOf
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
-import dev.mkeeda.arranger.ui.AttributeStyleResolver
-import dev.mkeeda.arranger.ui.RichTextEditor
-import dev.mkeeda.arranger.ui.RichTextState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
