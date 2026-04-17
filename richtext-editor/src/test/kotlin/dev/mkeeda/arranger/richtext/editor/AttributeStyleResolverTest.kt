@@ -13,7 +13,10 @@ import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class AttributeStyleResolverTest {
     private object AlignAttributeKey : AttributeKey<TextAlign> {
         override val name: String = "Align"
@@ -21,20 +24,7 @@ class AttributeStyleResolverTest {
     }
 
     private val resolver =
-        AttributeStyleResolver {
-            spanStyle(BoldKey) { SpanStyle(fontWeight = FontWeight.Bold) }
-            spanStyle(TextColorKey) { hexColor ->
-                SpanStyle(
-                    color =
-                        if (hexColor == HexColor.Unspecified) {
-                            Color.Unspecified
-                        } else {
-                            Color(
-                                hexColor.value.removePrefix("#").toLong(16) or 0xFF000000,
-                            )
-                        },
-                )
-            }
+        AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
             paragraphStyle(AlignAttributeKey) { align -> ParagraphStyle(textAlign = align) }
         }
 
@@ -61,6 +51,18 @@ class AttributeStyleResolverTest {
         resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold
         resolved.spanStyle?.color shouldBe Color.Unspecified
         resolved.paragraphStyle.shouldBeNull()
+    }
+
+    @Test
+    fun `AttributeStyleResolver allows custom resolver to override base default`() {
+        val overridingResolver =
+            AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
+                spanStyle(BoldKey) { SpanStyle(fontWeight = FontWeight.Normal) }
+            }
+
+        val container = attributeContainerOf(BoldKey to Unit)
+        val resolved = overridingResolver.resolve(container)
+        resolved.spanStyle?.fontWeight shouldBe FontWeight.Normal
     }
 
     @Test
