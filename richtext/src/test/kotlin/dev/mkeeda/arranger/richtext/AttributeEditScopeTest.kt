@@ -9,8 +9,8 @@ class AttributeEditScopeTest {
         val str =
             RichString("Hello World").edit {
                 editAttributes(range = 0..4) {
-                    textColor(HexColor("#FF0000"))
-                    backgroundColor(HexColor("#00FF00"))
+                    textColor(RgbaColor(0xFFFF0000))
+                    backgroundColor(RgbaColor(0xFF00FF00))
                     fontSize(TextSize(16f))
                     bold()
                 }
@@ -19,8 +19,8 @@ class AttributeEditScopeTest {
         val spans = str.getSpans()
         spans.size shouldBe 1
         val attrs = spans.first().attributes
-        attrs.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
-        attrs.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        attrs.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        attrs.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
         attrs.getOrNull(FontSizeKey) shouldBe TextSize(16f)
         attrs.getOrNull(BoldKey) shouldBe Unit
     }
@@ -29,7 +29,7 @@ class AttributeEditScopeTest {
     fun `editAttributes can clear multiple attributes simultaneously from the specified range`() {
         val initialContainer =
             attributeContainerOf(
-                TextColorKey to HexColor("#FF0000"),
+                TextColorKey to RgbaColor(0xFFFF0000),
                 BoldKey to Unit,
             )
         val initialStr = RichString("Hello World", initialContainer)
@@ -48,7 +48,7 @@ class AttributeEditScopeTest {
 
         // 5..10 attrs should remain
         secondSpan.range shouldBe 5..10
-        secondSpan.attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        secondSpan.attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
         secondSpan.attributes.getOrNull(BoldKey) shouldBe Unit
     }
 
@@ -70,21 +70,21 @@ class AttributeEditScopeTest {
     fun `textColor sets and clears properly`() {
         var str =
             RichString("Test").edit {
-                editAttributes { textColor(HexColor("#FF0000")) }
+                editAttributes { textColor(RgbaColor(0xFFFF0000)) }
             }
-        str.getSpans()[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        str.getSpans()[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
 
         // Passing Unspecified should clear it
         str =
             str.edit {
-                editAttributes { textColor(HexColor.Unspecified) }
+                editAttributes { textColor(RgbaColor.Unspecified) }
             }
         str.getSpans().isEmpty() shouldBe true
 
         // clearTextColor() should clear it
         str =
             str.edit {
-                editAttributes { textColor(HexColor("#00FF00")) }
+                editAttributes { textColor(RgbaColor(0xFF00FF00)) }
             }
         str =
             str.edit {
@@ -97,19 +97,19 @@ class AttributeEditScopeTest {
     fun `backgroundColor sets and clears properly`() {
         var str =
             RichString("Test").edit {
-                editAttributes { backgroundColor(HexColor("#00FF00")) }
+                editAttributes { backgroundColor(RgbaColor(0xFF00FF00)) }
             }
-        str.getSpans()[0].attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        str.getSpans()[0].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
 
         str =
             str.edit {
-                editAttributes { backgroundColor(HexColor.Unspecified) }
+                editAttributes { backgroundColor(RgbaColor.Unspecified) }
             }
         str.getSpans().isEmpty() shouldBe true
 
         str =
             str.edit {
-                editAttributes { backgroundColor(HexColor("#00FF00")) }
+                editAttributes { backgroundColor(RgbaColor(0xFF00FF00)) }
             }
         str =
             str.edit {

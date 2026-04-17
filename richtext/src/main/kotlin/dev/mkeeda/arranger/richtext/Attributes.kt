@@ -1,15 +1,16 @@
 package dev.mkeeda.arranger.richtext
 
 /**
- * Represents a color in Hex string format to keep the model platform-independent.
+ * Represents a color using a 64-bit ULong to keep the model platform-independent.
+ * It perfectly aligns with Compose's Color representation or an ARGB bitmask.
  */
 @JvmInline
-public value class HexColor(public val value: String) {
+public value class RgbaColor(public val value: Long) {
     public companion object {
         /**
          * Represents an unspecified color.
          */
-        public val Unspecified: HexColor = HexColor("")
+        public val Unspecified: RgbaColor = RgbaColor(Long.MAX_VALUE)
     }
 }
 
@@ -60,20 +61,20 @@ public object UnderlineKey : AttributeKey<Unit> {
 
 /**
  * The standard [AttributeKey] to denote the foreground text color.
- * Contains a [HexColor] when specified, or [HexColor.Unspecified] otherwise.
+ * Contains a [RgbaColor] when specified, or [RgbaColor.Unspecified] otherwise.
  */
-public object TextColorKey : AttributeKey<HexColor> {
+public object TextColorKey : AttributeKey<RgbaColor> {
     override val name: String = "textColor"
-    override val defaultValue: HexColor = HexColor.Unspecified
+    override val defaultValue: RgbaColor = RgbaColor.Unspecified
 }
 
 /**
  * The standard [AttributeKey] to denote the background color.
- * Contains a [HexColor] when specified, or [HexColor.Unspecified] otherwise.
+ * Contains a [RgbaColor] when specified, or [RgbaColor.Unspecified] otherwise.
  */
-public object BackgroundColorKey : AttributeKey<HexColor> {
+public object BackgroundColorKey : AttributeKey<RgbaColor> {
     override val name: String = "backgroundColor"
-    override val defaultValue: HexColor = HexColor.Unspecified
+    override val defaultValue: RgbaColor = RgbaColor.Unspecified
 }
 
 /**

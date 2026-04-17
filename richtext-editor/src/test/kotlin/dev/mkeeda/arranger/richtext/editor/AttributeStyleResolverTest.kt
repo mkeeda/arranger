@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.HexColor
+import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
@@ -33,7 +33,7 @@ class AttributeStyleResolverTest {
         val container =
             attributeContainerOf(
                 BoldKey to Unit,
-                TextColorKey to HexColor("#FF0000"),
+                TextColorKey to RgbaColor(0xFFFF0000),
                 AlignAttributeKey to TextAlign.Center,
             )
 

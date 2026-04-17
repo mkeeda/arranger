@@ -26,8 +26,8 @@ public class AttributeEditScope internal constructor(
 /**
  * Convenience function to set the text color within this builder.
  */
-public fun AttributeEditScope.textColor(color: HexColor) {
-    if (color == HexColor.Unspecified) {
+public fun AttributeEditScope.textColor(color: RgbaColor) {
+    if (color == RgbaColor.Unspecified) {
         clearTextColor()
     } else {
         set(TextColorKey, color)
@@ -44,8 +44,8 @@ public fun AttributeEditScope.clearTextColor() {
 /**
  * Convenience function to set the background color within this builder.
  */
-public fun AttributeEditScope.backgroundColor(color: HexColor) {
-    if (color == HexColor.Unspecified) {
+public fun AttributeEditScope.backgroundColor(color: RgbaColor) {
+    if (color == RgbaColor.Unspecified) {
         clearBackgroundColor()
     } else {
         set(BackgroundColorKey, color)

@@ -18,7 +18,7 @@ class RichStringTest {
     @Test
     fun `applies an attribute to the entire text and returns a new immutable instance`() {
         val original = RichString(text = "Hello")
-        val styled = original.edit { setAttribute(TextColorKey, HexColor("#FF0000")) }
+        val styled = original.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000)) }
 
         // A new instance is returned (immutability)
         styled shouldNotBe original
@@ -32,20 +32,20 @@ class RichStringTest {
         val spans = styled.getSpans()
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
     fun `applies an attribute to a specific range`() {
         val richString =
             RichString(text = "Hello, World!")
-                .edit { setAttribute(TextColorKey, HexColor("#0000FF"), range = 0..4) }
+                .edit { setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 0..4) }
 
         richString.text shouldBe "Hello, World!"
         val spans = richString.getSpans()
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#0000FF")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
     }
 
     @Test
@@ -53,8 +53,8 @@ class RichStringTest {
         val richString =
             RichString(text = "Hello, World!")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..4)
-                    setAttribute(BackgroundColorKey, HexColor("#00FF00"), range = 7..11)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 7..11)
                 }
 
         richString.text shouldBe "Hello, World!"
@@ -66,14 +66,14 @@ class RichStringTest {
                 it.attributes.getOrNull(TextColorKey) != null
             }
         colorSpan.range shouldBe 0..4
-        colorSpan.attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        colorSpan.attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
 
         val mentionSpan =
             spans.first {
                 it.attributes.getOrNull(BackgroundColorKey) != null
             }
         mentionSpan.range shouldBe 7..11
-        mentionSpan.attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        mentionSpan.attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
     }
 
     @Test
@@ -81,7 +81,7 @@ class RichStringTest {
         val richString = RichString(text = "Hello, World!")
         val exception =
             shouldThrow<IllegalArgumentException> {
-                richString.edit { setAttribute(TextColorKey, HexColor("#FF0000"), range = -1..3) }
+                richString.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = -1..3) }
             }
         exception.message shouldBe "Range start must not be negative: -1"
     }
@@ -91,7 +91,7 @@ class RichStringTest {
         val richString = RichString(text = "Hello")
         val exception =
             shouldThrow<IllegalArgumentException> {
-                richString.edit { setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..5) }
+                richString.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..5) }
             }
         exception.message shouldBe "Range end must be within text bounds: 5 >= 5"
     }
@@ -101,7 +101,7 @@ class RichStringTest {
         val richString = RichString(text = "Hello, World!")
         val exception =
             shouldThrow<IllegalArgumentException> {
-                richString.edit { setAttribute(TextColorKey, HexColor("#FF0000"), range = 5..3) }
+                richString.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..3) }
             }
         exception.message shouldBe "Range must not be empty: 5..3"
     }
@@ -110,12 +110,12 @@ class RichStringTest {
     fun `successfully applies an attribute to a 1-character range`() {
         val richString =
             RichString(text = "Hello")
-                .edit { setAttribute(TextColorKey, HexColor("#0000FF"), range = 3..3) }
+                .edit { setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 3..3) }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 1
         spans[0].range shouldBe 3..3
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#0000FF")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
     }
 
     @Test
@@ -128,24 +128,24 @@ class RichStringTest {
         val richString =
             RichString("1234567890123456")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..10)
-                    setAttribute(BackgroundColorKey, HexColor("#00FF00"), range = 5..15)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
+                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 5..15)
                 }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 3
 
         spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
         spans[0].attributes.getOrNull(BackgroundColorKey) shouldBe null
 
         spans[1].range shouldBe 5..10
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
-        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
 
         spans[2].range shouldBe 11..15
         spans[2].attributes.getOrNull(TextColorKey) shouldBe null
-        spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
     }
 
     @Test
@@ -158,23 +158,23 @@ class RichStringTest {
         val richString =
             RichString("12345678901")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..10)
-                    setAttribute(BackgroundColorKey, HexColor("#00FF00"), range = 3..7)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
+                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 3..7)
                 }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 3
 
         spans[0].range shouldBe 0..2
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
         spans[0].attributes.getOrNull(BackgroundColorKey) shouldBe null
 
         spans[1].range shouldBe 3..7
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
-        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
 
         spans[2].range shouldBe 8..10
-        spans[2].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        spans[2].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
         spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe null
     }
 
@@ -183,15 +183,15 @@ class RichStringTest {
         val richString =
             RichString("12345678901")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..10)
-                    setAttribute(TextColorKey, HexColor("#0000FF"), range = 0..10)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
+                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 0..10)
                 }
 
         // It should perfectly replace the attribute and optimize back to 1 span
         val spans = richString.getSpans()
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..10
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#0000FF")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
     }
 
     @Test
@@ -208,9 +208,9 @@ class RichStringTest {
         val richString =
             RichString("1234567890123")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..4)
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 8..12)
-                    setAttribute(BackgroundColorKey, HexColor("#00FF00"), range = 2..10)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 8..12)
+                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 2..10)
                 }
 
         val spans = richString.getSpans()
@@ -222,14 +222,14 @@ class RichStringTest {
         spans[3].range shouldBe 8..10
         spans[4].range shouldBe 11..12
 
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
-        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
         spans[2].attributes.getOrNull(TextColorKey) shouldBe null
-        spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
-        spans[3].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
-        spans[3].attributes.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
-        spans[4].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        spans[3].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[3].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        spans[4].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -237,14 +237,14 @@ class RichStringTest {
         val richString =
             RichString("12345678901")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..4)
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 5..10)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..10)
                 }
 
         val spans = richString.getSpans()
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..10
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -256,11 +256,11 @@ class RichStringTest {
         val richString =
             RichString("12345678901234567890")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..4)
-                    setAttribute(BackgroundColorKey, HexColor("#00FF00"), range = 5..9)
-                    setAttribute(BackgroundColorKey, HexColor("#00FF00"), range = 10..15)
-                    setAttribute(TextColorKey, HexColor("#0000FF"), range = 10..15)
-                    setAttribute(BackgroundColorKey, HexColor("#FF00FF"), range = 16..19)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 5..9)
+                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 10..15)
+                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 10..15)
+                    setAttribute(BackgroundColorKey, RgbaColor(0xFFFF00FF), range = 16..19)
                 }
 
         // There should be 4 internal spans: [0..4], [5..9], [10..15], [16..19]
@@ -273,11 +273,11 @@ class RichStringTest {
         mentionRuns shouldHaveSize 2
 
         mentionRuns[0].range shouldBe 5..15
-        mentionRuns[0].value shouldBe HexColor("#00FF00")
+        mentionRuns[0].value shouldBe RgbaColor(0xFF00FF00)
         mentionRuns[0].text shouldBe "67890123456"
 
         mentionRuns[1].range shouldBe 16..19
-        mentionRuns[1].value shouldBe HexColor("#FF00FF")
+        mentionRuns[1].value shouldBe RgbaColor(0xFFFF00FF)
         mentionRuns[1].text shouldBe "7890"
     }
 
@@ -286,9 +286,9 @@ class RichStringTest {
         val richString =
             RichString("01234567890123456789") // length 20
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 2..4)
-                    setAttribute(TextColorKey, HexColor("#0000FF"), range = 8..10)
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 15..19)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 2..4)
+                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 8..10)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 15..19)
                 }
 
         val colorRuns = richString.runs(TextColorKey)
@@ -296,13 +296,13 @@ class RichStringTest {
         colorRuns shouldHaveSize 3
 
         colorRuns[0].range shouldBe 2..4
-        colorRuns[0].value shouldBe HexColor("#FF0000")
+        colorRuns[0].value shouldBe RgbaColor(0xFFFF0000)
 
         colorRuns[1].range shouldBe 8..10
-        colorRuns[1].value shouldBe HexColor("#0000FF")
+        colorRuns[1].value shouldBe RgbaColor(0xFF0000FF)
 
         colorRuns[2].range shouldBe 15..19
-        colorRuns[2].value shouldBe HexColor("#FF0000")
+        colorRuns[2].value shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -310,23 +310,23 @@ class RichStringTest {
         val original =
             RichString("12345678901234567890")
                 .edit {
-                    setAttribute(TextColorKey, HexColor("#FF0000"), range = 0..9)
-                    setAttribute(TextColorKey, HexColor("#0000FF"), range = 10..19)
+                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..9)
+                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 10..19)
                 }
 
         val edited =
             original.edit {
                 // Apply mention to the middle
-                setAttribute(BackgroundColorKey, HexColor("#00FFFF"), range = 5..14)
+                setAttribute(BackgroundColorKey, RgbaColor(0xFF00FFFF), range = 5..14)
                 // Remove the color over a sub-range
                 removeAttribute(TextColorKey, range = 8..11)
                 // Add a completely new attribute spanning across everything
-                setAttribute(TextColorKey, HexColor.Unspecified, range = 2..17)
+                setAttribute(TextColorKey, RgbaColor.Unspecified, range = 2..17)
             }
 
         // Original remains completely unchanged
         original.getSpans() shouldHaveSize 2
-        original.getSpans()[0].attributes.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        original.getSpans()[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
 
         // Edited contains the new attributes
         edited.runs(BackgroundColorKey)[0].range shouldBe 5..14
@@ -340,16 +340,16 @@ class RichStringTest {
         // [18..19] Blue
         colorRuns shouldHaveSize 3
         colorRuns[0].range shouldBe 0..1
-        colorRuns[0].value shouldBe HexColor("#FF0000")
+        colorRuns[0].value shouldBe RgbaColor(0xFFFF0000)
         colorRuns[1].range shouldBe 2..17
-        colorRuns[1].value shouldBe HexColor.Unspecified
+        colorRuns[1].value shouldBe RgbaColor.Unspecified
         colorRuns[2].range shouldBe 18..19
-        colorRuns[2].value shouldBe HexColor("#0000FF")
+        colorRuns[2].value shouldBe RgbaColor(0xFF0000FF)
     }
 
     @Test
     fun `edit block handles empty spans and no-op correctly`() {
-        val original = RichString("hello", attributeContainerOf(TextColorKey to HexColor("#FF0000")))
+        val original = RichString("hello", attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000)))
         val edited =
             original.edit {
                 // Do nothing
