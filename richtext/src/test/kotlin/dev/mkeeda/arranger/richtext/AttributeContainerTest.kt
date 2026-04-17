@@ -10,27 +10,27 @@ class AttributeContainerTest {
     fun `stores and retrieves attributes in a type-safe manner`() {
         val container =
             attributeContainerOf(
-                MentionAttributeKey to "@mkeeda",
-                ColorAttributeKey to TextColor.Red,
+                BackgroundColorKey to HexColor("#00FF00"),
+                TextColorKey to HexColor("#FF0000"),
             )
 
-        val mention: String? = container.getOrNull(MentionAttributeKey)
-        val color: TextColor? = container.getOrNull(ColorAttributeKey)
+        val mention: HexColor? = container.getOrNull(BackgroundColorKey)
+        val color: HexColor? = container.getOrNull(TextColorKey)
 
-        mention shouldBe "@mkeeda"
-        color shouldBe TextColor.Red
+        mention shouldBe HexColor("#00FF00")
+        color shouldBe HexColor("#FF0000")
     }
 
     @Test
     fun `provides intuitive and type-safe access using extension functions and properties`() {
         val container =
             attributeContainerOf(
-                MentionAttributeKey to "@mkeeda",
-                ColorAttributeKey to TextColor.Blue,
+                BackgroundColorKey to HexColor("#00FF00"),
+                TextColorKey to HexColor("#0000FF"),
             )
 
-        container.mention shouldBe "@mkeeda"
-        container.textColor shouldBe TextColor.Blue
+        container.getOrDefault(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        container.getOrDefault(TextColorKey) shouldBe HexColor("#0000FF")
     }
 
     @Test
@@ -38,49 +38,49 @@ class AttributeContainerTest {
         val emptyContainer = attributeContainerOf()
 
         // getOrDefault
-        emptyContainer.getOrDefault(MentionAttributeKey) shouldBe ""
-        emptyContainer.getOrDefault(ColorAttributeKey) shouldBe TextColor.Unspecified
+        emptyContainer.getOrDefault(BackgroundColorKey) shouldBe HexColor.Unspecified
+        emptyContainer.getOrDefault(TextColorKey) shouldBe HexColor.Unspecified
 
         // getOrNull
-        emptyContainer.getOrNull(MentionAttributeKey).shouldBeNull()
-        emptyContainer.getOrNull(ColorAttributeKey).shouldBeNull()
+        emptyContainer.getOrNull(BackgroundColorKey).shouldBeNull()
+        emptyContainer.getOrNull(TextColorKey).shouldBeNull()
     }
 
     @Test
     fun `retains the newly set value when overwriting an attribute with the same name`() {
         val container =
             attributeContainerOf(
-                ColorAttributeKey to TextColor.Red,
-                ColorAttributeKey to TextColor.Blue,
+                TextColorKey to HexColor("#FF0000"),
+                TextColorKey to HexColor("#0000FF"),
             )
 
-        container.textColor shouldBe TextColor.Blue
+        container.getOrDefault(TextColorKey) shouldBe HexColor("#0000FF")
     }
 
     @Test
     fun `plus returns new container maintaining immutability`() {
         val c1 = attributeContainerOf()
-        val c2 = c1.plus(MentionAttributeKey, "@all")
-        val c3 = c2.plus(ColorAttributeKey, TextColor.Red)
+        val c2 = c1.plus(BackgroundColorKey, HexColor("#00FFFF"))
+        val c3 = c2.plus(TextColorKey, HexColor("#FF0000"))
 
-        c1.getOrNull(MentionAttributeKey).shouldBeNull()
+        c1.getOrNull(BackgroundColorKey).shouldBeNull()
 
-        c2.getOrNull(MentionAttributeKey) shouldBe "@all"
-        c2.getOrNull(ColorAttributeKey).shouldBeNull()
+        c2.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FFFF")
+        c2.getOrNull(TextColorKey).shouldBeNull()
 
-        c3.getOrNull(MentionAttributeKey) shouldBe "@all"
-        c3.getOrNull(ColorAttributeKey) shouldBe TextColor.Red
+        c3.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FFFF")
+        c3.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
     }
 
     @Test
     fun `plus operator merges two containers properly`() {
-        val c1 = attributeContainerOf(MentionAttributeKey to "@mkeeda")
-        val c2 = attributeContainerOf(ColorAttributeKey to TextColor.Blue)
+        val c1 = attributeContainerOf(BackgroundColorKey to HexColor("#00FF00"))
+        val c2 = attributeContainerOf(TextColorKey to HexColor("#0000FF"))
 
         val merged = c1 + c2
 
-        merged.getOrDefault(MentionAttributeKey) shouldBe "@mkeeda"
-        merged.getOrDefault(ColorAttributeKey) shouldBe TextColor.Blue
+        merged.getOrDefault(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        merged.getOrDefault(TextColorKey) shouldBe HexColor("#0000FF")
     }
 
     @Test
@@ -88,25 +88,25 @@ class AttributeContainerTest {
         val empty = attributeContainerOf()
         empty.isEmpty() shouldBe true
 
-        val notEmpty = empty + (MentionAttributeKey to "@user")
+        val notEmpty = empty + (BackgroundColorKey to HexColor("#00FF00"))
         notEmpty.isEmpty() shouldBe false
     }
 
     @Test
     fun `minus correctly removes attribute and maintains immutability`() {
-        val c1 = attributeContainerOf(MentionAttributeKey to "@user", ColorAttributeKey to TextColor.Red)
+        val c1 = attributeContainerOf(BackgroundColorKey to HexColor("#00FF00"), TextColorKey to HexColor("#FF0000"))
 
-        val c2 = c1 - ColorAttributeKey
+        val c2 = c1 - TextColorKey
 
-        c1.getOrNull(ColorAttributeKey) shouldBe TextColor.Red
-        c2.getOrNull(ColorAttributeKey).shouldBeNull()
-        c2.getOrNull(MentionAttributeKey) shouldBe "@user"
+        c1.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
+        c2.getOrNull(TextColorKey).shouldBeNull()
+        c2.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
     }
 
     @Test
     fun `minus on missing key returns same instance`() {
-        val c1 = attributeContainerOf(MentionAttributeKey to "@user")
-        val c2 = c1 - ColorAttributeKey
+        val c1 = attributeContainerOf(BackgroundColorKey to HexColor("#00FF00"))
+        val c2 = c1 - TextColorKey
 
         c2 shouldBeSameInstanceAs c1
     }
@@ -116,15 +116,15 @@ class AttributeContainerTest {
         val empty = attributeContainerOf()
         empty.isEmpty() shouldBe true
 
-        val onePair = attributeContainerOf(MentionAttributeKey to "@user")
-        onePair.getOrNull(MentionAttributeKey) shouldBe "@user"
+        val onePair = attributeContainerOf(BackgroundColorKey to HexColor("#00FF00"))
+        onePair.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
 
         val twoPairs =
             attributeContainerOf(
-                MentionAttributeKey to "@mkeeda",
-                ColorAttributeKey to TextColor.Red,
+                BackgroundColorKey to HexColor("#00FF00"),
+                TextColorKey to HexColor("#FF0000"),
             )
-        twoPairs.getOrNull(MentionAttributeKey) shouldBe "@mkeeda"
-        twoPairs.getOrNull(ColorAttributeKey) shouldBe TextColor.Red
+        twoPairs.getOrNull(BackgroundColorKey) shouldBe HexColor("#00FF00")
+        twoPairs.getOrNull(TextColorKey) shouldBe HexColor("#FF0000")
     }
 }
