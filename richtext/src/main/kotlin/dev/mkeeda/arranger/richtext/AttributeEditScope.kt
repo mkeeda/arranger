@@ -90,3 +90,17 @@ public fun AttributeEditScope.bold() {
 public fun AttributeEditScope.clearBold() {
     set(BoldKey, null)
 }
+
+/**
+ * Convenience function to apply the underline text attribute within this builder.
+ */
+public fun AttributeEditScope.underline() {
+    set(UnderlineKey, Unit)
+}
+
+/**
+ * Convenience function to remove the underline attribute in the range.
+ */
+public fun AttributeEditScope.clearUnderline() {
+    set(UnderlineKey, null)
+}

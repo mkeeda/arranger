@@ -44,7 +44,7 @@ public fun RichTextEditor(
     interactionSource: MutableInteractionSource? = null,
     cursorBrush: Brush = SolidColor(Color.Black),
     decorator: TextFieldDecorator? = null,
-    styleResolver: AttributeStyleResolver = AttributeStyleResolver { },
+    styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
 ) {
     val outputTransformation =
         remember(state, styleResolver) {

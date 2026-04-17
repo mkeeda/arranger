@@ -21,6 +21,7 @@ class AttributeConversionsTest {
     fun `RgbaColor toColor returns Unspecified when color is Unspecified`() {
         RgbaColor.Unspecified.toColor() shouldBe Color.Unspecified
     }
+
     @Test
     fun `TextSize toTextUnit returns expected TextUnit`() {
         TextSize(16f).toTextUnit() shouldBe 16f.sp
@@ -29,4 +30,5 @@ class AttributeConversionsTest {
     @Test
     fun `TextSize toTextUnit returns Unspecified when size is Unspecified`() {
         TextSize.Unspecified.toTextUnit() shouldBe androidx.compose.ui.unit.TextUnit.Unspecified
-    }}
+    }
+}
