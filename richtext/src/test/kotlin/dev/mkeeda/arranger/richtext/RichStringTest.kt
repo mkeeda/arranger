@@ -25,11 +25,11 @@ class RichStringTest {
 
         // The original remains unchanged
         original.text shouldBe "Hello"
-        original.getSpans().shouldBeEmpty()
+        original.spans.shouldBeEmpty()
 
         // The styled instance has the attribute applied to the full range
         styled.text shouldBe "Hello"
-        val spans = styled.getSpans()
+        val spans = styled.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..4
         spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
@@ -42,7 +42,7 @@ class RichStringTest {
                 .edit { setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 0..4) }
 
         richString.text shouldBe "Hello, World!"
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..4
         spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
@@ -58,7 +58,7 @@ class RichStringTest {
                 }
 
         richString.text shouldBe "Hello, World!"
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 2
 
         val colorSpan =
@@ -112,7 +112,7 @@ class RichStringTest {
             RichString(text = "Hello")
                 .edit { setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 3..3) }
 
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 3..3
         spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
@@ -132,7 +132,7 @@ class RichStringTest {
                     setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 5..15)
                 }
 
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 3
 
         spans[0].range shouldBe 0..4
@@ -162,7 +162,7 @@ class RichStringTest {
                     setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 3..7)
                 }
 
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 3
 
         spans[0].range shouldBe 0..2
@@ -188,7 +188,7 @@ class RichStringTest {
                 }
 
         // It should perfectly replace the attribute and optimize back to 1 span
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..10
         spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
@@ -213,7 +213,7 @@ class RichStringTest {
                     setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 2..10)
                 }
 
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 5
 
         spans[0].range shouldBe 0..1
@@ -241,7 +241,7 @@ class RichStringTest {
                     setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..10)
                 }
 
-        val spans = richString.getSpans()
+        val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..10
         spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
@@ -264,7 +264,7 @@ class RichStringTest {
                 }
 
         // There should be 4 internal spans: [0..4], [5..9], [10..15], [16..19]
-        richString.getSpans() shouldHaveSize 4
+        richString.spans shouldHaveSize 4
 
         val mentionRuns = richString.runs(BackgroundColorKey)
 
@@ -325,8 +325,8 @@ class RichStringTest {
             }
 
         // Original remains completely unchanged
-        original.getSpans() shouldHaveSize 2
-        original.getSpans()[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        original.spans shouldHaveSize 2
+        original.spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
 
         // Edited contains the new attributes
         edited.runs(BackgroundColorKey)[0].range shouldBe 5..14
@@ -356,6 +356,6 @@ class RichStringTest {
             }
 
         edited.text shouldBe original.text
-        edited.getSpans() shouldBe original.getSpans()
+        edited.spans shouldBe original.spans
     }
 }

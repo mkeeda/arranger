@@ -14,7 +14,7 @@ public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
 
     // The Single Source of Truth for spans
-    private var spans: List<RichSpan> by mutableStateOf(initialText.getSpans())
+    private var spans: List<RichSpan> by mutableStateOf(initialText.spans)
 
     // Computed property representing the complete rich text state
     public val richString: RichString
@@ -25,7 +25,7 @@ public class RichTextState(initialText: RichString) {
             )
 
     public fun edit(block: RichStringBuilder.() -> Unit) {
-        spans = richString.edit(block).getSpans()
+        spans = richString.edit(block).spans
     }
 
     @OptIn(ExperimentalFoundationApi::class)

@@ -7,10 +7,11 @@ package dev.mkeeda.arranger.richtext
  * All mutating operations return a new [RichString] instance, preserving the original unchanged.
  *
  * @property text The plain text content.
+ * @property spans A list of all [RichSpan]s currently held by this [RichString].
  */
-public class RichString(
+public data class RichString(
     public val text: String,
-    private val spans: List<RichSpan> = emptyList(),
+    public val spans: List<RichSpan> = emptyList(),
 ) {
     /**
      * Creates a new [RichString] having the given [initialAttributes] applied to the entire text.
@@ -24,11 +25,6 @@ public class RichString(
                 listOf(RichSpan(range = text.indices, attributes = initialAttributes))
             },
     )
-
-    /**
-     * Returns a snapshot of all [RichSpan]s currently held by this [RichString].
-     */
-    public fun getSpans(): List<RichSpan> = spans
 
     /**
      * Retrieves all contiguous runs of the requested attribute [key], merging internally split spans.
