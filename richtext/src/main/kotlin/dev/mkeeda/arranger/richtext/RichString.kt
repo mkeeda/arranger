@@ -8,7 +8,7 @@ package dev.mkeeda.arranger.richtext
  *
  * @property text The plain text content.
  */
-public class RichString(
+public data class RichString(
     public val text: String,
     public val spans: List<RichSpan> = emptyList(),
 ) {
