@@ -7,6 +7,7 @@ package dev.mkeeda.arranger.richtext
  * All mutating operations return a new [RichString] instance, preserving the original unchanged.
  *
  * @property text The plain text content.
+ * @property spans A list of all [RichSpan]s currently held by this [RichString].
  */
 public data class RichString(
     public val text: String,
