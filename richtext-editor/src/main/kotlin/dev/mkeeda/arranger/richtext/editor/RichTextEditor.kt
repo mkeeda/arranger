@@ -80,7 +80,7 @@ private class RichTextOutputTransformation(
     private val styleResolver: AttributeStyleResolver,
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
-        for (span in state.richString.getSpans()) {
+        for (span in state.richString.spans) {
             val resolved = styleResolver.resolve(span.attributes)
 
             // Determine boundaries avoiding out of bounds in case of race conditions or text shrinkage mid-frame.

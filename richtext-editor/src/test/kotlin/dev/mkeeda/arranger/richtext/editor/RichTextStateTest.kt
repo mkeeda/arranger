@@ -42,7 +42,7 @@ class RichTextStateTest {
         val expectedText = "Oh, Hello World"
         state.richString.text shouldBe expectedText
 
-        val spans = state.richString.getSpans()
+        val spans = state.richString.spans
         spans.size shouldBe 1
         spans.first().range shouldBe expectedText.rangeOf("World")
     }
@@ -65,7 +65,7 @@ class RichTextStateTest {
         val expectedText = "Hello Wor!ld"
         state.richString.text shouldBe expectedText
 
-        val spans = state.richString.getSpans()
+        val spans = state.richString.spans
         spans.size shouldBe 1
         spans.first().range shouldBe expectedText.rangeOf("Wor!ld")
     }
@@ -88,7 +88,7 @@ class RichTextStateTest {
         val expectedText = "Hello World!"
         state.richString.text shouldBe expectedText
 
-        val spans = state.richString.getSpans()
+        val spans = state.richString.spans
         spans.size shouldBe 1
         spans.first().range shouldBe expectedText.rangeOf("Hello")
     }
@@ -111,7 +111,7 @@ class RichTextStateTest {
         val expectedText = "Hello World"
         state.richString.text shouldBe expectedText
 
-        val spans = state.richString.getSpans()
+        val spans = state.richString.spans
         spans.size shouldBe 1
         spans.first().range shouldBe expectedText.rangeOf("World")
     }
@@ -134,7 +134,7 @@ class RichTextStateTest {
         val expectedText = "Hello World"
         state.richString.text shouldBe expectedText
 
-        val spans = state.richString.getSpans()
+        val spans = state.richString.spans
         spans.size shouldBe 1
         spans.first().range shouldBe expectedText.rangeOf("World")
     }
@@ -157,7 +157,7 @@ class RichTextStateTest {
         val expectedText = "Hello "
         state.richString.text shouldBe expectedText
 
-        val spans = state.richString.getSpans()
+        val spans = state.richString.spans
         spans.isEmpty() shouldBe true
     }
 }

@@ -16,7 +16,7 @@ class AttributeEditScopeTest {
                 }
             }
 
-        val spans = str.getSpans()
+        val spans = str.spans
         spans.size shouldBe 1
         val attrs = spans.first().attributes
         attrs.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
@@ -42,7 +42,7 @@ class AttributeEditScopeTest {
                 }
             }
 
-        val spans = str.getSpans()
+        val spans = str.spans
         spans.size shouldBe 1
         val secondSpan = spans.first()
 
@@ -60,7 +60,7 @@ class AttributeEditScopeTest {
                     bold()
                 }
             }
-        val spans = str.getSpans()
+        val spans = str.spans
         spans.size shouldBe 1
         spans[0].range shouldBe 0..4
         spans[0].attributes.getOrNull(BoldKey) shouldBe Unit
@@ -72,14 +72,14 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { textColor(RgbaColor(0xFFFF0000)) }
             }
-        str.getSpans()[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        str.spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
 
         // Passing Unspecified should clear it
         str =
             str.edit {
                 editAttributes { textColor(RgbaColor.Unspecified) }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
 
         // clearTextColor() should clear it
         str =
@@ -90,7 +90,7 @@ class AttributeEditScopeTest {
             str.edit {
                 editAttributes { clearTextColor() }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
     }
 
     @Test
@@ -99,13 +99,13 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { backgroundColor(RgbaColor(0xFF00FF00)) }
             }
-        str.getSpans()[0].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        str.spans[0].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
 
         str =
             str.edit {
                 editAttributes { backgroundColor(RgbaColor.Unspecified) }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
 
         str =
             str.edit {
@@ -115,7 +115,7 @@ class AttributeEditScopeTest {
             str.edit {
                 editAttributes { clearBackgroundColor() }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
     }
 
     @Test
@@ -124,13 +124,13 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { fontSize(TextSize(16f)) }
             }
-        str.getSpans()[0].attributes.getOrNull(FontSizeKey) shouldBe TextSize(16f)
+        str.spans[0].attributes.getOrNull(FontSizeKey) shouldBe TextSize(16f)
 
         str =
             str.edit {
                 editAttributes { fontSize(TextSize.Unspecified) }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
 
         str =
             str.edit {
@@ -140,7 +140,7 @@ class AttributeEditScopeTest {
             str.edit {
                 editAttributes { clearFontSize() }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
     }
 
     @Test
@@ -149,13 +149,13 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { bold() }
             }
-        str.getSpans()[0].attributes.getOrNull(BoldKey) shouldBe Unit
+        str.spans[0].attributes.getOrNull(BoldKey) shouldBe Unit
 
         str =
             str.edit {
                 editAttributes { clearBold() }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
     }
 
     @Test
@@ -164,13 +164,13 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { underline() }
             }
-        str.getSpans()[0].attributes.getOrNull(UnderlineKey) shouldBe Unit
+        str.spans[0].attributes.getOrNull(UnderlineKey) shouldBe Unit
 
         str =
             str.edit {
                 editAttributes { clearUnderline() }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
     }
 
     @Test
@@ -179,13 +179,13 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { italic() }
             }
-        str.getSpans()[0].attributes.getOrNull(ItalicKey) shouldBe Unit
+        str.spans[0].attributes.getOrNull(ItalicKey) shouldBe Unit
 
         str =
             str.edit {
                 editAttributes { clearItalic() }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
     }
 
     @Test
@@ -194,12 +194,12 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { strikethrough() }
             }
-        str.getSpans()[0].attributes.getOrNull(StrikethroughKey) shouldBe Unit
+        str.spans[0].attributes.getOrNull(StrikethroughKey) shouldBe Unit
 
         str =
             str.edit {
                 editAttributes { clearStrikethrough() }
             }
-        str.getSpans().isEmpty() shouldBe true
+        str.spans.isEmpty() shouldBe true
     }
 }

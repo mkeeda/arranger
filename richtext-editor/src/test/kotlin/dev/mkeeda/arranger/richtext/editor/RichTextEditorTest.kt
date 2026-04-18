@@ -53,7 +53,7 @@ class RichTextEditorTest {
         val expectedNewText = "Welcome aArranger!"
         state.richString.text shouldBe expectedNewText
 
-        val newSpans = state.richString.getSpans()
+        val newSpans = state.richString.spans
         newSpans.size shouldBe 1
 
         // Assert the span accurately shifted
