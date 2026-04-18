@@ -157,4 +157,49 @@ class AttributeEditScopeTest {
             }
         str.getSpans().isEmpty() shouldBe true
     }
+
+    @Test
+    fun `underline sets and clears properly`() {
+        var str =
+            RichString("Test").edit {
+                editAttributes { underline() }
+            }
+        str.getSpans()[0].attributes.getOrNull(UnderlineKey) shouldBe Unit
+
+        str =
+            str.edit {
+                editAttributes { clearUnderline() }
+            }
+        str.getSpans().isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `italic sets and clears properly`() {
+        var str =
+            RichString("Test").edit {
+                editAttributes { italic() }
+            }
+        str.getSpans()[0].attributes.getOrNull(ItalicKey) shouldBe Unit
+
+        str =
+            str.edit {
+                editAttributes { clearItalic() }
+            }
+        str.getSpans().isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `strikethrough sets and clears properly`() {
+        var str =
+            RichString("Test").edit {
+                editAttributes { strikethrough() }
+            }
+        str.getSpans()[0].attributes.getOrNull(StrikethroughKey) shouldBe Unit
+
+        str =
+            str.edit {
+                editAttributes { clearStrikethrough() }
+            }
+        str.getSpans().isEmpty() shouldBe true
+    }
 }

@@ -26,7 +26,7 @@ public fun Color.toRgbaColor(): RgbaColor {
     // By extracting the 32-bit ARGB representation and wrapping in Long,
     // we match the RgbaColor memory layout correctly.
     val argb = this.toArgb()
-    return RgbaColor(argb.toLong() and 0xFFFFFFFFL)
+    return RgbaColor(value = argb.toLong() and 0xFFFFFFFFL)
 }
 
 /**

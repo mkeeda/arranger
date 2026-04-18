@@ -10,7 +10,7 @@ public value class RgbaColor(public val value: Long) {
         /**
          * Represents an unspecified color.
          */
-        public val Unspecified: RgbaColor = RgbaColor(Long.MAX_VALUE)
+        public val Unspecified: RgbaColor = RgbaColor(value = Long.MAX_VALUE)
     }
 }
 
@@ -23,7 +23,7 @@ public value class TextSize(public val sp: Float) {
         /**
          * Represents an unspecified text size.
          */
-        public val Unspecified: TextSize = TextSize(Float.NaN)
+        public val Unspecified: TextSize = TextSize(sp = Float.NaN)
     }
 }
 

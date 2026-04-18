@@ -104,3 +104,31 @@ public fun AttributeEditScope.underline() {
 public fun AttributeEditScope.clearUnderline() {
     set(UnderlineKey, null)
 }
+
+/**
+ * Convenience function to apply the italic text attribute within this builder.
+ */
+public fun AttributeEditScope.italic() {
+    set(ItalicKey, Unit)
+}
+
+/**
+ * Convenience function to remove the italic attribute in the range.
+ */
+public fun AttributeEditScope.clearItalic() {
+    set(ItalicKey, null)
+}
+
+/**
+ * Convenience function to apply the strikethrough text attribute within this builder.
+ */
+public fun AttributeEditScope.strikethrough() {
+    set(StrikethroughKey, Unit)
+}
+
+/**
+ * Convenience function to remove the strikethrough attribute in the range.
+ */
+public fun AttributeEditScope.clearStrikethrough() {
+    set(StrikethroughKey, null)
+}
