@@ -39,6 +39,16 @@ public class RichStringBuilder internal constructor(
             }
     }
 
+    /**
+     * Applies a set of attribute mutations to the specified [range] using a DSL builder.
+     */
+    public fun editAttributes(
+        range: IntRange = 0 until textLength,
+        editAction: AttributeEditScope.() -> Unit,
+    ) {
+        AttributeEditScope(this, range).editAction()
+    }
+
     private fun checkRange(range: IntRange) {
         require(!range.isEmpty()) { "Range must not be empty: $range" }
         require(range.first >= 0) { "Range start must not be negative: ${range.first}" }

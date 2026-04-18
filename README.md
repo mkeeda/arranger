@@ -36,51 +36,44 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 ## Quick Start (Current Usage)
 
 ```kotlin
-// 1. Define custom Attribute Keys
-object BoldAttributeKey : AttributeKey<Unit>
-object LinkAttributeKey : AttributeKey<String>
-
 @Composable
-fun ArrangerExample() {
-    // 2. Initialize RichTextState
-    val state = remember { 
+fun RichTextSampleScreen(modifier: Modifier = Modifier) {
+    val initialText = "Welcome to Arranger!\nThis is a RichTextEditor sample.\nYou can mix colors, bold text, and underlines."
+
+    // 1. Initialize RichTextState with standard attributes via declarative DSL
+    val state = remember {
         RichTextState(
-            initialRichString = RichString(
-                text = "Hello Arranger!",
-                attributes = attributeContainerOf(BoldAttributeKey to Unit)
-            )
-        ) 
+            initialText = RichString(text = initialText).edit {
+                editAttributes(range = initialText.rangeOf("Arranger!")) {
+                    bold()
+                }
+                editAttributes(range = initialText.rangeOf("Welcome to Arranger!")) {
+                    textColor(Color(0xFF6200EA))
+                }
+                editAttributes(range = initialText.rangeOf("RichTextEditor")) {
+                    bold()
+                    textColor(Color(0xFF00C853))
+                }
+                editAttributes(range = initialText.rangeOf("underlines")) {
+                    underline()
+                }
+                editAttributes(range = initialText.rangeOf("colors")) {
+                    textColor(Color(0xFFD50000))
+                }
+            }
+        )
     }
 
-    // 3. Declaratively map domain Attributes to Compose UI Styles
-    val styleResolver = remember {
-        AttributeStyleResolver {
-            spanStyle(BoldAttributeKey) {
-                SpanStyle(fontWeight = FontWeight.Bold)
-            }
-            spanStyle<String>(LinkAttributeKey) { url ->
-                SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)
-            }
-        }
-    }
-
-    // 4. Render and Edit natively via Compose 1.7
+    // 2. Render natively via Compose 1.7
+    // RichTextEditor automatically uses \`DefaultAttributeStyleResolver\` for standard styling attributes.
     RichTextEditor(
         state = state,
-        styleResolver = styleResolver,
-        textStyle = TextStyle(fontSize = 16.sp)
+        modifier = modifier.fillMaxWidth(),
     )
-
-    // 5. Safely modify attributes using the edit DSL
-    Button(onClick = {
-        state.edit {
-            setAttribute(key = LinkAttributeKey, value = "https://example.com", range = 0..4)
-        }
-    }) {
-        Text("Make 'Hello' a Link")
-    }
 }
 ```
+
+![Compose RichTextEditor Demo](docs/images/screenshot.png)
 
 ## Development Roadmap
 
@@ -91,7 +84,7 @@ fun ArrangerExample() {
     * Logic to segment strings into semantic chunks (`RichRun`) that can be operated on as an iterator.
 - [x] **3. Integration with TextFieldState / OutputTransformation**
     * Logic to hook into `TextFieldBuffer` modifications (insertions/deletions) and dynamically track/shift the indices of the underlying attribute tree.
-- [ ] **4. Implementation of Basic Built-in AttributeKeys**
+- [x] **4. Implementation of Basic Built-in AttributeKeys**
     * Basic character-level decorations (e.g., Bold, Text Color, Underline, Italics, Font Size).
     * Paragraph-level decorations (e.g., Headings, Bullet Lists).
 - [ ] **5. Custom Attribute Mapping APIs**

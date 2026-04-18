@@ -1,6 +1,5 @@
 package dev.mkeeda.arranger.richtext.editor
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
@@ -8,7 +7,7 @@ import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
-import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
@@ -22,16 +21,6 @@ class RichTextEditorTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private object BoldAttributeKey : AttributeKey<Unit> {
-        override val name: String = "Bold"
-        override val defaultValue: Unit = Unit
-    }
-
-    private object ColorAttributeKey : AttributeKey<Color> {
-        override val name: String = "Color"
-        override val defaultValue: Color = Color.Unspecified
-    }
-
     @Test
     fun `spans shift synchronously when user edits text within RichTextEditor`() {
         val initialText = "Welcome to Arranger!"
@@ -40,7 +29,7 @@ class RichTextEditorTest {
                 initialText =
                     RichString(text = initialText).edit {
                         // "Arranger!" is length 9, at index 11
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("Arranger!"))
+                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("Arranger!"))
                     },
             )
 
@@ -49,7 +38,7 @@ class RichTextEditorTest {
                 state = state,
                 styleResolver =
                     AttributeStyleResolver {
-                        spanStyle(BoldAttributeKey) { SpanStyle(fontWeight = FontWeight.Bold) }
+                        spanStyle(BoldKey) { SpanStyle(fontWeight = FontWeight.Bold) }
                     },
             )
         }

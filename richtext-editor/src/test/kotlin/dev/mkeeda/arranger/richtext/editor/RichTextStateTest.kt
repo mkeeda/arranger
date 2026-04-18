@@ -3,18 +3,13 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
-import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
 class RichTextStateTest {
-    private object BoldAttributeKey : AttributeKey<Unit> {
-        override val name: String = "Bold"
-        override val defaultValue: Unit = Unit
-    }
-
     @Test
     fun `inserts simple text without attributes`() {
         val initialText = "Hello World"
@@ -36,7 +31,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
@@ -59,7 +54,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
@@ -82,7 +77,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("Hello"))
+                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("Hello"))
                     },
             )
 
@@ -105,7 +100,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
@@ -128,7 +123,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("Wor!ld"))
+                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("Wor!ld"))
                     },
             )
 
@@ -151,7 +146,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldAttributeKey, Unit, range = initialText.rangeOf("World"))
+                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 

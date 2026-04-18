@@ -23,11 +23,39 @@ public fun interface AttributeStyleResolver {
 
 /**
  * Creates an [AttributeStyleResolver] using a declarative DSL.
+ * Optionally accepts a [base] resolver. The styles constructed by this builder
+ * will take precedence and be merged on top of the styles produced by the [base] resolver.
  */
 public fun AttributeStyleResolver(
+    base: AttributeStyleResolver? = null,
     builder: AttributeStyleBuilder.() -> Unit,
 ): AttributeStyleResolver {
-    return AttributeStyleBuilder().apply(builder).build()
+    val customResolver = AttributeStyleBuilder().apply(builder).build()
+    if (base == null) return customResolver
+
+    return AttributeStyleResolver { attributes ->
+        val baseStyle = base.resolve(attributes)
+        val customStyle = customResolver.resolve(attributes)
+
+        val mergedSpan =
+            if (baseStyle.spanStyle != null) {
+                baseStyle.spanStyle.merge(customStyle.spanStyle)
+            } else {
+                customStyle.spanStyle
+            }
+
+        val mergedParagraph =
+            if (baseStyle.paragraphStyle != null) {
+                baseStyle.paragraphStyle.merge(customStyle.paragraphStyle)
+            } else {
+                customStyle.paragraphStyle
+            }
+
+        ResolvedRichStyle(
+            spanStyle = mergedSpan,
+            paragraphStyle = mergedParagraph,
+        )
+    }
 }
 
 /**

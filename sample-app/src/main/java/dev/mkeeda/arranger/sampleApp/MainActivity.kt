@@ -16,17 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
+import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
+import dev.mkeeda.arranger.richtext.editor.textColor
 import dev.mkeeda.arranger.richtext.rangeOf
+import dev.mkeeda.arranger.richtext.underline
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,21 +42,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private object BoldKey : AttributeKey<Unit> {
-    override val name: String = "Bold"
-    override val defaultValue: Unit = Unit
-}
-
-private object ColorKey : AttributeKey<Color> {
-    override val name: String = "Color"
-    override val defaultValue: Color = Color.Unspecified
-}
-
-private object UnderlineKey : AttributeKey<Unit> {
-    override val name: String = "Underline"
-    override val defaultValue: Unit = Unit
-}
-
 @Composable
 fun RichTextSampleScreen(modifier: Modifier = Modifier) {
     val initialText = "Welcome to Arranger!\nThis is a RichTextEditor sample.\nYou can mix colors, bold text, and underlines."
@@ -67,25 +51,24 @@ fun RichTextSampleScreen(modifier: Modifier = Modifier) {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("Arranger!"))
-                        setAttribute(ColorKey, Color(0xFF6200EA), range = initialText.rangeOf("Welcome to Arranger!"))
-
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("RichTextEditor"))
-                        setAttribute(ColorKey, Color(0xFF00C853), range = initialText.rangeOf("RichTextEditor"))
-
-                        setAttribute(UnderlineKey, Unit, range = initialText.rangeOf("underlines"))
-                        setAttribute(ColorKey, Color(0xFFD50000), range = initialText.rangeOf("colors"))
+                        editAttributes(range = initialText.rangeOf("Arranger!")) {
+                            bold()
+                        }
+                        editAttributes(range = initialText.rangeOf("Welcome to Arranger!")) {
+                            textColor(Color(0xFF6200EA))
+                        }
+                        editAttributes(range = initialText.rangeOf("RichTextEditor")) {
+                            bold()
+                            textColor(Color(0xFF00C853))
+                        }
+                        editAttributes(range = initialText.rangeOf("underlines")) {
+                            underline()
+                        }
+                        editAttributes(range = initialText.rangeOf("colors")) {
+                            textColor(Color(0xFFD50000))
+                        }
                     },
             )
-        }
-
-    val styleResolver =
-        remember {
-            AttributeStyleResolver {
-                spanStyle(BoldKey) { SpanStyle(fontWeight = FontWeight.Bold) }
-                spanStyle(ColorKey) { color -> SpanStyle(color = color) }
-                spanStyle(UnderlineKey) { SpanStyle(textDecoration = TextDecoration.Underline) }
-            }
         }
 
     Column(modifier = modifier.padding(16.dp)) {
@@ -94,7 +77,6 @@ fun RichTextSampleScreen(modifier: Modifier = Modifier) {
 
         RichTextEditor(
             state = state,
-            styleResolver = styleResolver,
             modifier = Modifier.fillMaxWidth(),
         )
     }
