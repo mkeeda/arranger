@@ -7,8 +7,9 @@ package dev.mkeeda.arranger.richtext
  */
 public class RichStringBuilder internal constructor(
     private var currentSpans: List<RichSpan>,
-    private val textLength: Int,
+    private val text: String,
 ) {
+    private val textLength: Int = text.length
     /**
      * Applies the specified attribute [key] and [value] to the given [range].
      * Any existing attributes of the same key within this range are completely overwritten.
@@ -37,6 +38,36 @@ public class RichStringBuilder internal constructor(
             currentSpans.transformSpans(targetRange = range) { attributes ->
                 attributes - key
             }
+    }
+
+    /**
+     * Applies the specified paragraph attribute [key] and [value] to the given [range].
+     * The [range] is automatically expanded to span the entire paragraphs (separated by `\n`)
+     * it intersects with.
+     */
+    public fun <T> setParagraphAttribute(
+        key: AttributeKey<T>,
+        value: T,
+        range: IntRange = 0 until textLength,
+    ) {
+        checkRange(range)
+        val snappedRange = range.snapToParagraphs(text)
+        setAttribute(key, value, snappedRange)
+    }
+
+    private fun IntRange.snapToParagraphs(text: String): IntRange {
+        var start = this.first
+        var end = this.last
+
+        while (start > 0 && text[start - 1] != '\n') {
+            start--
+        }
+
+        while (end < text.lastIndex && text[end + 1] != '\n') {
+            end++
+        }
+
+        return start..end
     }
 
     /**
