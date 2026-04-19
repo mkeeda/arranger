@@ -1,5 +1,6 @@
 package dev.mkeeda.arranger.richtext.editor
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -84,6 +85,9 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
             ParagraphStyle(textIndent = TextIndent(firstLine = 16.sp, restLine = 16.sp))
         }
         spanStyle(BlockquoteKey) {
-            SpanStyle(fontStyle = FontStyle.Italic)
+            SpanStyle(
+                fontStyle = FontStyle.Italic,
+                color = Color.Gray,
+            )
         }
     }
