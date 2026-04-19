@@ -87,7 +87,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
         spanStyle(BlockquoteKey) {
             SpanStyle(
                 fontStyle = FontStyle.Italic,
-                color = Color.Gray,
+                color = Color.Unspecified.copy(alpha = 0.5f),
             )
         }
     }
