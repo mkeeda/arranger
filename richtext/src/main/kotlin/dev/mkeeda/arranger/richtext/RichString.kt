@@ -59,7 +59,7 @@ public data class RichString(
      * and returns a completely new [RichString] carrying the modifications.
      */
     public fun edit(block: RichStringBuilder.() -> Unit): RichString {
-        val builder = RichStringBuilder(currentSpans = spans, textLength = text.length)
+        val builder = RichStringBuilder(currentSpans = spans, text = text)
         builder.block()
         return builder.build(text = text)
     }

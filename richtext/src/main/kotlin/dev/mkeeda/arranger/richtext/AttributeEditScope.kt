@@ -21,6 +21,21 @@ public class AttributeEditScope internal constructor(
             builder.setAttribute(key, value, range)
         }
     }
+
+    /**
+     * Sets or removes a paragraph-level attribute for the given [key].
+     * The underlying range is automatically snapped to paragraph boundaries.
+     */
+    public fun <T : Any> setParagraph(
+        key: AttributeKey<T>,
+        value: T?,
+    ) {
+        if (value == null) {
+            builder.removeParagraphAttribute(key, range)
+        } else {
+            builder.setParagraphAttribute(key, value, range)
+        }
+    }
 }
 
 /**
@@ -131,4 +146,49 @@ public fun AttributeEditScope.strikethrough() {
  */
 public fun AttributeEditScope.clearStrikethrough() {
     set(StrikethroughKey, null)
+}
+
+/**
+ * Convenience function to set the heading level of the paragraph within this builder.
+ * The applied range will automatically snap to paragraph boundaries.
+ */
+public fun AttributeEditScope.headingLevel(level: HeadingLevel?) {
+    setParagraph(HeadingKey, level)
+}
+
+/**
+ * Convenience function to remove the heading attribute in the range.
+ */
+public fun AttributeEditScope.clearHeadingLevel() {
+    setParagraph(HeadingKey, null)
+}
+
+/**
+ * Convenience function to set the text alignment of the paragraph within this builder.
+ * The applied range will automatically snap to paragraph boundaries.
+ */
+public fun AttributeEditScope.textAlignment(alignment: TextAlignment?) {
+    setParagraph(TextAlignmentKey, alignment)
+}
+
+/**
+ * Convenience function to remove the text alignment attribute in the range.
+ */
+public fun AttributeEditScope.clearTextAlignment() {
+    setParagraph(TextAlignmentKey, null)
+}
+
+/**
+ * Convenience function to set the blockquote attribute of the paragraph within this builder.
+ * The applied range will automatically snap to paragraph boundaries.
+ */
+public fun AttributeEditScope.blockquote() {
+    setParagraph(BlockquoteKey, Unit)
+}
+
+/**
+ * Convenience function to remove the blockquote attribute in the range.
+ */
+public fun AttributeEditScope.clearBlockquote() {
+    setParagraph(BlockquoteKey, null)
 }
