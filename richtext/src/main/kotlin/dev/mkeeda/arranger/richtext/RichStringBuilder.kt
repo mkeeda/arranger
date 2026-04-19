@@ -57,17 +57,14 @@ public class RichStringBuilder internal constructor(
     }
 
     private fun IntRange.snapToParagraphs(text: String): IntRange {
-        var start = this.first
-        var end = this.last
-
-        while (start > 0 && text[start - 1] != '\n') {
-            start--
-        }
-
-        while (end < text.lastIndex && text[end] != '\n') {
-            end++
-        }
-
+        val start =
+            text.lastIndexOf('\n', startIndex = this.first - 1).let {
+                if (it == -1) 0 else it + 1
+            }
+        val end =
+            text.indexOf('\n', startIndex = this.last).let {
+                if (it == -1) text.lastIndex else it
+            }
         return start..end
     }
 

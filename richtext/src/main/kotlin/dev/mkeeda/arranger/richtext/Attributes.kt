@@ -99,6 +99,9 @@ public enum class HeadingLevel {
     Unspecified,
 }
 
+/**
+ * A semantic marker indicating the heading level of the paragraph.
+ */
 public object HeadingKey : AttributeKey<HeadingLevel> {
     override val name: String = "heading"
     override val defaultValue: HeadingLevel = HeadingLevel.Unspecified
@@ -115,6 +118,9 @@ public enum class TextAlignment {
     Unspecified,
 }
 
+/**
+ * A semantic marker indicating the horizontal text alignment of the paragraph.
+ */
 public object TextAlignmentKey : AttributeKey<TextAlignment> {
     override val name: String = "textAlignment"
     override val defaultValue: TextAlignment = TextAlignment.Unspecified
