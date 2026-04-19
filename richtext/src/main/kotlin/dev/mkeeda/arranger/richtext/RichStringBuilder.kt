@@ -71,6 +71,20 @@ public class RichStringBuilder internal constructor(
     }
 
     /**
+     * Removes any paragraph attributes associated with the specified [key] within the given [range].
+     * The [range] is automatically expanded to span the entire paragraphs (separated by `\n`)
+     * it intersects with.
+     */
+    public fun <T> removeParagraphAttribute(
+        key: AttributeKey<T>,
+        range: IntRange = 0 until textLength,
+    ) {
+        checkRange(range)
+        val snappedRange = range.snapToParagraphs(text)
+        removeAttribute(key, snappedRange)
+    }
+
+    /**
      * Applies a set of attribute mutations to the specified [range] using a DSL builder.
      */
     public fun editAttributes(

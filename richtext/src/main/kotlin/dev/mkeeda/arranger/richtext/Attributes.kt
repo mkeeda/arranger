@@ -85,3 +85,37 @@ public object FontSizeKey : AttributeKey<TextSize> {
     override val name: String = "fontSize"
     override val defaultValue: TextSize = TextSize.Unspecified
 }
+
+/**
+ * Represents heading semantic levels.
+ */
+public enum class HeadingLevel {
+    H1, H2, H3, H4, H5, H6, Unspecified
+}
+
+public object HeadingKey : AttributeKey<HeadingLevel> {
+    override val name: String = "heading"
+    override val defaultValue: HeadingLevel = HeadingLevel.Unspecified
+}
+
+/**
+ * Represents horizontal text alignment within a paragraph.
+ */
+public enum class TextAlignment {
+    Left, Center, Right, Justify, Unspecified
+}
+
+public object TextAlignmentKey : AttributeKey<TextAlignment> {
+    override val name: String = "textAlignment"
+    override val defaultValue: TextAlignment = TextAlignment.Unspecified
+}
+
+/**
+ * A semantic marker indicating that the paragraph is a blockquote.
+ */
+public object BlockquoteKey : AttributeKey<Unit> {
+    override val name: String = "blockquote"
+    override val defaultValue: Unit = Unit
+}
+
+
