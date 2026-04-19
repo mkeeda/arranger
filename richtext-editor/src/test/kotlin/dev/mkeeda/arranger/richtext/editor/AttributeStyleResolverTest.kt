@@ -6,7 +6,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
+import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -16,17 +17,17 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class AttributeStyleResolverTest {
-    private object TestSpanKey : AttributeKey<String> {
+    private object TestSpanKey : SpanAttributeKey<String> {
         override val name: String = "TestSpan"
         override val defaultValue: String = ""
     }
 
-    private object TestParagraphKey : AttributeKey<TextAlign> {
+    private object TestParagraphKey : ParagraphAttributeKey<TextAlign> {
         override val name: String = "TestParagraph"
         override val defaultValue: TextAlign = TextAlign.Unspecified
     }
 
-    private object TestCombinedKey : AttributeKey<Unit> {
+    private object TestParagraphAndSpanKey : ParagraphAttributeKey<Unit> {
         override val name: String = "TestCombined"
         override val defaultValue: Unit = Unit
     }
@@ -39,10 +40,10 @@ class AttributeStyleResolverTest {
             paragraphStyle(TestParagraphKey) { align ->
                 ParagraphStyle(textAlign = align)
             }
-            spanStyle(TestCombinedKey) {
+            spanStyle(TestParagraphAndSpanKey) {
                 SpanStyle(fontWeight = FontWeight.Bold)
             }
-            paragraphStyle(TestCombinedKey) {
+            paragraphStyle(TestParagraphAndSpanKey) {
                 ParagraphStyle(lineHeight = 24.sp)
             }
         }
@@ -53,14 +54,14 @@ class AttributeStyleResolverTest {
             attributeContainerOf(
                 TestSpanKey to "FFFF0000",
                 TestParagraphKey to TextAlign.Center,
-                TestCombinedKey to Unit,
+                TestParagraphAndSpanKey to Unit,
             )
 
         val resolved = resolver.resolve(container)
         resolved.spanStyle?.color shouldBe Color(0xFFFF0000)
-        resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold // From TestCombinedKey
+        resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold // From TestParagraphAndSpanKey
         resolved.paragraphStyle?.textAlign shouldBe TextAlign.Center
-        resolved.paragraphStyle?.lineHeight shouldBe 24.sp // From TestCombinedKey
+        resolved.paragraphStyle?.lineHeight shouldBe 24.sp // From TestParagraphAndSpanKey
     }
 
     @Test
@@ -84,7 +85,7 @@ class AttributeStyleResolverTest {
 
     @Test
     fun `resolve returns matching span and paragraph styles when combined attribute matches`() {
-        val container = attributeContainerOf(TestCombinedKey to Unit)
+        val container = attributeContainerOf(TestParagraphAndSpanKey to Unit)
         val resolved = resolver.resolve(container)
 
         resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold
@@ -95,12 +96,12 @@ class AttributeStyleResolverTest {
     fun `AttributeStyleResolver allows custom resolver to override base default`() {
         val overridingResolver =
             AttributeStyleResolver(base = resolver) {
-                spanStyle(TestCombinedKey) {
+                spanStyle(TestParagraphAndSpanKey) {
                     SpanStyle(fontWeight = FontWeight.Normal)
                 }
             }
 
-        val container = attributeContainerOf(TestCombinedKey to Unit)
+        val container = attributeContainerOf(TestParagraphAndSpanKey to Unit)
         val resolved = overridingResolver.resolve(container)
 
         // Custom resolver overrides the base

@@ -11,7 +11,7 @@ class RichStringEditSpanTest {
     @Test
     fun `applies an attribute to the entire text and returns a new immutable instance`() {
         val original = RichString(text = "Hello")
-        val styled = original.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000)) }
+        val styled = original.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000)) }
 
         // A new instance is returned (immutability)
         styled shouldNotBe original
@@ -32,7 +32,7 @@ class RichStringEditSpanTest {
     fun `applies an attribute to a specific range`() {
         val richString =
             RichString(text = "Hello, World!")
-                .edit { setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 0..4) }
+                .edit { setSpanAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 0..4) }
 
         richString.text shouldBe "Hello, World!"
         val spans = richString.spans
@@ -46,8 +46,8 @@ class RichStringEditSpanTest {
         val richString =
             RichString(text = "Hello, World!")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
-                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 7..11)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setSpanAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 7..11)
                 }
 
         richString.text shouldBe "Hello, World!"
@@ -74,7 +74,7 @@ class RichStringEditSpanTest {
         val richString = RichString(text = "Hello, World!")
         val exception =
             shouldThrow<IllegalArgumentException> {
-                richString.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = -1..3) }
+                richString.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = -1..3) }
             }
         exception.message shouldBe "Range start must not be negative: -1"
     }
@@ -84,7 +84,7 @@ class RichStringEditSpanTest {
         val richString = RichString(text = "Hello")
         val exception =
             shouldThrow<IllegalArgumentException> {
-                richString.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..5) }
+                richString.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..5) }
             }
         exception.message shouldBe "Range end must be within text bounds: 5 >= 5"
     }
@@ -94,7 +94,7 @@ class RichStringEditSpanTest {
         val richString = RichString(text = "Hello, World!")
         val exception =
             shouldThrow<IllegalArgumentException> {
-                richString.edit { setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..3) }
+                richString.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..3) }
             }
         exception.message shouldBe "Range must not be empty: 5..3"
     }
@@ -103,7 +103,7 @@ class RichStringEditSpanTest {
     fun `successfully applies an attribute to a 1-character range`() {
         val richString =
             RichString(text = "Hello")
-                .edit { setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 3..3) }
+                .edit { setSpanAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 3..3) }
 
         val spans = richString.spans
         spans shouldHaveSize 1
@@ -121,8 +121,8 @@ class RichStringEditSpanTest {
         val richString =
             RichString("1234567890123456")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
-                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 5..15)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
+                    setSpanAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 5..15)
                 }
 
         val spans = richString.spans
@@ -151,8 +151,8 @@ class RichStringEditSpanTest {
         val richString =
             RichString("12345678901")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
-                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 3..7)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
+                    setSpanAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 3..7)
                 }
 
         val spans = richString.spans
@@ -176,8 +176,8 @@ class RichStringEditSpanTest {
         val richString =
             RichString("12345678901")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
-                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 0..10)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..10)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 0..10)
                 }
 
         // It should perfectly replace the attribute and optimize back to 1 span
@@ -201,9 +201,9 @@ class RichStringEditSpanTest {
         val richString =
             RichString("1234567890123")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 8..12)
-                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 2..10)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 8..12)
+                    setSpanAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 2..10)
                 }
 
         val spans = richString.spans
@@ -230,8 +230,8 @@ class RichStringEditSpanTest {
         val richString =
             RichString("12345678901")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..10)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..10)
                 }
 
         val spans = richString.spans
@@ -245,18 +245,18 @@ class RichStringEditSpanTest {
         val original =
             RichString("12345678901234567890")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..9)
-                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 10..19)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..9)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 10..19)
                 }
 
         val edited =
             original.edit {
                 // Apply mention to the middle
-                setAttribute(BackgroundColorKey, RgbaColor(0xFF00FFFF), range = 5..14)
+                setSpanAttribute(BackgroundColorKey, RgbaColor(0xFF00FFFF), range = 5..14)
                 // Remove the color over a sub-range
-                removeAttribute(TextColorKey, range = 8..11)
+                removeSpanAttribute(TextColorKey, range = 8..11)
                 // Add a completely new attribute spanning across everything
-                setAttribute(TextColorKey, RgbaColor.Unspecified, range = 2..17)
+                setSpanAttribute(TextColorKey, RgbaColor.Unspecified, range = 2..17)
             }
 
         // Original remains completely unchanged

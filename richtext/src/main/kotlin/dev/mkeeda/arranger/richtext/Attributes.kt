@@ -30,7 +30,7 @@ public value class TextSize(public val sp: Float) {
 /**
  * The standard [AttributeKey] to denote bold text.
  */
-public object BoldKey : AttributeKey<Unit> {
+public object BoldKey : SpanAttributeKey<Unit> {
     override val name: String = "bold"
     override val defaultValue: Unit = Unit
 }
@@ -38,7 +38,7 @@ public object BoldKey : AttributeKey<Unit> {
 /**
  * The standard [AttributeKey] to denote italic text.
  */
-public object ItalicKey : AttributeKey<Unit> {
+public object ItalicKey : SpanAttributeKey<Unit> {
     override val name: String = "italic"
     override val defaultValue: Unit = Unit
 }
@@ -46,7 +46,7 @@ public object ItalicKey : AttributeKey<Unit> {
 /**
  * The standard [AttributeKey] to denote strikethrough text.
  */
-public object StrikethroughKey : AttributeKey<Unit> {
+public object StrikethroughKey : SpanAttributeKey<Unit> {
     override val name: String = "strikethrough"
     override val defaultValue: Unit = Unit
 }
@@ -54,7 +54,7 @@ public object StrikethroughKey : AttributeKey<Unit> {
 /**
  * The standard [AttributeKey] to denote underlined text.
  */
-public object UnderlineKey : AttributeKey<Unit> {
+public object UnderlineKey : SpanAttributeKey<Unit> {
     override val name: String = "underline"
     override val defaultValue: Unit = Unit
 }
@@ -63,7 +63,7 @@ public object UnderlineKey : AttributeKey<Unit> {
  * The standard [AttributeKey] to denote the foreground text color.
  * Contains a [RgbaColor] when specified, or [RgbaColor.Unspecified] otherwise.
  */
-public object TextColorKey : AttributeKey<RgbaColor> {
+public object TextColorKey : SpanAttributeKey<RgbaColor> {
     override val name: String = "textColor"
     override val defaultValue: RgbaColor = RgbaColor.Unspecified
 }
@@ -72,7 +72,7 @@ public object TextColorKey : AttributeKey<RgbaColor> {
  * The standard [AttributeKey] to denote the background color.
  * Contains a [RgbaColor] when specified, or [RgbaColor.Unspecified] otherwise.
  */
-public object BackgroundColorKey : AttributeKey<RgbaColor> {
+public object BackgroundColorKey : SpanAttributeKey<RgbaColor> {
     override val name: String = "backgroundColor"
     override val defaultValue: RgbaColor = RgbaColor.Unspecified
 }
@@ -81,7 +81,7 @@ public object BackgroundColorKey : AttributeKey<RgbaColor> {
  * The standard [AttributeKey] to denote the font size.
  * Contains a [TextSize] when specified, or [TextSize.Unspecified] otherwise.
  */
-public object FontSizeKey : AttributeKey<TextSize> {
+public object FontSizeKey : SpanAttributeKey<TextSize> {
     override val name: String = "fontSize"
     override val defaultValue: TextSize = TextSize.Unspecified
 }
@@ -102,7 +102,7 @@ public enum class HeadingLevel {
 /**
  * A semantic marker indicating the heading level of the paragraph.
  */
-public object HeadingKey : AttributeKey<HeadingLevel> {
+public object HeadingKey : ParagraphAttributeKey<HeadingLevel> {
     override val name: String = "heading"
     override val defaultValue: HeadingLevel = HeadingLevel.Unspecified
 }
@@ -121,7 +121,7 @@ public enum class TextAlignment {
 /**
  * A semantic marker indicating the horizontal text alignment of the paragraph.
  */
-public object TextAlignmentKey : AttributeKey<TextAlignment> {
+public object TextAlignmentKey : ParagraphAttributeKey<TextAlignment> {
     override val name: String = "textAlignment"
     override val defaultValue: TextAlignment = TextAlignment.Unspecified
 }
@@ -129,7 +129,7 @@ public object TextAlignmentKey : AttributeKey<TextAlignment> {
 /**
  * A semantic marker indicating that the paragraph is a blockquote.
  */
-public object BlockquoteKey : AttributeKey<Unit> {
+public object BlockquoteKey : ParagraphAttributeKey<Unit> {
     override val name: String = "blockquote"
     override val defaultValue: Unit = Unit
 }

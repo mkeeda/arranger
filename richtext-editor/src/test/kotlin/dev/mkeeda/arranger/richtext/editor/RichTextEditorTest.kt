@@ -29,7 +29,7 @@ class RichTextEditorTest {
                 initialText =
                     RichString(text = initialText).edit {
                         // "Arranger!" is length 9, at index 11
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("Arranger!"))
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("Arranger!"))
                     },
             )
 
