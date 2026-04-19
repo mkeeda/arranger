@@ -20,11 +20,11 @@ class RichStringTest {
         val richString =
             RichString("12345678901234567890")
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
-                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 5..9)
-                    setAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 10..15)
-                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 10..15)
-                    setAttribute(BackgroundColorKey, RgbaColor(0xFFFF00FF), range = 16..19)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..4)
+                    setSpanAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 5..9)
+                    setSpanAttribute(BackgroundColorKey, RgbaColor(0xFF00FF00), range = 10..15)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 10..15)
+                    setSpanAttribute(BackgroundColorKey, RgbaColor(0xFFFF00FF), range = 16..19)
                 }
 
         // There should be 4 internal spans: [0..4], [5..9], [10..15], [16..19]
@@ -50,9 +50,9 @@ class RichStringTest {
         val richString =
             RichString("01234567890123456789") // length 20
                 .edit {
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 2..4)
-                    setAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 8..10)
-                    setAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 15..19)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 2..4)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 8..10)
+                    setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 15..19)
                 }
 
         val colorRuns = richString.runs(TextColorKey)

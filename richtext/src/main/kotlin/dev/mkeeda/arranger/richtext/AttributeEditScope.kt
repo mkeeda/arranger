@@ -16,9 +16,9 @@ public class AttributeEditScope internal constructor(
         value: T?,
     ) {
         if (value == null) {
-            builder.removeAttribute(key, range)
+            builder.removeSpanAttribute(key, range)
         } else {
-            builder.setAttribute(key, value, range)
+            builder.setSpanAttribute(key, value, range)
         }
     }
 

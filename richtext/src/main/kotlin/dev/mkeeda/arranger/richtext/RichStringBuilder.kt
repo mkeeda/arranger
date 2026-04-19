@@ -12,10 +12,10 @@ public class RichStringBuilder internal constructor(
     private val textLength: Int = text.length
 
     /**
-     * Applies the specified attribute [key] and [value] to the given [range].
-     * Any existing attributes of the same key within this range are completely overwritten.
+     * Applies the specified character span attribute [key] and [value] to the given [range].
+     * Any existing span attributes of the same key within this range are completely overwritten.
      */
-    public fun <T> setAttribute(
+    public fun <T> setSpanAttribute(
         key: SpanAttributeKey<T>,
         value: T,
         range: IntRange = 0 until textLength,
@@ -28,9 +28,9 @@ public class RichStringBuilder internal constructor(
     }
 
     /**
-     * Removes any attributes associated with the specified [key] within the given [range].
+     * Removes any character span attributes associated with the specified [key] within the given [range].
      */
-    public fun <T> removeAttribute(
+    public fun <T> removeSpanAttribute(
         key: SpanAttributeKey<T>,
         range: IntRange = 0 until textLength,
     ) {

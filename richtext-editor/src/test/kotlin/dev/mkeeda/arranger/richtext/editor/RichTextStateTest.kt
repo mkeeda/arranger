@@ -31,7 +31,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
@@ -54,7 +54,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
@@ -77,7 +77,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("Hello"))
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("Hello"))
                     },
             )
 
@@ -100,7 +100,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
@@ -123,7 +123,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("Wor!ld"))
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("Wor!ld"))
                     },
             )
 
@@ -146,7 +146,7 @@ class RichTextStateTest {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
