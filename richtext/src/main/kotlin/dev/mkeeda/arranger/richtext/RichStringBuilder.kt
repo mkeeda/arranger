@@ -10,6 +10,7 @@ public class RichStringBuilder internal constructor(
     private val text: String,
 ) {
     private val textLength: Int = text.length
+
     /**
      * Applies the specified attribute [key] and [value] to the given [range].
      * Any existing attributes of the same key within this range are completely overwritten.

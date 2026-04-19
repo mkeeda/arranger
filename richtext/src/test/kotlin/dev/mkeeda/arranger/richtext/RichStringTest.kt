@@ -1,10 +1,7 @@
 package dev.mkeeda.arranger.richtext
 
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 
 class RichStringTest {
@@ -14,7 +11,6 @@ class RichStringTest {
 
         richString.text shouldBe "Hello, World!"
     }
-
 
     fun `runs returns continuous chunks of the same queried attribute value, ignoring other attributes`() {
         // [0..4] Color=Red
@@ -72,5 +68,4 @@ class RichStringTest {
         colorRuns[2].range shouldBe 15..19
         colorRuns[2].value shouldBe RgbaColor(0xFFFF0000)
     }
-
 }

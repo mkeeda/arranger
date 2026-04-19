@@ -70,13 +70,14 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
             }
         }
         paragraphStyle(TextAlignmentKey) { alignment ->
-            val textAlign = when (alignment) {
-                TextAlignment.Left -> TextAlign.Left
-                TextAlignment.Center -> TextAlign.Center
-                TextAlignment.Right -> TextAlign.Right
-                TextAlignment.Justify -> TextAlign.Justify
-                TextAlignment.Unspecified -> TextAlign.Unspecified
-            }
+            val textAlign =
+                when (alignment) {
+                    TextAlignment.Left -> TextAlign.Left
+                    TextAlignment.Center -> TextAlign.Center
+                    TextAlignment.Right -> TextAlign.Right
+                    TextAlignment.Justify -> TextAlign.Justify
+                    TextAlignment.Unspecified -> TextAlign.Unspecified
+                }
             ParagraphStyle(textAlign = textAlign)
         }
         paragraphStyle(BlockquoteKey) {

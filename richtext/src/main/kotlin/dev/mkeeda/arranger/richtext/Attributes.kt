@@ -90,7 +90,13 @@ public object FontSizeKey : AttributeKey<TextSize> {
  * Represents heading semantic levels.
  */
 public enum class HeadingLevel {
-    H1, H2, H3, H4, H5, H6, Unspecified
+    H1,
+    H2,
+    H3,
+    H4,
+    H5,
+    H6,
+    Unspecified,
 }
 
 public object HeadingKey : AttributeKey<HeadingLevel> {
@@ -102,7 +108,11 @@ public object HeadingKey : AttributeKey<HeadingLevel> {
  * Represents horizontal text alignment within a paragraph.
  */
 public enum class TextAlignment {
-    Left, Center, Right, Justify, Unspecified
+    Left,
+    Center,
+    Right,
+    Justify,
+    Unspecified,
 }
 
 public object TextAlignmentKey : AttributeKey<TextAlignment> {
@@ -117,5 +127,3 @@ public object BlockquoteKey : AttributeKey<Unit> {
     override val name: String = "blockquote"
     override val defaultValue: Unit = Unit
 }
-
-

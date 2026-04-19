@@ -5,9 +5,8 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import dev.mkeeda.arranger.richtext.AttributeKey
 import androidx.compose.ui.unit.sp
-import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -32,28 +31,30 @@ class AttributeStyleResolverTest {
         override val defaultValue: Unit = Unit
     }
 
-    private val resolver = AttributeStyleResolver {
-        spanStyle(TestSpanKey) { spanValue ->
-            SpanStyle(color = Color(spanValue.toLong(16)))
+    private val resolver =
+        AttributeStyleResolver {
+            spanStyle(TestSpanKey) { spanValue ->
+                SpanStyle(color = Color(spanValue.toLong(16)))
+            }
+            paragraphStyle(TestParagraphKey) { align ->
+                ParagraphStyle(textAlign = align)
+            }
+            spanStyle(TestCombinedKey) {
+                SpanStyle(fontWeight = FontWeight.Bold)
+            }
+            paragraphStyle(TestCombinedKey) {
+                ParagraphStyle(lineHeight = 24.sp)
+            }
         }
-        paragraphStyle(TestParagraphKey) { align ->
-            ParagraphStyle(textAlign = align)
-        }
-        spanStyle(TestCombinedKey) {
-            SpanStyle(fontWeight = FontWeight.Bold)
-        }
-        paragraphStyle(TestCombinedKey) {
-            ParagraphStyle(lineHeight = 24.sp)
-        }
-    }
 
     @Test
     fun `resolve returns merged styles when multiple attributes match`() {
-        val container = attributeContainerOf(
-            TestSpanKey to "FFFF0000",
-            TestParagraphKey to TextAlign.Center,
-            TestCombinedKey to Unit
-        )
+        val container =
+            attributeContainerOf(
+                TestSpanKey to "FFFF0000",
+                TestParagraphKey to TextAlign.Center,
+                TestCombinedKey to Unit,
+            )
 
         val resolved = resolver.resolve(container)
         resolved.spanStyle?.color shouldBe Color(0xFFFF0000)
@@ -92,15 +93,16 @@ class AttributeStyleResolverTest {
 
     @Test
     fun `AttributeStyleResolver allows custom resolver to override base default`() {
-        val overridingResolver = AttributeStyleResolver(base = resolver) {
-            spanStyle(TestCombinedKey) {
-                SpanStyle(fontWeight = FontWeight.Normal)
+        val overridingResolver =
+            AttributeStyleResolver(base = resolver) {
+                spanStyle(TestCombinedKey) {
+                    SpanStyle(fontWeight = FontWeight.Normal)
+                }
             }
-        }
 
         val container = attributeContainerOf(TestCombinedKey to Unit)
         val resolved = overridingResolver.resolve(container)
-        
+
         // Custom resolver overrides the base
         resolved.spanStyle?.fontWeight shouldBe FontWeight.Normal
         // Base resolver properties that are not overridden still apply

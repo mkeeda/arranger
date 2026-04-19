@@ -49,12 +49,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun RichTextSampleScreen(modifier: Modifier = Modifier) {
-    val initialText = "Arranger RichText Editor\n" +
-        "Welcome to Arranger! This is a sample.\n" +
-        "You can mix colors, bold text, and underlines.\n\n" +
-        "Paragraph Styles Demo\n" +
-        "This paragraph is centered correctly.\n" +
-        "> This is a blockquote with nice indents."
+    val initialText =
+        "Arranger RichText Editor\n" +
+            "Welcome to Arranger! This is a sample.\n" +
+            "You can mix colors, bold text, and underlines.\n\n" +
+            "Paragraph Styles Demo\n" +
+            "This paragraph is centered correctly.\n" +
+            "> This is a blockquote with nice indents."
 
     val state =
         remember {
