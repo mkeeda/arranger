@@ -8,3 +8,13 @@ public interface AttributeKey<T> {
     public val name: String
     public val defaultValue: T
 }
+
+/**
+ * A marker interface indicating that the attribute applies to character spans.
+ */
+public interface SpanAttributeKey<T> : AttributeKey<T>
+
+/**
+ * A marker interface indicating that the attribute applies to whole paragraphs.
+ */
+public interface ParagraphAttributeKey<T> : AttributeKey<T>

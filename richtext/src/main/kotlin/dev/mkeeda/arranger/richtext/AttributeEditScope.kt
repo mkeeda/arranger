@@ -12,7 +12,7 @@ public class AttributeEditScope internal constructor(
      * If [value] is null, the attribute is removed from the specified range.
      */
     public fun <T : Any> set(
-        key: AttributeKey<T>,
+        key: SpanAttributeKey<T>,
         value: T?,
     ) {
         if (value == null) {
@@ -27,7 +27,7 @@ public class AttributeEditScope internal constructor(
      * The underlying range is automatically snapped to paragraph boundaries.
      */
     public fun <T : Any> setParagraph(
-        key: AttributeKey<T>,
+        key: ParagraphAttributeKey<T>,
         value: T?,
     ) {
         if (value == null) {

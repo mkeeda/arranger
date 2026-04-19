@@ -4,6 +4,7 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 
 /**
  * A container representing the resolved visual styles for a set of attributes.
@@ -84,7 +85,7 @@ public class AttributeStyleBuilder internal constructor() {
      * When the [AttributeContainer] contains this key, the [mapper] is invoked with the key's value.
      */
     public fun <T> paragraphStyle(
-        key: AttributeKey<T>,
+        key: ParagraphAttributeKey<T>,
         mapper: (T) -> ParagraphStyle,
     ) {
         paragraphResolvers.add { container ->

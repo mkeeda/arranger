@@ -6,7 +6,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
+import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -16,17 +17,17 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class AttributeStyleResolverTest {
-    private object TestSpanKey : AttributeKey<String> {
+    private object TestSpanKey : SpanAttributeKey<String> {
         override val name: String = "TestSpan"
         override val defaultValue: String = ""
     }
 
-    private object TestParagraphKey : AttributeKey<TextAlign> {
+    private object TestParagraphKey : ParagraphAttributeKey<TextAlign> {
         override val name: String = "TestParagraph"
         override val defaultValue: TextAlign = TextAlign.Unspecified
     }
 
-    private object TestCombinedKey : AttributeKey<Unit> {
+    private object TestCombinedKey : ParagraphAttributeKey<Unit> {
         override val name: String = "TestCombined"
         override val defaultValue: Unit = Unit
     }

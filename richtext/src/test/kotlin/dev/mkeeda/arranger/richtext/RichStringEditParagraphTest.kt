@@ -14,11 +14,11 @@ class RichStringEditParagraphTest {
         val actual =
             richString.edit {
                 // Index 8 is 'n' in "Line2"
-                setParagraphAttribute(BoldKey, Unit, 8..8)
+                setParagraphAttribute(BlockquoteKey, Unit, 8..8)
             }
 
         // "Line2" is from index 6 to 10. "Line1\n" is 0..5, "Line2\n" is 6..11.
-        val runs = actual.runs(BoldKey)
+        val runs = actual.runs(BlockquoteKey)
         runs shouldHaveSize 1
         runs[0] shouldBe RichRun(text = "Line2\n", range = 6..11, value = Unit)
     }
@@ -30,10 +30,10 @@ class RichStringEditParagraphTest {
         val actual =
             richString.edit {
                 // Index 0 is 'L' in "Line1"
-                setParagraphAttribute(BoldKey, Unit, 0..0)
+                setParagraphAttribute(BlockquoteKey, Unit, 0..0)
             }
 
-        val runs = actual.runs(BoldKey)
+        val runs = actual.runs(BlockquoteKey)
         runs shouldHaveSize 1
         runs[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = Unit)
     }
@@ -45,10 +45,10 @@ class RichStringEditParagraphTest {
         val actual =
             richString.edit {
                 // Last index is "Line3"
-                setParagraphAttribute(BoldKey, Unit, paragraphText.lastIndex..paragraphText.lastIndex)
+                setParagraphAttribute(BlockquoteKey, Unit, paragraphText.lastIndex..paragraphText.lastIndex)
             }
 
-        val runs = actual.runs(BoldKey)
+        val runs = actual.runs(BlockquoteKey)
         runs shouldHaveSize 1
         runs[0] shouldBe RichRun(text = "Line3", range = 12..16, value = Unit)
     }
@@ -60,10 +60,10 @@ class RichStringEditParagraphTest {
         val actual =
             richString.edit {
                 // Include 'n' in Line1 (index 2) to 'L' in Line3 (index 12)
-                setParagraphAttribute(BoldKey, Unit, 2..12)
+                setParagraphAttribute(BlockquoteKey, Unit, 2..12)
             }
 
-        val runs = actual.runs(BoldKey)
+        val runs = actual.runs(BlockquoteKey)
         runs shouldHaveSize 1
         runs[0] shouldBe RichRun(text = paragraphText, range = 0..16, value = Unit)
     }

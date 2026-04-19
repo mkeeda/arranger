@@ -16,7 +16,7 @@ public class RichStringBuilder internal constructor(
      * Any existing attributes of the same key within this range are completely overwritten.
      */
     public fun <T> setAttribute(
-        key: AttributeKey<T>,
+        key: SpanAttributeKey<T>,
         value: T,
         range: IntRange = 0 until textLength,
     ) {
@@ -31,7 +31,7 @@ public class RichStringBuilder internal constructor(
      * Removes any attributes associated with the specified [key] within the given [range].
      */
     public fun <T> removeAttribute(
-        key: AttributeKey<T>,
+        key: SpanAttributeKey<T>,
         range: IntRange = 0 until textLength,
     ) {
         checkRange(range)
@@ -47,13 +47,16 @@ public class RichStringBuilder internal constructor(
      * it intersects with.
      */
     public fun <T> setParagraphAttribute(
-        key: AttributeKey<T>,
+        key: ParagraphAttributeKey<T>,
         value: T,
         range: IntRange = 0 until textLength,
     ) {
         checkRange(range)
         val snappedRange = range.snapToParagraphs(text)
-        setAttribute(key, value, snappedRange)
+        currentSpans =
+            currentSpans.transformSpans(targetRange = snappedRange) { attributes ->
+                attributes.plus(key, value)
+            }
     }
 
     private fun IntRange.snapToParagraphs(text: String): IntRange {
@@ -74,12 +77,15 @@ public class RichStringBuilder internal constructor(
      * it intersects with.
      */
     public fun <T> removeParagraphAttribute(
-        key: AttributeKey<T>,
+        key: ParagraphAttributeKey<T>,
         range: IntRange = 0 until textLength,
     ) {
         checkRange(range)
         val snappedRange = range.snapToParagraphs(text)
-        removeAttribute(key, snappedRange)
+        currentSpans =
+            currentSpans.transformSpans(targetRange = snappedRange) { attributes ->
+                attributes - key
+            }
     }
 
     /**
