@@ -63,7 +63,7 @@ public class RichStringBuilder internal constructor(
             start--
         }
 
-        while (end < text.lastIndex && text[end + 1] != '\n') {
+        while (end < text.lastIndex && text[end] != '\n') {
             end++
         }
 

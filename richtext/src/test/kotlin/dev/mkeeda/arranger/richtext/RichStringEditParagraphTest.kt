@@ -19,7 +19,7 @@ class RichStringEditParagraphTest {
         // "Line2" is from index 6 to 10. "Line1\n" is 0..5, "Line2\n" is 6..11.
         val runs = actual.runs(BoldKey)
         runs shouldHaveSize 1
-        runs[0] shouldBe RichRun(text = "Line2", range = 6..10, value = Unit)
+        runs[0] shouldBe RichRun(text = "Line2\n", range = 6..11, value = Unit)
     }
 
     @Test
@@ -33,7 +33,7 @@ class RichStringEditParagraphTest {
 
         val runs = actual.runs(BoldKey)
         runs shouldHaveSize 1
-        runs[0] shouldBe RichRun(text = "Line1", range = 0..4, value = Unit)
+        runs[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = Unit)
     }
 
     @Test
@@ -82,11 +82,11 @@ class RichStringEditParagraphTest {
 
         val headingRuns = actual.runs(HeadingKey)
         headingRuns shouldHaveSize 1
-        headingRuns[0] shouldBe RichRun(text = "Line1", range = 0..4, value = HeadingLevel.H1)
+        headingRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = HeadingLevel.H1)
 
         val blockquoteRuns = actual.runs(BlockquoteKey)
         blockquoteRuns shouldHaveSize 1
-        blockquoteRuns[0] shouldBe RichRun(text = "Line2", range = 6..10, value = Unit)
+        blockquoteRuns[0] shouldBe RichRun(text = "Line2\n", range = 6..11, value = Unit)
 
         val alignRuns = actual.runs(TextAlignmentKey)
         alignRuns shouldHaveSize 1
@@ -114,11 +114,11 @@ class RichStringEditParagraphTest {
             }
         }
 
-        // The first paragraph ("Line1\n") and the third paragraph ("\nLine3") 
-        // should retain the attributes. The middle paragraph ("Line2") is cleared.
+        // The first paragraph ("Line1\n") and the third paragraph ("Line3") 
+        // should retain the attributes. The middle paragraph ("Line2\n") is cleared.
         val headingRuns = actual.runs(HeadingKey)
         headingRuns shouldHaveSize 2
         headingRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = HeadingLevel.H1)
-        headingRuns[1] shouldBe RichRun(text = "\nLine3", range = 11..16, value = HeadingLevel.H1)
+        headingRuns[1] shouldBe RichRun(text = "Line3", range = 12..16, value = HeadingLevel.H1)
     }
 }
