@@ -38,29 +38,47 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 ```kotlin
 @Composable
 fun RichTextSampleScreen(modifier: Modifier = Modifier) {
-    val initialText = "Welcome to Arranger!\nThis is a RichTextEditor sample.\nYou can mix colors, bold text, and underlines."
+    val initialText =
+        "Arranger RichText Editor\n" +
+            "Welcome to Arranger! This is a sample.\n" +
+            "You can mix colors, bold text, and underlines.\n\n" +
+            "Paragraph Styles Demo\n" +
+            "This paragraph is centered correctly.\n" +
+            "> This is a blockquote with nice indents."
 
     // 1. Initialize RichTextState with standard attributes via declarative DSL
     val state = remember {
         RichTextState(
-            initialText = RichString(text = initialText).edit {
-                editAttributes(range = initialText.rangeOf("Arranger!")) {
-                    bold()
+            initialText =
+                RichString(text = initialText).edit {
+                    editAttributes(range = initialText.rangeOf("Arranger RichText Editor")) {
+                        headingLevel(HeadingLevel.H1)
+                    }
+                    editAttributes(range = initialText.rangeOf("Paragraph Styles Demo")) {
+                        headingLevel(HeadingLevel.H3)
+                    }
+                    editAttributes(range = initialText.rangeOf("This paragraph is centered correctly.")) {
+                        textAlignment(TextAlignment.Center)
+                    }
+                    editAttributes(range = initialText.rangeOf("> This is a blockquote with nice indents.")) {
+                        blockquote()
+                    }
+                    editAttributes(range = initialText.rangeOf("Arranger!")) {
+                        bold()
+                    }
+                    editAttributes(range = initialText.rangeOf("Welcome to Arranger!")) {
+                        textColor(Color(0xFF6200EA))
+                    }
+                    editAttributes(range = initialText.rangeOf("colors")) {
+                        textColor(Color(0xFFD50000))
+                    }
+                    editAttributes(range = initialText.rangeOf("bold text")) {
+                        bold()
+                    }
+                    editAttributes(range = initialText.rangeOf("underlines")) {
+                        underline()
+                    }
                 }
-                editAttributes(range = initialText.rangeOf("Welcome to Arranger!")) {
-                    textColor(Color(0xFF6200EA))
-                }
-                editAttributes(range = initialText.rangeOf("RichTextEditor")) {
-                    bold()
-                    textColor(Color(0xFF00C853))
-                }
-                editAttributes(range = initialText.rangeOf("underlines")) {
-                    underline()
-                }
-                editAttributes(range = initialText.rangeOf("colors")) {
-                    textColor(Color(0xFFD50000))
-                }
-            }
         )
     }
 
