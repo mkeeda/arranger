@@ -11,7 +11,7 @@ public class AttributeEditScope internal constructor(
      * Sets or removes a character span attribute for the given [key].
      * If [value] is null, the span attribute is removed from the specified range.
      */
-    public fun <T : Any> setSpan(
+    public fun <T : Any> setSpanAttribute(
         key: SpanAttributeKey<T>,
         value: T?,
     ) {
@@ -26,7 +26,7 @@ public class AttributeEditScope internal constructor(
      * Sets or removes a paragraph-level attribute for the given [key].
      * The underlying range is automatically snapped to paragraph boundaries.
      */
-    public fun <T : Any> setParagraph(
+    public fun <T : Any> setParagraphAttribute(
         key: ParagraphAttributeKey<T>,
         value: T?,
     ) {
@@ -45,7 +45,7 @@ public fun AttributeEditScope.textColor(color: RgbaColor) {
     if (color == RgbaColor.Unspecified) {
         clearTextColor()
     } else {
-        setSpan(TextColorKey, color)
+        setSpanAttribute(TextColorKey, color)
     }
 }
 
@@ -53,7 +53,7 @@ public fun AttributeEditScope.textColor(color: RgbaColor) {
  * Convenience function to remove the text color attribute in the range.
  */
 public fun AttributeEditScope.clearTextColor() {
-    setSpan(TextColorKey, null)
+    setSpanAttribute(TextColorKey, null)
 }
 
 /**
@@ -63,7 +63,7 @@ public fun AttributeEditScope.backgroundColor(color: RgbaColor) {
     if (color == RgbaColor.Unspecified) {
         clearBackgroundColor()
     } else {
-        setSpan(BackgroundColorKey, color)
+        setSpanAttribute(BackgroundColorKey, color)
     }
 }
 
@@ -71,7 +71,7 @@ public fun AttributeEditScope.backgroundColor(color: RgbaColor) {
  * Convenience function to remove the background color attribute in the range.
  */
 public fun AttributeEditScope.clearBackgroundColor() {
-    setSpan(BackgroundColorKey, null)
+    setSpanAttribute(BackgroundColorKey, null)
 }
 
 /**
@@ -81,7 +81,7 @@ public fun AttributeEditScope.fontSize(size: TextSize) {
     if (size == TextSize.Unspecified) {
         clearFontSize()
     } else {
-        setSpan(FontSizeKey, size)
+        setSpanAttribute(FontSizeKey, size)
     }
 }
 
@@ -89,63 +89,63 @@ public fun AttributeEditScope.fontSize(size: TextSize) {
  * Convenience function to remove the font size attribute in the range.
  */
 public fun AttributeEditScope.clearFontSize() {
-    setSpan(FontSizeKey, null)
+    setSpanAttribute(FontSizeKey, null)
 }
 
 /**
  * Convenience function to apply the bold text attribute within this builder.
  */
 public fun AttributeEditScope.bold() {
-    setSpan(BoldKey, Unit)
+    setSpanAttribute(BoldKey, Unit)
 }
 
 /**
  * Convenience function to remove the bold attribute in the range.
  */
 public fun AttributeEditScope.clearBold() {
-    setSpan(BoldKey, null)
+    setSpanAttribute(BoldKey, null)
 }
 
 /**
  * Convenience function to apply the underline text attribute within this builder.
  */
 public fun AttributeEditScope.underline() {
-    setSpan(UnderlineKey, Unit)
+    setSpanAttribute(UnderlineKey, Unit)
 }
 
 /**
  * Convenience function to remove the underline attribute in the range.
  */
 public fun AttributeEditScope.clearUnderline() {
-    setSpan(UnderlineKey, null)
+    setSpanAttribute(UnderlineKey, null)
 }
 
 /**
  * Convenience function to apply the italic text attribute within this builder.
  */
 public fun AttributeEditScope.italic() {
-    setSpan(ItalicKey, Unit)
+    setSpanAttribute(ItalicKey, Unit)
 }
 
 /**
  * Convenience function to remove the italic attribute in the range.
  */
 public fun AttributeEditScope.clearItalic() {
-    setSpan(ItalicKey, null)
+    setSpanAttribute(ItalicKey, null)
 }
 
 /**
  * Convenience function to apply the strikethrough text attribute within this builder.
  */
 public fun AttributeEditScope.strikethrough() {
-    setSpan(StrikethroughKey, Unit)
+    setSpanAttribute(StrikethroughKey, Unit)
 }
 
 /**
  * Convenience function to remove the strikethrough attribute in the range.
  */
 public fun AttributeEditScope.clearStrikethrough() {
-    setSpan(StrikethroughKey, null)
+    setSpanAttribute(StrikethroughKey, null)
 }
 
 /**
@@ -153,14 +153,14 @@ public fun AttributeEditScope.clearStrikethrough() {
  * The applied range will automatically snap to paragraph boundaries.
  */
 public fun AttributeEditScope.headingLevel(level: HeadingLevel?) {
-    setParagraph(HeadingKey, level)
+    setParagraphAttribute(HeadingKey, level)
 }
 
 /**
  * Convenience function to remove the heading attribute in the range.
  */
 public fun AttributeEditScope.clearHeadingLevel() {
-    setParagraph(HeadingKey, null)
+    setParagraphAttribute(HeadingKey, null)
 }
 
 /**
@@ -168,14 +168,14 @@ public fun AttributeEditScope.clearHeadingLevel() {
  * The applied range will automatically snap to paragraph boundaries.
  */
 public fun AttributeEditScope.textAlignment(alignment: TextAlignment?) {
-    setParagraph(TextAlignmentKey, alignment)
+    setParagraphAttribute(TextAlignmentKey, alignment)
 }
 
 /**
  * Convenience function to remove the text alignment attribute in the range.
  */
 public fun AttributeEditScope.clearTextAlignment() {
-    setParagraph(TextAlignmentKey, null)
+    setParagraphAttribute(TextAlignmentKey, null)
 }
 
 /**
@@ -183,12 +183,12 @@ public fun AttributeEditScope.clearTextAlignment() {
  * The applied range will automatically snap to paragraph boundaries.
  */
 public fun AttributeEditScope.blockquote() {
-    setParagraph(BlockquoteKey, Unit)
+    setParagraphAttribute(BlockquoteKey, Unit)
 }
 
 /**
  * Convenience function to remove the blockquote attribute in the range.
  */
 public fun AttributeEditScope.clearBlockquote() {
-    setParagraph(BlockquoteKey, null)
+    setParagraphAttribute(BlockquoteKey, null)
 }
