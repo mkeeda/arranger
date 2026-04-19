@@ -4,7 +4,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
-class RichStringBuilderTest {
+class RichStringEditParagraphTest {
     private val paragraphText = "Line1\nLine2\nLine3"
 
     @Test
