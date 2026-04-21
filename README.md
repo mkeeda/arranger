@@ -91,7 +91,7 @@ fun QuickStartSample(modifier: Modifier = Modifier) {
 }
 ```
 
-![Compose RichTextEditor Demo](docs/images/screenshot.png)
+![Quick start code result](docs/images/quick-start-sample.png)
 
 ## Custom Attribute Mapping
 
@@ -139,6 +139,8 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
     )
 }
 ```
+
+![Custom attribute mapping result](docs/images/custom-attribute-mapping.png)
 
 ## Development Roadmap
 
