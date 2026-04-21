@@ -37,7 +37,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ```kotlin
 @Composable
-fun RichTextSampleScreen(modifier: Modifier = Modifier) {
+fun QuickStartSample(modifier: Modifier = Modifier) {
     val initialText =
         "Arranger RichText Editor\n" +
             "Welcome to Arranger! This is a sample.\n" +
@@ -91,7 +91,56 @@ fun RichTextSampleScreen(modifier: Modifier = Modifier) {
 }
 ```
 
-![Compose RichTextEditor Demo](docs/images/screenshot.png)
+![Quick start code result](docs/images/quick-start-sample.png)
+
+## Custom Attribute Mapping
+
+You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
+
+```kotlin
+// 1. Define Custom Attribute Key
+object HighlightKey : SpanAttributeKey<Unit> {
+    override val name: String = "Highlight"
+    override val defaultValue: Unit = Unit
+}
+
+@Composable
+fun CustomAttributeSample(modifier: Modifier = Modifier) {
+    val initialText = "Arranger also supports Custom Attributes.\nThis text is highlighted using a custom resolver!"
+
+    // 2. Initialize RichTextState with the custom attribute
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                val range = initialText.rangeOf("highlighted")
+                setSpanAttribute(HighlightKey, Unit, range)
+            }
+        )
+    }
+
+    // 3. Create a custom AttributeStyleResolver inheriting from DefaultAttributeStyleResolver
+    val customResolver = remember {
+        AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
+            spanStyle(HighlightKey) {
+                SpanStyle(
+                    background = Color(0xFFFFF59D), // Light Yellow
+                    color = Color(0xFFE65100),      // Orange Text
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
+        }
+    }
+
+    // 4. Pass the custom resolver to RichTextEditor
+    RichTextEditor(
+        state = state,
+        styleResolver = customResolver,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+```
+
+![Custom attribute mapping result](docs/images/custom-attribute-mapping.png)
 
 ## Development Roadmap
 
@@ -105,7 +154,7 @@ fun RichTextSampleScreen(modifier: Modifier = Modifier) {
 - [x] **4. Implementation of Basic Built-in AttributeKeys**
     * Basic character-level decorations (e.g., Bold, Text Color, Underline, Italics, Font Size).
     * Paragraph-level decorations (e.g., Headings, Bullet Lists).
-- [ ] **5. Custom Attribute Mapping APIs**
+- [x] **5. Custom Attribute Mapping APIs**
     * Expose mechanisms allowing developers to customize how default `AttributeKey`s are translated into Compose `AnnotatedString` styles.
 - [ ] **6. Declarative Formatting Constraints**
     * Mechanism leveraging `InputTransformation` to parse pasted clipboard HTML/RichText and strictly filter allowed attributes based on an access list.
