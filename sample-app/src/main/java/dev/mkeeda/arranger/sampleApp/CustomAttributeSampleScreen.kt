@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,7 +30,7 @@ public object HighlightKey : SpanAttributeKey<Unit> {
 }
 
 @Composable
-fun CustomAttributeSampleScreen(modifier: Modifier = Modifier) {
+fun CustomAttributeSampleItem(modifier: Modifier = Modifier) {
     val initialText = "Arranger also supports Custom Attributes.\nThis text is highlighted using a custom resolver!"
 
     // 2. Initialize RichTextState with the custom attribute
@@ -57,15 +59,20 @@ fun CustomAttributeSampleScreen(modifier: Modifier = Modifier) {
             }
         }
 
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("Custom Attribute Mapping Demo", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Custom Attribute Mapping Demo", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // 4. Pass the custom resolver to RichTextEditor
-        RichTextEditor(
-            state = state,
-            styleResolver = customResolver,
-            modifier = Modifier.fillMaxWidth(),
-        )
+            // 4. Pass the custom resolver to RichTextEditor
+            RichTextEditor(
+                state = state,
+                styleResolver = customResolver,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }

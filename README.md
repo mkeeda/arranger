@@ -105,7 +105,7 @@ object HighlightKey : SpanAttributeKey<Unit> {
 }
 
 @Composable
-fun CustomAttributeSampleScreen(modifier: Modifier = Modifier) {
+fun CustomAttributeSampleItem(modifier: Modifier = Modifier) {
     val initialText = "Arranger also supports Custom Attributes.\nThis text is highlighted using a custom resolver!"
 
     // 2. Initialize RichTextState with the custom attribute

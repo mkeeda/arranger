@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,10 +48,15 @@ class MainActivity : ComponentActivity() {
                         modifier =
                             Modifier
                                 .fillMaxSize()
-                                .padding(innerPadding),
+                                .padding(innerPadding)
+                                .padding(horizontal = 16.dp)
+                                .verticalScroll(rememberScrollState()),
                     ) {
-                        RichTextSampleScreen()
-                        CustomAttributeSampleScreen()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        RichTextSampleItem()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CustomAttributeSampleItem()
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
@@ -56,7 +65,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun RichTextSampleScreen(modifier: Modifier = Modifier) {
+fun RichTextSampleItem(modifier: Modifier = Modifier) {
     val initialText =
         "Arranger RichText Editor\n" +
             "Welcome to Arranger! This is a sample.\n" +
@@ -101,14 +110,19 @@ fun RichTextSampleScreen(modifier: Modifier = Modifier) {
             )
         }
 
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("Compose RichTextEditor Demo", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Compose RichTextEditor Demo", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(16.dp))
 
-        RichTextEditor(
-            state = state,
-            modifier = Modifier.fillMaxWidth(),
-        )
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -116,6 +130,6 @@ fun RichTextSampleScreen(modifier: Modifier = Modifier) {
 @Composable
 fun RichTextSamplePreview() {
     ArrangerTheme {
-        RichTextSampleScreen()
+        RichTextSampleItem()
     }
 }
