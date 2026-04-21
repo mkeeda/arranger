@@ -37,7 +37,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ```kotlin
 @Composable
-fun RichTextSampleScreen(modifier: Modifier = Modifier) {
+fun QuickStartSample(modifier: Modifier = Modifier) {
     val initialText =
         "Arranger RichText Editor\n" +
             "Welcome to Arranger! This is a sample.\n" +
@@ -105,7 +105,7 @@ object HighlightKey : SpanAttributeKey<Unit> {
 }
 
 @Composable
-fun CustomAttributeSampleItem(modifier: Modifier = Modifier) {
+fun CustomAttributeSample(modifier: Modifier = Modifier) {
     val initialText = "Arranger also supports Custom Attributes.\nThis text is highlighted using a custom resolver!"
 
     // 2. Initialize RichTextState with the custom attribute

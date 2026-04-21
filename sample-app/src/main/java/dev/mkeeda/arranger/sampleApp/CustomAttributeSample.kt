@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
@@ -23,6 +24,7 @@ import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.rangeOf
+import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 // 1. Define Custom Attribute Key
 public object HighlightKey : SpanAttributeKey<Unit> {
@@ -31,7 +33,7 @@ public object HighlightKey : SpanAttributeKey<Unit> {
 }
 
 @Composable
-fun CustomAttributeSampleItem(modifier: Modifier = Modifier) {
+fun CustomAttributeSample(modifier: Modifier = Modifier) {
     val initialText = "Arranger also supports Custom Attributes.\nThis text is highlighted using a custom resolver!"
 
     // 2. Initialize RichTextState with the custom attribute
@@ -78,5 +80,13 @@ fun CustomAttributeSampleItem(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CustomAttributeSamplePreview() {
+    ArrangerTheme {
+        CustomAttributeSample()
     }
 }
