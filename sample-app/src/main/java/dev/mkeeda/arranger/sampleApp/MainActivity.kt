@@ -40,7 +40,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             ArrangerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RichTextSampleScreen(modifier = Modifier.padding(innerPadding))
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                    ) {
+                        RichTextSampleScreen()
+                        CustomAttributeSampleScreen()
+                    }
                 }
             }
         }
