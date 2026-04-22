@@ -25,7 +25,7 @@ class RichStringRunsTest {
         // There should be 4 internal spans: [0..4], [5..9], [10..15], [16..19]
         richString.spans shouldHaveSize 4
 
-        val mentionRuns = richString.runs(BackgroundColorKey)
+        val mentionRuns = richString.runs(BackgroundColorKey).toList()
 
         // However, the runs API should merge [5..9] and [10..15]
         // because both have Mention=@user, ignoring the color change.
@@ -50,7 +50,7 @@ class RichStringRunsTest {
                     setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 15..19)
                 }
 
-        val colorRuns = richString.runs(TextColorKey)
+        val colorRuns = richString.runs(TextColorKey).toList()
 
         colorRuns shouldHaveSize 3
 
@@ -110,14 +110,17 @@ class RichStringRunsTest {
 
         // 0..4 and 5..9 are both Red, but they have different attributes (Bold vs Italic), so they are NOT merged.
         redRuns[0].range shouldBe 0..4
+        redRuns[0].value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
         redRuns[0].value.getOrNull(BoldKey) shouldBe Unit
 
         redRuns[1].range shouldBe 5..9
+        redRuns[1].value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
         redRuns[1].value.getOrNull(ItalicKey) shouldBe Unit
 
         // 10..14 is Blue, so it's skipped.
         // 15..19 is Red, Bold.
         redRuns[2].range shouldBe 15..19
+        redRuns[2].value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
         redRuns[2].value.getOrNull(BoldKey) shouldBe Unit
     }
 
