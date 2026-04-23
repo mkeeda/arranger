@@ -34,6 +34,38 @@ public class AttributeContainer private constructor(
     public fun isEmpty(): Boolean = attributes.isEmpty()
 
     /**
+     * Returns true if this container has at least one attribute.
+     */
+    public fun isNotEmpty(): Boolean = attributes.isNotEmpty()
+
+    /**
+     * Returns the number of attributes stored in this container.
+     */
+    public val size: Int
+        get() = attributes.size
+
+    /**
+     * Returns the set of attribute keys currently stored in this container.
+     */
+    public val keys: Set<AttributeKey<*>>
+        get() = attributes.keys
+
+    /**
+     * Returns true if this container contains the specified [key].
+     */
+    public fun containsKey(key: AttributeKey<*>): Boolean = attributes.containsKey(key)
+
+    /**
+     * Returns true if this container contains all of the specified [keys].
+     */
+    public fun containsAll(vararg keys: AttributeKey<*>): Boolean = keys.all { containsKey(it) }
+
+    /**
+     * Returns true if this container contains any of the specified [keys].
+     */
+    public fun containsAny(vararg keys: AttributeKey<*>): Boolean = keys.any { containsKey(it) }
+
+    /**
      * Returns a new [AttributeContainer] with the specified [key] mapped to the [value].
      */
     public fun <T> plus(
