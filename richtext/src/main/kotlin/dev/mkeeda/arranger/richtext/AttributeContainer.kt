@@ -48,7 +48,7 @@ public class AttributeContainer private constructor(
      * Returns the set of attribute keys currently stored in this container.
      */
     public val keys: Set<AttributeKey<*>>
-        get() = attributes.keys
+        get() = attributes.keys.toSet()
 
     /**
      * Returns true if this container contains the specified [key].
@@ -57,11 +57,13 @@ public class AttributeContainer private constructor(
 
     /**
      * Returns true if this container contains all of the specified [keys].
+     * If no keys are specified, this returns true (vacuous truth).
      */
     public fun containsAll(vararg keys: AttributeKey<*>): Boolean = keys.all { containsKey(it) }
 
     /**
      * Returns true if this container contains any of the specified [keys].
+     * If no keys are specified, this returns false.
      */
     public fun containsAny(vararg keys: AttributeKey<*>): Boolean = keys.any { containsKey(it) }
 

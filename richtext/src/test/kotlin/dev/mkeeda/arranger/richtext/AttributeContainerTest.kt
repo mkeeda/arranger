@@ -229,4 +229,16 @@ class AttributeContainerTest {
         val container = attributeContainerOf()
         container.containsAny(BoldKey) shouldBe false
     }
+
+    @Test
+    fun `containsAll returns true when no keys are specified`() {
+        val container = attributeContainerOf()
+        container.containsAll() shouldBe true
+    }
+
+    @Test
+    fun `containsAny returns false when no keys are specified`() {
+        val container = attributeContainerOf()
+        container.containsAny() shouldBe false
+    }
 }
