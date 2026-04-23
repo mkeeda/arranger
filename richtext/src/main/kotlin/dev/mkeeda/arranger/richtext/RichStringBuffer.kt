@@ -118,9 +118,9 @@ public class RichStringBuffer internal constructor(
      * from an immutable [RichString] (e.g., via [RichString.runs]), not from any mutable state
      * within this buffer.
      */
-    public fun editAll(
-        runs: Sequence<RichRun<AttributeContainer>>,
-        editAction: AttributeEditScope.(RichRun<AttributeContainer>) -> Unit,
+    public fun <T : Any> editAll(
+        runs: Sequence<RichRun<T>>,
+        editAction: AttributeEditScope.(RichRun<T>) -> Unit,
     ) {
         for (run in runs) {
             AttributeEditScope(this, run.range).editAction(run)

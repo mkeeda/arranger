@@ -15,7 +15,7 @@ The goal of "Arranger" is to provide a "declarative, type-safe, and immutable st
 Compared to Android's traditional `SpannableStringBuilder` or Compose's `AnnotatedString`, Arranger offers a superior, modern API design:
 * **Semantic "Runs":** Instead of managing `startIndex` and `endIndex`, developers can iterate over `Runs` (e.g., "find all chunks of mentions").
 * **Value Semantics:** The core text data structures are immutable, ensuring thread safety and predictable UI re-rendering, which is highly compatible with Compose.
-* **Type Safety:** We use Kotlin's Extension Properties to allow intuitive, property-like access to attributes.
+* **Type Safety:** We use Kotlin's Extension Functions with receivers to create an intuitive, declarative DSL for composing attributes.
 
 ## Basic Usage (Getting Started)
 
@@ -178,8 +178,13 @@ fun HashtagHighlightSample(modifier: Modifier = Modifier) {
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Button(onClick = { /* ... */ }) { Text("Highlight") }
-        RichTextEditor(state = state, modifier = Modifier.fillMaxWidth())
+        Text("Searching and Highlighting", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 ```
@@ -193,18 +198,26 @@ Instead of text searching, you can also query existing attributes using `runs(ke
 ```kotlin
 @Composable
 fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
-    val initialText = "This text has some bold words.\nWe can find all bold parts and change their color at once."
+    val initialText = "This text has some bold words.\n" +
+            "We can find all bold parts and change their color at once."
 
     val state = remember {
         RichTextState(
             initialText = RichString(text = initialText).edit {
-                editAttributes(range = initialText.rangeOf("bold words")) { bold() }
-                editAttributes(range = initialText.rangeOf("bold parts")) { bold() }
+                editAttributes(range = initialText.rangeOf("bold words")) {
+                    bold()
+                }
+                editAttributes(range = initialText.rangeOf("bold parts")) {
+                    bold()
+                }
             }
         )
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
+        Text("Querying and Modifying Attributes", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
                 // Find all runs that have the BoldKey
@@ -216,12 +229,18 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
                         textColor(Color(0xFFD32F2F)) // Red
                     }
                 }
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Highlight Bold Text in Red")
         }
         
-        RichTextEditor(state = state, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 ```
@@ -230,14 +249,14 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
 
 ### Pure Kotlin Core (Data Structures)
-* **`RichTextBuffer`**: An abstraction interface for the underlying string storage. The MVP will use a simple implementation, but it is designed to be replaceable with advanced structures (like Rope or Piece Table) for handling massive documents in the future.
+* **`RichStringBuffer`**: A buffer class used to safely mutate the attributes of a string within an `edit` block. Designed to accumulate mutations and produce a completely new, immutable `RichString`.
 * **`AttributeKey<T>`**: Defines the data type of an attribute.
 * **`RichString` & `RichRun`**: Immutable representations of text and its semantic chunks.
-* **`AttributeRangedTree`**: An internal data structure (like an Interval Tree) to manage attributes by range, independent of string indices.
+* **`AttributeContainer`**: A core structure holding a type-safe map of attributes, which is associated with specific text ranges to form `RichSpan`s.
 
 ### Compose UI Layer
-* **`RichTextState`**: Wraps `TextFieldState` and holds the `AttributeRangedTree`. It acts as the single source of truth.
-* **`RichTextOutputTransformation`**: Converts the plain text and internal attribute tree into Compose's `AnnotatedString` purely at render time.
+* **`RichTextState`**: Wraps `TextFieldState` and manages the Spans. It acts as the single source of truth and exposes the complete `RichString`.
+* **`RichTextOutputTransformation`**: Converts the plain text and spans into Compose's `AnnotatedString` purely at render time.
 * **`RichTextEditor`**: A simple, declarative Composable wrapping `BasicTextField` with our state and transformation.
 
 ## Development Roadmap
