@@ -5,7 +5,6 @@ import io.kotest.matchers.shouldBe
 import org.junit.Test
 
 class RichStringRunsTest {
-
     @Test
     fun `runs returns continuous chunks of the same queried attribute value, ignoring other attributes`() {
         // [0..4] Color=Red
@@ -66,13 +65,15 @@ class RichStringRunsTest {
 
     @Test
     fun `runs with predicate merges adjacent spans with identical attributes`() {
-        val fragmentedString = RichString(
-            text = "0123456789",
-            spans = listOf(
-                RichSpan(0..4, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
-                RichSpan(5..9, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000)))
+        val fragmentedString =
+            RichString(
+                text = "0123456789",
+                spans =
+                    listOf(
+                        RichSpan(0..4, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
+                        RichSpan(5..9, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
+                    ),
             )
-        )
 
         val redRuns = fragmentedString.runs { it.getOrNull(TextColorKey) == RgbaColor(0xFFFF0000) }.toList()
 
@@ -127,20 +128,23 @@ class RichStringRunsTest {
     @Test
     fun `runs with predicate is evaluated lazily`() {
         var evaluatedCount = 0
-        val fragmentedString = RichString(
-            text = "01234567890123456789",
-            spans = listOf(
-                RichSpan(0..4, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
-                RichSpan(5..9, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
-                RichSpan(10..14, attributeContainerOf(TextColorKey to RgbaColor(0xFF0000FF))),
-                RichSpan(15..19, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000)))
+        val fragmentedString =
+            RichString(
+                text = "01234567890123456789",
+                spans =
+                    listOf(
+                        RichSpan(0..4, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
+                        RichSpan(5..9, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
+                        RichSpan(10..14, attributeContainerOf(TextColorKey to RgbaColor(0xFF0000FF))),
+                        RichSpan(15..19, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
+                    ),
             )
-        )
 
-        val sequence = fragmentedString.runs {
-            evaluatedCount++
-            it.getOrNull(TextColorKey) == RgbaColor(0xFFFF0000)
-        }
+        val sequence =
+            fragmentedString.runs {
+                evaluatedCount++
+                it.getOrNull(TextColorKey) == RgbaColor(0xFFFF0000)
+            }
 
         evaluatedCount shouldBe 0 // Not evaluated yet
 

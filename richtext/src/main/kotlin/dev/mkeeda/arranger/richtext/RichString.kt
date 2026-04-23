@@ -31,32 +31,8 @@ public data class RichString(
      * Adjacent internal spans that possess the EXACT SAME attribute value for [key] will be combined
      * into a single [RichRun], ignoring differences in other attributes.
      */
-    /**
-     * Retrieves all contiguous runs of the requested attribute [key], merging internally split spans.
-     * Adjacent internal spans that possess the EXACT SAME attribute value for [key] will be combined
-     * into a single [RichRun], ignoring differences in other attributes.
-     */
-    public fun <T> runs(key: AttributeKey<T>): Sequence<RichRun<T>> {
-        // Isolate the requested attribute, allowing `transformSpans` to automatically
-        // drop spans where it is absent and coalesce contiguous spans where the value is identical.
-        val isolatedSpans =
-            spans.transformSpans(targetRange = text.indices) { attributes ->
-                val value = attributes.getOrNull(key)
-                if (value != null) {
-                    AttributeContainer.empty().plus(key, value)
-                } else {
-                    AttributeContainer.empty()
-                }
-            }
-
-        return isolatedSpans.asSequence().map { span ->
-            @Suppress("UNCHECKED_CAST")
-            RichRun(
-                text = text.substring(span.range),
-                range = span.range,
-                value = span.attributes.getOrNull(key) as T,
-            )
-        }
+    public fun <T : Any> runs(key: AttributeKey<T>): Sequence<RichRun<T>> {
+        return extractRuns { attributes -> attributes.getOrNull(key) }
     }
 
     /**
@@ -64,65 +40,70 @@ public data class RichString(
      * Adjacent internal spans that satisfy the predicate and possess EXACTLY THE SAME attributes
      * will be combined into a single [RichRun].
      */
-    public fun runs(predicate: (AttributeContainer) -> Boolean): Sequence<RichRun<AttributeContainer>> = sequence {
-        var mergedRangeStart = -1
-        var mergedRangeEnd = -1
-        var mergedAttributes: AttributeContainer? = null
+    public fun runs(predicate: (AttributeContainer) -> Boolean): Sequence<RichRun<AttributeContainer>> {
+        return extractRuns { attributes ->
+            if (predicate(attributes)) attributes else null
+        }
+    }
 
-        for (span in spans) {
-            if (predicate(span.attributes)) {
-                if (mergedAttributes != null) {
-                    if (mergedRangeEnd + 1 == span.range.first && mergedAttributes == span.attributes) {
-                        // Can merge
-                        mergedRangeEnd = span.range.last
+    private fun <T : Any> extractRuns(
+        extractValue: (AttributeContainer) -> T?,
+    ): Sequence<RichRun<T>> =
+        sequence {
+            var mergedRangeStart = -1
+            var mergedRangeEnd = -1
+            var mergedValue: T? = null
+
+            for (span in spans) {
+                val value = extractValue(span.attributes)
+                if (value != null) {
+                    if (mergedValue != null) {
+                        if (mergedRangeEnd + 1 == span.range.first && mergedValue == value) {
+                            mergedRangeEnd = span.range.last
+                        } else {
+                            val range = mergedRangeStart..mergedRangeEnd
+                            yield(
+                                RichRun(
+                                    text = text.substring(range),
+                                    range = range,
+                                    value = mergedValue,
+                                ),
+                            )
+                            mergedRangeStart = span.range.first
+                            mergedRangeEnd = span.range.last
+                            mergedValue = value
+                        }
                     } else {
-                        // Cannot merge, yield current and start new
+                        mergedRangeStart = span.range.first
+                        mergedRangeEnd = span.range.last
+                        mergedValue = value
+                    }
+                } else {
+                    if (mergedValue != null) {
                         val range = mergedRangeStart..mergedRangeEnd
                         yield(
                             RichRun(
                                 text = text.substring(range),
                                 range = range,
-                                value = mergedAttributes
-                            )
+                                value = mergedValue,
+                            ),
                         )
-                        mergedRangeStart = span.range.first
-                        mergedRangeEnd = span.range.last
-                        mergedAttributes = span.attributes
+                        mergedValue = null
                     }
-                } else {
-                    // Start new
-                    mergedRangeStart = span.range.first
-                    mergedRangeEnd = span.range.last
-                    mergedAttributes = span.attributes
-                }
-            } else {
-                // Predicate false, yield existing if any
-                if (mergedAttributes != null) {
-                    val range = mergedRangeStart..mergedRangeEnd
-                    yield(
-                        RichRun(
-                            text = text.substring(range),
-                            range = range,
-                            value = mergedAttributes
-                        )
-                    )
-                    mergedAttributes = null
                 }
             }
-        }
 
-        // Final yield
-        if (mergedAttributes != null) {
-            val range = mergedRangeStart..mergedRangeEnd
-            yield(
-                RichRun(
-                    text = text.substring(range),
-                    range = range,
-                    value = mergedAttributes
+            if (mergedValue != null) {
+                val range = mergedRangeStart..mergedRangeEnd
+                yield(
+                    RichRun(
+                        text = text.substring(range),
+                        range = range,
+                        value = mergedValue,
+                    ),
                 )
-            )
+            }
         }
-    }
 
     /**
      * Executes the given [block] on a [RichStringBuilder] scoped to this [RichString],
