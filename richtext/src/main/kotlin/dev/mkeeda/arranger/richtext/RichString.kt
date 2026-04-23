@@ -50,58 +50,34 @@ public data class RichString(
         extractValue: (AttributeContainer) -> T?,
     ): Sequence<RichRun<T>> =
         sequence {
-            var mergedRangeStart = -1
-            var mergedRangeEnd = -1
-            var mergedValue: T? = null
+            var start = -1
+            var end = -1
+            var currentVal: T? = null
 
             for (span in spans) {
                 val value = extractValue(span.attributes)
+                val canMerge = currentVal != null && value == currentVal && end + 1 == span.range.first
+
+                if (!canMerge) {
+                    if (currentVal != null) {
+                        val range = start..end
+                        yield(RichRun(text.substring(range), range, currentVal))
+                        currentVal = null
+                    }
+                }
+
                 if (value != null) {
-                    if (mergedValue != null) {
-                        if (mergedRangeEnd + 1 == span.range.first && mergedValue == value) {
-                            mergedRangeEnd = span.range.last
-                        } else {
-                            val range = mergedRangeStart..mergedRangeEnd
-                            yield(
-                                RichRun(
-                                    text = text.substring(range),
-                                    range = range,
-                                    value = mergedValue,
-                                ),
-                            )
-                            mergedRangeStart = span.range.first
-                            mergedRangeEnd = span.range.last
-                            mergedValue = value
-                        }
-                    } else {
-                        mergedRangeStart = span.range.first
-                        mergedRangeEnd = span.range.last
-                        mergedValue = value
+                    if (currentVal == null) {
+                        start = span.range.first
+                        currentVal = value
                     }
-                } else {
-                    if (mergedValue != null) {
-                        val range = mergedRangeStart..mergedRangeEnd
-                        yield(
-                            RichRun(
-                                text = text.substring(range),
-                                range = range,
-                                value = mergedValue,
-                            ),
-                        )
-                        mergedValue = null
-                    }
+                    end = span.range.last
                 }
             }
 
-            if (mergedValue != null) {
-                val range = mergedRangeStart..mergedRangeEnd
-                yield(
-                    RichRun(
-                        text = text.substring(range),
-                        range = range,
-                        value = mergedValue,
-                    ),
-                )
+            if (currentVal != null) {
+                val range = start..end
+                yield(RichRun(text.substring(range), range, currentVal))
             }
         }
 
