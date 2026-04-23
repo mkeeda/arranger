@@ -1,5 +1,6 @@
 package dev.mkeeda.arranger.richtext
 
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
@@ -40,7 +41,7 @@ class RichStringBatchEditTest {
                 }
             }
 
-        edited.spans.isEmpty() shouldBe true
+        edited.spans.shouldBeEmpty()
         edited.text shouldBe original.text
     }
 

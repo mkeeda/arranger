@@ -22,7 +22,7 @@ public fun CharSequence.rangesOf(
     sequence {
         var currentIndex = 0
         while (true) {
-            val startIndex = indexOf(target, startIndex = currentIndex, ignoreCase = ignoreCase)
+            val startIndex = this@rangesOf.indexOf(target, startIndex = currentIndex, ignoreCase = ignoreCase)
             if (startIndex == -1) break
 
             val endIndex = startIndex + target.length

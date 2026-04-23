@@ -113,6 +113,10 @@ public class RichStringBuffer internal constructor(
     /**
      * Applies a set of attribute mutations to all specified [runs] using a DSL builder.
      * The [editAction] receives each [RichRun] to allow conditional logic based on existing attributes.
+     *
+     * Note: The [runs] sequence is consumed lazily during iteration. It is expected to be derived
+     * from an immutable [RichString] (e.g., via [RichString.runs]), not from any mutable state
+     * within this buffer.
      */
     public fun editAll(
         runs: Sequence<RichRun<AttributeContainer>>,
