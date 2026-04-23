@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.RichStringBuilder
+import dev.mkeeda.arranger.richtext.RichStringBuffer
 
 public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
@@ -24,7 +24,7 @@ public class RichTextState(initialText: RichString) {
                 spans = spans,
             )
 
-    public fun edit(block: RichStringBuilder.() -> Unit) {
+    public fun edit(block: RichStringBuffer.() -> Unit) {
         spans = richString.edit(block).spans
     }
 

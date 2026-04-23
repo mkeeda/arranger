@@ -1,11 +1,11 @@
 package dev.mkeeda.arranger.richtext
 
 /**
- * A builder class used to safely mutate the attributes of a [RichString] within an `edit` block.
+ * A buffer class used to safely mutate the attributes of a [RichString] within an `edit` block.
  * All mutations are accumulated internally and used to produce a completely new, immutable [RichString] instance
  * when the block completes.
  */
-public class RichStringBuilder internal constructor(
+public class RichStringBuffer internal constructor(
     private var currentSpans: List<RichSpan>,
     private val text: String,
 ) {

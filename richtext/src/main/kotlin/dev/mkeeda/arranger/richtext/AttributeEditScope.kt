@@ -4,7 +4,7 @@ package dev.mkeeda.arranger.richtext
  * A builder DSL for safely mutating multiple text attributes within a specific range.
  */
 public class AttributeEditScope internal constructor(
-    private val builder: RichStringBuilder,
+    private val buffer: RichStringBuffer,
     private val range: IntRange,
 ) {
     /**
@@ -16,9 +16,9 @@ public class AttributeEditScope internal constructor(
         value: T?,
     ) {
         if (value == null) {
-            builder.removeSpanAttribute(key, range)
+            buffer.removeSpanAttribute(key, range)
         } else {
-            builder.setSpanAttribute(key, value, range)
+            buffer.setSpanAttribute(key, value, range)
         }
     }
 
@@ -31,9 +31,9 @@ public class AttributeEditScope internal constructor(
         value: T?,
     ) {
         if (value == null) {
-            builder.removeParagraphAttribute(key, range)
+            buffer.removeParagraphAttribute(key, range)
         } else {
-            builder.setParagraphAttribute(key, value, range)
+            buffer.setParagraphAttribute(key, value, range)
         }
     }
 }
