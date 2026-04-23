@@ -82,12 +82,12 @@ public data class RichString(
         }
 
     /**
-     * Executes the given [block] on a [RichStringBuilder] scoped to this [RichString],
+     * Executes the given [block] on a [RichStringBuffer] scoped to this [RichString],
      * and returns a completely new [RichString] carrying the modifications.
      */
-    public fun edit(block: RichStringBuilder.() -> Unit): RichString {
-        val builder = RichStringBuilder(currentSpans = spans, text = text)
-        builder.block()
-        return builder.build(text = text)
+    public fun edit(block: RichStringBuffer.() -> Unit): RichString {
+        val buffer = RichStringBuffer(currentSpans = spans, text = text)
+        buffer.block()
+        return buffer.build(text = text)
     }
 }
