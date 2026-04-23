@@ -98,6 +98,31 @@ public class RichStringBuffer internal constructor(
         AttributeEditScope(this, range).editAction()
     }
 
+    /**
+     * Applies a set of attribute mutations to all specified [ranges] using a DSL builder.
+     */
+    public fun editAll(
+        ranges: Sequence<IntRange>,
+        editAction: AttributeEditScope.() -> Unit,
+    ) {
+        for (range in ranges) {
+            editAttributes(range, editAction)
+        }
+    }
+
+    /**
+     * Applies a set of attribute mutations to all specified [runs] using a DSL builder.
+     * The [editAction] receives each [RichRun] to allow conditional logic based on existing attributes.
+     */
+    public fun editAll(
+        runs: Sequence<RichRun<AttributeContainer>>,
+        editAction: AttributeEditScope.(RichRun<AttributeContainer>) -> Unit,
+    ) {
+        for (run in runs) {
+            AttributeEditScope(this, run.range).editAction(run)
+        }
+    }
+
     private fun checkRange(range: IntRange) {
         require(!range.isEmpty()) { "Range must not be empty: $range" }
         require(range.first >= 0) { "Range start must not be negative: ${range.first}" }
