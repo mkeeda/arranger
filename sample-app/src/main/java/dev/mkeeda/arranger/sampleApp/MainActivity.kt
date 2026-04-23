@@ -43,7 +43,17 @@ class MainActivity : ComponentActivity() {
                                     containerColor = MaterialTheme.colorScheme.surface,
                                 ),
                         ) {
-                            QuickStartSample()
+                            BasicUsageSample()
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors =
+                                CardDefaults.outlinedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                ),
+                        ) {
+                            AdvancedFormattingSample()
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         OutlinedCard(
