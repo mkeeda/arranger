@@ -142,6 +142,107 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
 
 ![Custom attribute mapping result](docs/images/custom-attribute-mapping.png)
 
+## Searching and Highlighting
+
+You can easily search for strings or regular expressions and apply styles to all occurrences at once using `rangesOf` and `editAll`. Here's a sample that highlights hashtags in real-time.
+
+```kotlin
+@Composable
+fun HashtagHighlightSample(modifier: Modifier = Modifier) {
+    val initialText = "Type some #hashtags here!\nFor example: #Compose is #awesome"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText)
+        )
+    }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.richString.text }.collect { text ->
+            state.edit {
+                // Clear existing colors first
+                editAttributes(range = text.indices) {
+                    clearTextColor()
+                }
+                
+                // Find all hashtags and highlight them in blue
+                val hashtagRanges = text.rangesOf(Regex("#\\w+"))
+                editAll(hashtagRanges) {
+                    textColor(Color(0xFF1976D2)) // Blue
+                }
+            }
+        }
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Searching and Highlighting", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+```
+
+## Querying and Modifying Attributes
+
+Instead of text searching, you can also query existing attributes using `runs(key)` and apply a batch edit over those specific runs. This is useful for semantic manipulations like changing the color of all bold texts.
+
+> [!NOTE]
+> For more complex queries, you can also use `runs { predicate }` to extract runs that match any custom condition based on their attributes.
+
+```kotlin
+@Composable
+fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
+    val initialText = "This text has some bold words.\n" +
+            "We can find all bold parts and change their color at once."
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                editAttributes(range = initialText.rangeOf("bold words")) {
+                    bold()
+                }
+                editAttributes(range = initialText.rangeOf("bold parts")) {
+                    bold()
+                }
+            }
+        )
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Querying and Modifying Attributes", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                // Find all runs that have the BoldKey
+                val boldRuns = state.richString.runs(BoldKey)
+                
+                // Batch edit those specific runs
+                state.edit {
+                    editAll(boldRuns) {
+                        textColor(Color(0xFFD32F2F)) // Red
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Highlight Bold Text in Red")
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+```
+
 ## Development Roadmap
 
 - [x] **1. Core Data Structures (The Core)**

@@ -56,6 +56,26 @@ class MainActivity : ComponentActivity() {
                             CustomAttributeSample()
                         }
                         Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors =
+                                CardDefaults.outlinedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                ),
+                        ) {
+                            HashtagHighlightSample()
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors =
+                                CardDefaults.outlinedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                ),
+                        ) {
+                            AttributeBatchEditSample()
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
