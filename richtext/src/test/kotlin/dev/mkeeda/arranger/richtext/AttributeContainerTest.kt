@@ -127,4 +127,118 @@ class AttributeContainerTest {
         twoPairs.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
         twoPairs.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
     }
+
+    @Test
+    fun `containsKey returns true for a key that exists`() {
+        val container = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))
+        container.containsKey(TextColorKey) shouldBe true
+    }
+
+    @Test
+    fun `containsKey returns false for a key that does not exist`() {
+        val container = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))
+        container.containsKey(BoldKey) shouldBe false
+    }
+
+    @Test
+    fun `containsKey returns false on empty container`() {
+        val container = attributeContainerOf()
+        container.containsKey(TextColorKey) shouldBe false
+    }
+
+    @Test
+    fun `keys returns all stored attribute keys`() {
+        val container =
+            attributeContainerOf(
+                TextColorKey to RgbaColor(0xFFFF0000),
+                BoldKey to Unit,
+            )
+        container.keys shouldBe setOf(TextColorKey, BoldKey)
+    }
+
+    @Test
+    fun `keys returns empty set on empty container`() {
+        val container = attributeContainerOf()
+        container.keys shouldBe emptySet()
+    }
+
+    @Test
+    fun `size returns the number of stored attributes`() {
+        val container =
+            attributeContainerOf(
+                TextColorKey to RgbaColor(0xFFFF0000),
+                BoldKey to Unit,
+            )
+        container.size shouldBe 2
+    }
+
+    @Test
+    fun `size returns 0 on empty container`() {
+        val container = attributeContainerOf()
+        container.size shouldBe 0
+    }
+
+    @Test
+    fun `isNotEmpty returns true when container has attributes`() {
+        val container = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))
+        container.isNotEmpty() shouldBe true
+    }
+
+    @Test
+    fun `isNotEmpty returns false on empty container`() {
+        val container = attributeContainerOf()
+        container.isNotEmpty() shouldBe false
+    }
+
+    @Test
+    fun `containsAll returns true when all specified keys exist`() {
+        val container =
+            attributeContainerOf(
+                TextColorKey to RgbaColor(0xFFFF0000),
+                BoldKey to Unit,
+            )
+        container.containsAll(TextColorKey, BoldKey) shouldBe true
+    }
+
+    @Test
+    fun `containsAll returns false when some keys are missing`() {
+        val container = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))
+        container.containsAll(TextColorKey, BoldKey) shouldBe false
+    }
+
+    @Test
+    fun `containsAll returns true for single existing key`() {
+        val container = attributeContainerOf(BoldKey to Unit)
+        container.containsAll(BoldKey) shouldBe true
+    }
+
+    @Test
+    fun `containsAny returns true when at least one key exists`() {
+        val container = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))
+        container.containsAny(TextColorKey, BoldKey) shouldBe true
+    }
+
+    @Test
+    fun `containsAny returns false when none of the keys exist`() {
+        val container = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))
+        container.containsAny(BoldKey, ItalicKey) shouldBe false
+    }
+
+    @Test
+    fun `containsAny returns false on empty container`() {
+        val container = attributeContainerOf()
+        container.containsAny(BoldKey) shouldBe false
+    }
+
+    @Test
+    fun `containsAll returns true when no keys are specified`() {
+        val container = attributeContainerOf()
+        container.containsAll() shouldBe true
+    }
+
+    @Test
+    fun `containsAny returns false when no keys are specified`() {
+        val container = attributeContainerOf()
+        container.containsAny() shouldBe false
+    }
 }
