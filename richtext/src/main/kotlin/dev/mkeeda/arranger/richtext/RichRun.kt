@@ -6,7 +6,7 @@ package dev.mkeeda.arranger.richtext
  * @param T The type of the attribute value.
  * @property text The substring corresponding to this run.
  * @property range The character range (inclusive) within the original text.
- * @property value The value of the specific attribute queried.
+ * @property value The attribute value extracted by the query.
  */
 public data class RichRun<T>(
     val text: String,

@@ -264,10 +264,10 @@ class RichStringEditSpanTest {
         original.spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
 
         // Edited contains the new attributes
-        edited.runs(BackgroundColorKey)[0].range shouldBe 5..14
+        edited.runs(BackgroundColorKey).toList()[0].range shouldBe 5..14
 
         // Assert color spans in the edited version
-        val colorRuns = edited.runs(TextColorKey)
+        val colorRuns = edited.runs(TextColorKey).toList()
 
         // Color runs:
         // [0..1] Red

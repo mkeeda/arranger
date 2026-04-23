@@ -31,28 +31,55 @@ public data class RichString(
      * Adjacent internal spans that possess the EXACT SAME attribute value for [key] will be combined
      * into a single [RichRun], ignoring differences in other attributes.
      */
-    public fun <T> runs(key: AttributeKey<T>): List<RichRun<T>> {
-        // Isolate the requested attribute, allowing `transformSpans` to automatically
-        // drop spans where it is absent and coalesce contiguous spans where the value is identical.
-        val isolatedSpans =
-            spans.transformSpans(targetRange = text.indices) { attributes ->
-                val value = attributes.getOrNull(key)
+    public fun <T : Any> runs(key: AttributeKey<T>): Sequence<RichRun<T>> {
+        return extractRuns { attributes -> attributes.getOrNull(key) }
+    }
+
+    /**
+     * Retrieves all contiguous runs that satisfy the given [predicate], merging internally split spans.
+     * Adjacent internal spans that satisfy the predicate and possess EXACTLY THE SAME attributes
+     * will be combined into a single [RichRun].
+     */
+    public fun runs(predicate: (AttributeContainer) -> Boolean): Sequence<RichRun<AttributeContainer>> {
+        return extractRuns { attributes ->
+            if (predicate(attributes)) attributes else null
+        }
+    }
+
+    private fun <T : Any> extractRuns(
+        extractValue: (AttributeContainer) -> T?,
+    ): Sequence<RichRun<T>> =
+        sequence {
+            var start = -1
+            var end = -1
+            var currentVal: T? = null
+
+            for (span in spans) {
+                val value = extractValue(span.attributes)
+                val canMerge = currentVal != null && value == currentVal && end + 1 == span.range.first
+
+                if (!canMerge) {
+                    if (currentVal != null) {
+                        val range = start..end
+                        yield(RichRun(text.substring(range), range, currentVal))
+                        currentVal = null
+                    }
+                }
+
                 if (value != null) {
-                    AttributeContainer.empty().plus(key, value)
-                } else {
-                    AttributeContainer.empty()
+                    if (currentVal == null) {
+                        start = span.range.first
+                        currentVal = value
+                    }
+                    end = span.range.last
                 }
             }
 
-        return isolatedSpans.map { span ->
-            @Suppress("UNCHECKED_CAST")
-            RichRun(
-                text = text.substring(span.range),
-                range = span.range,
-                value = span.attributes.getOrNull(key) as T,
-            )
+            if (currentVal != null) {
+                val range = start..end
+                yield(RichRun(text.substring(range), range, currentVal))
+            }
         }
-    }
 
     /**
      * Executes the given [block] on a [RichStringBuilder] scoped to this [RichString],
