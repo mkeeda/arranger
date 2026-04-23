@@ -1,6 +1,6 @@
 ---
 name: format-code
-description: プロジェクト内のKotlinおよびComposeコードを一定のフォーマットに静的整形する
+description: プロジェクト内のKotlinおよびComposeコードを一定のフォーマットに静的整形する。コミット前に必ず実行する。
 ---
 
 # Kotlin Code Formatting Skill
