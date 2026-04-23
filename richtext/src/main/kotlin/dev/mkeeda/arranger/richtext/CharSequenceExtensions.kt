@@ -18,17 +18,18 @@ public fun CharSequence.rangeOf(substring: String): IntRange {
 public fun CharSequence.rangesOf(
     target: String,
     ignoreCase: Boolean = false,
-): Sequence<IntRange> = sequence {
-    var currentIndex = 0
-    while (true) {
-        val startIndex = indexOf(target, startIndex = currentIndex, ignoreCase = ignoreCase)
-        if (startIndex == -1) break
-        
-        val endIndex = startIndex + target.length
-        yield(startIndex until endIndex)
-        currentIndex = endIndex
+): Sequence<IntRange> =
+    sequence {
+        var currentIndex = 0
+        while (true) {
+            val startIndex = indexOf(target, startIndex = currentIndex, ignoreCase = ignoreCase)
+            if (startIndex == -1) break
+
+            val endIndex = startIndex + target.length
+            yield(startIndex until endIndex)
+            currentIndex = endIndex
+        }
     }
-}
 
 /**
  * Returns a lazily evaluated sequence of all occurrence ranges of the specified [regex] within this character sequence.

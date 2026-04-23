@@ -61,10 +61,11 @@ class CharSequenceExtensionsTest {
     fun `rangesOf is lazily evaluated`() {
         val text = "foo bar foo baz foo"
         var evaluationCount = 0
-        val sequence = text.rangesOf("foo").map {
-            evaluationCount++
-            it
-        }
+        val sequence =
+            text.rangesOf("foo").map {
+                evaluationCount++
+                it
+            }
 
         evaluationCount shouldBe 0 // Not evaluated yet
 
