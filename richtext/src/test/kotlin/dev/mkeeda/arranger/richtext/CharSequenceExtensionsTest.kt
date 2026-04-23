@@ -59,18 +59,22 @@ class CharSequenceExtensionsTest {
 
     @Test
     fun `rangesOf is lazily evaluated`() {
-        val text = "foo bar foo baz foo"
-        var evaluationCount = 0
-        val sequence =
-            text.rangesOf("foo").map {
-                evaluationCount++
-                it
+        val throwingCharSequence =
+            object : CharSequence {
+                override val length: Int get() = throw RuntimeException("Evaluated!")
+
+                override fun get(index: Int): Char = throw RuntimeException("Evaluated!")
+
+                override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = throw RuntimeException("Evaluated!")
             }
 
-        evaluationCount shouldBe 0 // Not evaluated yet
+        // Just calling rangesOf should not evaluate the sequence and thus not throw
+        val sequence = throwingCharSequence.rangesOf("foo")
 
-        sequence.first() shouldBe 0..2
-        evaluationCount shouldBe 1 // Evaluated only the first match
+        // It should throw when the sequence is actually consumed
+        shouldThrow<RuntimeException> {
+            sequence.first()
+        }
     }
 
     @Test

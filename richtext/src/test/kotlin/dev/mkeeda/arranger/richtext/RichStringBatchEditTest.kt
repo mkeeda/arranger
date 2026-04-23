@@ -1,6 +1,5 @@
 package dev.mkeeda.arranger.richtext
 
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
@@ -23,11 +22,11 @@ class RichStringBatchEditTest {
             }
 
         val spans = edited.spans
-        spans shouldHaveSize 2
-        spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[1].range shouldBe 10..14
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans shouldBe
+            listOf(
+                RichSpan(0..4, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
+                RichSpan(10..14, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000))),
+            )
     }
 
     @Test
@@ -70,19 +69,12 @@ class RichStringBatchEditTest {
             }
 
         val spans = edited.spans
-        spans shouldHaveSize 3
-
-        // 0..4 is now blue
-        spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
-
-        // 5..9 remains green
-        spans[1].range shouldBe 5..9
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF00FF00)
-
-        // 10..14 is now blue
-        spans[2].range shouldBe 10..14
-        spans[2].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
+        spans shouldBe
+            listOf(
+                RichSpan(0..4, attributeContainerOf(TextColorKey to RgbaColor(0xFF0000FF))),
+                RichSpan(5..9, attributeContainerOf(TextColorKey to RgbaColor(0xFF00FF00))),
+                RichSpan(10..14, attributeContainerOf(TextColorKey to RgbaColor(0xFF0000FF))),
+            )
     }
 
     @Test
@@ -102,15 +94,11 @@ class RichStringBatchEditTest {
             }
 
         val spans = edited.spans
-        spans shouldHaveSize 3
-
-        // "Error:" spans should be highlighted
-        val expectedRanges = listOf(0..5, 22..27, 43..48)
-
-        for (i in 0..2) {
-            spans[i].range shouldBe expectedRanges[i]
-            spans[i].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-            spans[i].attributes.getOrNull(BoldKey) shouldBe Unit
-        }
+        spans shouldBe
+            listOf(
+                RichSpan(0..5, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000), BoldKey to Unit)),
+                RichSpan(22..27, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000), BoldKey to Unit)),
+                RichSpan(43..48, attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000), BoldKey to Unit)),
+            )
     }
 }
