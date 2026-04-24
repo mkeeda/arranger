@@ -82,14 +82,14 @@ private fun ChatInputBox(state: RichTextState, modifier: Modifier = Modifier) {
                 )
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest),
     ) {
+        ChatInputField(state = state)
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
         ChatFormattingToolbar(
             state = state,
             hasSelection = hasSelection,
         )
-
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-        ChatInputField(state = state)
     }
 }
 
