@@ -50,6 +50,7 @@ private enum class SampleDestination(val title: String) : NavKey {
     CustomAttribute("Custom Attribute"),
     HashtagHighlight("Hashtag Highlight"),
     AttributeBatchEdit("Attribute Batch Edit"),
+    ChatInput("Chat Input"),
 }
 
 class MainActivity : ComponentActivity() {
@@ -192,6 +193,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.CustomAttribute -> CustomAttributeSample()
                 SampleDestination.HashtagHighlight -> HashtagHighlightSample()
                 SampleDestination.AttributeBatchEdit -> AttributeBatchEditSample()
+                SampleDestination.ChatInput -> ChatInputSample()
             }
         }
     }
