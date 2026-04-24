@@ -9,6 +9,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
@@ -78,5 +79,25 @@ class RichTextEditorTest {
 
         // The state should now reflect the selection
         state.selection shouldBe selectionRange
+    }
+
+    @Test
+    fun `editAttributes correctly handles reversed selection range`() {
+        val initialText = "Hello World"
+        val state = RichTextState(initialText = RichString(text = initialText))
+
+        val reversedSelection = TextRange(11, 6)
+
+        // Apply formatting using editAttributes with the reversed selection
+        state.edit {
+            editAttributes(reversedSelection) {
+                bold()
+            }
+        }
+
+        // The formatting should be correctly applied to the min/max range (6..11)
+        val newSpans = state.richString.spans
+        newSpans.size shouldBe 1
+        newSpans.first().range shouldBe (6 until 11)
     }
 }

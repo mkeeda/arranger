@@ -12,5 +12,5 @@ public fun RichStringBuffer.editAttributes(
     selection: TextRange,
     editAction: AttributeEditScope.() -> Unit,
 ) {
-    editAttributes(range = selection.start until selection.end, editAction = editAction)
+    editAttributes(range = selection.min until selection.max, editAction = editAction)
 }
