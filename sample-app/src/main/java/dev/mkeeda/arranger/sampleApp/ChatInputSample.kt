@@ -2,6 +2,7 @@ package dev.mkeeda.arranger.sampleApp
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.HorizontalDivider
@@ -26,16 +28,34 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.TextAlignment
+import dev.mkeeda.arranger.richtext.TextSize
+import dev.mkeeda.arranger.richtext.backgroundColor
+import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
+import dev.mkeeda.arranger.richtext.clearBackgroundColor
+import dev.mkeeda.arranger.richtext.clearBlockquote
 import dev.mkeeda.arranger.richtext.clearBold
+import dev.mkeeda.arranger.richtext.clearFontSize
+import dev.mkeeda.arranger.richtext.clearHeadingLevel
 import dev.mkeeda.arranger.richtext.clearItalic
 import dev.mkeeda.arranger.richtext.clearStrikethrough
+import dev.mkeeda.arranger.richtext.clearTextAlignment
+import dev.mkeeda.arranger.richtext.clearTextColor
+import dev.mkeeda.arranger.richtext.clearUnderline
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.editAttributes
+import dev.mkeeda.arranger.richtext.fontSize
+import dev.mkeeda.arranger.richtext.headingLevel
 import dev.mkeeda.arranger.richtext.italic
 import dev.mkeeda.arranger.richtext.strikethrough
+import dev.mkeeda.arranger.richtext.textAlignment
+import dev.mkeeda.arranger.richtext.textColor
+import dev.mkeeda.arranger.richtext.underline
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
@@ -103,6 +123,7 @@ private fun ChatFormattingToolbar(
         modifier =
             modifier
                 .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 4.dp, vertical = 2.dp),
     ) {
         IconButton(
@@ -129,6 +150,17 @@ private fun ChatFormattingToolbar(
         }
         IconButton(
             onClick = {
+                state.edit { editAttributes(state.selection) { underline() } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_underlined),
+                contentDescription = "Underline",
+            )
+        }
+        IconButton(
+            onClick = {
                 state.edit { editAttributes(state.selection) { strikethrough() } }
             },
             enabled = hasSelection,
@@ -138,7 +170,72 @@ private fun ChatFormattingToolbar(
                 contentDescription = "Strikethrough",
             )
         }
-
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { textColor(RgbaColor(0xFFFF0000.toLong())) } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_color_text),
+                contentDescription = "Text Color Red",
+            )
+        }
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { backgroundColor(RgbaColor(0xFFFFFF00.toLong())) } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_color_fill),
+                contentDescription = "Background Color Yellow",
+            )
+        }
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { fontSize(TextSize(24f)) } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_size),
+                contentDescription = "Large Font Size",
+            )
+        }
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { headingLevel(HeadingLevel.H1) } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_h1),
+                contentDescription = "Heading 1",
+            )
+        }
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { textAlignment(TextAlignment.Center) } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_align_center),
+                contentDescription = "Align Center",
+            )
+        }
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { blockquote() } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_quote),
+                contentDescription = "Blockquote",
+            )
+        }
         Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
@@ -148,7 +245,13 @@ private fun ChatFormattingToolbar(
                         clearBold()
                         clearItalic()
                         clearStrikethrough()
-                        // Clear other attributes if needed
+                        clearUnderline()
+                        clearTextColor()
+                        clearBackgroundColor()
+                        clearFontSize()
+                        clearHeadingLevel()
+                        clearTextAlignment()
+                        clearBlockquote()
                     }
                 }
             },
