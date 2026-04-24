@@ -44,7 +44,7 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
             )
         }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = modifier.padding(16.dp)) {
         Text("Querying and Modifying Attributes", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 

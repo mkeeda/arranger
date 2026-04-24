@@ -66,7 +66,7 @@ fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
             )
         }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = modifier.padding(16.dp)) {
         Text("Paragraph Styles & Advanced Formatting", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 

@@ -39,7 +39,7 @@ fun BasicUsageSample(modifier: Modifier = Modifier) {
             )
         }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = modifier.padding(16.dp)) {
         Text("Basic Usage", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
