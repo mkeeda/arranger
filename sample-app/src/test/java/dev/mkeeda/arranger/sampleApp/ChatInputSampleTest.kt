@@ -29,11 +29,18 @@ class ChatInputSampleTest {
             }
         }
 
-        // Check if toolbar buttons exist
-        composeTestRule.onNodeWithContentDescription("Bold").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Italic").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Strikethrough").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Clear Formatting").assertIsDisplayed()
+        // Check if toolbar buttons exist in the composition (some may be scrolled off-screen)
+        composeTestRule.onNodeWithContentDescription("Bold").assertExists()
+        composeTestRule.onNodeWithContentDescription("Italic").assertExists()
+        composeTestRule.onNodeWithContentDescription("Strikethrough").assertExists()
+        composeTestRule.onNodeWithContentDescription("Underline").assertExists()
+        composeTestRule.onNodeWithContentDescription("Text Color Red").assertExists()
+        composeTestRule.onNodeWithContentDescription("Background Color Yellow").assertExists()
+        composeTestRule.onNodeWithContentDescription("Large Font Size").assertExists()
+        composeTestRule.onNodeWithContentDescription("Heading 1").assertExists()
+        composeTestRule.onNodeWithContentDescription("Align Center").assertExists()
+        composeTestRule.onNodeWithContentDescription("Blockquote").assertExists()
+        composeTestRule.onNodeWithContentDescription("Clear Formatting").assertExists()
 
         // Check if the editor exists by tag
         composeTestRule.onNodeWithTag("ChatInputEditor").assertIsDisplayed()
