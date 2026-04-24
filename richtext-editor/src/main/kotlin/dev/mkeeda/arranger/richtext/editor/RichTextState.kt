@@ -7,6 +7,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.RichStringBuffer
@@ -26,6 +27,17 @@ public class RichTextState(initialText: RichString) {
                 spans = spans,
             )
 
+    /**
+     * The current selection range within the text field.
+     * Returns [TextRange.Zero] when no selection is active (cursor at position 0).
+     */
+    public val selection: TextRange
+        get() = textFieldState.selection
+
+    /**
+     * Edits the underlying [RichString] state using a builder DSL.
+     * This allows you to apply or remove multiple attributes within a [RichStringBuffer].
+     */
     public fun edit(block: RichStringBuffer.() -> Unit) {
         spans = richString.edit(block).spans
     }

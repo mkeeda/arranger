@@ -253,6 +253,14 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
 
 <img src="./docs/images/attribute-batch-edit.gif" width="500" alt="attribute batch edit sample"/>
 
+## Practical Examples
+
+Arranger can be used to build rich and complex text input interfaces. Below are some real-world use cases demonstrating how to integrate Arranger into your applications.
+
+| Sample | Screenshot |
+| --- | --- |
+| **[Chat UI with Rich Formatting](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/ChatInputSample.kt)**<br><br>This sample demonstrates a comprehensive chat input UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, apply various built-in attributes (like bold, colors, headings, and alignments), and manage keyboard interactions seamlessly within Jetpack Compose. | <img src="./docs/images/chat-ui.png" width="400" alt="chat UI sample"/> |
+
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
 
