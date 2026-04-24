@@ -3,95 +3,99 @@
 > [!WARNING]
 > **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice.
 
-## Project Vision
+## Project Vision & Features
 The goal of "Arranger" is to provide a "declarative, type-safe, and immutable string manipulation experience similar to SwiftUI's `AttributedString`" to Jetpack Compose and Kotlin Multiplatform (KMP). We aim to break away from the tedious, error-prone index manipulations required by the existing `AnnotatedString` and the traditional WYSIWYG approaches.
 
-## Target Developer Experience (DX)
 * **Type-Safe Custom Attributes:** Define and apply UI-specific styles (like `SpanStyle`) and domain-specific attributes (e.g., `@Mention`, `#Hashtag`) with full compile-time safety.
 * **Run-Based Manipulation:** Treat text not just as an array of characters, but as "Runs" (chunks of text with identical attributes). This allows for semantic iteration, searching, and editing.
 * **Declarative Formatting Constraints:** Provide a way to declaratively define constraints (e.g., "This text field only allows bold text and links") to automatically strip unwanted styles during paste or input.
 * **Native Compose Integration (1.7+):** Elegantly separate state management and UI rendering by leveraging the latest `TextFieldState` and `OutputTransformation`.
 
-## Why SwiftUI's Paradigm? (Inspiration)
-Compared to Android's traditional `SpannableStringBuilder` or Compose's `AnnotatedString`, SwiftUI offers superior API design:
-* **Type Safety:** We will simulate SwiftUI's `@dynamicMemberLookup` using Kotlin's Extension Properties to allow intuitive, property-like access to attributes.
+## Why Arranger? (Inspiration from SwiftUI)
+Compared to Android's traditional `SpannableStringBuilder` or Compose's `AnnotatedString`, Arranger offers a superior, modern API design:
 * **Semantic "Runs":** Instead of managing `startIndex` and `endIndex`, developers can iterate over `Runs` (e.g., "find all chunks of mentions").
-* **Value Semantics:** The core text data structures will be immutable, ensuring thread safety and predictable UI re-rendering, which is highly compatible with Compose.
-* **Paste Protection:** Prevent "paste pollution" (unintended massive fonts or weird colors) via declarative constraints without writing messy parsers.
+* **Value Semantics:** The core text data structures are immutable, ensuring thread safety and predictable UI re-rendering, which is highly compatible with Compose.
+* **Type Safety:** We use Kotlin's Extension Functions with receivers to create an intuitive, declarative DSL for composing attributes.
 
-## Core Architecture Overview
-To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
+## Basic Usage (Getting Started)
 
-### Pure Kotlin Core (Data Structures)
-* **`RichTextBuffer`**: An abstraction interface for the underlying string storage. The MVP will use a simple implementation, but it is designed to be replaceable with advanced structures (like Rope or Piece Table) for handling massive documents in the future.
-* **`AttributeKey<T>`**: Defines the data type of an attribute.
-* **`RichString` & `RichRun`**: Immutable representations of text and its semantic chunks.
-* **`AttributeRangedTree`**: An internal data structure (like an Interval Tree) to manage attributes by range, independent of string indices.
-
-### Compose UI Layer
-* **`RichTextState`**: Wraps `TextFieldState` and holds the `AttributeRangedTree`. It acts as the single source of truth.
-* **`RichTextOutputTransformation`**: Converts the plain text and internal attribute tree into Compose's `AnnotatedString` purely at render time.
-* **`RichTextEditor`**: A simple, declarative Composable wrapping `BasicTextField` with our state and transformation.
-
-## Quick Start (Current Usage)
+Arranger's biggest selling point is that you can programmatically construct and decorate RichText using a clean DSL. Simply create a `RichTextState`, decorate it with `editAttributes`, and pass it to the `RichTextEditor`.
 
 ```kotlin
 @Composable
-fun QuickStartSample(modifier: Modifier = Modifier) {
-    val initialText =
-        "Arranger RichText Editor\n" +
-            "Welcome to Arranger! This is a sample.\n" +
-            "You can mix colors, bold text, and underlines.\n\n" +
-            "Paragraph Styles Demo\n" +
-            "This paragraph is centered correctly.\n" +
-            "> This is a blockquote with nice indents."
+fun BasicUsageSample(modifier: Modifier = Modifier) {
+    val initialText = "Welcome to Arranger!\nEnjoy building RichText in Compose programmatically."
 
-    // 1. Initialize RichTextState with standard attributes via declarative DSL
+    // 1. Initialize state with minimal attributes using the declarative DSL
     val state = remember {
         RichTextState(
-            initialText =
-                RichString(text = initialText).edit {
-                    editAttributes(range = initialText.rangeOf("Arranger RichText Editor")) {
-                        headingLevel(HeadingLevel.H1)
-                    }
-                    editAttributes(range = initialText.rangeOf("Paragraph Styles Demo")) {
-                        headingLevel(HeadingLevel.H3)
-                    }
-                    editAttributes(range = initialText.rangeOf("This paragraph is centered correctly.")) {
-                        textAlignment(TextAlignment.Center)
-                    }
-                    editAttributes(range = initialText.rangeOf("> This is a blockquote with nice indents.")) {
-                        blockquote()
-                    }
-                    editAttributes(range = initialText.rangeOf("Arranger!")) {
-                        bold()
-                    }
-                    editAttributes(range = initialText.rangeOf("Welcome to Arranger!")) {
-                        textColor(Color(0xFF6200EA))
-                    }
-                    editAttributes(range = initialText.rangeOf("colors")) {
-                        textColor(Color(0xFFD50000))
-                    }
-                    editAttributes(range = initialText.rangeOf("bold text")) {
-                        bold()
-                    }
-                    editAttributes(range = initialText.rangeOf("underlines")) {
-                        underline()
-                    }
+            initialText = RichString(text = initialText).edit {
+                editAttributes(range = initialText.rangeOf("Arranger!")) {
+                    bold()
+                    textColor(Color(0xFF6200EA)) // Purple
                 }
+            }
         )
     }
 
     // 2. Render natively via Compose 1.7
-    // RichTextEditor automatically uses \`DefaultAttributeStyleResolver\` for standard styling attributes.
     RichTextEditor(
         state = state,
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 ```
 
-![Quick start code result](docs/images/quick-start-sample.png)
+<img src="./docs/images/basic-usage.png" width="500" alt="basic usage sample"/>
+
+## Paragraph Styles & Advanced Formatting
+
+Arranger natively supports not only inline character formatting (like colors and boldness) but also block-level paragraph formatting such as Headers, Blockquotes, and Alignments.
+
+```kotlin
+@Composable
+fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
+    val initialText =
+        "Advanced Formatting Options\n" +
+            "You can easily apply various text and paragraph styles.\n\n" +
+            "Paragraph Styling\n" +
+            "This paragraph is explicitly centered, overriding the default alignment.\n" +
+            "> Blockquotes are perfect for highlighting external quotes or important notes."
+
+    val state =
+        remember {
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        editAttributes(range = initialText.rangeOf("Advanced Formatting Options")) {
+                            headingLevel(HeadingLevel.H1)
+                        }
+                        editAttributes(range = initialText.rangeOf("Paragraph Styling")) {
+                            headingLevel(HeadingLevel.H3)
+                        }
+                        editAttributes(range = initialText.rangeOf("This paragraph is explicitly centered, overriding the default alignment.")) {
+                            textAlignment(TextAlignment.Center)
+                        }
+                        editAttributes(range = initialText.rangeOf("> Blockquotes are perfect for highlighting external quotes or important notes.")) {
+                            blockquote()
+                        }
+                        editAttributes(range = initialText.rangeOf("various text and paragraph styles")) {
+                            textColor(Color(0xFFE91E63)) // Pink
+                            bold()
+                            underline()
+                        }
+                    },
+            )
+        }
+
+    RichTextEditor(
+        state = state,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+```
+
+<img src="./docs/images/advanced-formatting.png" width="500" alt="advanced formatting sample"/>
 
 ## Custom Attribute Mapping
 
@@ -140,7 +144,128 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
 }
 ```
 
-![Custom attribute mapping result](docs/images/custom-attribute-mapping.png)
+<img src="./docs/images/custom-attribute.png" width="500" alt="custom attribute mapping sample"/>
+
+## Batch Editing (Searching & Querying)
+
+Arranger treats text as semantic "Runs" (chunks of text with identical attributes). This allows you to effortlessly search for patterns or query existing attributes, and modify them all at once.
+
+### Searching and Highlighting
+You can easily search for strings or regular expressions and apply styles to all occurrences at once using `rangesOf` and `editAll`. Here's a sample that highlights hashtags in real-time.
+
+```kotlin
+@Composable
+fun HashtagHighlightSample(modifier: Modifier = Modifier) {
+    val initialText = "Type some #hashtags here!\nFor example: #Compose is #awesome"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText)
+        )
+    }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.richString.text }.collect { text ->
+            state.edit {
+                // Clear existing colors first
+                editAttributes(range = text.indices) {
+                    clearTextColor()
+                }
+                
+                // Find all hashtags and highlight them in blue
+                val hashtagRanges = text.rangesOf(Regex("#\\w+"))
+                editAll(hashtagRanges) {
+                    textColor(Color(0xFF1976D2)) // Blue
+                }
+            }
+        }
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Searching and Highlighting", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+```
+
+<img src="./docs/images/hashtag-highlight.gif" width="500" alt="hashtag highlighting sample"/>
+
+### Querying and Modifying Attributes
+Instead of text searching, you can also query existing attributes using `runs(key)` and apply a batch edit over those specific runs. This is useful for semantic manipulations like changing the color of all bold texts.
+
+> [!NOTE]
+> For more complex queries, you can also use `runs { predicate }` to extract runs that match any custom condition based on their attributes.
+
+```kotlin
+@Composable
+fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
+    val initialText = "This text has some bold words.\n" +
+            "We can find all bold parts and change their color at once."
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                editAttributes(range = initialText.rangeOf("bold words")) {
+                    bold()
+                }
+                editAttributes(range = initialText.rangeOf("bold parts")) {
+                    bold()
+                }
+            }
+        )
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Querying and Modifying Attributes", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                // Find all runs that have the BoldKey
+                val boldRuns = state.richString.runs(BoldKey)
+                
+                // Batch edit those specific runs
+                state.edit {
+                    editAll(boldRuns) {
+                        textColor(Color(0xFFD32F2F)) // Red
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Highlight Bold Text in Red")
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+```
+
+<img src="./docs/images/attribute-batch-edit.gif" width="500" alt="attribute batch edit sample"/>
+
+## Core Architecture Overview
+To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
+
+### Pure Kotlin Core (Data Structures)
+* **`RichStringBuffer`**: A buffer class used to safely mutate the attributes of a string within an `edit` block. Designed to accumulate mutations and produce a completely new, immutable `RichString`.
+* **`AttributeKey<T>`**: Defines the data type of an attribute.
+* **`RichString` & `RichRun`**: Immutable representations of text and its semantic chunks.
+* **`AttributeContainer`**: A core structure holding a type-safe map of attributes, which is associated with specific text ranges to form `RichSpan`s.
+
+### Compose UI Layer
+* **`RichTextState`**: Wraps `TextFieldState` and manages the Spans. It acts as the single source of truth and exposes the complete `RichString`.
+* **`RichTextOutputTransformation`**: Converts the plain text and spans into Compose's `AnnotatedString` purely at render time.
+* **`RichTextEditor`**: A simple, declarative Composable wrapping `BasicTextField` with our state and transformation.
 
 ## Development Roadmap
 

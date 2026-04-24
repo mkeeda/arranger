@@ -3,6 +3,7 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,6 +11,7 @@ import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.RichStringBuffer
 
+@Stable
 public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
 

@@ -28,53 +28,46 @@ import dev.mkeeda.arranger.richtext.underline
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
-fun QuickStartSample(modifier: Modifier = Modifier) {
+fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
     val initialText =
-        "Arranger RichText Editor\n" +
-            "Welcome to Arranger! This is a sample.\n" +
-            "You can mix colors, bold text, and underlines.\n\n" +
-            "Paragraph Styles Demo\n" +
-            "This paragraph is centered correctly.\n" +
-            "> This is a blockquote with nice indents."
+        "Advanced Formatting Options\n" +
+            "You can easily apply various text and paragraph styles.\n\n" +
+            "Paragraph Styling\n" +
+            "This paragraph is explicitly centered, overriding the default alignment.\n" +
+            "> Blockquotes are perfect for highlighting external quotes or important notes."
 
     val state =
         remember {
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        editAttributes(range = initialText.rangeOf("Arranger RichText Editor")) {
+                        editAttributes(range = initialText.rangeOf("Advanced Formatting Options")) {
                             headingLevel(HeadingLevel.H1)
                         }
-                        editAttributes(range = initialText.rangeOf("Paragraph Styles Demo")) {
+                        editAttributes(range = initialText.rangeOf("Paragraph Styling")) {
                             headingLevel(HeadingLevel.H3)
                         }
-                        editAttributes(range = initialText.rangeOf("This paragraph is centered correctly.")) {
+                        editAttributes(
+                            range = initialText.rangeOf("This paragraph is explicitly centered, overriding the default alignment."),
+                        ) {
                             textAlignment(TextAlignment.Center)
                         }
-                        editAttributes(range = initialText.rangeOf("> This is a blockquote with nice indents.")) {
+                        editAttributes(
+                            range = initialText.rangeOf("> Blockquotes are perfect for highlighting external quotes or important notes."),
+                        ) {
                             blockquote()
                         }
-                        editAttributes(range = initialText.rangeOf("Arranger!")) {
+                        editAttributes(range = initialText.rangeOf("various text and paragraph styles")) {
+                            textColor(Color(0xFFE91E63)) // Pink
                             bold()
-                        }
-                        editAttributes(range = initialText.rangeOf("Welcome to Arranger!")) {
-                            textColor(Color(0xFF6200EA))
-                        }
-                        editAttributes(range = initialText.rangeOf("colors")) {
-                            textColor(Color(0xFFD50000))
-                        }
-                        editAttributes(range = initialText.rangeOf("bold text")) {
-                            bold()
-                        }
-                        editAttributes(range = initialText.rangeOf("underlines")) {
                             underline()
                         }
                     },
             )
         }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Compose RichTextEditor Demo", fontWeight = FontWeight.Bold)
+    Column(modifier = modifier.padding(16.dp)) {
+        Text("Paragraph Styles & Advanced Formatting", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
         RichTextEditor(
@@ -86,8 +79,8 @@ fun QuickStartSample(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun QuickStartSamplePreview() {
+fun AdvancedFormattingSamplePreview() {
     ArrangerTheme {
-        QuickStartSample()
+        AdvancedFormattingSample()
     }
 }
