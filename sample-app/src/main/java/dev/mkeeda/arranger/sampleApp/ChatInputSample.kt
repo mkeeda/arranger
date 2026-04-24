@@ -112,7 +112,7 @@ private fun ChatFormattingToolbar(
             enabled = hasSelection,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.format_bold_24),
+                painter = painterResource(id = R.drawable.format_bold),
                 contentDescription = "Bold",
             )
         }
@@ -123,7 +123,7 @@ private fun ChatFormattingToolbar(
             enabled = hasSelection,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.format_italic_24),
+                painter = painterResource(id = R.drawable.format_italic),
                 contentDescription = "Italic",
             )
         }
@@ -134,7 +134,7 @@ private fun ChatFormattingToolbar(
             enabled = hasSelection,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.format_strikethrough_24),
+                painter = painterResource(id = R.drawable.format_strikethrough),
                 contentDescription = "Strikethrough",
             )
         }
@@ -155,7 +155,7 @@ private fun ChatFormattingToolbar(
             enabled = hasSelection,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.format_clear_24),
+                painter = painterResource(id = R.drawable.format_clear),
                 contentDescription = "Clear Formatting",
             )
         }
