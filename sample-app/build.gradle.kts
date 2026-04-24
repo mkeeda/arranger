@@ -1,6 +1,7 @@
 plugins {
     id("arranger.android.application")
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -41,4 +42,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(project(":richtext-editor"))
     implementation(project(":richtext"))
+
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.material3.adaptive.navigation3)
+    implementation(libs.kotlinx.serialization.core)
 }
