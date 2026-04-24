@@ -7,6 +7,9 @@ import dev.mkeeda.arranger.richtext.RichStringBuffer
 /**
  * Applies a set of attribute mutations to the range specified by the given [TextRange].
  * This is a convenience overload that converts [TextRange] to [IntRange].
+ *
+ * If the selection is collapsed (cursor with no selection), the resulting range is empty
+ * and no attributes are modified.
  */
 public fun RichStringBuffer.editAttributes(
     selection: TextRange,

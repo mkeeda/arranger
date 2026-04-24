@@ -1,5 +1,6 @@
 package dev.mkeeda.arranger.sampleApp
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -29,6 +30,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.mkeeda.arranger.richtext.AttributeEditScope
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
@@ -128,116 +130,32 @@ private fun ChatFormattingToolbar(
                 .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 4.dp, vertical = 2.dp),
     ) {
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { bold() } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_bold),
-                contentDescription = "Bold",
+        val formatActions =
+            listOf(
+                FormatAction(R.drawable.format_bold, "Bold") { bold() },
+                FormatAction(R.drawable.format_italic, "Italic") { italic() },
+                FormatAction(R.drawable.format_underlined, "Underline") { underline() },
+                FormatAction(R.drawable.format_strikethrough, "Strikethrough") { strikethrough() },
+                FormatAction(R.drawable.format_color_text, "Text Color Red") { textColor(RgbaColor(0xFFFF0000.toLong())) },
+                FormatAction(R.drawable.format_color_fill, "Background Color Yellow") { backgroundColor(RgbaColor(0xFFFFFF00.toLong())) },
+                FormatAction(R.drawable.format_size, "Large Font Size") { fontSize(TextSize(24f)) },
+                FormatAction(R.drawable.format_h1, "Heading 1") { headingLevel(HeadingLevel.H1) },
+                FormatAction(R.drawable.format_align_center, "Align Center") { textAlignment(TextAlignment.Center) },
+                FormatAction(R.drawable.format_quote, "Blockquote") { blockquote() },
             )
+
+        formatActions.forEach { action ->
+            IconButton(
+                onClick = { state.edit { editAttributes(state.selection) { action.action(this) } } },
+                enabled = hasSelection,
+            ) {
+                Icon(
+                    painter = painterResource(id = action.iconRes),
+                    contentDescription = action.contentDescription,
+                )
+            }
         }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { italic() } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_italic),
-                contentDescription = "Italic",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { underline() } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_underlined),
-                contentDescription = "Underline",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { strikethrough() } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_strikethrough),
-                contentDescription = "Strikethrough",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { textColor(RgbaColor(0xFFFF0000.toLong())) } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_color_text),
-                contentDescription = "Text Color Red",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { backgroundColor(RgbaColor(0xFFFFFF00.toLong())) } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_color_fill),
-                contentDescription = "Background Color Yellow",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { fontSize(TextSize(24f)) } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_size),
-                contentDescription = "Large Font Size",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { headingLevel(HeadingLevel.H1) } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_h1),
-                contentDescription = "Heading 1",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { textAlignment(TextAlignment.Center) } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_align_center),
-                contentDescription = "Align Center",
-            )
-        }
-        IconButton(
-            onClick = {
-                state.edit { editAttributes(state.selection) { blockquote() } }
-            },
-            enabled = hasSelection,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.format_quote),
-                contentDescription = "Blockquote",
-            )
-        }
+
         Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
@@ -266,6 +184,12 @@ private fun ChatFormattingToolbar(
         }
     }
 }
+
+private data class FormatAction(
+    @DrawableRes val iconRes: Int,
+    val contentDescription: String,
+    val action: AttributeEditScope.() -> Unit,
+)
 
 @Composable
 private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) {
