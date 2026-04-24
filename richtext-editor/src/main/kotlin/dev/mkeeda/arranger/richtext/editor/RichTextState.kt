@@ -11,6 +11,7 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.RichStringBuffer
+import dev.mkeeda.arranger.richtext.resnapParagraphSpans
 
 @Stable
 public class RichTextState(initialText: RichString) {
@@ -46,7 +47,7 @@ public class RichTextState(initialText: RichString) {
     internal fun updateRichString(buffer: TextFieldBuffer) {
         if (buffer.changes.changeCount == 0) return
 
-        this.spans =
+        val shiftedSpans =
             (0 until buffer.changes.changeCount).fold(spans) { currentSpans, i ->
                 val originalRange = buffer.changes.getOriginalRange(i)
                 val range = buffer.changes.getRange(i)
@@ -65,6 +66,8 @@ public class RichTextState(initialText: RichString) {
                     )
                 }
             }
+
+        this.spans = shiftedSpans.resnapParagraphSpans(buffer.toString())
     }
 
     private fun shiftSpan(
