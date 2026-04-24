@@ -82,98 +82,113 @@ private fun ChatInputBox(state: RichTextState, modifier: Modifier = Modifier) {
                 )
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest),
     ) {
-        // Formatting Toolbar
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
-        ) {
-            IconButton(
-                onClick = {
-                    state.edit { editAttributes(state.selection) { bold() } }
-                },
-                enabled = hasSelection,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.format_bold_24),
-                    contentDescription = "Bold",
-                )
-            }
-            IconButton(
-                onClick = {
-                    state.edit { editAttributes(state.selection) { italic() } }
-                },
-                enabled = hasSelection,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.format_italic_24),
-                    contentDescription = "Italic",
-                )
-            }
-            IconButton(
-                onClick = {
-                    state.edit { editAttributes(state.selection) { strikethrough() } }
-                },
-                enabled = hasSelection,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.format_strikethrough_24),
-                    contentDescription = "Strikethrough",
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            IconButton(
-                onClick = {
-                    state.edit {
-                        editAttributes(state.selection) {
-                            clearBold()
-                            clearItalic()
-                            clearStrikethrough()
-                            // Clear other attributes if needed
-                        }
-                    }
-                },
-                enabled = hasSelection,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.format_clear_24),
-                    contentDescription = "Clear Formatting",
-                )
-            }
-        }
+        ChatFormattingToolbar(
+            state = state,
+            hasSelection = hasSelection,
+        )
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-        // Text Input Area
-        Box(
+        ChatInputField(state = state)
+    }
+}
+
+@Composable
+private fun ChatFormattingToolbar(
+    state: RichTextState,
+    hasSelection: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+    ) {
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { bold() } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_bold_24),
+                contentDescription = "Bold",
+            )
+        }
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { italic() } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_italic_24),
+                contentDescription = "Italic",
+            )
+        }
+        IconButton(
+            onClick = {
+                state.edit { editAttributes(state.selection) { strikethrough() } }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_strikethrough_24),
+                contentDescription = "Strikethrough",
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        IconButton(
+            onClick = {
+                state.edit {
+                    editAttributes(state.selection) {
+                        clearBold()
+                        clearItalic()
+                        clearStrikethrough()
+                        // Clear other attributes if needed
+                    }
+                }
+            },
+            enabled = hasSelection,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.format_clear_24),
+                contentDescription = "Clear Formatting",
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+    ) {
+        if (state.richString.text.isEmpty()) {
+            Text(
+                text = "Type a message...",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+        RichTextEditor(
+            state = state,
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
-        ) {
-            if (state.richString.text.isEmpty()) {
-                Text(
-                    text = "Type a message...",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-            RichTextEditor(
-                state = state,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .testTag("ChatInputEditor"),
-                textStyle =
-                    MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface,
-                    ),
-                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1, maxHeightInLines = 5),
-            )
-        }
+                    .testTag("ChatInputEditor"),
+            textStyle =
+                MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                ),
+            lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1, maxHeightInLines = 5),
+        )
     }
 }
 
