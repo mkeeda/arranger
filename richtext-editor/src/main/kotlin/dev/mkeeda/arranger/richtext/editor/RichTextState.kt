@@ -26,6 +26,13 @@ public class RichTextState(initialText: RichString) {
                 spans = spans,
             )
 
+    /**
+     * The current selection range within the text field.
+     * Returns [androidx.compose.ui.text.TextRange.Zero] when no selection is active (cursor at position 0).
+     */
+    public val selection: androidx.compose.ui.text.TextRange
+        get() = textFieldState.selection
+
     public fun edit(block: RichStringBuffer.() -> Unit) {
         spans = richString.edit(block).spans
     }

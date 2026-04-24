@@ -59,4 +59,24 @@ class RichTextEditorTest {
         // Assert the span accurately shifted
         newSpans.first().range shouldBe expectedNewText.rangeOf("Arranger!")
     }
+
+    @Test
+    fun `selection is exposed from TextFieldState`() {
+        val initialText = "Hello World"
+        val state = RichTextState(initialText = RichString(text = initialText))
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Initial state should be no selection at the start of the text
+        state.selection shouldBe TextRange(initialText.length)
+
+        // Select "World" (indices 6 to 11)
+        val selectionRange = TextRange(6, 11)
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(selectionRange)
+
+        // The state should now reflect the selection
+        state.selection shouldBe selectionRange
+    }
 }
