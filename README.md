@@ -46,6 +46,8 @@ fun BasicUsageSample(modifier: Modifier = Modifier) {
 }
 ```
 
+<img src="./docs/images/basic-usage.png" width="500" alt="basic usage sample"/>
+
 ## Paragraph Styles & Advanced Formatting
 
 Arranger natively supports not only inline character formatting (like colors and boldness) but also block-level paragraph formatting such as Headers, Blockquotes, and Alignments.
@@ -92,6 +94,8 @@ fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
     )
 }
 ```
+
+<img src="./docs/images/advanced-formatting.png" width="500" alt="advanced formatting sample"/>
 
 ## Custom Attribute Mapping
 
@@ -140,7 +144,7 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
 }
 ```
 
-![Custom attribute mapping result](docs/images/custom-attribute-mapping.png)
+<img src="./docs/images/custom-attribute.png" width="500" alt="custom attribute mapping sample"/>
 
 ## Batch Editing (Searching & Querying)
 
@@ -188,6 +192,8 @@ fun HashtagHighlightSample(modifier: Modifier = Modifier) {
     }
 }
 ```
+
+<img src="./docs/images/hashtag-highlight.gif" width="500" alt="hashtag highlighting sample"/>
 
 ### Querying and Modifying Attributes
 Instead of text searching, you can also query existing attributes using `runs(key)` and apply a batch edit over those specific runs. This is useful for semantic manipulations like changing the color of all bold texts.
@@ -244,6 +250,8 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
     }
 }
 ```
+
+<img src="./docs/images/attribute-batch-edit.gif" width="500" alt="attribute batch edit sample"/>
 
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
