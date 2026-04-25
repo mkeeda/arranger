@@ -277,23 +277,27 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ## Development Roadmap
 
-- [x] **1. Core Data Structures (The Core)**
-    * Implementation of a range-based data structure (e.g., Interval Tree) to manage attributes by range rather than character indices.
-    * Foundation setup for `AttributeKey` and extension properties.
-- [x] **2. Runs API Implementation**
-    * Logic to segment strings into semantic chunks (`RichRun`) that can be operated on as an iterator.
-- [x] **3. Integration with TextFieldState / OutputTransformation**
-    * Logic to hook into `TextFieldBuffer` modifications (insertions/deletions) and dynamically track/shift the indices of the underlying attribute tree.
-- [x] **4. Implementation of Basic Built-in AttributeKeys**
-    * Basic character-level decorations (e.g., Bold, Text Color, Underline, Italics, Font Size).
-    * Paragraph-level decorations (e.g., Headings, Bullet Lists).
-- [x] **5. Custom Attribute Mapping APIs**
-    * Expose mechanisms allowing developers to customize how default `AttributeKey`s are translated into Compose `AnnotatedString` styles.
-- [ ] **6. Declarative Formatting Constraints**
-    * Mechanism leveraging `InputTransformation` to parse pasted clipboard HTML/RichText and strictly filter allowed attributes based on an access list.
-- [ ] **7. Full Attribute Restoration on Undo/Redo**
-    * Seamlessly align with `TextFieldState`'s native Undo/Redo to accurately restore historical attribute ranges.
-- [ ] **8. Performance Tuning**
-    * Optimize internal data structures to production-grade performance variants (e.g., Rope or Piece Table) for large text handling.
-- [ ] **9. Kotlin Multiplatform (KMP) Support**
-    * Ensure the core data structures, state management, and formatting logic are fully platform-agnostic to support Compose Multiplatform distribution (iOS, Desktop, Web).
+### Phase 1: Core Foundation (Completed)
+- [x] **Core Data Structures**: Range-based attribute management using interval logic.
+- [x] **Runs API**: Semantic segmentation of text into operable chunks.
+- [x] **Compose Integration**: Native binding with `TextFieldState` and `OutputTransformation`.
+- [x] **Built-in Attributes**: Support for Bold, Italic, Underline, Color, and Headings.
+
+### Phase 2: Advanced Manipulation & Structural Elements
+- [ ] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
+- [ ] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
+- [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., vertical lines for blockquotes, background boxes for code blocks).
+- [ ] **Material 3 Integration**: Specialized resolvers for M3 Typography and Color Schemes.
+
+### Phase 3: Interoperability & Media
+- [ ] **HTML & Markdown Support**: Import/Export logic (CommonMark and HTML5).
+- [ ] **WYSIWYG Auto-formatting**: Real-time conversion of Markdown syntax during input.
+- [ ] **Inline Media**: Support for images and attachments using Compose `InlineContent`.
+- [ ] **Declarative Constraints**: Restricting allowed formatting (e.g., "Plain text + Links only") for specific use cases.
+
+### Phase 4: Complex Layouts & Enterprise Features
+- [ ] **Table Support**: Implementation of nested structural layouts for grids/tables within the editor.
+- [ ] **Undo/Redo Synchronization**: Full history restoration for both text and complex structural changes.
+- [ ] **Performance Optimization**: Internal migration to Piece Table/Rope structures for document-scale text.
+- [ ] **Kotlin Multiplatform (KMP)**: Full support for iOS, Desktop, and Web.
+
