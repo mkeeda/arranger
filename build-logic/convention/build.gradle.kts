@@ -13,6 +13,7 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.spotless.gradlePlugin)
+    implementation(libs.vanniktech.maven.publish.gradlePlugin)
 }
 
 gradlePlugin {
@@ -28,6 +29,10 @@ gradlePlugin {
         register("androidSpotless") {
             id = "arranger.android.spotless"
             implementationClass = "AndroidSpotlessConventionPlugin"
+        }
+        register("mavenPublish") {
+            id = "arranger.maven.publish"
+            implementationClass = "MavenPublishConventionPlugin"
         }
     }
 }

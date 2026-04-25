@@ -1,5 +1,6 @@
 plugins {
     id("arranger.android.library")
+    id("arranger.maven.publish")
     alias(libs.plugins.kotlin.compose)
 }
 
