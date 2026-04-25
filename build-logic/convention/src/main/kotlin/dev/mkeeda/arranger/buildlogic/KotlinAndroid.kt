@@ -35,6 +35,7 @@ private fun Project.configureKotlin() {
             freeCompilerArgs.addAll(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=dev.mkeeda.arranger.richtext.InternalArrangerApi",
             )
         }
     }

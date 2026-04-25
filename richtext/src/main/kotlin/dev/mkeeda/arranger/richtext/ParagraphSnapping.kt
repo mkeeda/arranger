@@ -23,6 +23,7 @@ internal fun IntRange.snapToParagraphs(text: String): IntRange {
  * Spans that contain only [SpanAttributeKey]s are left unchanged.
  * Paragraph spans whose range becomes invalid (e.g., in empty text) are removed.
  */
+@InternalArrangerApi
 public fun List<RichSpan>.resnapParagraphSpans(text: String): List<RichSpan> {
     if (this.isEmpty()) return this
 
