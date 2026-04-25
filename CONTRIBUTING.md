@@ -14,15 +14,17 @@ Arranger follows [Semantic Versioning](https://semver.org/), but while we are in
 
 *Note: The single source of truth for the project's current version is the `VERSION_NAME` property in the root `gradle.properties` file.*
 
-## Release Process (GitHub Releases Driven)
+## Release Process (Tag-Driven)
 
-We use an automated CI/CD pipeline triggered by GitHub Releases. If you are a maintainer, follow these steps to publish a new version:
+We use an automated CI/CD pipeline triggered by a tag push matching `v*`. If you are a maintainer, follow these steps to publish a new version:
 
 1.  **Update Version**: Update the `VERSION_NAME` in `gradle.properties` (e.g., to `0.1.0-alpha01`) and merge it into the `main` branch.
 2.  **Draft Release**: Go to GitHub Releases and click "Draft a new release".
 3.  **Create Tag**: Create a new tag matching the version with a `v` prefix (e.g., `v0.1.0-alpha01`).
 4.  **Generate Notes**: Use the "Generate release notes" button to auto-generate the changelog based on merged PRs.
-5.  **Publish**: Click "Publish release". The GitHub Actions workflow will automatically build, sign, and publish the artifacts to Maven Central.
+5.  **Publish**: Click "Publish release". GitHub will push the associated tag, which automatically triggers the GitHub Actions workflow to build, sign, and publish the artifacts to Maven Central.
+
+*Note: Because the workflow listens to tag pushes, pushing a `v*` tag directly via git (without creating a GitHub Release) will also trigger the publish workflow. Please be careful when managing tags locally.*
 
 ## Commit Guidelines
 
