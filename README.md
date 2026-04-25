@@ -3,6 +3,11 @@
 > [!WARNING]
 > **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice.
 
+## Requirements
+* **Android API Level 26+**
+* **Jetpack Compose 1.7+**
+* **Kotlin 2.3.20+**
+
 ## Project Vision & Features
 The goal of "Arranger" is to provide a "declarative, type-safe, and immutable string manipulation experience similar to SwiftUI's `AttributedString`" to Jetpack Compose and Kotlin Multiplatform (KMP). We aim to break away from the tedious, error-prone index manipulations required by the existing `AnnotatedString` and the traditional WYSIWYG approaches.
 
@@ -16,6 +21,21 @@ Compared to Android's traditional `SpannableStringBuilder` or Compose's `Annotat
 * **Semantic "Runs":** Instead of managing `startIndex` and `endIndex`, developers can iterate over `Runs` (e.g., "find all chunks of mentions").
 * **Value Semantics:** The core text data structures are immutable, ensuring thread safety and predictable UI re-rendering, which is highly compatible with Compose.
 * **Type Safety:** We use Kotlin's Extension Functions with receivers to create an intuitive, declarative DSL for composing attributes.
+
+## Installation
+
+Arranger is published to Maven Central. Add the following dependencies to your module's `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    // For Compose UI integration (RichTextEditor).
+    // This automatically includes the core 'arranger-richtext' module.
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.1.0-alpha01")
+
+    // Or, if you only need the core data structures without Compose UI:
+    // implementation("dev.mkeeda.arranger:arranger-richtext:0.1.0-alpha01")
+}
+```
 
 ## Basic Usage (Getting Started)
 
