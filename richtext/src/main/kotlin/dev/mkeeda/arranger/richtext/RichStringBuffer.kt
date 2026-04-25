@@ -59,18 +59,6 @@ public class RichStringBuffer internal constructor(
             }
     }
 
-    private fun IntRange.snapToParagraphs(text: String): IntRange {
-        val start =
-            text.lastIndexOf('\n', startIndex = this.first - 1).let {
-                if (it == -1) 0 else it + 1
-            }
-        val end =
-            text.indexOf('\n', startIndex = this.last).let {
-                if (it == -1) text.lastIndex else it
-            }
-        return start..end
-    }
-
     /**
      * Removes any paragraph attributes associated with the specified [key] within the given [range].
      * The [range] is automatically expanded to span the entire paragraphs (separated by `\n`)
