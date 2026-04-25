@@ -6,6 +6,7 @@
 ## Requirements
 * **Android API Level 26+**
 * **Jetpack Compose 1.7+**
+* **Kotlin 2.3.20+**
 
 ## Project Vision & Features
 The goal of "Arranger" is to provide a "declarative, type-safe, and immutable string manipulation experience similar to SwiftUI's `AttributedString`" to Jetpack Compose and Kotlin Multiplatform (KMP). We aim to break away from the tedious, error-prone index manipulations required by the existing `AnnotatedString` and the traditional WYSIWYG approaches.
@@ -27,11 +28,12 @@ Arranger is published to Maven Central. Add the following dependencies to your m
 
 ```kotlin
 dependencies {
-    // Core data structures and state management
-    implementation("dev.mkeeda.arranger:arranger-richtext:0.1.0-alpha01")
-
-    // Compose UI integration (RichTextEditor)
+    // For Compose UI integration (RichTextEditor).
+    // This automatically includes the core 'arranger-richtext' module.
     implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.1.0-alpha01")
+
+    // Or, if you only need the core data structures without Compose UI:
+    // implementation("dev.mkeeda.arranger:arranger-richtext:0.1.0-alpha01")
 }
 ```
 
