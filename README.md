@@ -21,6 +21,20 @@ Compared to Android's traditional `SpannableStringBuilder` or Compose's `Annotat
 * **Value Semantics:** The core text data structures are immutable, ensuring thread safety and predictable UI re-rendering, which is highly compatible with Compose.
 * **Type Safety:** We use Kotlin's Extension Functions with receivers to create an intuitive, declarative DSL for composing attributes.
 
+## Installation
+
+Arranger is published to Maven Central. Add the following dependencies to your module's `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    // Core data structures and state management
+    implementation("dev.mkeeda.arranger:arranger-richtext:0.1.0-alpha01")
+
+    // Compose UI integration (RichTextEditor)
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.1.0-alpha01")
+}
+```
+
 ## Basic Usage (Getting Started)
 
 Arranger's biggest selling point is that you can programmatically construct and decorate RichText using a clean DSL. Simply create a `RichTextState`, decorate it with `editAttributes`, and pass it to the `RichTextEditor`.
