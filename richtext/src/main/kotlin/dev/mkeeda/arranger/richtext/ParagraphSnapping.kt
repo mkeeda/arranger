@@ -25,18 +25,8 @@ internal fun IntRange.snapToParagraphs(text: String): IntRange {
  */
 public fun List<RichSpan>.resnapParagraphSpans(text: String): List<RichSpan> {
     if (this.isEmpty()) return this
-    if (text.isEmpty()) {
-        return mapNotNull { span ->
-            val sAttrs = span.attributes.filterSpanAttributes()
-            if (sAttrs.isNotEmpty()) {
-                span.copy(attributes = sAttrs)
-            } else {
-                null
-            }
-        }
-    }
 
-    var resultSpans =
+    val spanOnlySpans =
         mapNotNull { span ->
             val sAttrs = span.attributes.filterSpanAttributes()
             if (sAttrs.isNotEmpty()) {
@@ -45,6 +35,10 @@ public fun List<RichSpan>.resnapParagraphSpans(text: String): List<RichSpan> {
                 null
             }
         }
+
+    if (text.isEmpty()) return spanOnlySpans
+
+    var resultSpans = spanOnlySpans
 
     val pSpans =
         this.mapNotNull { span ->

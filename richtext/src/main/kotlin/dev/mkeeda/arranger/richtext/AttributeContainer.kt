@@ -68,12 +68,6 @@ public class AttributeContainer private constructor(
     public fun containsAny(vararg keys: AttributeKey<*>): Boolean = keys.any { containsKey(it) }
 
     /**
-     * Returns true if this container contains any [ParagraphAttributeKey].
-     */
-    public fun hasParagraphAttributes(): Boolean =
-        attributes.keys.any { it is ParagraphAttributeKey<*> }
-
-    /**
      * Returns a new [AttributeContainer] containing only the paragraph attributes.
      */
     internal fun filterParagraphAttributes(): AttributeContainer {
