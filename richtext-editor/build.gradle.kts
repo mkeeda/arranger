@@ -17,10 +17,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":richtext"))
+    api(project(":richtext"))
 
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.foundation)
+    api(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.foundation)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotest.assertions.core)
