@@ -3,6 +3,10 @@
 > [!WARNING]
 > **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice.
 
+## Requirements
+* **Android API Level 26+**
+* **Jetpack Compose 1.7+**
+
 ## Project Vision & Features
 The goal of "Arranger" is to provide a "declarative, type-safe, and immutable string manipulation experience similar to SwiftUI's `AttributedString`" to Jetpack Compose and Kotlin Multiplatform (KMP). We aim to break away from the tedious, error-prone index manipulations required by the existing `AnnotatedString` and the traditional WYSIWYG approaches.
 
