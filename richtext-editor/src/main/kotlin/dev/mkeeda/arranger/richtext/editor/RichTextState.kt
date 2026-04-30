@@ -56,24 +56,33 @@ public class RichTextState(initialText: RichString) {
                 val originalRange = buffer.changes.getOriginalRange(i)
                 val range = buffer.changes.getRange(i)
 
-                val editStart = originalRange.min
-                val editEnd = originalRange.max
-                val offsetDiff = range.length - originalRange.length
-
-                currentSpans.mapNotNull { span ->
-                    shiftSpan(
-                        span = span,
-                        editStart = editStart,
-                        editEnd = editEnd,
-                        newLength = range.length,
-                        offsetDiff = offsetDiff,
-                    )
-                }
+                currentSpans.shiftSpans(
+                    editStart = originalRange.min,
+                    editEnd = originalRange.max,
+                    newLength = range.length,
+                    offsetDiff = range.length - originalRange.length,
+                )
             }
 
         this.spans = shiftedSpans.resnapParagraphSpans(buffer.toString())
     }
 }
+
+internal fun List<RichSpan>.shiftSpans(
+    editStart: Int,
+    editEnd: Int,
+    newLength: Int,
+    offsetDiff: Int,
+): List<RichSpan> =
+    mapNotNull { span ->
+        shiftSpan(
+            span = span,
+            editStart = editStart,
+            editEnd = editEnd,
+            newLength = newLength,
+            offsetDiff = offsetDiff,
+        )
+    }
 
 internal fun shiftSpan(
     span: RichSpan,

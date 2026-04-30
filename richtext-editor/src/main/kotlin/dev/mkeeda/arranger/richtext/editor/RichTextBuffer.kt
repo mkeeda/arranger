@@ -189,15 +189,12 @@ public class RichTextBuffer internal constructor(
         offsetDiff: Int,
     ) {
         currentSpans =
-            currentSpans.mapNotNull { span ->
-                shiftSpan(
-                    span = span,
-                    editStart = editStart,
-                    editEnd = editEnd,
-                    newLength = newLength,
-                    offsetDiff = offsetDiff,
-                )
-            }
+            currentSpans.shiftSpans(
+                editStart = editStart,
+                editEnd = editEnd,
+                newLength = newLength,
+                offsetDiff = offsetDiff,
+            )
     }
 
     internal val spans: List<RichSpan>

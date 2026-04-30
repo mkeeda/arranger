@@ -100,4 +100,31 @@ class RichTextEditorTest {
         newSpans.size shouldBe 1
         newSpans.first().range shouldBe (6 until 11)
     }
+
+    @Test
+    fun `programmatic edit and user edit produce identical spans`() {
+        val initialText = "Hello World"
+        val stateProgrammatic = RichTextState(initialText = RichString(initialText).edit { editAttributes { bold() } })
+        val stateUser = RichTextState(initialText = RichString(initialText).edit { editAttributes { bold() } })
+
+        // 1. Programmatic Edit
+        stateProgrammatic.edit {
+            replace(0..4, "Beautiful")
+        }
+
+        // 2. User Edit
+        composeTestRule.setContent {
+            RichTextEditor(state = stateUser)
+        }
+        // Select "Hello" and type "Beautiful"
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(0, 5))
+        composeTestRule.onNodeWithText(initialText).performTextInput("Beautiful")
+
+        // 3. Verify
+        stateProgrammatic.richString.text shouldBe stateUser.richString.text
+
+        // Assert that spans and paragraph spans are identical.
+        // This guarantees `RichTextBuffer` shift logic is identical to `updateRichString`
+        stateProgrammatic.richString.spans shouldBe stateUser.richString.spans
+    }
 }
