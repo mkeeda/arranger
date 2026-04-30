@@ -7,61 +7,57 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import dev.mkeeda.arranger.richtext.ListIndentLevel
-import dev.mkeeda.arranger.richtext.buildRichString
+import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.bulletList
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.rememberRichTextState
+import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.orderedList
 
 @Composable
 fun ListFormattingSample(modifier: Modifier = Modifier) {
     val initialText =
         remember {
-            buildRichString {
-                append("List Formatting Features\n\n")
+            val plainText =
+                "List Formatting Features\n\n" +
+                    "Bullet Item 1\n" +
+                    "Bullet Item 2\n" +
+                    "Bullet Item 3\n\n" +
+                    "First step\n" +
+                    "Second step\n" +
+                    "Third step\n\n" +
+                    "Nested Lists\n" +
+                    "Parent item\n" +
+                    "Child item 1\n" +
+                    "Child item 2\n"
 
-                // Bullet lists
-                val bulletStart = length
-                append("Bullet Item 1\n")
-                append("Bullet Item 2\n")
-                append("Bullet Item 3\n")
-                editAttributes(range = bulletStart until length) {
+            RichString(plainText).edit {
+                val b1 = plainText.indexOf("Bullet Item 1")
+                val bEnd = plainText.indexOf("First step") - 1
+                editAttributes(b1 until bEnd) {
                     bulletList(ListIndentLevel.Level1)
                 }
 
-                append("\n")
-
-                // Ordered lists
-                val orderedStart = length
-                append("First step\n")
-                append("Second step\n")
-                append("Third step\n")
-                editAttributes(range = orderedStart until length) {
+                val o1 = plainText.indexOf("First step")
+                val oEnd = plainText.indexOf("Nested Lists") - 1
+                editAttributes(o1 until oEnd) {
                     orderedList(ListIndentLevel.Level1)
                 }
 
-                append("\nNested Lists\n")
-                val nestedStart = length
-                append("Parent item\n")
-                editAttributes(range = nestedStart until length) {
+                val p1 = plainText.indexOf("Parent item")
+                val pEnd = plainText.indexOf("Child item 1")
+                editAttributes(p1 until pEnd) {
                     bulletList(ListIndentLevel.Level1)
                 }
 
-                val child1Start = length
-                append("Child item 1\n")
-                editAttributes(range = child1Start until length) {
-                    bulletList(ListIndentLevel.Level2)
-                }
-
-                val child2Start = length
-                append("Child item 2\n")
-                editAttributes(range = child2Start until length) {
+                val c1 = plainText.indexOf("Child item 1")
+                val c2End = plainText.length
+                editAttributes(c1 until c2End) {
                     bulletList(ListIndentLevel.Level2)
                 }
             }
         }
 
-    val state = rememberRichTextState(initialText)
+    val state = remember { RichTextState(initialText) }
 
     RichTextEditor(
         state = state,
