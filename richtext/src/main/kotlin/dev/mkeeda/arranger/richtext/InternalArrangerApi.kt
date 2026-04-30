@@ -5,5 +5,5 @@ package dev.mkeeda.arranger.richtext
     level = RequiresOptIn.Level.ERROR,
 )
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
 public annotation class InternalArrangerApi

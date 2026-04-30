@@ -4,23 +4,110 @@ import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
 import dev.mkeeda.arranger.richtext.AttributeEditScope
+import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
+import dev.mkeeda.arranger.richtext.RichRun
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichStringScope
+import dev.mkeeda.arranger.richtext.SpanAttributeKey
 
 /**
  * A buffer for safely mutating both text and attributes of a [RichTextState] within an `edit` block.
- * This class inherits all attribute operations from [RichStringScope] and adds text operations
+ * This class provides attribute operations by delegating to [RichStringScope] and adds text operations
  * like insert, delete, and replace.
  */
 public class RichTextBuffer internal constructor(
-    spans: List<RichSpan>,
+    private var currentSpans: List<RichSpan>,
     private val textFieldBuffer: TextFieldBuffer,
-) : RichStringScope(spans) {
-    override val textLength: Int
+) {
+    public val textLength: Int
         get() = textFieldBuffer.length
 
-    public override val text: String
+    public val text: String
         get() = textFieldBuffer.toString()
+
+    private inline fun withAttributeScope(block: RichStringScope.() -> Unit) {
+        val scope = RichStringScope(currentSpans, textFieldBuffer.toString())
+        scope.block()
+        currentSpans = scope.spans
+    }
+
+    /**
+     * Applies the specified character span attribute [key] and [value] to the given [range].
+     * Any existing span attributes of the same key within this range are completely overwritten.
+     */
+    public fun <T> setSpanAttribute(
+        key: SpanAttributeKey<T>,
+        value: T,
+        range: IntRange = 0 until textLength,
+    ) {
+        withAttributeScope { setSpanAttribute(key, value, range) }
+    }
+
+    /**
+     * Removes any character span attributes associated with the specified [key] within the given [range].
+     */
+    public fun <T> removeSpanAttribute(
+        key: SpanAttributeKey<T>,
+        range: IntRange = 0 until textLength,
+    ) {
+        withAttributeScope { removeSpanAttribute(key, range) }
+    }
+
+    /**
+     * Applies the specified paragraph attribute [key] and [value] to the given [range].
+     * The [range] is automatically expanded to span the entire paragraphs (separated by `\n`)
+     * it intersects with.
+     */
+    public fun <T> setParagraphAttribute(
+        key: ParagraphAttributeKey<T>,
+        value: T,
+        range: IntRange = 0 until textLength,
+    ) {
+        withAttributeScope { setParagraphAttribute(key, value, range) }
+    }
+
+    /**
+     * Removes any paragraph attributes associated with the specified [key] within the given [range].
+     * The [range] is automatically expanded to span the entire paragraphs (separated by `\n`)
+     * it intersects with.
+     */
+    public fun <T> removeParagraphAttribute(
+        key: ParagraphAttributeKey<T>,
+        range: IntRange = 0 until textLength,
+    ) {
+        withAttributeScope { removeParagraphAttribute(key, range) }
+    }
+
+    /**
+     * Applies a set of attribute mutations to the specified [range] using a DSL builder.
+     */
+    public fun editAttributes(
+        range: IntRange = 0 until textLength,
+        editAction: AttributeEditScope.() -> Unit,
+    ) {
+        withAttributeScope { editAttributes(range, editAction) }
+    }
+
+    /**
+     * Applies a set of attribute mutations to all specified [ranges] using a DSL builder.
+     */
+    public fun editAll(
+        ranges: Sequence<IntRange>,
+        editAction: AttributeEditScope.() -> Unit,
+    ) {
+        withAttributeScope { editAll(ranges, editAction) }
+    }
+
+    /**
+     * Applies a set of attribute mutations to all specified [runs] using a DSL builder.
+     * The [editAction] receives each [RichRun] to allow conditional logic based on existing attributes.
+     */
+    public fun <T : Any> editAll(
+        runs: Sequence<RichRun<T>>,
+        editAction: AttributeEditScope.(RichRun<T>) -> Unit,
+    ) {
+        withAttributeScope { editAll(runs, editAction) }
+    }
 
     /**
      * Inserts the given [text] at the specified [index].
