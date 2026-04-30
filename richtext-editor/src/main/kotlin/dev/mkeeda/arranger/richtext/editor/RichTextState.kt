@@ -84,7 +84,7 @@ internal fun List<RichSpan>.shiftSpans(
         )
     }
 
-internal fun shiftSpan(
+private fun shiftSpan(
     span: RichSpan,
     editStart: Int,
     editEnd: Int,
