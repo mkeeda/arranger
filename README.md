@@ -285,13 +285,14 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
 
 ### Pure Kotlin Core (Data Structures)
-* **`RichStringBuffer`**: A buffer class used to safely mutate the attributes of a string within an `edit` block. Designed to accumulate mutations and produce a completely new, immutable `RichString`.
-* **`AttributeKey<T>`**: Defines the data type of an attribute.
 * **`RichString` & `RichRun`**: Immutable representations of text and its semantic chunks.
+* **`AttributeKey<T>`**: Defines the data type of an attribute.
 * **`AttributeContainer`**: A core structure holding a type-safe map of attributes, which is associated with specific text ranges to form `RichSpan`s.
+* **`RichStringScope`**: A builder scope used to safely mutate the attributes of a string within an `edit` block. Designed to accumulate attribute mutations and produce a completely new, immutable `RichString`.
 
 ### Compose UI Layer
 * **`RichTextState`**: Wraps `TextFieldState` and manages the Spans. It acts as the single source of truth and exposes the complete `RichString`.
+* **`RichTextBuffer`**: A state-backed buffer provided inside `RichTextState.edit { }` that allows atomic, programmatic text and attribute mutations while automatically keeping spans synchronized.
 * **`RichTextOutputTransformation`**: Converts the plain text and spans into Compose's `AnnotatedString` purely at render time.
 * **`RichTextEditor`**: A simple, declarative Composable wrapping `BasicTextField` with our state and transformation.
 
@@ -304,7 +305,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 - [x] **Built-in Attributes**: Support for Bold, Italic, Underline, Color, and Headings.
 
 ### Phase 2: Advanced Manipulation & Structural Elements
-- [ ] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
+- [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
 - [ ] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
 - [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., vertical lines for blockquotes, background boxes for code blocks).
 - [ ] **Material 3 Integration**: Specialized resolvers for M3 Typography and Color Schemes.
