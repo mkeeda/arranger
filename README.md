@@ -30,10 +30,10 @@ Arranger is published to Maven Central. Add the following dependencies to your m
 dependencies {
     // For Compose UI integration (RichTextEditor).
     // This automatically includes the core 'arranger-richtext' module.
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.1.0-alpha01")
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha01")
 
     // Or, if you only need the core data structures without Compose UI:
-    // implementation("dev.mkeeda.arranger:arranger-richtext:0.1.0-alpha01")
+    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha01")
 }
 ```
 
@@ -272,6 +272,51 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
 ```
 
 <img src="./docs/images/attribute-batch-edit.gif" width="500" alt="attribute batch edit sample"/>
+
+## Atomic Text Mutations
+
+Arranger allows you to programmatically mutate text (`insert`, `delete`, `replace`) and apply formatting atomically within the `RichTextState.edit { }` block.
+The `RichTextBuffer` automatically shifts existing spans to maintain alignment and allows you to apply new attributes safely to the newly inserted text.
+
+```kotlin
+@Composable
+fun AtomicMutationSample(modifier: Modifier = Modifier) {
+    val state = remember {
+        RichTextState(initialText = RichString(text = "Hello "))
+    }
+
+    Column(modifier = modifier.padding(16.dp)) {
+        Text("Atomic Text Mutations", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                state.edit {
+                    // Atomically insert text and apply styles to the newly inserted text
+                    insert(index = textLength, text = "World!") {
+                        bold()
+                        textColor(Color(0xFFE91E63)) // Pink
+                    }
+                    
+                    // You can also delete or replace text:
+                    // delete(range = 0..5)
+                    // replace(range = 0..5, text = "Hi, ") { italic() }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Insert Styled Text")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+```
 
 ## Practical Examples
 
