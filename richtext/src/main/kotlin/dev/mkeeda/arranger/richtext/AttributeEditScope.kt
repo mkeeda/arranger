@@ -4,7 +4,7 @@ package dev.mkeeda.arranger.richtext
  * A builder DSL for safely mutating multiple text attributes within a specific range.
  */
 public class AttributeEditScope internal constructor(
-    private val buffer: RichStringBuffer,
+    private val buffer: RichStringScope,
     private val range: IntRange,
 ) {
     /**
