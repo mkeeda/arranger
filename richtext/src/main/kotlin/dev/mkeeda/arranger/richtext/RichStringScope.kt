@@ -1,11 +1,13 @@
 package dev.mkeeda.arranger.richtext
 
 /**
- * A buffer class used to safely mutate the attributes of a [RichString] within an `edit` block.
+ * A DSL scope used to safely mutate the attributes of a [RichString] within an `edit` block.
  * All mutations are accumulated internally and used to produce a completely new, immutable [RichString] instance
  * when the block completes.
+ *
+ * Note: This scope does not mutate the text itself. It is scoped exclusively to attribute operations.
  */
-public class RichStringBuffer internal constructor(
+public class RichStringScope internal constructor(
     private var currentSpans: List<RichSpan>,
     private val text: String,
 ) {
@@ -104,7 +106,7 @@ public class RichStringBuffer internal constructor(
      *
      * Note: The [runs] sequence is consumed lazily during iteration. It is expected to be derived
      * from an immutable [RichString] (e.g., via [RichString.runs]), not from any mutable state
-     * within this buffer.
+     * within this scope.
      */
     public fun <T : Any> editAll(
         runs: Sequence<RichRun<T>>,

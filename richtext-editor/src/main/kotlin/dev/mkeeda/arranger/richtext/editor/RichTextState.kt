@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.RichStringBuffer
+import dev.mkeeda.arranger.richtext.RichStringScope
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
 
 @Stable
@@ -37,9 +37,9 @@ public class RichTextState(initialText: RichString) {
 
     /**
      * Edits the underlying [RichString] state using a builder DSL.
-     * This allows you to apply or remove multiple attributes within a [RichStringBuffer].
+     * This allows you to apply or remove multiple attributes within a [RichStringScope].
      */
-    public fun edit(block: RichStringBuffer.() -> Unit) {
+    public fun edit(block: RichStringScope.() -> Unit) {
         spans = richString.edit(block).spans
     }
 
