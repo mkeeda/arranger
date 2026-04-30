@@ -12,10 +12,13 @@ import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
+import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
+import dev.mkeeda.arranger.richtext.ListIndentLevel
+import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.TextAlignmentKey
@@ -89,5 +92,31 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                 fontStyle = FontStyle.Italic,
                 color = Color.Unspecified.copy(alpha = 0.5f),
             )
+        }
+        paragraphStyle(BulletListKey) { level ->
+            val indent =
+                when (level) {
+                    ListIndentLevel.Level1 -> 24.sp
+                    ListIndentLevel.Level2 -> 48.sp
+                    ListIndentLevel.Level3 -> 72.sp
+                    ListIndentLevel.Level4 -> 96.sp
+                    ListIndentLevel.Level5 -> 120.sp
+                    ListIndentLevel.Level6 -> 144.sp
+                    ListIndentLevel.Unspecified -> 0.sp
+                }
+            ParagraphStyle(textIndent = TextIndent(firstLine = indent, restLine = indent))
+        }
+        paragraphStyle(OrderedListKey) { level ->
+            val indent =
+                when (level) {
+                    ListIndentLevel.Level1 -> 24.sp
+                    ListIndentLevel.Level2 -> 48.sp
+                    ListIndentLevel.Level3 -> 72.sp
+                    ListIndentLevel.Level4 -> 96.sp
+                    ListIndentLevel.Level5 -> 120.sp
+                    ListIndentLevel.Level6 -> 144.sp
+                    ListIndentLevel.Unspecified -> 0.sp
+                }
+            ParagraphStyle(textIndent = TextIndent(firstLine = indent, restLine = indent))
         }
     }
