@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.RichStringScope
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
 
 @Stable
@@ -37,10 +36,15 @@ public class RichTextState(initialText: RichString) {
 
     /**
      * Edits the underlying [RichString] state using a builder DSL.
-     * This allows you to apply or remove multiple attributes within a [RichStringScope].
+     * This allows you to apply or remove multiple attributes within a [RichTextBuffer],
+     * as well as insert, delete, or replace text.
      */
-    public fun edit(block: RichStringScope.() -> Unit) {
-        spans = richString.edit(block).spans
+    public fun edit(block: RichTextBuffer.() -> Unit) {
+        textFieldState.edit {
+            val richTextBuffer = RichTextBuffer(spans, this)
+            richTextBuffer.block()
+            spans = richTextBuffer.spans.resnapParagraphSpans(this.toString())
+        }
     }
 
     @OptIn(ExperimentalFoundationApi::class)
@@ -52,64 +56,78 @@ public class RichTextState(initialText: RichString) {
                 val originalRange = buffer.changes.getOriginalRange(i)
                 val range = buffer.changes.getRange(i)
 
-                val editStart = originalRange.min
-                val editEnd = originalRange.max
-                val offsetDiff = range.length - originalRange.length
-
-                currentSpans.mapNotNull { span ->
-                    shiftSpan(
-                        span = span,
-                        editStart = editStart,
-                        editEnd = editEnd,
-                        newLength = range.length,
-                        offsetDiff = offsetDiff,
-                    )
-                }
+                currentSpans.shiftSpans(
+                    editStart = originalRange.min,
+                    editEnd = originalRange.max,
+                    newLength = range.length,
+                    offsetDiff = range.length - originalRange.length,
+                )
             }
 
         this.spans = shiftedSpans.resnapParagraphSpans(buffer.toString())
     }
+}
 
-    private fun shiftSpan(
-        span: RichSpan,
-        editStart: Int,
-        editEnd: Int,
-        newLength: Int,
-        offsetDiff: Int,
-    ): RichSpan? {
-        val spanStart = span.range.first
-        val spanEnd = span.range.last
+internal fun List<RichSpan>.shiftSpans(
+    editStart: Int,
+    editEnd: Int,
+    newLength: Int,
+    offsetDiff: Int,
+): List<RichSpan> =
+    mapNotNull { span ->
+        shiftSpan(
+            span = span,
+            editStart = editStart,
+            editEnd = editEnd,
+            newLength = newLength,
+            offsetDiff = offsetDiff,
+        )
+    }
 
-        return when {
-            editEnd <= spanStart -> {
-                // Edit happens entirely before the span. Shift it securely.
-                span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff))
-            }
-            editStart > spanEnd -> {
-                // Edit happens entirely after the span. Unaffected.
-                span
-            }
-            else -> {
-                // Edit overlaps with the span.
-                val newStart =
-                    when {
-                        spanStart < editStart -> spanStart
-                        spanStart >= editEnd -> spanStart + offsetDiff
-                        else -> editStart
-                    }
+private fun shiftSpan(
+    span: RichSpan,
+    editStart: Int,
+    editEnd: Int,
+    newLength: Int,
+    offsetDiff: Int,
+): RichSpan? {
+    val spanStart = span.range.first
+    val spanEnd = span.range.last
 
-                val newEnd =
-                    when {
-                        spanEnd < editStart -> spanEnd
-                        spanEnd >= editEnd -> spanEnd + offsetDiff
-                        else -> editStart + newLength - 1
-                    }
-
-                if (newStart > newEnd) {
-                    null
-                } else {
-                    span.copy(range = newStart..newEnd)
+    return when {
+        editEnd <= spanStart -> {
+            // Edit happens entirely before the span. Shift it securely.
+            span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff))
+        }
+        editStart > spanEnd + 1 -> {
+            // Edit happens entirely after the span with a gap. Unaffected.
+            // When editStart == spanEnd + 1, it falls through to the overlap branch
+            // so that adjacent insertions can inherit the span's attributes.
+            span
+        }
+        else -> {
+            // Edit overlaps with the span.
+            val newStart =
+                when {
+                    spanStart < editStart -> spanStart
+                    spanStart >= editEnd -> spanStart + offsetDiff
+                    else -> editStart
                 }
+
+            val newEnd =
+                when {
+                    spanEnd >= editEnd -> spanEnd + offsetDiff
+                    // Adjacent insertion (e.g., typing right after a bold word) inherits the span's attributes.
+                    // This matches common rich-text editor behavior where continuing to type at the end
+                    // of a styled region extends the style.
+                    editStart == spanEnd + 1 && editEnd == spanEnd + 1 -> spanEnd + offsetDiff
+                    else -> editStart + newLength - 1
+                }
+
+            if (newStart > newEnd) {
+                null
+            } else {
+                span.copy(range = newStart..newEnd)
             }
         }
     }
