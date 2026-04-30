@@ -7,11 +7,20 @@ package dev.mkeeda.arranger.richtext
  *
  * Note: This scope does not mutate the text itself. It is scoped exclusively to attribute operations.
  */
-public class RichStringScope internal constructor(
-    private var currentSpans: List<RichSpan>,
-    private val text: String,
+public open class RichStringScope protected constructor(
+    protected var currentSpans: List<RichSpan>,
 ) {
-    private val textLength: Int = text.length
+    internal constructor(currentSpans: List<RichSpan>, text: String) : this(currentSpans) {
+        this.immutableText = text
+    }
+
+    private var immutableText: String? = null
+
+    protected open val textLength: Int
+        get() = immutableText?.length ?: 0
+
+    protected open val text: String
+        get() = immutableText ?: ""
 
     /**
      * Applies the specified character span attribute [key] and [value] to the given [range].

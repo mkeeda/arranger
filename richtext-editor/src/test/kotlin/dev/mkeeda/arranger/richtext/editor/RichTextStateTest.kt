@@ -1,8 +1,5 @@
 package dev.mkeeda.arranger.richtext.editor
 
-import androidx.compose.foundation.text.input.TextFieldBuffer
-import androidx.compose.foundation.text.input.delete
-import androidx.compose.foundation.text.input.insert
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -16,7 +13,7 @@ class RichTextStateTest {
         val initialText = "Hello World"
         val state = RichTextState(initialText = RichString(text = initialText))
 
-        state.simulateTextEdit {
+        state.edit {
             insertAfter(substring = "Hello", textToInsert = " My")
         }
 
@@ -36,7 +33,7 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             insertBefore(substring = "Hello", textToInsert = "Oh, ")
         }
 
@@ -59,7 +56,7 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             insertAfter(substring = "Wor", textToInsert = "!")
         }
 
@@ -72,7 +69,7 @@ class RichTextStateTest {
     }
 
     @Test
-    fun `inserts text after an attribute range`() {
+    fun `inserts text after an attribute range - does not inherit`() {
         val initialText = "Hello World"
         val state =
             RichTextState(
@@ -82,7 +79,7 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             insertAfter(substring = "World", textToInsert = "!")
         }
 
@@ -92,6 +89,31 @@ class RichTextStateTest {
         val spans = state.richString.spans
         spans.size shouldBe 1
         spans.first().range shouldBe expectedText.rangeOf("Hello")
+    }
+
+    @Test
+    fun `inserts text exactly at the end of an attribute range - inherits attributes`() {
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("Hello"))
+                    },
+            )
+
+        state.edit {
+            // Insert exactly at spanEnd + 1
+            insertAfter(substring = "Hello", textToInsert = "!")
+        }
+
+        val expectedText = "Hello! World"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        // Span should expand to include "!"
+        spans.first().range shouldBe expectedText.rangeOf("Hello!")
     }
 
     @Test
@@ -105,7 +127,7 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             deleteSubstring("Oh, ")
         }
 
@@ -128,7 +150,7 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             deleteSubstring("!")
         }
 
@@ -151,7 +173,7 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             deleteSubstring("World")
         }
 
@@ -176,10 +198,11 @@ class RichTextStateTest {
         // Initial span should be "Bravo\n" (indices 6..11)
         state.richString.spans.first().range shouldBe (6..11)
 
-        state.simulateTextEdit {
+        state.edit {
             // Delete the '\n' between Alpha and Bravo
             deleteSubstring("pha\nBr")
-            insert(originalText.indexOf("pha\nBr"), "phaBr")
+            val insertIndex = text.indexOf("avo\nCharlie")
+            insert(insertIndex, "phaBr")
         }
 
         val expectedText = "AlphaBravo\nCharlie"
@@ -205,7 +228,7 @@ class RichTextStateTest {
         // Initial span should be "Bravo" (indices 6..10)
         state.richString.spans.first().range shouldBe (6..10)
 
-        state.simulateTextEdit {
+        state.edit {
             // Insert a '\n' in the middle of Bravo
             insertAfter(substring = "Bra", textToInsert = "\n")
         }
@@ -230,7 +253,7 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             deleteSubstring("av")
         }
 
@@ -255,10 +278,10 @@ class RichTextStateTest {
                     },
             )
 
-        state.simulateTextEdit {
+        state.edit {
             // Delete the '\n' between Alpha and Bravo
             // Instead of overlapping Bravo, we delete just '\n' and insert a space
-            delete(5, 6)
+            delete(5..5) // index 5 is '\n'
             insert(5, " ")
         }
 
@@ -280,31 +303,45 @@ class RichTextStateTest {
         secondSpan.attributes.containsKey(BlockquoteKey) shouldBe true
         secondSpan.attributes.containsKey(BoldKey) shouldBe true
     }
+
+    @Test
+    fun `atomic text insertion applies attributes immediately`() {
+        val initialText = "Hello World"
+        val state = RichTextState(initialText = RichString(text = initialText))
+
+        state.edit {
+            val insertIndex = text.indexOf("World")
+            insert(insertIndex, "Beautiful ", editAction = {
+                setSpanAttribute(BoldKey, Unit)
+            })
+        }
+
+        val expectedText = "Hello Beautiful World"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        spans.first().range shouldBe expectedText.rangeOf("Beautiful ")
+        spans.first().attributes.containsKey(BoldKey) shouldBe true
+    }
 }
 
 // --- Test Helpers ---
 
-internal fun RichTextState.simulateTextEdit(block: TextFieldBuffer.() -> Unit) {
-    textFieldState.edit {
-        block()
-        updateRichString(this)
-    }
-}
-
-private fun TextFieldBuffer.insertAfter(substring: String, textToInsert: String) {
-    val index = originalText.indexOf(substring)
-    require(index >= 0) { "Substring '$substring' not found in '$originalText'" }
+private fun RichTextBuffer.insertAfter(substring: String, textToInsert: String) {
+    val index = text.indexOf(substring)
+    require(index >= 0) { "Substring '$substring' not found in '$text'" }
     insert(index + substring.length, textToInsert)
 }
 
-private fun TextFieldBuffer.insertBefore(substring: String, textToInsert: String) {
-    val index = originalText.indexOf(substring)
-    require(index >= 0) { "Substring '$substring' not found in '$originalText'" }
+private fun RichTextBuffer.insertBefore(substring: String, textToInsert: String) {
+    val index = text.indexOf(substring)
+    require(index >= 0) { "Substring '$substring' not found in '$text'" }
     insert(index, textToInsert)
 }
 
-private fun TextFieldBuffer.deleteSubstring(substring: String) {
-    val index = originalText.indexOf(substring)
-    require(index >= 0) { "Substring '$substring' not found in '$originalText'" }
-    delete(index, index + substring.length)
+private fun RichTextBuffer.deleteSubstring(substring: String) {
+    val index = text.indexOf(substring)
+    require(index >= 0) { "Substring '$substring' not found in '$text'" }
+    delete(index until (index + substring.length))
 }
