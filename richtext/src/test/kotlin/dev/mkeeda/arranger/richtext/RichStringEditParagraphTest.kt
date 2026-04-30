@@ -128,4 +128,78 @@ class RichStringEditParagraphTest {
         headingRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = HeadingLevel.H1)
         headingRuns[1] shouldBe RichRun(text = "Line3", range = 12..16, value = HeadingLevel.H1)
     }
+
+    @Test
+    fun `bulletList DSL methods correctly apply and update attributes`() {
+        val richString = RichString(text = paragraphText)
+
+        val firstApplied =
+            richString.edit {
+                editAttributes(range = 0..0) {
+                    bulletList(ListIndentLevel.Level1)
+                }
+            }
+
+        var bulletRuns = firstApplied.runs(BulletListKey).toList()
+        bulletRuns shouldHaveSize 1
+        bulletRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = ListIndentLevel.Level1)
+
+        val updated =
+            firstApplied.edit {
+                editAttributes(range = 0..0) {
+                    bulletList(ListIndentLevel.Level2)
+                }
+            }
+
+        bulletRuns = updated.runs(BulletListKey).toList()
+        bulletRuns shouldHaveSize 1
+        bulletRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = ListIndentLevel.Level2)
+
+        val cleared =
+            updated.edit {
+                editAttributes(range = 0..0) {
+                    clearBulletList()
+                }
+            }
+
+        bulletRuns = cleared.runs(BulletListKey).toList()
+        bulletRuns shouldHaveSize 0
+    }
+
+    @Test
+    fun `orderedList DSL methods correctly apply and update attributes`() {
+        val richString = RichString(text = paragraphText)
+
+        val firstApplied =
+            richString.edit {
+                editAttributes(range = 0..0) {
+                    orderedList(ListIndentLevel.Level1)
+                }
+            }
+
+        var orderedRuns = firstApplied.runs(OrderedListKey).toList()
+        orderedRuns shouldHaveSize 1
+        orderedRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = ListIndentLevel.Level1)
+
+        val updated =
+            firstApplied.edit {
+                editAttributes(range = 0..0) {
+                    orderedList(ListIndentLevel.Level2)
+                }
+            }
+
+        orderedRuns = updated.runs(OrderedListKey).toList()
+        orderedRuns shouldHaveSize 1
+        orderedRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = ListIndentLevel.Level2)
+
+        val cleared =
+            updated.edit {
+                editAttributes(range = 0..0) {
+                    clearOrderedList()
+                }
+            }
+
+        orderedRuns = cleared.runs(OrderedListKey).toList()
+        orderedRuns shouldHaveSize 0
+    }
 }
