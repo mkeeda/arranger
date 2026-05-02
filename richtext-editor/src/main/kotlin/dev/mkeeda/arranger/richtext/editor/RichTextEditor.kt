@@ -81,72 +81,108 @@ public fun RichTextEditor(
                 // Draw bullet lists
                 state.richString.runs(dev.mkeeda.arranger.richtext.BulletListKey).forEach { run ->
                     if (run.value == dev.mkeeda.arranger.richtext.ListIndentLevel.Unspecified) return@forEach
-                    val line = layoutResult.getLineForOffset(run.range.first)
-                    val top = layoutResult.getLineTop(line)
-                    val bottom = layoutResult.getLineBottom(line)
-                    val yCenter = top + (bottom - top) / 2f
 
-                    val levelIndex = run.value.ordinal + 1
-                    val previousIndentPx = (levelIndex - 1) * 24f * drawScope.density * drawScope.fontScale
-                    val xCenter = previousIndentPx + 12f * drawScope.density * drawScope.fontScale
-
-                    val spanAtStart = state.richString.spans.firstOrNull { run.range.first in it.range }
-                    val textColorHex = spanAtStart?.attributes?.getOrNull(dev.mkeeda.arranger.richtext.TextColorKey)
-                    val textColor =
-                        if (textColorHex != null && textColorHex != dev.mkeeda.arranger.richtext.RgbaColor.Unspecified) {
-                            textColorHex.toColor()
-                        } else {
-                            currentTextStyle.color
+                    val text = state.richString.text
+                    val startIndices = mutableListOf<Int>()
+                    startIndices.add(run.range.first)
+                    for (i in run.range.first until run.range.last) {
+                        if (text[i] == '\n') {
+                            startIndices.add(i + 1)
                         }
+                    }
 
-                    val textLayout = textMeasurer.measure("・", style = currentTextStyle.copy(color = textColor))
-                    val canvas = drawScope.drawContext.canvas
-                    canvas.save()
-                    canvas.translate(dx = xCenter - textLayout.size.width / 2f, dy = yCenter - textLayout.size.height / 2f)
-                    TextPainter.paint(canvas = canvas, textLayoutResult = textLayout)
-                    canvas.restore()
+                    startIndices.forEach { startIndex ->
+                        val line = layoutResult.getLineForOffset(startIndex)
+                        val top = layoutResult.getLineTop(line)
+                        val bottom = layoutResult.getLineBottom(line)
+                        val yCenter = top + (bottom - top) / 2f
+
+                        val levelIndex = run.value.ordinal + 1
+                        val previousIndentPx = (levelIndex - 1) * 24f * drawScope.density * drawScope.fontScale
+                        val xCenter = previousIndentPx + 12f * drawScope.density * drawScope.fontScale
+
+                        val spanAtStart = state.richString.spans.firstOrNull { startIndex in it.range }
+                        val textColorHex = spanAtStart?.attributes?.getOrNull(dev.mkeeda.arranger.richtext.TextColorKey)
+                        val textColor =
+                            if (textColorHex != null && textColorHex != dev.mkeeda.arranger.richtext.RgbaColor.Unspecified) {
+                                textColorHex.toColor()
+                            } else {
+                                currentTextStyle.color
+                            }
+
+                        val textLayout = textMeasurer.measure("・", style = currentTextStyle.copy(color = textColor))
+                        val canvas = drawScope.drawContext.canvas
+                        canvas.save()
+                        canvas.translate(dx = xCenter - textLayout.size.width / 2f, dy = yCenter - textLayout.size.height / 2f)
+                        TextPainter.paint(canvas = canvas, textLayoutResult = textLayout)
+                        canvas.restore()
+                    }
                 }
 
                 // Draw ordered lists
-                var currentLevel = dev.mkeeda.arranger.richtext.ListIndentLevel.Unspecified
-                var currentNumber = 1
+                val currentNumbers = IntArray(dev.mkeeda.arranger.richtext.ListIndentLevel.entries.size) { 1 }
+                var expectedNextRunStart = -1
+                var previousLevelOrdinal = -1
+
                 state.richString.runs(dev.mkeeda.arranger.richtext.OrderedListKey).forEach { run ->
-                    if (run.value == dev.mkeeda.arranger.richtext.ListIndentLevel.Unspecified) {
-                        currentLevel = dev.mkeeda.arranger.richtext.ListIndentLevel.Unspecified
-                        currentNumber = 1
-                        return@forEach
-                    }
-                    if (run.value != currentLevel) {
-                        currentLevel = run.value
-                        currentNumber = 1
-                    }
+                    if (run.value == dev.mkeeda.arranger.richtext.ListIndentLevel.Unspecified) return@forEach
 
-                    val line = layoutResult.getLineForOffset(run.range.first)
-                    val top = layoutResult.getLineTop(line)
-                    val bottom = layoutResult.getLineBottom(line)
-                    val yCenter = top + (bottom - top) / 2f
-
-                    val levelIndex = run.value.ordinal + 1
-                    val previousIndentPx = (levelIndex - 1) * 24f * drawScope.density * drawScope.fontScale
-                    val xCenter = previousIndentPx + 12f * drawScope.density * drawScope.fontScale
-
-                    val spanAtStart = state.richString.spans.firstOrNull { run.range.first in it.range }
-                    val textColorHex = spanAtStart?.attributes?.getOrNull(dev.mkeeda.arranger.richtext.TextColorKey)
-                    val textColor =
-                        if (textColorHex != null && textColorHex != dev.mkeeda.arranger.richtext.RgbaColor.Unspecified) {
-                            textColorHex.toColor()
-                        } else {
-                            currentTextStyle.color
+                    if (expectedNextRunStart != -1 && run.range.first != expectedNextRunStart) {
+                        for (i in currentNumbers.indices) {
+                            currentNumbers[i] = 1
                         }
+                        previousLevelOrdinal = -1
+                    }
+                    expectedNextRunStart = run.range.last + 1
 
-                    val text = "$currentNumber."
-                    val textLayout = textMeasurer.measure(text, style = currentTextStyle.copy(color = textColor))
-                    val canvas = drawScope.drawContext.canvas
-                    canvas.save()
-                    canvas.translate(dx = xCenter - textLayout.size.width / 2f, dy = yCenter - textLayout.size.height / 2f)
-                    TextPainter.paint(canvas = canvas, textLayoutResult = textLayout)
-                    canvas.restore()
-                    currentNumber++
+                    val text = state.richString.text
+                    val startIndices = mutableListOf<Int>()
+                    startIndices.add(run.range.first)
+                    for (i in run.range.first until run.range.last) {
+                        if (text[i] == '\n') {
+                            startIndices.add(i + 1)
+                        }
+                    }
+
+                    startIndices.forEach { startIndex ->
+                        val currentLevelOrdinal = run.value.ordinal
+
+                        if (previousLevelOrdinal != -1 && currentLevelOrdinal > previousLevelOrdinal) {
+                            for (i in previousLevelOrdinal + 1..currentLevelOrdinal) {
+                                currentNumbers[i] = 1
+                            }
+                        }
+                        previousLevelOrdinal = currentLevelOrdinal
+
+                        val currentNumber = currentNumbers[currentLevelOrdinal]
+                        currentNumbers[currentLevelOrdinal]++
+
+                        val line = layoutResult.getLineForOffset(startIndex)
+                        val top = layoutResult.getLineTop(line)
+                        val bottom = layoutResult.getLineBottom(line)
+                        val yCenter = top + (bottom - top) / 2f
+
+                        val levelIndex = currentLevelOrdinal + 1
+                        val previousIndentPx = (levelIndex - 1) * 24f * drawScope.density * drawScope.fontScale
+                        val xCenter = previousIndentPx + 12f * drawScope.density * drawScope.fontScale
+
+                        val spanAtStart = state.richString.spans.firstOrNull { startIndex in it.range }
+                        val textColorHex = spanAtStart?.attributes?.getOrNull(dev.mkeeda.arranger.richtext.TextColorKey)
+                        val textColor =
+                            if (textColorHex != null && textColorHex != dev.mkeeda.arranger.richtext.RgbaColor.Unspecified) {
+                                textColorHex.toColor()
+                            } else {
+                                currentTextStyle.color
+                            }
+
+                        val textStr = "$currentNumber."
+                        val textLayout = textMeasurer.measure(textStr, style = currentTextStyle.copy(color = textColor))
+                        val canvas = drawScope.drawContext.canvas
+                        canvas.save()
+                        canvas.translate(dx = xCenter - textLayout.size.width / 2f, dy = yCenter - textLayout.size.height / 2f)
+                        TextPainter.paint(canvas = canvas, textLayoutResult = textLayout)
+                        canvas.restore()
+                    }
                 }
             }
         }
