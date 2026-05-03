@@ -12,14 +12,29 @@ import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
+import dev.mkeeda.arranger.richtext.BulletListItem
+import dev.mkeeda.arranger.richtext.ListItem
+import dev.mkeeda.arranger.richtext.OrderedListItem
+import dev.mkeeda.arranger.richtext.RgbaColor
+import dev.mkeeda.arranger.richtext.extractListItems
 
 /**
  * A basic text editor component tailored for editing and displaying RichText content.
@@ -56,9 +71,29 @@ public fun RichTextEditor(
             RichTextInputTransformation(state)
         }
 
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val internalOnTextLayout: (Density.(getResult: () -> TextLayoutResult?) -> Unit) = { getResult ->
+        textLayoutResult = getResult()
+        onTextLayout?.invoke(this, getResult)
+    }
+
+    val textMeasurer = rememberTextMeasurer()
+    val currentTextStyle = textStyle.copy(color = textStyle.color.takeOrElse { Color.Black })
+
+    val listItems = remember(state.richString) { state.richString.extractListItems() }
+
+    val drawModifier =
+        Modifier.drawBehind {
+            val layoutResult = textLayoutResult ?: return@drawBehind
+
+            translate(top = -scrollState.value.toFloat()) {
+                drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle)
+            }
+        }
+
     BasicTextField(
         state = state.textFieldState,
-        modifier = modifier,
+        modifier = modifier.then(drawModifier),
         enabled = enabled,
         readOnly = readOnly,
         inputTransformation = inputTransformation,
@@ -66,13 +101,52 @@ public fun RichTextEditor(
         keyboardOptions = keyboardOptions,
         onKeyboardAction = onKeyboardAction,
         lineLimits = lineLimits,
-        onTextLayout = onTextLayout,
+        onTextLayout = internalOnTextLayout,
         scrollState = scrollState,
         interactionSource = interactionSource,
         cursorBrush = cursorBrush,
         outputTransformation = outputTransformation,
         decorator = decorator,
     )
+}
+
+private fun DrawScope.drawListItems(
+    listItems: List<ListItem>,
+    layoutResult: TextLayoutResult,
+    textMeasurer: TextMeasurer,
+    currentTextStyle: TextStyle,
+) {
+    listItems.forEach { item ->
+        val line = layoutResult.getLineForOffset(item.textIndex)
+        val top = layoutResult.getLineTop(line)
+        val bottom = layoutResult.getLineBottom(line)
+        val yCenter = top + (bottom - top) / 2f
+
+        val levelIndex = item.indentLevel.ordinal + 1
+        val previousIndentPx = (levelIndex - 1) * ListIndentStepSp * density * fontScale
+        val xCenter = previousIndentPx + (ListIndentStepSp / 2f) * density * fontScale
+
+        val itemColor = item.color
+        val textColor =
+            if (itemColor != null && itemColor != RgbaColor.Unspecified) {
+                itemColor.toColor()
+            } else {
+                currentTextStyle.color
+            }
+
+        val markerText =
+            when (item) {
+                is BulletListItem -> "・"
+                is OrderedListItem -> "${item.index}."
+            }
+
+        val textLayout = textMeasurer.measure(markerText, style = currentTextStyle.copy(color = textColor))
+        val canvas = drawContext.canvas
+        canvas.save()
+        canvas.translate(dx = xCenter - textLayout.size.width / 2f, dy = yCenter - textLayout.size.height / 2f)
+        TextPainter.paint(canvas = canvas, textLayoutResult = textLayout)
+        canvas.restore()
+    }
 }
 
 private class RichTextOutputTransformation(

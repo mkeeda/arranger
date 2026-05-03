@@ -192,3 +192,41 @@ public fun AttributeEditScope.blockquote() {
 public fun AttributeEditScope.clearBlockquote() {
     setParagraphAttribute(BlockquoteKey, null)
 }
+
+/**
+ * Convenience function to set the bullet list attribute of the paragraph within this builder.
+ * The applied range will automatically snap to paragraph boundaries.
+ */
+public fun AttributeEditScope.bulletList(level: ListIndentLevel) {
+    if (level == ListIndentLevel.Unspecified) {
+        clearBulletList()
+    } else {
+        setParagraphAttribute(BulletListKey, level)
+    }
+}
+
+/**
+ * Convenience function to remove the bullet list attribute in the range.
+ */
+public fun AttributeEditScope.clearBulletList() {
+    setParagraphAttribute(BulletListKey, null)
+}
+
+/**
+ * Convenience function to set the ordered list attribute of the paragraph within this builder.
+ * The applied range will automatically snap to paragraph boundaries.
+ */
+public fun AttributeEditScope.orderedList(level: ListIndentLevel) {
+    if (level == ListIndentLevel.Unspecified) {
+        clearOrderedList()
+    } else {
+        setParagraphAttribute(OrderedListKey, level)
+    }
+}
+
+/**
+ * Convenience function to remove the ordered list attribute in the range.
+ */
+public fun AttributeEditScope.clearOrderedList() {
+    setParagraphAttribute(OrderedListKey, null)
+}

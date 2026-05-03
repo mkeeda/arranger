@@ -8,19 +8,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
+import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
+import dev.mkeeda.arranger.richtext.ListIndentLevel
+import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
+
+internal const val ListIndentStepSp = 24f
+
+private fun ListIndentLevel.toIndent(): TextUnit =
+    when (this) {
+        ListIndentLevel.Unspecified -> 0.sp
+        else -> (this.ordinal * ListIndentStepSp).sp
+    }
 
 /**
  * The standard default [AttributeStyleResolver] mapping the semantic attributes to Compose [SpanStyle].
@@ -89,5 +101,13 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                 fontStyle = FontStyle.Italic,
                 color = Color.Unspecified.copy(alpha = 0.5f),
             )
+        }
+        paragraphStyle(BulletListKey) { level ->
+            val indent = level.toIndent()
+            ParagraphStyle(textIndent = TextIndent(firstLine = indent, restLine = indent))
+        }
+        paragraphStyle(OrderedListKey) { level ->
+            val indent = level.toIndent()
+            ParagraphStyle(textIndent = TextIndent(firstLine = indent, restLine = indent))
         }
     }

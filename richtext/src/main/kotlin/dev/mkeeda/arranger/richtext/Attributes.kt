@@ -133,3 +133,32 @@ public object BlockquoteKey : ParagraphAttributeKey<Unit> {
     override val name: String = "blockquote"
     override val defaultValue: Unit = Unit
 }
+
+/**
+ * Represents the indent level of a list item.
+ */
+public enum class ListIndentLevel {
+    Level1,
+    Level2,
+    Level3,
+    Level4,
+    Level5,
+    Level6,
+    Unspecified,
+}
+
+/**
+ * A semantic marker indicating that the paragraph is a bullet list item.
+ */
+public object BulletListKey : ParagraphAttributeKey<ListIndentLevel> {
+    override val name: String = "bulletList"
+    override val defaultValue: ListIndentLevel = ListIndentLevel.Unspecified
+}
+
+/**
+ * A semantic marker indicating that the paragraph is an ordered list item.
+ */
+public object OrderedListKey : ParagraphAttributeKey<ListIndentLevel> {
+    override val name: String = "orderedList"
+    override val defaultValue: ListIndentLevel = ListIndentLevel.Unspecified
+}
