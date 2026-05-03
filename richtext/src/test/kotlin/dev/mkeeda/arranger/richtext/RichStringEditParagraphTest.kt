@@ -128,5 +128,4 @@ class RichStringEditParagraphTest {
         headingRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = HeadingLevel.H1)
         headingRuns[1] shouldBe RichRun(text = "Line3", range = 12..16, value = HeadingLevel.H1)
     }
-
 }

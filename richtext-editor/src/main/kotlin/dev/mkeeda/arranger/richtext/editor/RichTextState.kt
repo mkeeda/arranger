@@ -99,12 +99,14 @@ private fun shiftSpan(
             // Edit happens entirely before the span. Shift it securely.
             span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff))
         }
+
         editStart > spanEnd + 1 -> {
             // Edit happens entirely after the span with a gap. Unaffected.
             // When editStart == spanEnd + 1, it falls through to the overlap branch
             // so that adjacent insertions can inherit the span's attributes.
             span
         }
+
         else -> {
             // Edit overlaps with the span.
             val newStart =
@@ -117,10 +119,12 @@ private fun shiftSpan(
             val newEnd =
                 when {
                     spanEnd >= editEnd -> spanEnd + offsetDiff
+
                     // Adjacent insertion (e.g., typing right after a bold word) inherits the span's attributes.
                     // This matches common rich-text editor behavior where continuing to type at the end
                     // of a styled region extends the style.
                     editStart == spanEnd + 1 && editEnd == spanEnd + 1 -> spanEnd + offsetDiff
+
                     else -> editStart + newLength - 1
                 }
 
