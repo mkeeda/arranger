@@ -106,7 +106,8 @@ public class AttributeContainer private constructor(
             return AttributeContainer(attributes = attributes + (key to value))
         }
 
-        val filteredAttributes = attributes.filterKeys { it !in keysToRemove }
+        val keysToRemoveSet = keysToRemove.toSet()
+        val filteredAttributes = attributes.filterKeys { it !in keysToRemoveSet }
         return AttributeContainer(attributes = filteredAttributes + (key to value))
     }
 
