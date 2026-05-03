@@ -17,7 +17,7 @@ public interface SpanAttributeKey<T> : AttributeKey<T>
 /**
  * A marker interface indicating that the attribute applies to whole paragraphs.
  */
-public interface ParagraphAttributeKey<T> : AttributeKey<T>
+public sealed interface ParagraphAttributeKey<T> : AttributeKey<T>
 
 /**
  * A category interface for paragraph attributes that dictate block structure (e.g., Heading, List, Blockquote).

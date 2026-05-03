@@ -88,7 +88,26 @@ public class AttributeContainer private constructor(
         key: AttributeKey<T>,
         value: T,
     ): AttributeContainer {
-        return AttributeContainer(attributes = attributes + (key to value))
+        return plusAny(key, value)
+    }
+
+    private fun plusAny(key: AttributeKey<*>, value: Any?): AttributeContainer {
+        val keysToRemove =
+            if (key is ParagraphAttributeKey<*>) {
+                when (key) {
+                    is BlockTypeAttributeKey<*> -> keys.filterIsInstance<BlockTypeAttributeKey<*>>()
+                    is AlignmentAttributeKey<*> -> keys.filterIsInstance<AlignmentAttributeKey<*>>()
+                }
+            } else {
+                emptyList()
+            }
+
+        if (keysToRemove.isEmpty()) {
+            return AttributeContainer(attributes = attributes + (key to value))
+        }
+
+        val filteredAttributes = attributes.filterKeys { it !in keysToRemove }
+        return AttributeContainer(attributes = filteredAttributes + (key to value))
     }
 
     /**
@@ -103,7 +122,12 @@ public class AttributeContainer private constructor(
     public operator fun plus(other: AttributeContainer): AttributeContainer {
         if (other.attributes.isEmpty()) return this
         if (this.attributes.isEmpty()) return other
-        return AttributeContainer(attributes = attributes + other.attributes)
+
+        var result = this
+        for ((key, value) in other.attributes) {
+            result = result.plusAny(key, value)
+        }
+        return result
     }
 
     /**

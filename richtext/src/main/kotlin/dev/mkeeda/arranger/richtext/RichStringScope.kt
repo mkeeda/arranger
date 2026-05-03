@@ -58,22 +58,9 @@ public class RichStringScope
             checkRange(range)
             val snappedRange = range.snapToParagraphs(text)
 
-            val isBlockType = key is BlockTypeAttributeKey<*>
-            val isAlignment = key is AlignmentAttributeKey<*>
-
             currentSpans =
                 currentSpans.transformSpans(targetRange = snappedRange) { attributes ->
-                    var newAttributes = attributes
-                    if (isBlockType) {
-                        newAttributes.keys.filterIsInstance<BlockTypeAttributeKey<*>>().forEach {
-                            newAttributes -= it
-                        }
-                    } else if (isAlignment) {
-                        newAttributes.keys.filterIsInstance<AlignmentAttributeKey<*>>().forEach {
-                            newAttributes -= it
-                        }
-                    }
-                    newAttributes.plus(key, value)
+                    attributes.plus(key, value)
                 }
         }
 
