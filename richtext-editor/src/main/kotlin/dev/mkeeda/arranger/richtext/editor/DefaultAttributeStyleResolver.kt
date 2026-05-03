@@ -26,7 +26,6 @@ import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 
-@Suppress("ConstPropertyName")
 internal const val ListIndentStepSp = 24f
 
 private fun ListIndentLevel.toIndent(): TextUnit =
