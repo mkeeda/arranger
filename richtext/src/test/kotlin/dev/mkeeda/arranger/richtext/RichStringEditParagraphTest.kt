@@ -105,7 +105,6 @@ class RichStringEditParagraphTest {
                 // Apply attributes to the entire text
                 editAttributes(range = paragraphText.indices) {
                     headingLevel(HeadingLevel.H1)
-                    blockquote()
                     textAlignment(TextAlignment.Center)
                 }
             }
@@ -116,7 +115,6 @@ class RichStringEditParagraphTest {
                 val line2Start = paragraphText.indexOf("Line2")
                 editAttributes(range = line2Start..line2Start) {
                     clearHeadingLevel()
-                    clearBlockquote()
                     clearTextAlignment()
                 }
             }
@@ -127,5 +125,102 @@ class RichStringEditParagraphTest {
         headingRuns shouldHaveSize 2
         headingRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = HeadingLevel.H1)
         headingRuns[1] shouldBe RichRun(text = "Line3", range = 12..16, value = HeadingLevel.H1)
+    }
+
+    @Test
+    fun `setParagraphAttribute excludes attributes of the same category`() {
+        val richString = RichString(text = "Paragraph")
+
+        val actual =
+            richString.edit {
+                // Setup: apply OrderedList (BlockType)
+                editAttributes {
+                    orderedList(ListIndentLevel.Level1)
+                }
+                // Action: apply Heading (BlockType)
+                editAttributes {
+                    headingLevel(HeadingLevel.H1)
+                }
+            }
+
+        val orderedListRuns = actual.runs(OrderedListKey).toList()
+        orderedListRuns shouldHaveSize 0
+
+        val headingRuns = actual.runs(HeadingKey).toList()
+        headingRuns shouldHaveSize 1
+        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = HeadingLevel.H1)
+    }
+
+    @Test
+    fun `setParagraphAttribute coexists with attributes of different categories`() {
+        val richString = RichString(text = "Paragraph")
+
+        val actual =
+            richString.edit {
+                // Setup: apply Heading (BlockType)
+                editAttributes {
+                    headingLevel(HeadingLevel.H1)
+                }
+                // Action: apply TextAlignment (Alignment)
+                editAttributes {
+                    textAlignment(TextAlignment.Center)
+                }
+            }
+
+        val headingRuns = actual.runs(HeadingKey).toList()
+        headingRuns shouldHaveSize 1
+        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = HeadingLevel.H1)
+
+        val alignRuns = actual.runs(TextAlignmentKey).toList()
+        alignRuns shouldHaveSize 1
+        alignRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = TextAlignment.Center)
+    }
+
+    @Test
+    fun `setParagraphAttribute correctly splits spans when applied to middle paragraph`() {
+        val richString = RichString(text = paragraphText) // Line1\nLine2\nLine3
+
+        val actual =
+            richString.edit {
+                // Setup: apply OrderedList to all
+                editAttributes {
+                    orderedList(ListIndentLevel.Level1)
+                }
+                // Action: apply Heading to the middle paragraph only
+                val line2Start = paragraphText.indexOf("Line2")
+                editAttributes(range = line2Start..line2Start) {
+                    headingLevel(HeadingLevel.H2)
+                }
+            }
+
+        val orderedListRuns = actual.runs(OrderedListKey).toList()
+        orderedListRuns shouldHaveSize 2
+        orderedListRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = ListIndentLevel.Level1)
+        orderedListRuns[1] shouldBe RichRun(text = "Line3", range = 12..16, value = ListIndentLevel.Level1)
+
+        val headingRuns = actual.runs(HeadingKey).toList()
+        headingRuns shouldHaveSize 1
+        headingRuns[0] shouldBe RichRun(text = "Line2\n", range = 6..11, value = HeadingLevel.H2)
+    }
+
+    @Test
+    fun `setParagraphAttribute is idempotent when reapplying the same attribute`() {
+        val richString = RichString(text = "Paragraph")
+
+        val actual =
+            richString.edit {
+                // Setup: apply Heading (BlockType)
+                editAttributes {
+                    headingLevel(HeadingLevel.H1)
+                }
+                // Action: apply Heading again
+                editAttributes {
+                    headingLevel(HeadingLevel.H1)
+                }
+            }
+
+        val headingRuns = actual.runs(HeadingKey).toList()
+        headingRuns shouldHaveSize 1
+        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = HeadingLevel.H1)
     }
 }
