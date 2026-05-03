@@ -57,6 +57,7 @@ public class RichStringScope
         ) {
             checkRange(range)
             val snappedRange = range.snapToParagraphs(text)
+
             currentSpans =
                 currentSpans.transformSpans(targetRange = snappedRange) { attributes ->
                     attributes.plus(key, value)

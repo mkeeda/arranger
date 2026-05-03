@@ -102,7 +102,7 @@ public enum class HeadingLevel {
 /**
  * A semantic marker indicating the heading level of the paragraph.
  */
-public object HeadingKey : ParagraphAttributeKey<HeadingLevel> {
+public object HeadingKey : BlockTypeAttributeKey<HeadingLevel> {
     override val name: String = "heading"
     override val defaultValue: HeadingLevel = HeadingLevel.Unspecified
 }
@@ -121,7 +121,7 @@ public enum class TextAlignment {
 /**
  * A semantic marker indicating the horizontal text alignment of the paragraph.
  */
-public object TextAlignmentKey : ParagraphAttributeKey<TextAlignment> {
+public object TextAlignmentKey : AlignmentAttributeKey<TextAlignment> {
     override val name: String = "textAlignment"
     override val defaultValue: TextAlignment = TextAlignment.Unspecified
 }
@@ -129,7 +129,7 @@ public object TextAlignmentKey : ParagraphAttributeKey<TextAlignment> {
 /**
  * A semantic marker indicating that the paragraph is a blockquote.
  */
-public object BlockquoteKey : ParagraphAttributeKey<Unit> {
+public object BlockquoteKey : BlockTypeAttributeKey<Unit> {
     override val name: String = "blockquote"
     override val defaultValue: Unit = Unit
 }
@@ -150,7 +150,7 @@ public enum class ListIndentLevel {
 /**
  * A semantic marker indicating that the paragraph is a bullet list item.
  */
-public object BulletListKey : ParagraphAttributeKey<ListIndentLevel> {
+public object BulletListKey : BlockTypeAttributeKey<ListIndentLevel> {
     override val name: String = "bulletList"
     override val defaultValue: ListIndentLevel = ListIndentLevel.Unspecified
 }
@@ -158,7 +158,7 @@ public object BulletListKey : ParagraphAttributeKey<ListIndentLevel> {
 /**
  * A semantic marker indicating that the paragraph is an ordered list item.
  */
-public object OrderedListKey : ParagraphAttributeKey<ListIndentLevel> {
+public object OrderedListKey : BlockTypeAttributeKey<ListIndentLevel> {
     override val name: String = "orderedList"
     override val defaultValue: ListIndentLevel = ListIndentLevel.Unspecified
 }

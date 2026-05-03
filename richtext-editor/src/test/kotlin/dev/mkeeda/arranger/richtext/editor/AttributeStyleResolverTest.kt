@@ -6,7 +6,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
+import dev.mkeeda.arranger.richtext.AlignmentAttributeKey
+import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
@@ -22,12 +23,12 @@ class AttributeStyleResolverTest {
         override val defaultValue: String = ""
     }
 
-    private object TestParagraphKey : ParagraphAttributeKey<TextAlign> {
+    private object TestParagraphKey : AlignmentAttributeKey<TextAlign> {
         override val name: String = "TestParagraph"
         override val defaultValue: TextAlign = TextAlign.Unspecified
     }
 
-    private object TestParagraphAndSpanKey : ParagraphAttributeKey<Unit> {
+    private object TestParagraphAndSpanKey : BlockTypeAttributeKey<Unit> {
         override val name: String = "TestCombined"
         override val defaultValue: Unit = Unit
     }
