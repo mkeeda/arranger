@@ -123,8 +123,8 @@ private fun DrawScope.drawListItems(
         val yCenter = top + (bottom - top) / 2f
 
         val levelIndex = item.indentLevel.ordinal + 1
-        val previousIndentPx = (levelIndex - 1) * LIST_INDENT_STEP_SP * density * fontScale
-        val xCenter = previousIndentPx + (LIST_INDENT_STEP_SP / 2f) * density * fontScale
+        val previousIndentPx = (levelIndex - 1) * ListIndentStepSp * density * fontScale
+        val xCenter = previousIndentPx + (ListIndentStepSp / 2f) * density * fontScale
 
         val itemColor = item.color
         val textColor =

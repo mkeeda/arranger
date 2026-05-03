@@ -26,12 +26,13 @@ import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 
-internal const val LIST_INDENT_STEP_SP = 24f
+@Suppress("ConstPropertyName")
+internal const val ListIndentStepSp = 24f
 
 private fun ListIndentLevel.toIndent(): TextUnit =
     when (this) {
         ListIndentLevel.Unspecified -> 0.sp
-        else -> (this.ordinal * LIST_INDENT_STEP_SP).sp
+        else -> (this.ordinal * ListIndentStepSp).sp
     }
 
 /**

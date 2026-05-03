@@ -5,7 +5,7 @@ import org.junit.Test
 
 class ListItemExtractorTest {
     @Test
-    fun `extract list items bulletList splitByNewline`() {
+    fun `extract list items bullet list split by newline`() {
         val text = "Item 1\nItem 2\nItem 3"
         val richString =
             RichString(text).edit {
@@ -38,7 +38,7 @@ class ListItemExtractorTest {
     }
 
     @Test
-    fun `extract list items orderedList countUp`() {
+    fun `extract list items ordered list count up`() {
         val text = "First\nSecond\nThird"
         val richString =
             RichString(text).edit {
@@ -74,7 +74,7 @@ class ListItemExtractorTest {
     }
 
     @Test
-    fun `extract list items orderedList resetOnGap`() {
+    fun `extract list items ordered list reset on gap`() {
         // "First" is ordered list, "Gap" is plain text, "Second" is ordered list again
         val text = "First\nGap\nSecond"
         val richString =
@@ -110,7 +110,7 @@ class ListItemExtractorTest {
     }
 
     @Test
-    fun `extract list items orderedList resetOnNesting`() {
+    fun `extract list items ordered list reset on nesting`() {
         val text = "Level1-1\nLevel2-1\nLevel2-2\nLevel1-2"
         val richString =
             RichString(text).edit {
@@ -162,7 +162,7 @@ class ListItemExtractorTest {
     }
 
     @Test
-    fun `extract list items orderedList resetOnReenteringNesting`() {
+    fun `extract list items ordered list reset on reentering nesting`() {
         val text = "Level1-1\nLevel2-1\nLevel2-2\nLevel1-2\nLevel2-1"
         val richString =
             RichString(text).edit {
@@ -225,7 +225,7 @@ class ListItemExtractorTest {
     }
 
     @Test
-    fun `extract list items withTextColor`() {
+    fun `extract list items with text color`() {
         val color = RgbaColor(value = 0xFFFF0000)
         val text = "Red Bullet"
         val richString =
