@@ -54,11 +54,7 @@ public fun RichString.extractListItems(): List<ListItem> {
         runs(BulletListKey)
             .filter { it.value != ListIndentLevel.Unspecified }
             .flatMap { run ->
-                val startIndices =
-                    listOf(run.range.first) +
-                        (run.range.first until run.range.last)
-                            .filter { text[it] == '\n' }
-                            .map { it + 1 }
+                val startIndices = paragraphStartIndices(run.range)
 
                 startIndices.map { startIndex ->
                     val spanAtStart = spans.firstOrNull { startIndex in it.range }
@@ -87,11 +83,7 @@ public fun RichString.extractListItems(): List<ListItem> {
                     }
                     expectedNextRunStart = run.range.last + 1
 
-                    val startIndices =
-                        listOf(run.range.first) +
-                            (run.range.first until run.range.last)
-                                .filter { text[it] == '\n' }
-                                .map { it + 1 }
+                    val startIndices = paragraphStartIndices(run.range)
 
                     startIndices.forEach { startIndex ->
                         val currentLevelOrdinal = run.value.ordinal
@@ -123,3 +115,9 @@ public fun RichString.extractListItems(): List<ListItem> {
 
     return (bulletItems + orderedItems).sortedBy { it.textIndex }
 }
+
+private fun RichString.paragraphStartIndices(range: IntRange): List<Int> =
+    listOf(range.first) +
+        (range.first until range.last)
+            .filter { text[it] == '\n' }
+            .map { it + 1 }

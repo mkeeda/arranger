@@ -86,7 +86,6 @@ public fun RichTextEditor(
         Modifier.drawBehind {
             val layoutResult = textLayoutResult ?: return@drawBehind
 
-            val outerDrawScope = this
             translate(top = -scrollState.value.toFloat()) {
                 drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle)
             }
@@ -124,8 +123,8 @@ private fun DrawScope.drawListItems(
         val yCenter = top + (bottom - top) / 2f
 
         val levelIndex = item.indentLevel.ordinal + 1
-        val previousIndentPx = (levelIndex - 1) * 24f * density * fontScale
-        val xCenter = previousIndentPx + 12f * density * fontScale
+        val previousIndentPx = (levelIndex - 1) * LIST_INDENT_STEP_SP * density * fontScale
+        val xCenter = previousIndentPx + (LIST_INDENT_STEP_SP / 2f) * density * fontScale
 
         val itemColor = item.color
         val textColor =

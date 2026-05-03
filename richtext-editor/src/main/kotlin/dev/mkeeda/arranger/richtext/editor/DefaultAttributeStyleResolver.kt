@@ -8,6 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
@@ -24,6 +25,14 @@ import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
+
+internal const val LIST_INDENT_STEP_SP = 24f
+
+private fun ListIndentLevel.toIndent(): TextUnit =
+    when (this) {
+        ListIndentLevel.Unspecified -> 0.sp
+        else -> (this.ordinal * LIST_INDENT_STEP_SP).sp
+    }
 
 /**
  * The standard default [AttributeStyleResolver] mapping the semantic attributes to Compose [SpanStyle].
@@ -94,29 +103,11 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
             )
         }
         paragraphStyle(BulletListKey) { level ->
-            val indent =
-                when (level) {
-                    ListIndentLevel.Level1 -> 24.sp
-                    ListIndentLevel.Level2 -> 48.sp
-                    ListIndentLevel.Level3 -> 72.sp
-                    ListIndentLevel.Level4 -> 96.sp
-                    ListIndentLevel.Level5 -> 120.sp
-                    ListIndentLevel.Level6 -> 144.sp
-                    ListIndentLevel.Unspecified -> 0.sp
-                }
+            val indent = level.toIndent()
             ParagraphStyle(textIndent = TextIndent(firstLine = indent, restLine = indent))
         }
         paragraphStyle(OrderedListKey) { level ->
-            val indent =
-                when (level) {
-                    ListIndentLevel.Level1 -> 24.sp
-                    ListIndentLevel.Level2 -> 48.sp
-                    ListIndentLevel.Level3 -> 72.sp
-                    ListIndentLevel.Level4 -> 96.sp
-                    ListIndentLevel.Level5 -> 120.sp
-                    ListIndentLevel.Level6 -> 144.sp
-                    ListIndentLevel.Unspecified -> 0.sp
-                }
+            val indent = level.toIndent()
             ParagraphStyle(textIndent = TextIndent(firstLine = indent, restLine = indent))
         }
     }

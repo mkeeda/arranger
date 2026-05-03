@@ -162,6 +162,69 @@ class ListItemExtractorTest {
     }
 
     @Test
+    fun `extract list items orderedList resetOnReenteringNesting`() {
+        val text = "Level1-1\nLevel2-1\nLevel2-2\nLevel1-2\nLevel2-1"
+        val richString =
+            RichString(text).edit {
+                setParagraphAttribute(
+                    key = OrderedListKey,
+                    value = ListIndentLevel.Level1,
+                    range = text.rangeOf("Level1-1\n"),
+                )
+                setParagraphAttribute(
+                    key = OrderedListKey,
+                    value = ListIndentLevel.Level2,
+                    range = text.rangeOf("Level2-1\nLevel2-2\n"),
+                )
+                setParagraphAttribute(
+                    key = OrderedListKey,
+                    value = ListIndentLevel.Level1,
+                    range = text.rangeOf("Level1-2\n"),
+                )
+                setParagraphAttribute(
+                    key = OrderedListKey,
+                    value = ListIndentLevel.Level2,
+                    range = text.lastIndexOf("Level2-1").let { it until (it + "Level2-1".length) },
+                )
+            }
+
+        val items = richString.extractListItems()
+
+        items.shouldContainExactly(
+            OrderedListItem(
+                textIndex = text.rangeOf("Level1-1\n").first,
+                indentLevel = ListIndentLevel.Level1,
+                color = null,
+                index = 1,
+            ),
+            OrderedListItem(
+                textIndex = text.indexOf("Level2-1\n"),
+                indentLevel = ListIndentLevel.Level2,
+                color = null,
+                index = 1,
+            ),
+            OrderedListItem(
+                textIndex = text.rangeOf("Level2-2\n").first,
+                indentLevel = ListIndentLevel.Level2,
+                color = null,
+                index = 2,
+            ),
+            OrderedListItem(
+                textIndex = text.rangeOf("Level1-2\n").first,
+                indentLevel = ListIndentLevel.Level1,
+                color = null,
+                index = 2,
+            ),
+            OrderedListItem(
+                textIndex = text.lastIndexOf("Level2-1"),
+                indentLevel = ListIndentLevel.Level2,
+                color = null,
+                index = 1, // Counter should restart at 1 when re-entering deeper level
+            ),
+        )
+    }
+
+    @Test
     fun `extract list items withTextColor`() {
         val color = RgbaColor(value = 0xFFFF0000)
         val text = "Red Bullet"
