@@ -62,7 +62,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
         }
         spanStyle(HeadingKey) { level ->
             when (level) {
-                HeadingLevel.H1 -> SpanStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                HeadingLevel.H1 -> SpanStyle(fontSize = 40.sp, fontWeight = FontWeight.Bold)
                 HeadingLevel.H2 -> SpanStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 HeadingLevel.H3 -> SpanStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 HeadingLevel.H4 -> SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
