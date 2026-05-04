@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextPainter
@@ -149,11 +150,38 @@ private fun DrawScope.drawListItems(
     }
 }
 
-private class RichTextOutputTransformation(
+internal class RichTextOutputTransformation(
     private val state: RichTextState,
     private val styleResolver: AttributeStyleResolver,
 ) : OutputTransformation {
+    private fun getParagraphStyleAt(index: Int): ParagraphStyle? {
+        val span = state.richString.spans.find { index in it.range }
+        return span?.attributes?.let { styleResolver.resolve(it).paragraphStyle }
+    }
+
     override fun TextFieldBuffer.transformOutput() {
+        // Workaround for Jetpack Compose's paragraph rendering behavior:
+        // Compose interprets `\n` within or at the end of a `ParagraphStyle` span as a hard paragraph separator.
+        // When two adjacent lines have different `ParagraphStyle`s, keeping the `\n` between them causes Compose 
+        // to render an unintended extra empty line (double spacing).
+        // By replacing the boundary `\n` with a zero-width space (`\uFEFF`) right before rendering, 
+        // we prevent this extra empty line while the underlying text model and expected visual line break are preserved.
+        val text = asCharSequence()
+        var searchStartIndex = 0
+        while (true) {
+            val i = text.indexOf('\n', searchStartIndex)
+            if (i == -1) break
+            searchStartIndex = i + 1
+
+            if (i + 1 < length) {
+                val styleAtI = getParagraphStyleAt(i)
+                val styleAtNext = getParagraphStyleAt(i + 1)
+                if (styleAtI != styleAtNext) {
+                    replace(i, i + 1, "\uFEFF")
+                }
+            }
+        }
+
         for (span in state.richString.spans) {
             val resolved = styleResolver.resolve(span.attributes)
 
