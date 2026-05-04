@@ -5,9 +5,9 @@ import dev.mkeeda.arranger.richtext.ListIndentLevel
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
-class DefaultAttributeStyleResolverTest {
+class ListIndentLevelTest {
     @Test
-    fun listIndentLevel_toIndent_values() {
+    fun `toIndent calculates expected indentation for each level`() {
         // Level1 should produce 1 * 24 = 24.sp
         ListIndentLevel.Level1.toIndent() shouldBe 24.sp
 
