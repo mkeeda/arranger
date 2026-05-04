@@ -28,7 +28,7 @@ import dev.mkeeda.arranger.richtext.UnderlineKey
 
 internal const val ListIndentStepSp = 24f
 
-private fun ListIndentLevel.toIndent(): TextUnit =
+internal fun ListIndentLevel.toIndent(): TextUnit =
     when (this) {
         ListIndentLevel.Unspecified -> 0.sp
         else -> ((this.ordinal + 1) * ListIndentStepSp).sp

@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.LibraryExtension
 import io.github.takahirom.roborazzi.RoborazziExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,10 +11,22 @@ class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply("io.github.takahirom.roborazzi")
 
-            extensions.configure<LibraryExtension> {
-                testOptions {
-                    unitTests {
-                        isIncludeAndroidResources = true
+            pluginManager.withPlugin("com.android.library") {
+                extensions.configure<com.android.build.api.dsl.LibraryExtension> {
+                    testOptions {
+                        unitTests {
+                            isIncludeAndroidResources = true
+                        }
+                    }
+                }
+            }
+
+            pluginManager.withPlugin("com.android.application") {
+                extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
+                    testOptions {
+                        unitTests {
+                            isIncludeAndroidResources = true
+                        }
                     }
                 }
             }
