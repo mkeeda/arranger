@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextPainter
@@ -149,14 +150,46 @@ private fun DrawScope.drawListItems(
     }
 }
 
-private class RichTextOutputTransformation(
+internal class RichTextOutputTransformation(
     private val state: RichTextState,
     private val styleResolver: AttributeStyleResolver,
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
-        for (span in state.richString.spans) {
-            val resolved = styleResolver.resolve(span.attributes)
+        // Pre-resolve styles for all spans to avoid redundant object allocations
+        val resolvedSpans =
+            state.richString.spans.map { span ->
+                span to styleResolver.resolve(span.attributes)
+            }
 
+        fun getParagraphStyleAt(index: Int): ParagraphStyle? {
+            val resolvedSpan = resolvedSpans.find { index in it.first.range }
+            return resolvedSpan?.second?.paragraphStyle
+        }
+
+        // Workaround for Jetpack Compose's paragraph rendering behavior:
+        // Compose interprets `\n` within or at the end of a `ParagraphStyle` span as a hard paragraph separator.
+        // When two adjacent lines have different `ParagraphStyle`s, keeping the `\n` between them causes Compose
+        // to render an unintended extra empty line (double spacing).
+        // By replacing the boundary `\n` with a zero-width space (`\uFEFF`) right before rendering,
+        // we prevent this extra empty line while the underlying text model and expected visual line break are preserved.
+        val text = asCharSequence()
+        var searchStartIndex = 0
+        while (true) {
+            val i = text.indexOf('\n', searchStartIndex)
+            if (i == -1) break
+            searchStartIndex = i + 1
+
+            if (i + 1 < length) {
+                val styleAtI = getParagraphStyleAt(i)
+                val styleAtNext = getParagraphStyleAt(i + 1)
+                if (styleAtI != styleAtNext) {
+                    replace(i, i + 1, "\uFEFF")
+                }
+            }
+        }
+
+        // Reuse the resolved styles here
+        for ((span, resolved) in resolvedSpans) {
             // Determine boundaries avoiding out of bounds in case of race conditions or text shrinkage mid-frame.
             val start = span.range.first.coerceIn(0, length)
             val end = (span.range.last + 1).coerceIn(0, length)
