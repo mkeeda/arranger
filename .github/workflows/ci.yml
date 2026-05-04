@@ -23,14 +23,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Run Verification (Lint, Spotless, Tests)
-        run: ./gradlew lint spotlessCheck testDebugUnitTest
+      - name: Run Verification (Lint, Spotless, Tests, Screenshot Verify)
+        run: ./gradlew lint spotlessCheck testDebugUnitTest verifyRoborazziDebug
 
       - name: Upload Verification Reports
         uses: actions/upload-artifact@v7
-        if: always()
+        if: failure()
         with:
           name: verification-reports
           path: |
             **/build/reports/
             **/build/test-results/
+            **/build/outputs/roborazzi/
