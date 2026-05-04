@@ -14,6 +14,7 @@ dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.spotless.gradlePlugin)
     implementation(libs.vanniktech.maven.publish.gradlePlugin)
+    implementation(libs.roborazzi.gradlePlugin)
 }
 
 gradlePlugin {
@@ -33,6 +34,10 @@ gradlePlugin {
         register("mavenPublish") {
             id = "arranger.maven.publish"
             implementationClass = "MavenPublishConventionPlugin"
+        }
+        register("androidScreenshotTest") {
+            id = "arranger.android.screenshot"
+            implementationClass = "AndroidScreenshotTestConventionPlugin"
         }
     }
 }
