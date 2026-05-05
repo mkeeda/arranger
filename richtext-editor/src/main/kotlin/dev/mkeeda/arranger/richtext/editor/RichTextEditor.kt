@@ -61,6 +61,7 @@ public fun RichTextEditor(
     cursorBrush: Brush = SolidColor(Color.Black),
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
+    listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
 ) {
     val outputTransformation =
         remember(state, styleResolver) {
@@ -88,7 +89,7 @@ public fun RichTextEditor(
             val layoutResult = textLayoutResult ?: return@drawBehind
 
             translate(top = -scrollState.value.toFloat()) {
-                drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle)
+                drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle, listMarkerResolver)
             }
         }
 
@@ -116,6 +117,7 @@ private fun DrawScope.drawListItems(
     layoutResult: TextLayoutResult,
     textMeasurer: TextMeasurer,
     currentTextStyle: TextStyle,
+    listMarkerResolver: ListMarkerResolver,
 ) {
     listItems.forEach { item ->
         val line = layoutResult.getLineForOffset(item.textIndex)
@@ -135,11 +137,7 @@ private fun DrawScope.drawListItems(
                 currentTextStyle.color
             }
 
-        val markerText =
-            when (item) {
-                is BulletListItem -> "・"
-                is OrderedListItem -> "${item.index}."
-            }
+        val markerText = listMarkerResolver.resolve(item)
 
         val textLayout = textMeasurer.measure(markerText, style = currentTextStyle.copy(color = textColor))
         val canvas = drawContext.canvas

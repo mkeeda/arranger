@@ -3,7 +3,6 @@ package dev.mkeeda.arranger.richtext
 /**
  * Represents the semantic structure of a list item within a RichString.
  */
-@InternalArrangerApi
 public sealed interface ListItem {
     /**
      * The character index of the start of the paragraph that forms this list item.
@@ -24,7 +23,6 @@ public sealed interface ListItem {
 /**
  * Represents a bullet list item.
  */
-@InternalArrangerApi
 public data class BulletListItem(
     override val textIndex: Int,
     override val indentLevel: ListIndentLevel,
@@ -34,7 +32,6 @@ public data class BulletListItem(
 /**
  * Represents an ordered list item (e.g., 1. 2. 3.).
  */
-@InternalArrangerApi
 public data class OrderedListItem(
     override val textIndex: Int,
     override val indentLevel: ListIndentLevel,
