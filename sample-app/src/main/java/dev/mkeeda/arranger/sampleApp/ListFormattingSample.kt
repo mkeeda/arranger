@@ -68,7 +68,7 @@ fun BulletListSample(modifier: Modifier = Modifier) {
             "Second item\n" +
             "Third item\n" +
             "Nested item 1\n" +
-            "Nested item 2\n"
+            "Nested item 2"
 
     val state =
         remember {
@@ -102,7 +102,7 @@ fun OrderedListSample(modifier: Modifier = Modifier) {
         "Steps to follow:\n" +
             "Prepare ingredients\n" +
             "Cook the meal\n" +
-            "Serve on plates\n"
+            "Serve on plates"
 
     val state =
         remember {
@@ -130,7 +130,7 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
         "Checklist:\n" +
             "Review code\n" +
             "Run tests\n" +
-            "Deploy\n"
+            "Deploy"
 
     val state =
         remember {
