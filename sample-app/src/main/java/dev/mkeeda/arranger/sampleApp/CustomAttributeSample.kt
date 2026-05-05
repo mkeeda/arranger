@@ -29,11 +29,23 @@ public object HighlightKey : SpanAttributeKey<Unit> {
     override val defaultValue: Unit = Unit
 }
 
+// 2. Create a custom AttributeStyleResolver inheriting from DefaultAttributeStyleResolver
+private val customResolver =
+    AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
+        spanStyle(HighlightKey) {
+            SpanStyle(
+                background = Color(0xFFFFF59D), // Light Yellow
+                color = Color(0xFFE65100), // Orange Text
+                fontWeight = FontWeight.ExtraBold,
+            )
+        }
+    }
+
 @Composable
 fun CustomAttributeSample(modifier: Modifier = Modifier) {
     val initialText = "Arranger also supports Custom Attributes.\nThis text is highlighted using a custom resolver!"
 
-    // 2. Initialize RichTextState with the custom attribute
+    // 3. Initialize RichTextState with the custom attribute
     val state =
         remember {
             RichTextState(
@@ -45,31 +57,12 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
             )
         }
 
-    // 3. Create a custom AttributeStyleResolver inheriting from DefaultAttributeStyleResolver
-    val customResolver =
-        remember {
-            AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
-                spanStyle(HighlightKey) {
-                    SpanStyle(
-                        background = Color(0xFFFFF59D), // Light Yellow
-                        color = Color(0xFFE65100), // Orange Text
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-            }
-        }
-
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("Custom Attribute Mapping Demo", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 4. Pass the custom resolver to RichTextEditor
-        RichTextEditor(
-            state = state,
-            styleResolver = customResolver,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    // 4. Pass the custom resolver to RichTextEditor
+    RichTextEditor(
+        state = state,
+        styleResolver = customResolver,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Preview(showBackground = true)

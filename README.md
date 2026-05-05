@@ -117,6 +117,134 @@ fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
 
 <img src="./docs/images/advanced-formatting.png" width="500" alt="advanced formatting sample"/>
 
+## Lists & Ordered Lists
+
+Arranger provides native support for `bulletList` and `orderedList` paragraph formatting. You can apply list attributes over a text range, and the editor will automatically render the appropriate markers and handle indentation.
+
+### Bullet Lists
+Bullet lists automatically change their marker symbol based on the indentation level (e.g., Level 1 uses `・`, Level 2 uses `○`).
+
+```kotlin
+@Composable
+fun BulletListSample(modifier: Modifier = Modifier) {
+    val initialText = "Bullet Items:\n" +
+            "First item\n" +
+            "Second item\n" +
+            "Third item\n" +
+            "Nested item 1\n" +
+            "Nested item 2"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                val itemsStart = initialText.indexOf("First item")
+                val itemsEnd = initialText.indexOf("Nested item 1") - 1
+                editAttributes(itemsStart until itemsEnd) {
+                    bulletList(ListIndentLevel.Level1)
+                }
+
+                val nestedStart = initialText.indexOf("Nested item 1")
+                val nestedEnd = initialText.length
+                editAttributes(nestedStart until nestedEnd) {
+                    bulletList(ListIndentLevel.Level2)
+                }
+            }
+        )
+    }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+```
+
+<img src="./docs/images/bullet-list.png" width="500" alt="bullet list sample"/>
+
+### Ordered Lists
+Ordered lists automatically calculate and display the sequence numbers based on their position and nesting level.
+
+```kotlin
+@Composable
+fun OrderedListSample(modifier: Modifier = Modifier) {
+    val initialText = "Steps to follow:\n" +
+            "Prepare ingredients\n" +
+            "Cook the meal\n" +
+            "Serve on plates"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                val start = initialText.indexOf("Prepare ingredients")
+                val end = initialText.length
+                editAttributes(start until end) {
+                    orderedList(ListIndentLevel.Level1)
+                }
+            }
+        )
+    }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+```
+
+<img src="./docs/images/ordered-list.png" width="500" alt="ordered list sample"/>
+
+### Custom List Markers
+You can customize the list markers by providing a `ListMarkerResolver` to the `RichTextEditor`. This allows you to use different symbols, letters, or parentheses for your lists.
+
+```kotlin
+@Composable
+fun CustomListMarkerSample(modifier: Modifier = Modifier) {
+    val initialText = "Checklist:\n" +
+            "Review code\n" +
+            "Run tests\n" +
+            "Deploy\n" +
+            "Priorities:\n" +
+            "Critical bugs\n" +
+            "New features\n" +
+            "Refactoring"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                val start = initialText.indexOf("Review code")
+                val end = initialText.indexOf("Priorities:") - 1
+                editAttributes(start until end) {
+                    bulletList(ListIndentLevel.Level1)
+                }
+
+                val orderedStart = initialText.indexOf("Critical bugs")
+                val orderedEnd = initialText.length
+                editAttributes(orderedStart until orderedEnd) {
+                    orderedList(ListIndentLevel.Level1)
+                }
+            }
+        )
+    }
+
+    val customMarkerResolver = remember {
+        ListMarkerResolver { item ->
+            when (item) {
+                is BulletListItem -> "✔️ "
+                is OrderedListItem -> "${('a' + item.index - 1)}) "
+            }
+        }
+    }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+        listMarkerResolver = customMarkerResolver,
+    )
+}
+```
+
+<img src="./docs/images/custom-list-marker.png" width="500" alt="custom list marker sample"/>
+
 ## Custom Attribute Mapping
 
 You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
@@ -128,11 +256,22 @@ object HighlightKey : SpanAttributeKey<Unit> {
     override val defaultValue: Unit = Unit
 }
 
+// 2. Create a custom AttributeStyleResolver inheriting from DefaultAttributeStyleResolver
+private val customResolver = AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
+    spanStyle(HighlightKey) {
+        SpanStyle(
+            background = Color(0xFFFFF59D), // Light Yellow
+            color = Color(0xFFE65100),      // Orange Text
+            fontWeight = FontWeight.ExtraBold
+        )
+    }
+}
+
 @Composable
 fun CustomAttributeSample(modifier: Modifier = Modifier) {
     val initialText = "Arranger also supports Custom Attributes.\nThis text is highlighted using a custom resolver!"
 
-    // 2. Initialize RichTextState with the custom attribute
+    // 3. Initialize RichTextState with the custom attribute
     val state = remember {
         RichTextState(
             initialText = RichString(text = initialText).edit {
@@ -140,19 +279,6 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
                 setSpanAttribute(HighlightKey, Unit, range)
             }
         )
-    }
-
-    // 3. Create a custom AttributeStyleResolver inheriting from DefaultAttributeStyleResolver
-    val customResolver = remember {
-        AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
-            spanStyle(HighlightKey) {
-                SpanStyle(
-                    background = Color(0xFFFFF59D), // Light Yellow
-                    color = Color(0xFFE65100),      // Orange Text
-                    fontWeight = FontWeight.ExtraBold
-                )
-            }
-        }
     }
 
     // 4. Pass the custom resolver to RichTextEditor
@@ -201,15 +327,10 @@ fun HashtagHighlightSample(modifier: Modifier = Modifier) {
         }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Searching and Highlighting", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        RichTextEditor(
-            state = state,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 ```
 
@@ -240,10 +361,7 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
         )
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Querying and Modifying Attributes", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
+    Column(modifier = modifier) {
         Button(
             onClick = {
                 // Find all runs that have the BoldKey
@@ -351,7 +469,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ### Phase 2: Advanced Manipulation & Structural Elements
 - [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
-- [ ] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
+- [x] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
 - [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., vertical lines for blockquotes, background boxes for code blocks).
 - [ ] **Material 3 Integration**: Specialized resolvers for M3 Typography and Color Schemes.
 

@@ -50,8 +50,8 @@ private enum class SampleDestination(val title: String) : NavKey {
     CustomAttribute("Custom Attribute"),
     HashtagHighlight("Hashtag Highlight"),
     AttributeBatchEdit("Attribute Batch Edit"),
-    ChatInput("Chat Input"),
     ListFormatting("List Formatting"),
+    ChatInput("Chat Input"),
 }
 
 class MainActivity : ComponentActivity() {
@@ -186,7 +186,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
+                    .padding(16.dp),
         ) {
             when (destination) {
                 SampleDestination.BasicUsage -> BasicUsageSample()
