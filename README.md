@@ -117,6 +117,118 @@ fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
 
 <img src="./docs/images/advanced-formatting.png" width="500" alt="advanced formatting sample"/>
 
+## Lists & Ordered Lists
+
+Arranger provides native support for `bulletList` and `orderedList` paragraph formatting. You can apply list attributes over a text range, and the editor will automatically render the appropriate markers and handle indentation.
+
+### Bullet Lists
+Bullet lists automatically change their marker symbol based on the indentation level (e.g., Level 1 uses `・`, Level 2 uses `○`).
+
+```kotlin
+@Composable
+fun BulletListSample(modifier: Modifier = Modifier) {
+    val initialText = "Bullet Items:\n" +
+            "First item\n" +
+            "Second item\n" +
+            "Third item\n" +
+            "Nested item 1\n" +
+            "Nested item 2\n"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                val itemsStart = initialText.indexOf("First item")
+                val itemsEnd = initialText.indexOf("Nested item 1") - 1
+                editAttributes(itemsStart until itemsEnd) {
+                    bulletList(ListIndentLevel.Level1)
+                }
+
+                val nestedStart = initialText.indexOf("Nested item 1")
+                val nestedEnd = initialText.length
+                editAttributes(nestedStart until nestedEnd) {
+                    bulletList(ListIndentLevel.Level2)
+                }
+            }
+        )
+    }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+```
+
+### Ordered Lists
+Ordered lists automatically calculate and display the sequence numbers based on their position and nesting level.
+
+```kotlin
+@Composable
+fun OrderedListSample(modifier: Modifier = Modifier) {
+    val initialText = "Steps to follow:\n" +
+            "Prepare ingredients\n" +
+            "Cook the meal\n" +
+            "Serve on plates\n"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                val start = initialText.indexOf("Prepare ingredients")
+                val end = initialText.length
+                editAttributes(start until end) {
+                    orderedList(ListIndentLevel.Level1)
+                }
+            }
+        )
+    }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+```
+
+### Custom List Markers
+You can customize the list markers by providing a `ListMarkerResolver` to the `RichTextEditor`. This allows you to use different symbols, letters, or parentheses for your lists.
+
+```kotlin
+@Composable
+fun CustomListMarkerSample(modifier: Modifier = Modifier) {
+    val initialText = "Checklist:\n" +
+            "Review code\n" +
+            "Run tests\n" +
+            "Deploy\n"
+
+    val state = remember {
+        RichTextState(
+            initialText = RichString(text = initialText).edit {
+                val start = initialText.indexOf("Review code")
+                val end = initialText.length
+                editAttributes(start until end) {
+                    bulletList(ListIndentLevel.Level1)
+                }
+            }
+        )
+    }
+
+    val customMarkerResolver = remember {
+        ListMarkerResolver { item ->
+            when (item) {
+                is BulletListItem -> "✔️ "
+                is OrderedListItem -> "${item.index}) "
+            }
+        }
+    }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+        listMarkerResolver = customMarkerResolver,
+    )
+}
+```
+
 ## Custom Attribute Mapping
 
 You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
@@ -351,7 +463,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ### Phase 2: Advanced Manipulation & Structural Elements
 - [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
-- [ ] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
+- [x] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
 - [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., vertical lines for blockquotes, background boxes for code blocks).
 - [ ] **Material 3 Integration**: Specialized resolvers for M3 Typography and Color Schemes.
 
