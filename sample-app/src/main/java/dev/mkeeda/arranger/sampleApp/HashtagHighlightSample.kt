@@ -51,15 +51,10 @@ fun HashtagHighlightSample(modifier: Modifier = Modifier) {
         }
     }
 
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("Searching and Highlighting", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        RichTextEditor(
-            state = state,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Preview(showBackground = true)

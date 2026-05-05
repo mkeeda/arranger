@@ -329,15 +329,10 @@ fun HashtagHighlightSample(modifier: Modifier = Modifier) {
         }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Searching and Highlighting", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        RichTextEditor(
-            state = state,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 ```
 
@@ -368,10 +363,7 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
         )
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Querying and Modifying Attributes", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
+    Column(modifier = modifier) {
         Button(
             onClick = {
                 // Find all runs that have the BoldKey

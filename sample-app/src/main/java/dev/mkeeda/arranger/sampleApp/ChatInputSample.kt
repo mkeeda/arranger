@@ -74,14 +74,8 @@ fun ChatInputSample(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxSize()
-                .imePadding()
-                .padding(16.dp),
+                .imePadding(),
     ) {
-        Text(
-            text = "Chat UI Sample",
-            style = MaterialTheme.typography.titleLarge,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Select text and use the toolbar to format it. Real-time cursor state reflection is not supported in this phase.",
             style = MaterialTheme.typography.bodyMedium,

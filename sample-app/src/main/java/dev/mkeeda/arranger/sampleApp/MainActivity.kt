@@ -186,7 +186,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
+                    .padding(16.dp),
         ) {
             when (destination) {
                 SampleDestination.BasicUsage -> BasicUsageSample()

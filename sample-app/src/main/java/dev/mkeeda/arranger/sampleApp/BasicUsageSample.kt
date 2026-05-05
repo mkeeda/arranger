@@ -39,16 +39,11 @@ fun BasicUsageSample(modifier: Modifier = Modifier) {
             )
         }
 
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("Basic Usage", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 2. Render editor
-        RichTextEditor(
-            state = state,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    // 2. Render editor
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Preview(showBackground = true)

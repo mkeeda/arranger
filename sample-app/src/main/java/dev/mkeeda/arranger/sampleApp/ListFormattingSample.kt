@@ -32,12 +32,8 @@ fun ListFormattingSample(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .verticalScroll(rememberScrollState()),
     ) {
-        Text("List Formatting Sample", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(16.dp))
-
         Text("Bullet List", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
         BulletListSample()

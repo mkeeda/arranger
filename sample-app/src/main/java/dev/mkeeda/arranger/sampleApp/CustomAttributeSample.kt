@@ -59,17 +59,12 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
             }
         }
 
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("Custom Attribute Mapping Demo", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 4. Pass the custom resolver to RichTextEditor
-        RichTextEditor(
-            state = state,
-            styleResolver = customResolver,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    // 4. Pass the custom resolver to RichTextEditor
+    RichTextEditor(
+        state = state,
+        styleResolver = customResolver,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Preview(showBackground = true)
