@@ -132,7 +132,7 @@ fun BulletListSample(modifier: Modifier = Modifier) {
             "Second item\n" +
             "Third item\n" +
             "Nested item 1\n" +
-            "Nested item 2\n"
+            "Nested item 2"
 
     val state = remember {
         RichTextState(
@@ -170,7 +170,7 @@ fun OrderedListSample(modifier: Modifier = Modifier) {
     val initialText = "Steps to follow:\n" +
             "Prepare ingredients\n" +
             "Cook the meal\n" +
-            "Serve on plates\n"
+            "Serve on plates"
 
     val state = remember {
         RichTextState(
@@ -206,7 +206,7 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
             "Priorities:\n" +
             "Critical bugs\n" +
             "New features\n" +
-            "Refactoring\n"
+            "Refactoring"
 
     val state = remember {
         RichTextState(
