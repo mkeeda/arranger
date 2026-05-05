@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.AttributeEditScope
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.TextAlignment
@@ -39,12 +40,15 @@ import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.backgroundColor
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
+import dev.mkeeda.arranger.richtext.bulletList
 import dev.mkeeda.arranger.richtext.clearBackgroundColor
 import dev.mkeeda.arranger.richtext.clearBlockquote
 import dev.mkeeda.arranger.richtext.clearBold
+import dev.mkeeda.arranger.richtext.clearBulletList
 import dev.mkeeda.arranger.richtext.clearFontSize
 import dev.mkeeda.arranger.richtext.clearHeadingLevel
 import dev.mkeeda.arranger.richtext.clearItalic
+import dev.mkeeda.arranger.richtext.clearOrderedList
 import dev.mkeeda.arranger.richtext.clearStrikethrough
 import dev.mkeeda.arranger.richtext.clearTextAlignment
 import dev.mkeeda.arranger.richtext.clearTextColor
@@ -55,6 +59,7 @@ import dev.mkeeda.arranger.richtext.editor.editAttributes
 import dev.mkeeda.arranger.richtext.fontSize
 import dev.mkeeda.arranger.richtext.headingLevel
 import dev.mkeeda.arranger.richtext.italic
+import dev.mkeeda.arranger.richtext.orderedList
 import dev.mkeeda.arranger.richtext.strikethrough
 import dev.mkeeda.arranger.richtext.textAlignment
 import dev.mkeeda.arranger.richtext.textColor
@@ -142,6 +147,8 @@ private fun ChatFormattingToolbar(
                 FormatAction(R.drawable.format_h1, "Heading 1") { headingLevel(HeadingLevel.H1) },
                 FormatAction(R.drawable.format_align_center, "Align Center") { textAlignment(TextAlignment.Center) },
                 FormatAction(R.drawable.format_quote, "Blockquote") { blockquote() },
+                FormatAction(R.drawable.format_list_bulleted, "Bullet List") { bulletList(ListIndentLevel.Level1) },
+                FormatAction(R.drawable.format_list_numbered, "Ordered List") { orderedList(ListIndentLevel.Level1) },
             )
 
         formatActions.forEach { action ->
@@ -172,6 +179,8 @@ private fun ChatFormattingToolbar(
                         clearHeadingLevel()
                         clearTextAlignment()
                         clearBlockquote()
+                        clearBulletList()
+                        clearOrderedList()
                     }
                 }
             },
