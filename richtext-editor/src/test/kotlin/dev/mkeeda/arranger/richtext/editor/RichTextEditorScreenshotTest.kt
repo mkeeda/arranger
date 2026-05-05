@@ -129,6 +129,41 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
+    fun listsWithCustomMarker() {
+        val text = "Bullet item 1\nBullet item 2\nNested bullet\nOrdered item 1\nOrdered item 2\nNested ordered"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Bullet item 2")) { bulletList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Nested bullet")) { bulletList(ListIndentLevel.Level2) }
+                        editAttributes(text.rangeOf("Ordered item 1")) { orderedList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Ordered item 2")) { orderedList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Nested ordered")) { orderedList(ListIndentLevel.Level2) }
+                    },
+            )
+
+        val customMarkerResolver =
+            ListMarkerResolver { item ->
+                when (item) {
+                    is dev.mkeeda.arranger.richtext.BulletListItem -> "★"
+                    is dev.mkeeda.arranger.richtext.OrderedListItem -> "(${item.index})"
+                }
+            }
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White),
+                listMarkerResolver = customMarkerResolver,
+            )
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
     fun paragraphSpacing() {
         val text = "First paragraph with bold text.\n\nSecond paragraph plain.\nThird paragraph with italic.\n\nFourth paragraph plain."
         val state =
