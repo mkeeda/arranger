@@ -159,6 +159,8 @@ fun BulletListSample(modifier: Modifier = Modifier) {
 }
 ```
 
+<img src="./docs/images/bullet-list.png" width="500" alt="bullet list sample"/>
+
 ### Ordered Lists
 Ordered lists automatically calculate and display the sequence numbers based on their position and nesting level.
 
@@ -189,6 +191,8 @@ fun OrderedListSample(modifier: Modifier = Modifier) {
 }
 ```
 
+<img src="./docs/images/ordered-list.png" width="500" alt="ordered list sample"/>
+
 ### Custom List Markers
 You can customize the list markers by providing a `ListMarkerResolver` to the `RichTextEditor`. This allows you to use different symbols, letters, or parentheses for your lists.
 
@@ -198,15 +202,25 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
     val initialText = "Checklist:\n" +
             "Review code\n" +
             "Run tests\n" +
-            "Deploy\n"
+            "Deploy\n" +
+            "Priorities:\n" +
+            "Critical bugs\n" +
+            "New features\n" +
+            "Refactoring\n"
 
     val state = remember {
         RichTextState(
             initialText = RichString(text = initialText).edit {
                 val start = initialText.indexOf("Review code")
-                val end = initialText.length
+                val end = initialText.indexOf("Priorities:") - 1
                 editAttributes(start until end) {
                     bulletList(ListIndentLevel.Level1)
+                }
+
+                val orderedStart = initialText.indexOf("Critical bugs")
+                val orderedEnd = initialText.length
+                editAttributes(orderedStart until orderedEnd) {
+                    orderedList(ListIndentLevel.Level1)
                 }
             }
         )
@@ -216,7 +230,7 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
         ListMarkerResolver { item ->
             when (item) {
                 is BulletListItem -> "✔️ "
-                is OrderedListItem -> "${item.index}) "
+                is OrderedListItem -> "${('a' + item.index - 1)}) "
             }
         }
     }
@@ -228,6 +242,8 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
     )
 }
 ```
+
+<img src="./docs/images/custom-list-marker.png" width="500" alt="custom list marker sample"/>
 
 ## Custom Attribute Mapping
 

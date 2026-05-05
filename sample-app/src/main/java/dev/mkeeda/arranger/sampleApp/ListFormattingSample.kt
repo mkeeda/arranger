@@ -130,7 +130,11 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
         "Checklist:\n" +
             "Review code\n" +
             "Run tests\n" +
-            "Deploy"
+            "Deploy\n" +
+            "Priorities:\n" +
+            "Critical bugs\n" +
+            "New features\n" +
+            "Refactoring"
 
     val state =
         remember {
@@ -138,9 +142,15 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
                 initialText =
                     RichString(text = initialText).edit {
                         val start = initialText.indexOf("Review code")
-                        val end = initialText.length
+                        val end = initialText.indexOf("Priorities:") - 1
                         editAttributes(start until end) {
                             bulletList(ListIndentLevel.Level1)
+                        }
+
+                        val orderedStart = initialText.indexOf("Critical bugs")
+                        val orderedEnd = initialText.length
+                        editAttributes(orderedStart until orderedEnd) {
+                            orderedList(ListIndentLevel.Level1)
                         }
                     },
             )
@@ -151,7 +161,7 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
             ListMarkerResolver { item ->
                 when (item) {
                     is BulletListItem -> "✔️ "
-                    is OrderedListItem -> "${item.index}) "
+                    is OrderedListItem -> "${('a' + item.index - 1)}) "
                 }
             }
         }
