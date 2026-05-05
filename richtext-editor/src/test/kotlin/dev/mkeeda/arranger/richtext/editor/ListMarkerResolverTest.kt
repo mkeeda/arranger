@@ -31,21 +31,4 @@ class ListMarkerResolverTest {
         DefaultListMarkerResolver.resolve(index5Item) shouldBe "5."
         DefaultListMarkerResolver.resolve(index100Item) shouldBe "100."
     }
-
-    @Test
-    fun `Custom ListMarkerResolver returns custom markers`() {
-        val customResolver =
-            ListMarkerResolver { item ->
-                when (item) {
-                    is BulletListItem -> "★"
-                    is OrderedListItem -> "(${item.index})"
-                }
-            }
-
-        val bulletItem = BulletListItem(textIndex = 0, indentLevel = ListIndentLevel.Level1, color = RgbaColor.Unspecified)
-        val orderedItem = OrderedListItem(textIndex = 0, indentLevel = ListIndentLevel.Level1, color = RgbaColor.Unspecified, index = 2)
-
-        customResolver.resolve(bulletItem) shouldBe "★"
-        customResolver.resolve(orderedItem) shouldBe "(2)"
-    }
 }

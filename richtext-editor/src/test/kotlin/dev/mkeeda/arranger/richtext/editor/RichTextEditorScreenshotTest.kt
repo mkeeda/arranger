@@ -8,8 +8,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.captureRoboImage
+import dev.mkeeda.arranger.richtext.BulletListItem
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ListIndentLevel
+import dev.mkeeda.arranger.richtext.OrderedListItem
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.backgroundColor
@@ -147,8 +149,8 @@ class RichTextEditorScreenshotTest {
         val customMarkerResolver =
             ListMarkerResolver { item ->
                 when (item) {
-                    is dev.mkeeda.arranger.richtext.BulletListItem -> "★"
-                    is dev.mkeeda.arranger.richtext.OrderedListItem -> "(${item.index})"
+                    is BulletListItem -> "★"
+                    is OrderedListItem -> "(${item.index})"
                 }
             }
 
