@@ -50,8 +50,8 @@ private enum class SampleDestination(val title: String) : NavKey {
     CustomAttribute("Custom Attribute"),
     HashtagHighlight("Hashtag Highlight"),
     AttributeBatchEdit("Attribute Batch Edit"),
-    ChatInput("Chat Input"),
     ListFormatting("List Formatting"),
+    ChatInput("Chat Input"),
 }
 
 class MainActivity : ComponentActivity() {
