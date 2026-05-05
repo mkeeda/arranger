@@ -123,7 +123,6 @@ private fun ChatFormattingToolbar(
     hasSelection: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
     FlowRow(
         modifier =
             modifier
