@@ -106,23 +106,7 @@ class RichTextEditorScreenshotTest {
 
     @Test
     fun lists() {
-        val text =
-            "Bullet item 1\nBullet item 2\nNested bullet\nDeep nested bullet\n" +
-                "Ordered item 1\nOrdered item 2\nNested ordered\nDeep nested ordered"
-        val state =
-            RichTextState(
-                initialText =
-                    RichString(text).edit {
-                        editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Bullet item 2")) { bulletList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Nested bullet")) { bulletList(ListIndentLevel.Level2) }
-                        editAttributes(text.rangeOf("Deep nested bullet")) { bulletList(ListIndentLevel.Level3) }
-                        editAttributes(text.rangeOf("Ordered item 1")) { orderedList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Ordered item 2")) { orderedList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Nested ordered")) { orderedList(ListIndentLevel.Level2) }
-                        editAttributes(text.rangeOf("Deep nested ordered")) { orderedList(ListIndentLevel.Level3) }
-                    },
-            )
+        val state = createMultiLevelListState()
 
         composeTestRule.setContent {
             RichTextEditor(
@@ -136,23 +120,7 @@ class RichTextEditorScreenshotTest {
 
     @Test
     fun listsWithCustomMarker() {
-        val text =
-            "Bullet item 1\nBullet item 2\nNested bullet\nDeep nested bullet\n" +
-                "Ordered item 1\nOrdered item 2\nNested ordered\nDeep nested ordered"
-        val state =
-            RichTextState(
-                initialText =
-                    RichString(text).edit {
-                        editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Bullet item 2")) { bulletList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Nested bullet")) { bulletList(ListIndentLevel.Level2) }
-                        editAttributes(text.rangeOf("Deep nested bullet")) { bulletList(ListIndentLevel.Level3) }
-                        editAttributes(text.rangeOf("Ordered item 1")) { orderedList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Ordered item 2")) { orderedList(ListIndentLevel.Level1) }
-                        editAttributes(text.rangeOf("Nested ordered")) { orderedList(ListIndentLevel.Level2) }
-                        editAttributes(text.rangeOf("Deep nested ordered")) { orderedList(ListIndentLevel.Level3) }
-                    },
-            )
+        val state = createMultiLevelListState()
 
         val customMarkerResolver =
             ListMarkerResolver { item ->
@@ -193,5 +161,24 @@ class RichTextEditorScreenshotTest {
         }
 
         composeTestRule.onRoot().captureRoboImage()
+    }
+
+    private fun createMultiLevelListState(): RichTextState {
+        val text =
+            "Bullet item 1\nBullet item 2\nNested bullet\nDeep nested bullet\n" +
+                "Ordered item 1\nOrdered item 2\nNested ordered\nDeep nested ordered"
+        return RichTextState(
+            initialText =
+                RichString(text).edit {
+                    editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
+                    editAttributes(text.rangeOf("Bullet item 2")) { bulletList(ListIndentLevel.Level1) }
+                    editAttributes(text.rangeOf("Nested bullet")) { bulletList(ListIndentLevel.Level2) }
+                    editAttributes(text.rangeOf("Deep nested bullet")) { bulletList(ListIndentLevel.Level3) }
+                    editAttributes(text.rangeOf("Ordered item 1")) { orderedList(ListIndentLevel.Level1) }
+                    editAttributes(text.rangeOf("Ordered item 2")) { orderedList(ListIndentLevel.Level1) }
+                    editAttributes(text.rangeOf("Nested ordered")) { orderedList(ListIndentLevel.Level2) }
+                    editAttributes(text.rangeOf("Deep nested ordered")) { orderedList(ListIndentLevel.Level3) }
+                },
+        )
     }
 }

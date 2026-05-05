@@ -13,7 +13,11 @@ import dev.mkeeda.arranger.richtext.OrderedListItem
  * val alphabeticalResolver = ListMarkerResolver { item ->
  *     when (item) {
  *         is BulletListItem -> "•"
- *         is OrderedListItem -> "${'a' + item.index - 1}."
+ *         is OrderedListItem -> {
+ *             // Char arithmetic: 'a'(0-based) + index(1-based) - 1
+ *             val letter = 'a' + item.index - 1
+ *             "$letter."
+ *         }
  *     }
  * }
  * ```
