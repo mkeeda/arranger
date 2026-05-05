@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.BulletListItem
 import dev.mkeeda.arranger.richtext.ListIndentLevel
@@ -160,4 +161,22 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         listMarkerResolver = customMarkerResolver,
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BulletListSamplePreview() {
+    BulletListSample()
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OrderedListSamplePreview() {
+    OrderedListSample()
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CustomListMarkerSamplePreview() {
+    CustomListMarkerSample()
 }
