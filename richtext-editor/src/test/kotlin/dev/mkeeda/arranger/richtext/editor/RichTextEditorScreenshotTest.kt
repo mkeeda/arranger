@@ -106,7 +106,9 @@ class RichTextEditorScreenshotTest {
 
     @Test
     fun lists() {
-        val text = "Bullet item 1\nBullet item 2\nNested bullet\nOrdered item 1\nOrdered item 2\nNested ordered"
+        val text =
+            "Bullet item 1\nBullet item 2\nNested bullet\nDeep nested bullet\n" +
+                "Ordered item 1\nOrdered item 2\nNested ordered\nDeep nested ordered"
         val state =
             RichTextState(
                 initialText =
@@ -114,9 +116,11 @@ class RichTextEditorScreenshotTest {
                         editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Bullet item 2")) { bulletList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Nested bullet")) { bulletList(ListIndentLevel.Level2) }
+                        editAttributes(text.rangeOf("Deep nested bullet")) { bulletList(ListIndentLevel.Level3) }
                         editAttributes(text.rangeOf("Ordered item 1")) { orderedList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Ordered item 2")) { orderedList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Nested ordered")) { orderedList(ListIndentLevel.Level2) }
+                        editAttributes(text.rangeOf("Deep nested ordered")) { orderedList(ListIndentLevel.Level3) }
                     },
             )
 
@@ -132,7 +136,9 @@ class RichTextEditorScreenshotTest {
 
     @Test
     fun listsWithCustomMarker() {
-        val text = "Bullet item 1\nBullet item 2\nNested bullet\nOrdered item 1\nOrdered item 2\nNested ordered"
+        val text =
+            "Bullet item 1\nBullet item 2\nNested bullet\nDeep nested bullet\n" +
+                "Ordered item 1\nOrdered item 2\nNested ordered\nDeep nested ordered"
         val state =
             RichTextState(
                 initialText =
@@ -140,9 +146,11 @@ class RichTextEditorScreenshotTest {
                         editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Bullet item 2")) { bulletList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Nested bullet")) { bulletList(ListIndentLevel.Level2) }
+                        editAttributes(text.rangeOf("Deep nested bullet")) { bulletList(ListIndentLevel.Level3) }
                         editAttributes(text.rangeOf("Ordered item 1")) { orderedList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Ordered item 2")) { orderedList(ListIndentLevel.Level1) }
                         editAttributes(text.rangeOf("Nested ordered")) { orderedList(ListIndentLevel.Level2) }
+                        editAttributes(text.rangeOf("Deep nested ordered")) { orderedList(ListIndentLevel.Level3) }
                     },
             )
 
