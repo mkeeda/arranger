@@ -36,6 +36,12 @@ internal fun ListIndentLevel.toIndent(): TextUnit =
         else -> ((this.ordinal + 1) * ListIndentStepSp).sp
     }
 
+private val blockLineHeightStyle =
+    LineHeightStyle(
+        alignment = LineHeightStyle.Alignment.Center,
+        trim = LineHeightStyle.Trim.None,
+    )
+
 /**
  * The standard default [AttributeStyleResolver] mapping the semantic attributes to Compose [SpanStyle].
  */
@@ -74,17 +80,12 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
             }
         }
         paragraphStyle(HeadingKey) { level ->
-            val headingLineHeightStyle =
-                LineHeightStyle(
-                    alignment = LineHeightStyle.Alignment.Center,
-                    trim = LineHeightStyle.Trim.None,
-                )
             when (level) {
                 HeadingLevel.H1 -> {
                     ParagraphStyle(
                         lineHeight = 44.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = headingLineHeightStyle,
+                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -92,7 +93,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                     ParagraphStyle(
                         lineHeight = 36.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = headingLineHeightStyle,
+                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -100,7 +101,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                     ParagraphStyle(
                         lineHeight = 30.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = headingLineHeightStyle,
+                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -108,7 +109,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                     ParagraphStyle(
                         lineHeight = 26.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = headingLineHeightStyle,
+                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -116,7 +117,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                     ParagraphStyle(
                         lineHeight = 24.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = headingLineHeightStyle,
+                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -124,7 +125,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                     ParagraphStyle(
                         lineHeight = 22.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = headingLineHeightStyle,
+                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -149,6 +150,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                 textIndent = TextIndent(firstLine = 16.sp, restLine = 16.sp),
                 lineHeight = 24.sp,
                 lineBreak = LineBreak.Paragraph,
+                lineHeightStyle = blockLineHeightStyle,
             )
         }
         spanStyle(BlockquoteKey) {
@@ -163,6 +165,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                 textIndent = TextIndent(firstLine = indent, restLine = indent),
                 lineHeight = 24.sp,
                 lineBreak = LineBreak.Paragraph,
+                lineHeightStyle = blockLineHeightStyle,
             )
         }
         paragraphStyle(OrderedListKey) { level ->
@@ -171,6 +174,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
                 textIndent = TextIndent(firstLine = indent, restLine = indent),
                 lineHeight = 24.sp,
                 lineBreak = LineBreak.Paragraph,
+                lineHeightStyle = blockLineHeightStyle,
             )
         }
     }
