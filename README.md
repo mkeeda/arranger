@@ -30,10 +30,10 @@ Arranger is published to Maven Central. Add the following dependencies to your m
 dependencies {
     // For Compose UI integration (RichTextEditor).
     // This automatically includes the core 'arranger-richtext' module.
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha01")
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha02")
 
     // Or, if you only need the core data structures without Compose UI:
-    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha01")
+    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha02")
 }
 ```
 
