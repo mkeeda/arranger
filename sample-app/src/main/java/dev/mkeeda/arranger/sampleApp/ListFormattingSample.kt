@@ -120,6 +120,14 @@ fun OrderedListSample(modifier: Modifier = Modifier) {
     )
 }
 
+private val customMarkerResolver =
+    ListMarkerResolver { item ->
+        when (item) {
+            is BulletListItem -> "✔️ "
+            is OrderedListItem -> "${('a' + item.index - 1)}) "
+        }
+    }
+
 @Composable
 fun CustomListMarkerSample(modifier: Modifier = Modifier) {
     val initialText =
@@ -150,16 +158,6 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
                         }
                     },
             )
-        }
-
-    val customMarkerResolver =
-        remember {
-            ListMarkerResolver { item ->
-                when (item) {
-                    is BulletListItem -> "✔️ "
-                    is OrderedListItem -> "${('a' + item.index - 1)}) "
-                }
-            }
         }
 
     RichTextEditor(

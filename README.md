@@ -197,6 +197,13 @@ fun OrderedListSample(modifier: Modifier = Modifier) {
 You can customize the list markers by providing a `ListMarkerResolver` to the `RichTextEditor`. This allows you to use different symbols, letters, or parentheses for your lists.
 
 ```kotlin
+private val customMarkerResolver = ListMarkerResolver { item ->
+    when (item) {
+        is BulletListItem -> "✔️ "
+        is OrderedListItem -> "${('a' + item.index - 1)}) "
+    }
+}
+
 @Composable
 fun CustomListMarkerSample(modifier: Modifier = Modifier) {
     val initialText = "Checklist:\n" +
@@ -224,15 +231,6 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
                 }
             }
         )
-    }
-
-    val customMarkerResolver = remember {
-        ListMarkerResolver { item ->
-            when (item) {
-                is BulletListItem -> "✔️ "
-                is OrderedListItem -> "${('a' + item.index - 1)}) "
-            }
-        }
     }
 
     RichTextEditor(
