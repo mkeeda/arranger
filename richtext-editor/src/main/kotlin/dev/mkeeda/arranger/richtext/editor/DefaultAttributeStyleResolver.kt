@@ -83,7 +83,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
             when (level) {
                 HeadingLevel.H1 -> {
                     ParagraphStyle(
-                        lineHeight = 44.sp,
+                        lineHeight = 40.sp,
                         lineBreak = LineBreak.Heading,
                         lineHeightStyle = blockLineHeightStyle,
                     )
@@ -91,7 +91,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
 
                 HeadingLevel.H2 -> {
                     ParagraphStyle(
-                        lineHeight = 36.sp,
+                        lineHeight = 32.sp,
                         lineBreak = LineBreak.Heading,
                         lineHeightStyle = blockLineHeightStyle,
                     )
@@ -99,7 +99,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
 
                 HeadingLevel.H3 -> {
                     ParagraphStyle(
-                        lineHeight = 30.sp,
+                        lineHeight = 28.sp,
                         lineBreak = LineBreak.Heading,
                         lineHeightStyle = blockLineHeightStyle,
                     )
@@ -107,7 +107,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
 
                 HeadingLevel.H4 -> {
                     ParagraphStyle(
-                        lineHeight = 26.sp,
+                        lineHeight = 24.sp,
                         lineBreak = LineBreak.Heading,
                         lineHeightStyle = blockLineHeightStyle,
                     )
@@ -115,7 +115,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
 
                 HeadingLevel.H5 -> {
                     ParagraphStyle(
-                        lineHeight = 24.sp,
+                        lineHeight = 20.sp,
                         lineBreak = LineBreak.Heading,
                         lineHeightStyle = blockLineHeightStyle,
                     )
@@ -123,14 +123,16 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
 
                 HeadingLevel.H6 -> {
                     ParagraphStyle(
-                        lineHeight = 22.sp,
+                        lineHeight = 16.sp,
                         lineBreak = LineBreak.Heading,
                         lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
                 HeadingLevel.Unspecified -> {
-                    ParagraphStyle()
+                    ParagraphStyle(
+                        lineHeightStyle = blockLineHeightStyle,
+                    )
                 }
             }
         }
