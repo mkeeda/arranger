@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -122,11 +123,11 @@ private fun ChatFormattingToolbar(
     hasSelection: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+    FlowRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 4.dp, vertical = 2.dp),
     ) {
         val formatActions =
