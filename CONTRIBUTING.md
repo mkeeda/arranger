@@ -2,6 +2,23 @@
 
 Thank you for your interest in contributing to Arranger! This document outlines our development process, versioning strategy, and release workflow.
 
+## Reporting Issues
+
+If you find a bug or have a feature request, please open an issue on GitHub.
+To help us resolve issues quickly, please include the following information:
+
+**For Bug Reports:**
+* **Expected behavior**: What did you expect to happen?
+* **Actual behavior**: What actually happened? (Include screenshots or GIFs if it's a UI issue).
+* **Steps to reproduce**: A clear and concise list of steps to reproduce the issue.
+* **Environment**: Your Android OS version, Compose version, and device/emulator details.
+
+**For Feature Requests:**
+* **Use case**: Why do you need this feature? What problem does it solve?
+* **Proposed API/Solution**: If you have an idea of how the API should look, please share it!
+
+If you'd like to work on an issue yourself, please comment on it first to let us know, so we can avoid duplicate effort.
+
 ## Versioning Strategy (0.x.x Phase)
 
 Arranger follows [Semantic Versioning](https://semver.org/), but while we are in the `0.x.x` pre-v1.0 phase, we apply the following specific rules to set clear expectations:
