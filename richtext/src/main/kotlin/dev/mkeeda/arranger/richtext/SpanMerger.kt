@@ -106,7 +106,8 @@ internal fun List<RichSpan>.transformSpans(
  * Merges a [newSpan] into this list of spans.
  * Convenience extension that wraps [transformSpans].
  */
-internal fun List<RichSpan>.mergeSpan(newSpan: RichSpan): List<RichSpan> {
+@InternalArrangerApi
+public fun List<RichSpan>.mergeSpan(newSpan: RichSpan): List<RichSpan> {
     return transformSpans(targetRange = newSpan.range) { existingAttributes ->
         existingAttributes + newSpan.attributes
     }

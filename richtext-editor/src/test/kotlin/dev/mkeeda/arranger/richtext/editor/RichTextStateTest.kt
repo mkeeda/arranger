@@ -3,7 +3,11 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
+import dev.mkeeda.arranger.richtext.ItalicKey
+import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.TextColorKey
+import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -344,7 +348,7 @@ class RichTextStateTest {
         }
 
         val attrs = state.currentAttributes
-        attrs.containsKey(BoldKey) shouldBe true
+        attrs shouldBe attributeContainerOf(BoldKey to Unit)
     }
 
     @Test
@@ -362,31 +366,35 @@ class RichTextStateTest {
             selection = TextRange(0)
         }
 
-        state.currentAttributes.isEmpty() shouldBe true
+        state.currentAttributes shouldBe attributeContainerOf()
     }
 
     @Test
     fun `currentAttributes returns empty when text is empty`() {
         val state = RichTextState(initialText = RichString(text = ""))
-        state.currentAttributes.isEmpty() shouldBe true
+        state.currentAttributes shouldBe attributeContainerOf()
     }
 
     @Test
-    fun `currentAttributes returns empty when selection is not collapsed`() {
+    fun `currentAttributes returns intersection of attributes when selection is not collapsed`() {
         val initialText = "Hello World"
         val state =
             RichTextState(
                 initialText =
                     RichString(text = initialText).edit {
-                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                        // "Hello " is Bold, "World" is Bold and Italic
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("Hello World"))
+                        setSpanAttribute(ItalicKey, Unit, range = initialText.rangeOf("World"))
                     },
             )
 
+        // Select "lo Wo"
         state.textFieldState.edit {
-            selection = TextRange(initialText.indexOf("World"), initialText.length)
+            selection = TextRange(initialText.indexOf("lo"), initialText.indexOf("rld"))
         }
 
-        state.currentAttributes.isEmpty() shouldBe true
+        // Only Bold is common across the entire selection
+        state.currentAttributes shouldBe attributeContainerOf(BoldKey to Unit)
     }
 
     @Test
@@ -401,7 +409,7 @@ class RichTextStateTest {
         state.setTypingAttribute(BoldKey, Unit)
 
         val attrs = state.currentAttributes
-        attrs.containsKey(BoldKey) shouldBe true
+        attrs shouldBe attributeContainerOf(BoldKey to Unit)
     }
 
     @Test
@@ -423,13 +431,15 @@ class RichTextStateTest {
         state.currentAttributes.containsKey(BoldKey) shouldBe true
 
         // Override with typing attribute
-        state.setTypingAttribute(BlockquoteKey, Unit) // Use a different attribute to add
-        state.setTypingAttribute(BoldKey, Unit) // Even if we set the same, it overrides
+        val newColor = RgbaColor(0xFFFF0000)
+        state.setTypingAttribute(TextColorKey, newColor)
 
-        // Let's test overriding a color or something, or we can just test adding another
         val attrs = state.currentAttributes
-        attrs.containsKey(BoldKey) shouldBe true
-        attrs.containsKey(BlockquoteKey) shouldBe true
+        attrs shouldBe
+            attributeContainerOf(
+                BoldKey to Unit,
+                TextColorKey to newColor,
+            )
     }
 
     @Test
@@ -440,8 +450,7 @@ class RichTextStateTest {
         state.currentAttributes.containsKey(BoldKey) shouldBe true
 
         state.removeTypingAttribute(BoldKey)
-        state.currentAttributes.containsKey(BoldKey) shouldBe false
-        state.currentAttributes.isEmpty() shouldBe true
+        state.currentAttributes shouldBe attributeContainerOf()
     }
 
     @Test
@@ -452,7 +461,7 @@ class RichTextStateTest {
         state.setTypingAttribute(BlockquoteKey, Unit)
 
         state.clearTypingAttributes()
-        state.currentAttributes.isEmpty() shouldBe true
+        state.currentAttributes shouldBe attributeContainerOf()
     }
 }
 

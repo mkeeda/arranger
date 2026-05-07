@@ -12,6 +12,7 @@ import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.mergeSpan
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
 
 @Stable
@@ -51,12 +52,39 @@ public class RichTextState(initialText: RichString) {
      * Returns [AttributeContainer.empty] when:
      * - The text is empty
      * - The cursor is at position 0 with no typing attributes
-     * - A text range is selected (non-collapsed selection)
      */
     public val currentAttributes: AttributeContainer
         get() {
             if (!selection.collapsed) {
-                return AttributeContainer.empty()
+                val selStart = selection.min
+                val selEnd = selection.max
+                var intersection: AttributeContainer? = null
+
+                for (i in selStart until selEnd) {
+                    val charAttrs =
+                        spans.filter { i in it.range }.fold(AttributeContainer.empty()) { acc, span ->
+                            acc + span.attributes
+                        }
+                    if (intersection == null) {
+                        intersection = charAttrs
+                    } else {
+                        var newIntersection = AttributeContainer.empty()
+                        for (key in intersection.keys) {
+                            if (charAttrs.containsKey(key)) {
+                                @Suppress("UNCHECKED_CAST")
+                                val k = key as AttributeKey<Any>
+                                val v1 = intersection.getOrDefault(k)
+                                val v2 = charAttrs.getOrDefault(k)
+                                if (v1 == v2) {
+                                    newIntersection += k to v1
+                                }
+                            }
+                        }
+                        intersection = newIntersection
+                    }
+                    if (intersection.isEmpty()) break
+                }
+                return intersection ?: AttributeContainer.empty()
             }
 
             val cursorPosition = selection.start
@@ -162,10 +190,12 @@ public class RichTextState(initialText: RichString) {
                     val insertStart = originalRange.min
                     val insertEnd = insertStart + range.length - 1
                     if (insertStart <= insertEnd) {
-                        updatedSpans = updatedSpans +
-                            RichSpan(
-                                range = insertStart..insertEnd,
-                                attributes = typingAttr,
+                        updatedSpans =
+                            updatedSpans.mergeSpan(
+                                RichSpan(
+                                    range = insertStart..insertEnd,
+                                    attributes = typingAttr,
+                                ),
                             )
                     }
                 }
