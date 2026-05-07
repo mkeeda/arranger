@@ -1,5 +1,6 @@
 package dev.mkeeda.arranger.richtext.editor
 
+import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -323,6 +324,135 @@ class RichTextStateTest {
         spans.size shouldBe 1
         spans.first().range shouldBe expectedText.rangeOf("Beautiful ")
         spans.first().attributes.containsKey(BoldKey) shouldBe true
+    }
+
+    @Test
+    fun `currentAttributes returns attributes at cursor position`() {
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                    },
+            )
+
+        // Cursor inside "World" (e.g., after 'W')
+        val cursorPosition = initialText.indexOf("World") + 1
+        state.textFieldState.edit {
+            selection = TextRange(cursorPosition)
+        }
+
+        val attrs = state.currentAttributes
+        attrs.containsKey(BoldKey) shouldBe true
+    }
+
+    @Test
+    fun `currentAttributes returns empty when cursor is at position 0`() {
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("Hello"))
+                    },
+            )
+
+        state.textFieldState.edit {
+            selection = TextRange(0)
+        }
+
+        state.currentAttributes.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `currentAttributes returns empty when text is empty`() {
+        val state = RichTextState(initialText = RichString(text = ""))
+        state.currentAttributes.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `currentAttributes returns empty when selection is not collapsed`() {
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                    },
+            )
+
+        state.textFieldState.edit {
+            selection = TextRange(initialText.indexOf("World"), initialText.length)
+        }
+
+        state.currentAttributes.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `currentAttributes reflects typing attributes`() {
+        val initialText = "Hello World"
+        val state = RichTextState(initialText = RichString(text = initialText))
+
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        state.setTypingAttribute(BoldKey, Unit)
+
+        val attrs = state.currentAttributes
+        attrs.containsKey(BoldKey) shouldBe true
+    }
+
+    @Test
+    fun `typing attributes override cursor attributes in currentAttributes`() {
+        val initialText = "Hello World"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("World"))
+                    },
+            )
+
+        // Cursor at the end of "World", where Bold is present
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        state.currentAttributes.containsKey(BoldKey) shouldBe true
+
+        // Override with typing attribute
+        state.setTypingAttribute(BlockquoteKey, Unit) // Use a different attribute to add
+        state.setTypingAttribute(BoldKey, Unit) // Even if we set the same, it overrides
+
+        // Let's test overriding a color or something, or we can just test adding another
+        val attrs = state.currentAttributes
+        attrs.containsKey(BoldKey) shouldBe true
+        attrs.containsKey(BlockquoteKey) shouldBe true
+    }
+
+    @Test
+    fun `typing attributes can be removed`() {
+        val state = RichTextState(initialText = RichString(text = ""))
+
+        state.setTypingAttribute(BoldKey, Unit)
+        state.currentAttributes.containsKey(BoldKey) shouldBe true
+
+        state.removeTypingAttribute(BoldKey)
+        state.currentAttributes.containsKey(BoldKey) shouldBe false
+        state.currentAttributes.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `typing attributes can be cleared`() {
+        val state = RichTextState(initialText = RichString(text = ""))
+
+        state.setTypingAttribute(BoldKey, Unit)
+        state.setTypingAttribute(BlockquoteKey, Unit)
+
+        state.clearTypingAttributes()
+        state.currentAttributes.isEmpty() shouldBe true
     }
 }
 

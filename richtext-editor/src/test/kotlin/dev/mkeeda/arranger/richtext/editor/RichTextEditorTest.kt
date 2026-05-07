@@ -127,4 +127,56 @@ class RichTextEditorTest {
         // This guarantees `RichTextBuffer` shift logic is identical to `updateRichString`
         stateProgrammatic.richString.spans shouldBe stateUser.richString.spans
     }
+
+    @Test
+    fun `typing attributes are applied when text is entered`() {
+        val initialText = "Hello "
+        val state = RichTextState(initialText = RichString(text = initialText))
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Set cursor at the end
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Set typing attribute
+        state.setTypingAttribute(BoldKey, Unit)
+
+        // Type "World"
+        composeTestRule.onNodeWithText(initialText).performTextInput("World")
+
+        val expectedNewText = "Hello World"
+        state.richString.text shouldBe expectedNewText
+
+        // Assert that the newly typed text has the Bold attribute
+        val newSpans = state.richString.spans
+        newSpans.size shouldBe 1
+        newSpans.first().range shouldBe expectedNewText.rangeOf("World")
+        newSpans.first().attributes.containsKey(BoldKey) shouldBe true
+    }
+
+    @Test
+    fun `typing attributes are cleared on cursor movement`() {
+        val initialText = "Hello World"
+        val state = RichTextState(initialText = RichString(text = initialText))
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Set cursor at the end
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Set typing attribute
+        state.setTypingAttribute(BoldKey, Unit)
+        state.currentAttributes.containsKey(BoldKey) shouldBe true
+
+        // Move cursor to the beginning
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(0))
+
+        // Typing attributes should be cleared
+        state.currentAttributes.containsKey(BoldKey) shouldBe false
+        state.currentAttributes.isEmpty() shouldBe true
+    }
 }
