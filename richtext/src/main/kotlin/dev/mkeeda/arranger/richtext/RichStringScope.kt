@@ -142,7 +142,9 @@ public class RichStringScope
         }
 
         private fun checkRange(range: IntRange) {
-            require(!range.isEmpty()) { "Range must not be empty: $range" }
+            // Empty ranges (where first = last + 1) represent a collapsed cursor position.
+            // Span attributes gracefully ignore empty target ranges, while paragraph attributes
+            // use the cursor position to snap to the surrounding paragraph bounds.
             require(range.first >= 0) { "Range start must not be negative: ${range.first}" }
             require(range.last < textLength) { "Range end must be within text bounds: ${range.last} >= $textLength" }
         }

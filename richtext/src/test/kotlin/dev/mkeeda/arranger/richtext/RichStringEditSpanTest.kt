@@ -90,13 +90,12 @@ class RichStringEditSpanTest {
     }
 
     @Test
-    fun `throws IllegalArgumentException when range is reversed or empty`() {
-        val richString = RichString(text = "Hello, World!")
-        val exception =
-            shouldThrow<IllegalArgumentException> {
-                richString.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..3) }
-            }
-        exception.message shouldBe "Range must not be empty: 5..3"
+    fun `safely ignores when applying to a reversed or empty range`() {
+        val original = RichString(text = "Hello, World!")
+        val richString = original.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 5..3) }
+
+        richString.spans.shouldBeEmpty()
+        richString.text shouldBe original.text
     }
 
     @Test
