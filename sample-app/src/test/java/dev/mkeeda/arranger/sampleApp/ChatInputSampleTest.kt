@@ -96,6 +96,16 @@ class ChatInputSampleTest {
         // Cursor is now at the end of "BoldText", which is bold, so button should remain ON
         composeTestRule.onNodeWithContentDescription("Bold").assertIsOn()
 
+        // Turn OFF Bold at the current position
+        composeTestRule.onNodeWithContentDescription("Bold").performClick()
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOff()
+
+        // Type more text
+        textInputNode.performTextInput("Normal")
+
+        // Cursor is now at the end of "Normal", which should NOT be bold
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOff()
+
         // Move cursor to beginning (index 0)
         textInputNode.performTextInputSelection(TextRange(0))
 

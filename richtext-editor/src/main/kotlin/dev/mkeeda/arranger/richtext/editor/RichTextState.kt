@@ -10,8 +10,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.mergeSpan
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
 
@@ -33,6 +35,13 @@ public class RichTextState(initialText: RichString) {
      * without text input (e.g., tapping a different position, arrow key navigation).
      */
     private var typingAttributes: AttributeContainer? by mutableStateOf(null)
+
+    /**
+     * Attributes explicitly removed by the user at the cursor position.
+     * When text is typed, these attributes will be forcefully cleared from the new text
+     * so that inherited attributes don't apply.
+     */
+    private var removedTypingAttributes: Set<AttributeKey<*>>? by mutableStateOf(null)
 
     // Computed property representing the complete rich text state
     public val richString: RichString
@@ -89,6 +98,7 @@ public class RichTextState(initialText: RichString) {
 
             val cursorPosition = selection.start
             val typingAttr = typingAttributes
+            val removedAttr = removedTypingAttributes
 
             val inheritedAttributes =
                 if (cursorPosition > 0 && cursorPosition <= textFieldState.text.length) {
@@ -101,11 +111,16 @@ public class RichTextState(initialText: RichString) {
                     AttributeContainer.empty()
                 }
 
-            return if (typingAttr != null) {
-                inheritedAttributes + typingAttr
-            } else {
-                inheritedAttributes
+            var finalAttrs = inheritedAttributes
+            if (typingAttr != null) {
+                finalAttrs += typingAttr
             }
+            if (removedAttr != null) {
+                removedAttr.forEach { key ->
+                    finalAttrs -= key
+                }
+            }
+            return finalAttrs
         }
 
     /**
@@ -121,6 +136,12 @@ public class RichTextState(initialText: RichString) {
         if (!selection.collapsed) return
         val current = typingAttributes ?: AttributeContainer.empty()
         typingAttributes = current + (key to value)
+
+        val currentRemoved = removedTypingAttributes
+        if (currentRemoved != null && currentRemoved.contains(key)) {
+            val updated = currentRemoved - key
+            removedTypingAttributes = if (updated.isEmpty()) null else updated
+        }
     }
 
     /**
@@ -131,9 +152,15 @@ public class RichTextState(initialText: RichString) {
      */
     public fun <T> removeTypingAttribute(key: AttributeKey<T>) {
         if (!selection.collapsed) return
-        val current = typingAttributes ?: return
-        val updated = current - key
-        typingAttributes = if (updated.isEmpty()) null else updated
+
+        val currentTyping = typingAttributes
+        if (currentTyping != null && currentTyping.containsKey(key)) {
+            val updated = currentTyping - key
+            typingAttributes = if (updated.isEmpty()) null else updated
+        } else {
+            val currentRemoved = removedTypingAttributes ?: emptySet()
+            removedTypingAttributes = currentRemoved + key
+        }
     }
 
     /**
@@ -141,6 +168,7 @@ public class RichTextState(initialText: RichString) {
      */
     public fun clearTypingAttributes() {
         typingAttributes = null
+        removedTypingAttributes = null
     }
 
     /**
@@ -171,6 +199,7 @@ public class RichTextState(initialText: RichString) {
         }
 
         val typingAttr = typingAttributes
+        val removedAttr = removedTypingAttributes
 
         val newSpans =
             (0 until buffer.changes.changeCount).fold(spans) { currentSpans, i ->
@@ -197,6 +226,25 @@ public class RichTextState(initialText: RichString) {
                                     attributes = typingAttr,
                                 ),
                             )
+                    }
+                }
+
+                // Explicitly remove removed attributes from the inserted text
+                if (removedAttr != null && range.length > originalRange.length) {
+                    val insertStart = originalRange.min
+                    val insertEnd = insertStart + range.length - 1
+                    if (insertStart <= insertEnd) {
+                        val tempBuffer = RichTextBuffer(updatedSpans, buffer)
+                        removedAttr.forEach { key ->
+                            if (key is SpanAttributeKey<*>) {
+                                @Suppress("UNCHECKED_CAST")
+                                tempBuffer.removeSpanAttribute(key as SpanAttributeKey<Any>, insertStart..insertEnd)
+                            } else if (key is ParagraphAttributeKey<*>) {
+                                @Suppress("UNCHECKED_CAST")
+                                tempBuffer.removeParagraphAttribute(key as ParagraphAttributeKey<Any>, insertStart..insertEnd)
+                            }
+                        }
+                        updatedSpans = tempBuffer.spans
                     }
                 }
 
