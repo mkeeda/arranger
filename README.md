@@ -1,26 +1,72 @@
 # Arranger - Type-safe Rich Text for Jetpack Compose
 
+[![CI](https://github.com/mkeeda/arranger/actions/workflows/ci.yml/badge.svg)](https://github.com/mkeeda/arranger/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-richtext-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-richtext-editor%22)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+Arranger is a declarative, type-safe rich text library for Jetpack Compose (Kotlin Multiplatform support is planned on the roadmap).
+Inspired by SwiftUI's AttributedString, it eliminates the tedious and error-prone index manipulations of traditional AnnotatedString, giving you a modern, immutable, and fully type-safe API for rich text formatting.
+
 > [!WARNING]
-> **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice.
+> **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice. We highly welcome your feedback, feature requests, and bug reports via GitHub Issues!
 
 ## Requirements
 * **Android API Level 26+**
 * **Jetpack Compose 1.7+**
 * **Kotlin 2.3.20+**
 
-## Project Vision & Features
-The goal of "Arranger" is to provide a "declarative, type-safe, and immutable string manipulation experience similar to SwiftUI's `AttributedString`" to Jetpack Compose and Kotlin Multiplatform (KMP). We aim to break away from the tedious, error-prone index manipulations required by the existing `AnnotatedString` and the traditional WYSIWYG approaches.
+## Core Features
 
-* **Type-Safe Custom Attributes:** Define and apply UI-specific styles (like `SpanStyle`) and domain-specific attributes (e.g., `@Mention`, `#Hashtag`) with full compile-time safety.
-* **Run-Based Manipulation:** Treat text not just as an array of characters, but as "Runs" (chunks of text with identical attributes). This allows for semantic iteration, searching, and editing.
-* **Declarative Formatting Constraints:** Provide a way to declaratively define constraints (e.g., "This text field only allows bold text and links") to automatically strip unwanted styles during paste or input.
-* **Native Compose Integration (1.7+):** Elegantly separate state management and UI rendering by leveraging the latest `TextFieldState` and `OutputTransformation`.
+* 🛡️ **Type-Safe Custom Attributes:** Define and apply UI-specific styles (like `SpanStyle`) and domain-specific attributes (e.g., `@Mention`, `#Hashtag`) with full compile-time safety.
+* 🔄 **Atomic Mutations:** Safely insert, delete, and replace text. Arranger automatically tracks and shifts span indices, eliminating manual calculation errors.
+* 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes). This allows for semantic iteration, searching, and batch editing.
+* 🎨 **Declarative Constraints (Planned):** Provide a way to declaratively define constraints (e.g., "This text field only allows bold text and links") to automatically strip unwanted styles.
+* 🧩 **Native Compose Integration (1.7+):** Elegantly separate state management and UI rendering by leveraging the latest `TextFieldState` and `OutputTransformation`.
 
-## Why Arranger? (Inspiration from SwiftUI)
-Compared to Android's traditional `SpannableStringBuilder` or Compose's `AnnotatedString`, Arranger offers a superior, modern API design:
-* **Semantic "Runs":** Instead of managing `startIndex` and `endIndex`, developers can iterate over `Runs` (e.g., "find all chunks of mentions").
-* **Value Semantics:** The core text data structures are immutable, ensuring thread safety and predictable UI re-rendering, which is highly compatible with Compose.
-* **Type Safety:** We use Kotlin's Extension Functions with receivers to create an intuitive, declarative DSL for composing attributes.
+## Why Arranger?
+
+Arranger solves the biggest pain points of traditional rich text handling in Android and Compose.
+
+### 1. No More Manual Index Math
+When a user types or you programmatically insert text, shifting existing span indices in `AnnotatedString` is tedious and highly error-prone.
+
+**The Pain (`AnnotatedString`)**
+```kotlin
+// The Pain: If a user inserts text, you must manually recalculate all span indices!
+val oldText = "Hello Bold Text"
+val oldSpans = listOf(AnnotatedString.Range(SpanStyle(fontWeight = FontWeight.Bold), 6, 10))
+
+// Inserting "!" at the beginning
+val newText = "!" + oldText
+val newSpans = oldSpans.map { 
+    // Manual index shifting - tedious and highly error-prone
+    AnnotatedString.Range(it.item, it.start + 1, it.end + 1) 
+}
+```
+
+**The Arranger Way**
+Arranger automatically tracks and shifts spans during text mutations.
+```kotlin
+// Arranger Way 1: Automatically tracks and shifts spans during text mutations.
+state.edit {
+    insert(index = 0, text = "!")
+    // The "Bold" span is automatically shifted. No manual index math required!
+}
+```
+
+### 2. Semantic Attribute Search via "Runs"
+Inspired by SwiftUI's `AttributedString.Runs`, Arranger treats text as semantic chunks. You can easily find and batch-edit specific attributes without complex regex or index tracking.
+
+```kotlin
+// Arranger Way 2: Semantic iteration over attributes via "Runs"
+state.edit {
+    // Find all chunks of text that are Bold, and turn them Red at once
+    val boldRuns = state.richString.runs(BoldKey)
+    editAll(boldRuns) {
+        textColor(Color.Red)
+    }
+}
+```
 
 ## Installation
 
@@ -39,7 +85,7 @@ dependencies {
 
 ## Basic Usage (Getting Started)
 
-Arranger's biggest selling point is that you can programmatically construct and decorate RichText using a clean DSL. Simply create a `RichTextState`, decorate it with `editAttributes`, and pass it to the `RichTextEditor`.
+One of the core strengths of Arranger is that you can programmatically construct and decorate RichText using a clean DSL. Simply create a `RichTextState`, decorate it with `editAttributes`, and pass it to the `RichTextEditor`.
 
 ```kotlin
 @Composable
@@ -71,6 +117,9 @@ fun BasicUsageSample(modifier: Modifier = Modifier) {
 ## Paragraph Styles & Advanced Formatting
 
 Arranger natively supports not only inline character formatting (like colors and boldness) but also block-level paragraph formatting such as Headers, Blockquotes, and Alignments.
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 @Composable
@@ -115,6 +164,8 @@ fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
 }
 ```
 
+</details>
+
 <img src="./docs/images/advanced-formatting.png" width="500" alt="advanced formatting sample"/>
 
 ## Lists & Ordered Lists
@@ -123,6 +174,9 @@ Arranger provides native support for `bulletList` and `orderedList` paragraph fo
 
 ### Bullet Lists
 Bullet lists automatically change their marker symbol based on the indentation level (e.g., Level 1 uses `・`, Level 2 uses `○`).
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 @Composable
@@ -159,10 +213,15 @@ fun BulletListSample(modifier: Modifier = Modifier) {
 }
 ```
 
+</details>
+
 <img src="./docs/images/bullet-list.png" width="500" alt="bullet list sample"/>
 
 ### Ordered Lists
 Ordered lists automatically calculate and display the sequence numbers based on their position and nesting level.
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 @Composable
@@ -191,10 +250,15 @@ fun OrderedListSample(modifier: Modifier = Modifier) {
 }
 ```
 
+</details>
+
 <img src="./docs/images/ordered-list.png" width="500" alt="ordered list sample"/>
 
 ### Custom List Markers
 You can customize the list markers by providing a `ListMarkerResolver` to the `RichTextEditor`. This allows you to use different symbols, letters, or parentheses for your lists.
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 private val customMarkerResolver = ListMarkerResolver { item ->
@@ -241,11 +305,16 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
 }
 ```
 
+</details>
+
 <img src="./docs/images/custom-list-marker.png" width="500" alt="custom list marker sample"/>
 
 ## Custom Attribute Mapping
 
 You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 // 1. Define Custom Attribute Key
@@ -288,14 +357,19 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
 }
 ```
 
+</details>
+
 <img src="./docs/images/custom-attribute.png" width="500" alt="custom attribute mapping sample"/>
 
-## Batch Editing (Searching & Querying)
+## Semantic Batch Editing (Searching & Querying)
 
 Arranger treats text as semantic "Runs" (chunks of text with identical attributes). This allows you to effortlessly search for patterns or query existing attributes, and modify them all at once.
 
 ### Searching and Highlighting
 You can easily search for strings or regular expressions and apply styles to all occurrences at once using `rangesOf` and `editAll`. Here's a sample that highlights hashtags in real-time.
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 @Composable
@@ -332,6 +406,8 @@ fun HashtagHighlightSample(modifier: Modifier = Modifier) {
 }
 ```
 
+</details>
+
 <img src="./docs/images/hashtag-highlight.gif" width="500" alt="hashtag highlighting sample"/>
 
 ### Querying and Modifying Attributes
@@ -339,6 +415,9 @@ Instead of text searching, you can also query existing attributes using `runs(ke
 
 > [!NOTE]
 > For more complex queries, you can also use `runs { predicate }` to extract runs that match any custom condition based on their attributes.
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 @Composable
@@ -387,12 +466,17 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
 }
 ```
 
+</details>
+
 <img src="./docs/images/attribute-batch-edit.gif" width="500" alt="attribute batch edit sample"/>
 
 ## Atomic Text Mutations
 
 Arranger allows you to programmatically mutate text (`insert`, `delete`, `replace`) and apply formatting atomically within the `RichTextState.edit { }` block.
 The `RichTextBuffer` automatically shifts existing spans to maintain alignment and allows you to apply new attributes safely to the newly inserted text.
+
+<details>
+<summary><b>Show Code</b></summary>
 
 ```kotlin
 @Composable
@@ -433,6 +517,8 @@ fun AtomicMutationSample(modifier: Modifier = Modifier) {
     }
 }
 ```
+
+</details>
 
 ## Practical Examples
 
@@ -483,3 +569,9 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 - [ ] **Performance Optimization**: Internal migration to Piece Table/Rope structures for document-scale text.
 - [ ] **Kotlin Multiplatform (KMP)**: Full support for iOS, Desktop, and Web.
 
+
+## Contributing
+Contributions are welcome! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
+
+## License
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
