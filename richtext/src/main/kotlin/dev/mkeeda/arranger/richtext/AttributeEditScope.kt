@@ -36,6 +36,14 @@ public class AttributeEditScope internal constructor(
             buffer.setParagraphAttribute(key, value, range)
         }
     }
+
+    /**
+     * Removes all rich text attributes (both span and paragraph level) in the range.
+     * Including user-customized attributes.
+     */
+    public fun clearAll() {
+        buffer.clearAllAttributes(range)
+    }
 }
 
 /**

@@ -19,6 +19,8 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,12 +32,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.AttributeEditScope
+import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BackgroundColorKey
+import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.BoldKey
+import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.FontSizeKey
+import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
+import dev.mkeeda.arranger.richtext.OrderedListKey
+import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.SpanAttributeKey
+import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
+import dev.mkeeda.arranger.richtext.TextAlignmentKey
+import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
+import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.backgroundColor
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
@@ -76,7 +93,7 @@ fun ChatInputSample(modifier: Modifier = Modifier) {
                 .imePadding(),
     ) {
         Text(
-            text = "Select text and use the toolbar to format it. Real-time cursor state reflection is not supported in this phase.",
+            text = "Select text and use the toolbar to format it, or use the toolbar before typing.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -129,24 +146,101 @@ private fun ChatFormattingToolbar(
     ) {
         val formatActions =
             listOf(
-                FormatAction(R.drawable.format_bold, "Bold") { bold() },
-                FormatAction(R.drawable.format_italic, "Italic") { italic() },
-                FormatAction(R.drawable.format_underlined, "Underline") { underline() },
-                FormatAction(R.drawable.format_strikethrough, "Strikethrough") { strikethrough() },
-                FormatAction(R.drawable.format_color_text, "Text Color Red") { textColor(RgbaColor(0xFFFF0000.toLong())) },
-                FormatAction(R.drawable.format_color_fill, "Background Color Yellow") { backgroundColor(RgbaColor(0xFFFFFF00.toLong())) },
-                FormatAction(R.drawable.format_size, "Large Font Size") { fontSize(TextSize(24f)) },
-                FormatAction(R.drawable.format_h1, "Heading 1") { headingLevel(HeadingLevel.H1) },
-                FormatAction(R.drawable.format_align_center, "Align Center") { textAlignment(TextAlignment.Center) },
-                FormatAction(R.drawable.format_quote, "Blockquote") { blockquote() },
-                FormatAction(R.drawable.format_list_bulleted, "Bullet List") { bulletList(ListIndentLevel.Level1) },
-                FormatAction(R.drawable.format_list_numbered, "Ordered List") { orderedList(ListIndentLevel.Level1) },
+                FormatAction.Span(
+                    iconRes = R.drawable.format_bold,
+                    contentDescription = "Bold",
+                    key = BoldKey,
+                    value = Unit,
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_italic,
+                    contentDescription = "Italic",
+                    key = ItalicKey,
+                    value = Unit,
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_underlined,
+                    contentDescription = "Underline",
+                    key = UnderlineKey,
+                    value = Unit,
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_strikethrough,
+                    contentDescription = "Strikethrough",
+                    key = StrikethroughKey,
+                    value = Unit,
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_color_text,
+                    contentDescription = "Text Color Red",
+                    key = TextColorKey,
+                    value = RgbaColor(0xFFFF0000.toLong()),
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_color_fill,
+                    contentDescription = "Background Color Yellow",
+                    key = BackgroundColorKey,
+                    value = RgbaColor(0xFFFFFF00.toLong()),
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_size,
+                    contentDescription = "Large Font Size",
+                    key = FontSizeKey,
+                    value = TextSize(24f),
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_h1,
+                    contentDescription = "Heading 1",
+                    key = HeadingKey,
+                    value = HeadingLevel.H1,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_align_center,
+                    contentDescription = "Align Center",
+                    key = TextAlignmentKey,
+                    value = TextAlignment.Center,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_quote,
+                    contentDescription = "Blockquote",
+                    key = BlockquoteKey,
+                    value = Unit,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_list_bulleted,
+                    contentDescription = "Bullet List",
+                    key = BulletListKey,
+                    value = ListIndentLevel.Level1,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_list_numbered,
+                    contentDescription = "Ordered List",
+                    key = OrderedListKey,
+                    value = ListIndentLevel.Level1,
+                ),
             )
 
         formatActions.forEach { action ->
-            IconButton(
-                onClick = { state.edit { editAttributes(state.selection) { action.action(this) } } },
-                enabled = hasSelection,
+            val isActive = state.currentAttributes.containsKey(action.key)
+            IconToggleButton(
+                checked = isActive,
+                onCheckedChange = {
+                    if (hasSelection) {
+                        state.edit {
+                            editAttributes(state.selection) {
+                                action.applyAttribute(this, isActive)
+                            }
+                        }
+                    } else {
+                        action.toggleTyping(state, isActive)
+                    }
+                },
+                enabled = true,
+                colors =
+                    IconButtonDefaults.iconToggleButtonColors(
+                        checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
             ) {
                 Icon(
                     painter = painterResource(id = action.iconRes),
@@ -159,24 +253,17 @@ private fun ChatFormattingToolbar(
 
         IconButton(
             onClick = {
-                state.edit {
-                    editAttributes(state.selection) {
-                        clearBold()
-                        clearItalic()
-                        clearStrikethrough()
-                        clearUnderline()
-                        clearTextColor()
-                        clearBackgroundColor()
-                        clearFontSize()
-                        clearHeadingLevel()
-                        clearTextAlignment()
-                        clearBlockquote()
-                        clearBulletList()
-                        clearOrderedList()
+                if (hasSelection) {
+                    state.edit {
+                        editAttributes(state.selection) {
+                            clearAll()
+                        }
                     }
+                } else {
+                    state.clearTypingAttributes()
                 }
             },
-            enabled = hasSelection,
+            enabled = true,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.format_clear),
@@ -186,11 +273,51 @@ private fun ChatFormattingToolbar(
     }
 }
 
-private data class FormatAction(
-    @DrawableRes val iconRes: Int,
-    val contentDescription: String,
-    val action: AttributeEditScope.() -> Unit,
-)
+private sealed interface FormatAction<T : Any> {
+    val iconRes: Int
+    val contentDescription: String
+    val key: AttributeKey<T>
+
+    fun applyAttribute(scope: AttributeEditScope, isActive: Boolean)
+
+    fun toggleTyping(state: RichTextState, isActive: Boolean)
+
+    data class Span<T : Any>(
+        @DrawableRes override val iconRes: Int,
+        override val contentDescription: String,
+        override val key: SpanAttributeKey<T>,
+        val value: T,
+    ) : FormatAction<T> {
+        override fun applyAttribute(scope: AttributeEditScope, isActive: Boolean) {
+            scope.setSpanAttribute(key, if (isActive) null else value)
+        }
+
+        override fun toggleTyping(state: RichTextState, isActive: Boolean) {
+            if (isActive) state.removeTypingAttribute(key) else state.setTypingAttribute(key, value)
+        }
+    }
+
+    data class Paragraph<T : Any>(
+        @DrawableRes override val iconRes: Int,
+        override val contentDescription: String,
+        override val key: ParagraphAttributeKey<T>,
+        val value: T,
+    ) : FormatAction<T> {
+        override fun applyAttribute(scope: AttributeEditScope, isActive: Boolean) {
+            scope.setParagraphAttribute(key, if (isActive) null else value)
+        }
+
+        override fun toggleTyping(state: RichTextState, isActive: Boolean) {
+            // Paragraph attributes logically apply to the whole paragraph immediately.
+            // There's no need to delay it as a typing attribute.
+            state.edit {
+                editAttributes(state.selection) {
+                    applyAttribute(this, isActive)
+                }
+            }
+        }
+    }
+}
 
 @Composable
 private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) {

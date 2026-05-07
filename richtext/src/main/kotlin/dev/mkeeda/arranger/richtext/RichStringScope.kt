@@ -82,6 +82,27 @@ public class RichStringScope
         }
 
         /**
+         * Removes all attributes (both span and paragraph level) within the given [range].
+         * Paragraph attributes will be cleared from their entire respective paragraphs.
+         */
+        public fun clearAllAttributes(range: IntRange = 0 until textLength) {
+            checkRange(range)
+
+            // Clear span attributes exactly in the specified range by keeping only paragraph attributes
+            currentSpans =
+                currentSpans.transformSpans(targetRange = range) { attributes ->
+                    attributes.filterParagraphAttributes()
+                }
+
+            // Clear paragraph attributes in the snapped paragraph boundaries by keeping only span attributes
+            val snappedRange = range.snapToParagraphs(text)
+            currentSpans =
+                currentSpans.transformSpans(targetRange = snappedRange) { attributes ->
+                    attributes.filterSpanAttributes()
+                }
+        }
+
+        /**
          * Applies a set of attribute mutations to the specified [range] using a DSL builder.
          */
         public fun editAttributes(
@@ -121,7 +142,9 @@ public class RichStringScope
         }
 
         private fun checkRange(range: IntRange) {
-            require(!range.isEmpty()) { "Range must not be empty: $range" }
+            // Empty ranges (where first = last + 1) represent a collapsed cursor position.
+            // Span attributes gracefully ignore empty target ranges, while paragraph attributes
+            // use the cursor position to snap to the surrounding paragraph bounds.
             require(range.first >= 0) { "Range start must not be negative: ${range.first}" }
             require(range.last < textLength) { "Range end must be within text bounds: ${range.last} >= $textLength" }
         }

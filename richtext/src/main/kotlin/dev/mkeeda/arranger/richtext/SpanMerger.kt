@@ -105,8 +105,13 @@ internal fun List<RichSpan>.transformSpans(
 /**
  * Merges a [newSpan] into this list of spans.
  * Convenience extension that wraps [transformSpans].
+ *
+ * Note: This function is public to allow cross-module usage within the library
+ * (e.g., from the `richtext-editor` module), but is marked with `@InternalArrangerApi`
+ * as it is not intended to be a stable public API for library consumers.
  */
-internal fun List<RichSpan>.mergeSpan(newSpan: RichSpan): List<RichSpan> {
+@InternalArrangerApi
+public fun List<RichSpan>.mergeSpan(newSpan: RichSpan): List<RichSpan> {
     return transformSpans(targetRange = newSpan.range) { existingAttributes ->
         existingAttributes + newSpan.attributes
     }
