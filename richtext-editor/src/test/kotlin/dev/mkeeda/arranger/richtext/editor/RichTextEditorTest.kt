@@ -179,4 +179,77 @@ class RichTextEditorTest {
         state.currentAttributes.containsKey(BoldKey) shouldBe false
         state.currentAttributes.isEmpty() shouldBe true
     }
+
+    @Test
+    fun `turned off attributes are not inherited when typing at the end of styled text`() {
+        val initialText = "Hello"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.indices)
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Move cursor to the end of "Hello"
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // At this point, currentAttributes should have BoldKey due to inheritance
+        state.currentAttributes.containsKey(BoldKey) shouldBe true
+
+        // Remove the inherited BoldKey
+        state.removeTypingAttribute(BoldKey)
+
+        // currentAttributes should no longer have BoldKey
+        state.currentAttributes.containsKey(BoldKey) shouldBe false
+
+        // Type new text
+        composeTestRule.onNodeWithText(initialText).performTextInput(" World")
+
+        // Verify that the new text does NOT have BoldKey
+        val newSpans = state.richString.spans
+        val boldSpans = newSpans.filter { it.attributes.containsKey(BoldKey) }
+
+        // Bold should only cover "Hello" (0..4)
+        boldSpans.size shouldBe 1
+        boldSpans[0].range shouldBe 0..4
+    }
+
+    @Test
+    fun `turned off attributes are not inherited when typing inside styled text`() {
+        val initialText = "Hello"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.indices)
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Move cursor to between 'l' and 'l' (index 3)
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(3))
+
+        // Remove inherited BoldKey
+        state.removeTypingAttribute(BoldKey)
+
+        // Type new text
+        composeTestRule.onNodeWithText(initialText).performTextInput("x")
+
+        // The text is now "Helxlo"
+        // Bold should cover "Hel" (0..2) and "lo" (4..5), but NOT "x" (3..3)
+        val newSpans = state.richString.spans
+        val boldSpans = newSpans.filter { it.attributes.containsKey(BoldKey) }
+
+        boldSpans.size shouldBe 2
+        boldSpans[0].range shouldBe 0..2
+        boldSpans[1].range shouldBe 4..5
+    }
 }
