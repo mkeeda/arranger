@@ -144,31 +144,54 @@ private fun ChatFormattingToolbar(
     ) {
         val formatActions =
             listOf(
-                FormatAction(R.drawable.format_bold, "Bold", BoldKey, Unit) { bold() },
-                FormatAction(R.drawable.format_italic, "Italic", ItalicKey, Unit) { italic() },
-                FormatAction(R.drawable.format_underlined, "Underline", UnderlineKey, Unit) { underline() },
-                FormatAction(R.drawable.format_strikethrough, "Strikethrough", StrikethroughKey, Unit) { strikethrough() },
-                FormatAction(R.drawable.format_color_text, "Text Color Red", TextColorKey, RgbaColor(0xFFFF0000.toLong())) {
+                FormatAction(R.drawable.format_bold, "Bold", BoldKey, Unit, { bold() }, { clearBold() }),
+                FormatAction(R.drawable.format_italic, "Italic", ItalicKey, Unit, { italic() }, { clearItalic() }),
+                FormatAction(R.drawable.format_underlined, "Underline", UnderlineKey, Unit, { underline() }, { clearUnderline() }),
+                FormatAction(
+                    R.drawable.format_strikethrough,
+                    "Strikethrough",
+                    StrikethroughKey,
+                    Unit,
+                    { strikethrough() },
+                    { clearStrikethrough() },
+                ),
+                FormatAction(R.drawable.format_color_text, "Text Color Red", TextColorKey, RgbaColor(0xFFFF0000.toLong()), {
                     textColor(RgbaColor(0xFFFF0000.toLong()))
-                },
-                FormatAction(R.drawable.format_color_fill, "Background Color Yellow", BackgroundColorKey, RgbaColor(0xFFFFFF00.toLong())) {
+                }, { clearTextColor() }),
+                FormatAction(R.drawable.format_color_fill, "Background Color Yellow", BackgroundColorKey, RgbaColor(0xFFFFFF00.toLong()), {
                     backgroundColor(RgbaColor(0xFFFFFF00.toLong()))
-                },
-                FormatAction(R.drawable.format_size, "Large Font Size", FontSizeKey, TextSize(24f)) { fontSize(TextSize(24f)) },
-                FormatAction(R.drawable.format_h1, "Heading 1", HeadingKey, HeadingLevel.H1) { headingLevel(HeadingLevel.H1) },
-                FormatAction(R.drawable.format_align_center, "Align Center", TextAlignmentKey, TextAlignment.Center) {
+                }, { clearBackgroundColor() }),
+                FormatAction(
+                    R.drawable.format_size,
+                    "Large Font Size",
+                    FontSizeKey,
+                    TextSize(24f),
+                    { fontSize(TextSize(24f)) },
+                    { clearFontSize() },
+                ),
+                FormatAction(
+                    R.drawable.format_h1,
+                    "Heading 1",
+                    HeadingKey,
+                    HeadingLevel.H1,
+                    { headingLevel(HeadingLevel.H1) },
+                    { clearHeadingLevel() },
+                ),
+                FormatAction(R.drawable.format_align_center, "Align Center", TextAlignmentKey, TextAlignment.Center, {
                     textAlignment(TextAlignment.Center)
-                },
-                FormatAction(R.drawable.format_quote, "Blockquote", BlockquoteKey, Unit) { blockquote() },
+                }, { clearTextAlignment() }),
+                FormatAction(R.drawable.format_quote, "Blockquote", BlockquoteKey, Unit, { blockquote() }, { clearBlockquote() }),
                 FormatAction(
                     R.drawable.format_list_bulleted,
                     "Bullet List",
                     BulletListKey,
                     ListIndentLevel.Level1,
-                ) { bulletList(ListIndentLevel.Level1) },
-                FormatAction(R.drawable.format_list_numbered, "Ordered List", OrderedListKey, ListIndentLevel.Level1) {
+                    { bulletList(ListIndentLevel.Level1) },
+                    { clearBulletList() },
+                ),
+                FormatAction(R.drawable.format_list_numbered, "Ordered List", OrderedListKey, ListIndentLevel.Level1, {
                     orderedList(ListIndentLevel.Level1)
-                },
+                }, { clearOrderedList() }),
             )
 
         formatActions.forEach { action ->
@@ -177,7 +200,15 @@ private fun ChatFormattingToolbar(
                 checked = isActive,
                 onCheckedChange = {
                     if (hasSelection) {
-                        state.edit { editAttributes(state.selection) { action.applySelection(this) } }
+                        state.edit {
+                            editAttributes(state.selection) {
+                                if (isActive) {
+                                    action.removeSelection(this)
+                                } else {
+                                    action.applySelection(this)
+                                }
+                            }
+                        }
                     } else {
                         toggleTypingAttribute(state, action, isActive)
                     }
@@ -249,6 +280,7 @@ private data class FormatAction<T : Any>(
     val key: AttributeKey<T>,
     val value: T,
     val applySelection: AttributeEditScope.() -> Unit,
+    val removeSelection: AttributeEditScope.() -> Unit,
 )
 
 @Composable

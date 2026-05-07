@@ -24,6 +24,29 @@ class ChatInputSampleTest {
     val composeTestRule = createComposeRule()
 
     @Test
+    fun `toolbar buttons toggle formatting on selection when clicked`() {
+        composeTestRule.setContent {
+            ArrangerTheme {
+                ChatInputSample()
+            }
+        }
+
+        val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
+        textInputNode.performTextInput("Hello World")
+
+        // Select "Hello"
+        textInputNode.performTextInputSelection(TextRange(0, 5))
+
+        // Toggle Bold on
+        composeTestRule.onNodeWithContentDescription("Bold").performClick()
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOn()
+
+        // Toggle Bold off
+        composeTestRule.onNodeWithContentDescription("Bold").performClick()
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOff()
+    }
+
+    @Test
     fun `toolbar buttons sync with cursor position attributes`() {
         composeTestRule.setContent {
             ArrangerTheme {
