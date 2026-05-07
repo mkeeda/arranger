@@ -43,8 +43,10 @@ import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
+import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.TextAlignmentKey
@@ -144,54 +146,78 @@ private fun ChatFormattingToolbar(
     ) {
         val formatActions =
             listOf(
-                FormatAction(R.drawable.format_bold, "Bold", BoldKey, Unit, { bold() }, { clearBold() }),
-                FormatAction(R.drawable.format_italic, "Italic", ItalicKey, Unit, { italic() }, { clearItalic() }),
-                FormatAction(R.drawable.format_underlined, "Underline", UnderlineKey, Unit, { underline() }, { clearUnderline() }),
-                FormatAction(
-                    R.drawable.format_strikethrough,
-                    "Strikethrough",
-                    StrikethroughKey,
-                    Unit,
-                    { strikethrough() },
-                    { clearStrikethrough() },
+                FormatAction.Span(
+                    iconRes = R.drawable.format_bold,
+                    contentDescription = "Bold",
+                    key = BoldKey,
+                    value = Unit,
                 ),
-                FormatAction(R.drawable.format_color_text, "Text Color Red", TextColorKey, RgbaColor(0xFFFF0000.toLong()), {
-                    textColor(RgbaColor(0xFFFF0000.toLong()))
-                }, { clearTextColor() }),
-                FormatAction(R.drawable.format_color_fill, "Background Color Yellow", BackgroundColorKey, RgbaColor(0xFFFFFF00.toLong()), {
-                    backgroundColor(RgbaColor(0xFFFFFF00.toLong()))
-                }, { clearBackgroundColor() }),
-                FormatAction(
-                    R.drawable.format_size,
-                    "Large Font Size",
-                    FontSizeKey,
-                    TextSize(24f),
-                    { fontSize(TextSize(24f)) },
-                    { clearFontSize() },
+                FormatAction.Span(
+                    iconRes = R.drawable.format_italic,
+                    contentDescription = "Italic",
+                    key = ItalicKey,
+                    value = Unit,
                 ),
-                FormatAction(
-                    R.drawable.format_h1,
-                    "Heading 1",
-                    HeadingKey,
-                    HeadingLevel.H1,
-                    { headingLevel(HeadingLevel.H1) },
-                    { clearHeadingLevel() },
+                FormatAction.Span(
+                    iconRes = R.drawable.format_underlined,
+                    contentDescription = "Underline",
+                    key = UnderlineKey,
+                    value = Unit,
                 ),
-                FormatAction(R.drawable.format_align_center, "Align Center", TextAlignmentKey, TextAlignment.Center, {
-                    textAlignment(TextAlignment.Center)
-                }, { clearTextAlignment() }),
-                FormatAction(R.drawable.format_quote, "Blockquote", BlockquoteKey, Unit, { blockquote() }, { clearBlockquote() }),
-                FormatAction(
-                    R.drawable.format_list_bulleted,
-                    "Bullet List",
-                    BulletListKey,
-                    ListIndentLevel.Level1,
-                    { bulletList(ListIndentLevel.Level1) },
-                    { clearBulletList() },
+                FormatAction.Span(
+                    iconRes = R.drawable.format_strikethrough,
+                    contentDescription = "Strikethrough",
+                    key = StrikethroughKey,
+                    value = Unit,
                 ),
-                FormatAction(R.drawable.format_list_numbered, "Ordered List", OrderedListKey, ListIndentLevel.Level1, {
-                    orderedList(ListIndentLevel.Level1)
-                }, { clearOrderedList() }),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_color_text,
+                    contentDescription = "Text Color Red",
+                    key = TextColorKey,
+                    value = RgbaColor(0xFFFF0000.toLong()),
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_color_fill,
+                    contentDescription = "Background Color Yellow",
+                    key = BackgroundColorKey,
+                    value = RgbaColor(0xFFFFFF00.toLong()),
+                ),
+                FormatAction.Span(
+                    iconRes = R.drawable.format_size,
+                    contentDescription = "Large Font Size",
+                    key = FontSizeKey,
+                    value = TextSize(24f),
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_h1,
+                    contentDescription = "Heading 1",
+                    key = HeadingKey,
+                    value = HeadingLevel.H1,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_align_center,
+                    contentDescription = "Align Center",
+                    key = TextAlignmentKey,
+                    value = TextAlignment.Center,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_quote,
+                    contentDescription = "Blockquote",
+                    key = BlockquoteKey,
+                    value = Unit,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_list_bulleted,
+                    contentDescription = "Bullet List",
+                    key = BulletListKey,
+                    value = ListIndentLevel.Level1,
+                ),
+                FormatAction.Paragraph(
+                    iconRes = R.drawable.format_list_numbered,
+                    contentDescription = "Ordered List",
+                    key = OrderedListKey,
+                    value = ListIndentLevel.Level1,
+                ),
             )
 
         formatActions.forEach { action ->
@@ -202,15 +228,11 @@ private fun ChatFormattingToolbar(
                     if (hasSelection) {
                         state.edit {
                             editAttributes(state.selection) {
-                                if (isActive) {
-                                    action.removeSelection(this)
-                                } else {
-                                    action.applySelection(this)
-                                }
+                                action.applyAttribute(this, isActive)
                             }
                         }
                     } else {
-                        toggleTypingAttribute(state, action, isActive)
+                        action.toggleTyping(state, isActive)
                     }
                 },
                 enabled = true,
@@ -262,26 +284,45 @@ private fun ChatFormattingToolbar(
     }
 }
 
-private fun <T : Any> toggleTypingAttribute(
-    state: RichTextState,
-    action: FormatAction<T>,
-    isActive: Boolean,
-) {
-    if (isActive) {
-        state.removeTypingAttribute(action.key)
-    } else {
-        state.setTypingAttribute(action.key, action.value)
+private sealed interface FormatAction<T : Any> {
+    val iconRes: Int
+    val contentDescription: String
+    val key: AttributeKey<T>
+
+    fun applyAttribute(scope: AttributeEditScope, isActive: Boolean)
+
+    fun toggleTyping(state: RichTextState, isActive: Boolean)
+
+    data class Span<T : Any>(
+        @DrawableRes override val iconRes: Int,
+        override val contentDescription: String,
+        override val key: SpanAttributeKey<T>,
+        val value: T,
+    ) : FormatAction<T> {
+        override fun applyAttribute(scope: AttributeEditScope, isActive: Boolean) {
+            scope.setSpanAttribute(key, if (isActive) null else value)
+        }
+
+        override fun toggleTyping(state: RichTextState, isActive: Boolean) {
+            if (isActive) state.removeTypingAttribute(key) else state.setTypingAttribute(key, value)
+        }
+    }
+
+    data class Paragraph<T : Any>(
+        @DrawableRes override val iconRes: Int,
+        override val contentDescription: String,
+        override val key: ParagraphAttributeKey<T>,
+        val value: T,
+    ) : FormatAction<T> {
+        override fun applyAttribute(scope: AttributeEditScope, isActive: Boolean) {
+            scope.setParagraphAttribute(key, if (isActive) null else value)
+        }
+
+        override fun toggleTyping(state: RichTextState, isActive: Boolean) {
+            if (isActive) state.removeTypingAttribute(key) else state.setTypingAttribute(key, value)
+        }
     }
 }
-
-private data class FormatAction<T : Any>(
-    @DrawableRes val iconRes: Int,
-    val contentDescription: String,
-    val key: AttributeKey<T>,
-    val value: T,
-    val applySelection: AttributeEditScope.() -> Unit,
-    val removeSelection: AttributeEditScope.() -> Unit,
-)
 
 @Composable
 private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) {
