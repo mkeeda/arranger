@@ -308,7 +308,7 @@ private sealed interface FormatAction<T : Any> {
         }
 
         override fun toggleTyping(state: RichTextState, isActive: Boolean) {
-            // Paragraph attributes logcially apply to the whole paragraph immediately.
+            // Paragraph attributes logically apply to the whole paragraph immediately.
             // There's no need to delay it as a typing attribute.
             state.edit {
                 editAttributes(state.selection) {
