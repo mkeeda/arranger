@@ -167,6 +167,7 @@ class RichTextEditorTest {
 
         // Set cursor at the end
         composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+        composeTestRule.waitForIdle()
 
         // Set typing attribute
         state.setTypingAttribute(BoldKey, Unit)
@@ -174,6 +175,7 @@ class RichTextEditorTest {
 
         // Move cursor to the beginning
         composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(0))
+        composeTestRule.waitForIdle()
 
         // Typing attributes should be cleared
         state.currentAttributes.containsKey(BoldKey) shouldBe false

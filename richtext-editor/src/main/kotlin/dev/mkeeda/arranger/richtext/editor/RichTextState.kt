@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,7 +35,8 @@ public class RichTextState(initialText: RichString) {
      * Typing attributes are automatically cleared when the cursor position changes
      * without text input (e.g., tapping a different position, arrow key navigation).
      */
-    private var typingAttributes: AttributeContainer? by mutableStateOf(null)
+    public var typingAttributes: AttributeContainer? by mutableStateOf(null)
+        private set
 
     /**
      * Attributes explicitly removed by the user at the cursor position.
@@ -42,6 +44,12 @@ public class RichTextState(initialText: RichString) {
      * so that inherited attributes don't apply.
      */
     private var removedTypingAttributes: Set<AttributeKey<*>>? by mutableStateOf(null)
+
+    /**
+     * Records the selection state at the exact moment typing attributes were modified.
+     * Used to detect true cursor movement vs. non-text-changing buffer updates.
+     */
+    private var typingAttributesAnchor: TextRange? = null
 
     // Computed property representing the complete rich text state
     public val richString: RichString
@@ -51,49 +59,53 @@ public class RichTextState(initialText: RichString) {
                 spans = spans,
             )
 
-    /**
-     * The merged attributes at the current cursor position.
-     *
-     * When [typingAttributes] is set, returns the cursor's inherited attributes
-     * overlaid with the typing overrides. Otherwise, returns the attributes of
-     * the character immediately before the cursor.
-     *
-     * Returns [AttributeContainer.empty] when:
-     * - The text is empty
-     * - The cursor is at position 0 with no typing attributes
-     */
-    public val currentAttributes: AttributeContainer
-        get() {
+    private val currentAttributesState =
+        derivedStateOf {
             if (!selection.collapsed) {
                 val selStart = selection.min
                 val selEnd = selection.max
-                var intersection: AttributeContainer? = null
+                val selectionLength = selEnd - selStart
 
-                for (i in selStart until selEnd) {
-                    val charAttrs =
-                        spans.filter { i in it.range }.fold(AttributeContainer.empty()) { acc, span ->
-                            acc + span.attributes
-                        }
-                    if (intersection == null) {
-                        intersection = charAttrs
-                    } else {
-                        var newIntersection = AttributeContainer.empty()
-                        for (key in intersection.keys) {
-                            if (charAttrs.containsKey(key)) {
-                                @Suppress("UNCHECKED_CAST")
-                                val k = key as AttributeKey<Any>
-                                val v1 = intersection.getOrDefault(k)
-                                val v2 = charAttrs.getOrDefault(k)
-                                if (v1 == v2) {
-                                    newIntersection += k to v1
-                                }
-                            }
-                        }
-                        intersection = newIntersection
+                val activeSpans =
+                    spans.filter { span ->
+                        maxOf(selStart, span.range.first) < minOf(selEnd, span.range.last + 1)
                     }
-                    if (intersection.isEmpty()) break
+                if (activeSpans.isEmpty()) return@derivedStateOf AttributeContainer.empty()
+
+                // Optimization: Instead of filtering spans for every character index (O(n * m)),
+                // we calculate the intersection by tracking the number of characters each
+                // attribute value covers within the selection.
+                // Since spans with the same attribute key do not overlap in the buffer,
+                // if an attribute value's coverage length equals the selection length, it's in the intersection.
+                val attributeCounts = mutableMapOf<AttributeKey<*>, MutableMap<Any, Int>>()
+
+                for (span in activeSpans) {
+                    val overlapStart = maxOf(selStart, span.range.first)
+                    val overlapEnd = minOf(selEnd, span.range.last + 1)
+                    val overlapLength = overlapEnd - overlapStart
+
+                    if (overlapLength > 0) {
+                        for (key in span.attributes.keys) {
+                            @Suppress("UNCHECKED_CAST")
+                            val k = key as AttributeKey<Any>
+                            val value = span.attributes.getOrDefault(k)
+                            val valueCounts = attributeCounts.getOrPut(k) { mutableMapOf() }
+                            valueCounts[value as Any] = valueCounts.getOrDefault(value, 0) + overlapLength
+                        }
+                    }
                 }
-                return intersection ?: AttributeContainer.empty()
+
+                var intersection = AttributeContainer.empty()
+                for ((key, valueCounts) in attributeCounts) {
+                    for ((value, count) in valueCounts) {
+                        if (count == selectionLength) {
+                            @Suppress("UNCHECKED_CAST")
+                            val k = key as AttributeKey<Any>
+                            intersection += k to value
+                        }
+                    }
+                }
+                return@derivedStateOf intersection
             }
 
             val cursorPosition = selection.start
@@ -120,8 +132,22 @@ public class RichTextState(initialText: RichString) {
                     finalAttrs -= key
                 }
             }
-            return finalAttrs
+            finalAttrs
         }
+
+    /**
+     * The merged attributes at the current cursor position.
+     *
+     * When [typingAttributes] is set, returns the cursor's inherited attributes
+     * overlaid with the typing overrides. Otherwise, returns the attributes of
+     * the character immediately before the cursor.
+     *
+     * Returns [AttributeContainer.empty] when:
+     * - The text is empty
+     * - The cursor is at position 0 with no typing attributes
+     */
+    public val currentAttributes: AttributeContainer
+        get() = currentAttributesState.value
 
     /**
      * Adds or overwrites a single attribute in the current typing attributes.
@@ -142,6 +168,8 @@ public class RichTextState(initialText: RichString) {
             val updated = currentRemoved - key
             removedTypingAttributes = if (updated.isEmpty()) null else updated
         }
+
+        typingAttributesAnchor = selection
     }
 
     /**
@@ -161,6 +189,7 @@ public class RichTextState(initialText: RichString) {
             val currentRemoved = removedTypingAttributes ?: emptySet()
             removedTypingAttributes = currentRemoved + key
         }
+        typingAttributesAnchor = selection
     }
 
     /**
@@ -169,6 +198,7 @@ public class RichTextState(initialText: RichString) {
     public fun clearTypingAttributes() {
         typingAttributes = null
         removedTypingAttributes = null
+        typingAttributesAnchor = null
     }
 
     /**
@@ -194,7 +224,12 @@ public class RichTextState(initialText: RichString) {
     @OptIn(ExperimentalFoundationApi::class)
     internal fun updateRichString(buffer: TextFieldBuffer) {
         if (buffer.changes.changeCount == 0) {
-            clearTypingAttributes()
+            // Compose may trigger input transformations for non-text changes.
+            // We only clear typing attributes if the cursor actually moved away
+            // from where the attributes were originally set.
+            if (typingAttributesAnchor != null && buffer.selection != typingAttributesAnchor) {
+                clearTypingAttributes()
+            }
             return
         }
 
