@@ -256,18 +256,7 @@ private fun ChatFormattingToolbar(
                 if (hasSelection) {
                     state.edit {
                         editAttributes(state.selection) {
-                            clearBold()
-                            clearItalic()
-                            clearStrikethrough()
-                            clearUnderline()
-                            clearTextColor()
-                            clearBackgroundColor()
-                            clearFontSize()
-                            clearHeadingLevel()
-                            clearTextAlignment()
-                            clearBlockquote()
-                            clearBulletList()
-                            clearOrderedList()
+                            clearAll()
                         }
                     }
                 } else {

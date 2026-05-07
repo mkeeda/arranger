@@ -202,4 +202,29 @@ class AttributeEditScopeTest {
             }
         str.spans.isEmpty() shouldBe true
     }
+
+    @Test
+    fun `clearAll removes all known attributes properly`() {
+        var str =
+            RichString("Test").edit {
+                editAttributes {
+                    textColor(RgbaColor(0xFFFF0000))
+                    bold()
+                    italic()
+                    strikethrough()
+                    underline()
+                    headingLevel(HeadingLevel.H1)
+                    bulletList(ListIndentLevel.Level1)
+                }
+            }
+
+        str.spans.isEmpty() shouldBe false
+
+        str =
+            str.edit {
+                editAttributes { clearAll() }
+            }
+
+        str.spans.isEmpty() shouldBe true
+    }
 }
