@@ -19,6 +19,8 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,12 +32,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.AttributeEditScope
+import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BackgroundColorKey
+import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.BoldKey
+import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.FontSizeKey
+import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
+import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
+import dev.mkeeda.arranger.richtext.TextAlignmentKey
+import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
+import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.backgroundColor
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
@@ -76,7 +91,7 @@ fun ChatInputSample(modifier: Modifier = Modifier) {
                 .imePadding(),
     ) {
         Text(
-            text = "Select text and use the toolbar to format it. Real-time cursor state reflection is not supported in this phase.",
+            text = "Select text and use the toolbar to format it, or use the toolbar before typing.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -129,24 +144,50 @@ private fun ChatFormattingToolbar(
     ) {
         val formatActions =
             listOf(
-                FormatAction(R.drawable.format_bold, "Bold") { bold() },
-                FormatAction(R.drawable.format_italic, "Italic") { italic() },
-                FormatAction(R.drawable.format_underlined, "Underline") { underline() },
-                FormatAction(R.drawable.format_strikethrough, "Strikethrough") { strikethrough() },
-                FormatAction(R.drawable.format_color_text, "Text Color Red") { textColor(RgbaColor(0xFFFF0000.toLong())) },
-                FormatAction(R.drawable.format_color_fill, "Background Color Yellow") { backgroundColor(RgbaColor(0xFFFFFF00.toLong())) },
-                FormatAction(R.drawable.format_size, "Large Font Size") { fontSize(TextSize(24f)) },
-                FormatAction(R.drawable.format_h1, "Heading 1") { headingLevel(HeadingLevel.H1) },
-                FormatAction(R.drawable.format_align_center, "Align Center") { textAlignment(TextAlignment.Center) },
-                FormatAction(R.drawable.format_quote, "Blockquote") { blockquote() },
-                FormatAction(R.drawable.format_list_bulleted, "Bullet List") { bulletList(ListIndentLevel.Level1) },
-                FormatAction(R.drawable.format_list_numbered, "Ordered List") { orderedList(ListIndentLevel.Level1) },
+                FormatAction(R.drawable.format_bold, "Bold", BoldKey, Unit) { bold() },
+                FormatAction(R.drawable.format_italic, "Italic", ItalicKey, Unit) { italic() },
+                FormatAction(R.drawable.format_underlined, "Underline", UnderlineKey, Unit) { underline() },
+                FormatAction(R.drawable.format_strikethrough, "Strikethrough", StrikethroughKey, Unit) { strikethrough() },
+                FormatAction(R.drawable.format_color_text, "Text Color Red", TextColorKey, RgbaColor(0xFFFF0000.toLong())) {
+                    textColor(RgbaColor(0xFFFF0000.toLong()))
+                },
+                FormatAction(R.drawable.format_color_fill, "Background Color Yellow", BackgroundColorKey, RgbaColor(0xFFFFFF00.toLong())) {
+                    backgroundColor(RgbaColor(0xFFFFFF00.toLong()))
+                },
+                FormatAction(R.drawable.format_size, "Large Font Size", FontSizeKey, TextSize(24f)) { fontSize(TextSize(24f)) },
+                FormatAction(R.drawable.format_h1, "Heading 1", HeadingKey, HeadingLevel.H1) { headingLevel(HeadingLevel.H1) },
+                FormatAction(R.drawable.format_align_center, "Align Center", TextAlignmentKey, TextAlignment.Center) {
+                    textAlignment(TextAlignment.Center)
+                },
+                FormatAction(R.drawable.format_quote, "Blockquote", BlockquoteKey, Unit) { blockquote() },
+                FormatAction(
+                    R.drawable.format_list_bulleted,
+                    "Bullet List",
+                    BulletListKey,
+                    ListIndentLevel.Level1,
+                ) { bulletList(ListIndentLevel.Level1) },
+                FormatAction(R.drawable.format_list_numbered, "Ordered List", OrderedListKey, ListIndentLevel.Level1) {
+                    orderedList(ListIndentLevel.Level1)
+                },
             )
 
         formatActions.forEach { action ->
-            IconButton(
-                onClick = { state.edit { editAttributes(state.selection) { action.action(this) } } },
-                enabled = hasSelection,
+            val isActive = state.currentAttributes.containsKey(action.key)
+            IconToggleButton(
+                checked = isActive,
+                onCheckedChange = {
+                    if (hasSelection) {
+                        state.edit { editAttributes(state.selection) { action.applySelection(this) } }
+                    } else {
+                        toggleTypingAttribute(state, action, isActive)
+                    }
+                },
+                enabled = true,
+                colors =
+                    IconButtonDefaults.iconToggleButtonColors(
+                        checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
             ) {
                 Icon(
                     painter = painterResource(id = action.iconRes),
@@ -159,24 +200,28 @@ private fun ChatFormattingToolbar(
 
         IconButton(
             onClick = {
-                state.edit {
-                    editAttributes(state.selection) {
-                        clearBold()
-                        clearItalic()
-                        clearStrikethrough()
-                        clearUnderline()
-                        clearTextColor()
-                        clearBackgroundColor()
-                        clearFontSize()
-                        clearHeadingLevel()
-                        clearTextAlignment()
-                        clearBlockquote()
-                        clearBulletList()
-                        clearOrderedList()
+                if (hasSelection) {
+                    state.edit {
+                        editAttributes(state.selection) {
+                            clearBold()
+                            clearItalic()
+                            clearStrikethrough()
+                            clearUnderline()
+                            clearTextColor()
+                            clearBackgroundColor()
+                            clearFontSize()
+                            clearHeadingLevel()
+                            clearTextAlignment()
+                            clearBlockquote()
+                            clearBulletList()
+                            clearOrderedList()
+                        }
                     }
+                } else {
+                    state.clearTypingAttributes()
                 }
             },
-            enabled = hasSelection,
+            enabled = true,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.format_clear),
@@ -186,10 +231,24 @@ private fun ChatFormattingToolbar(
     }
 }
 
-private data class FormatAction(
+private fun <T : Any> toggleTypingAttribute(
+    state: RichTextState,
+    action: FormatAction<T>,
+    isActive: Boolean,
+) {
+    if (isActive) {
+        state.removeTypingAttribute(action.key)
+    } else {
+        state.setTypingAttribute(action.key, action.value)
+    }
+}
+
+private data class FormatAction<T : Any>(
     @DrawableRes val iconRes: Int,
     val contentDescription: String,
-    val action: AttributeEditScope.() -> Unit,
+    val key: AttributeKey<T>,
+    val value: T,
+    val applySelection: AttributeEditScope.() -> Unit,
 )
 
 @Composable

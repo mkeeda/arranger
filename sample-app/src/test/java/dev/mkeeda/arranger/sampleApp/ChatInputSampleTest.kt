@@ -2,11 +2,13 @@ package dev.mkeeda.arranger.sampleApp
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.TextRange
@@ -48,12 +50,12 @@ class ChatInputSampleTest {
         // Check if placeholder is displayed
         composeTestRule.onNodeWithText("Type a message...").assertIsDisplayed()
 
-        // Buttons should be disabled initially (no selection)
-        composeTestRule.onNodeWithContentDescription("Bold").assertIsNotEnabled()
+        // Buttons should be enabled initially (even with no selection)
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsEnabled()
     }
 
     @Test
-    fun `buttons are enabled only when text is selected`() {
+    fun `buttons are always enabled regardless of selection`() {
         composeTestRule.setContent {
             ArrangerTheme {
                 ChatInputSample()
@@ -63,13 +65,70 @@ class ChatInputSampleTest {
         val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
         textInputNode.performTextInput("Hello World")
 
-        // Still disabled because no text is selected (selection is just a cursor)
-        composeTestRule.onNodeWithContentDescription("Bold").assertIsNotEnabled()
+        // Enabled even with no selection (cursor only)
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsEnabled()
 
         // Select some text
         textInputNode.performTextInputSelection(TextRange(0, 5))
 
-        // Now buttons should be enabled
+        // Still enabled
         composeTestRule.onNodeWithContentDescription("Bold").assertIsEnabled()
+    }
+
+    @Test
+    fun `toolbar buttons sync with cursor position attributes`() {
+        composeTestRule.setContent {
+            ArrangerTheme {
+                ChatInputSample()
+            }
+        }
+
+        val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
+        textInputNode.performTextInput("Hello World")
+
+        // Select "Hello" and apply Bold
+        textInputNode.performTextInputSelection(TextRange(0, 5))
+        composeTestRule.onNodeWithContentDescription("Bold").performClick()
+
+        // Move cursor to "Hello" (index 3)
+        textInputNode.performTextInputSelection(TextRange(3))
+
+        // Bold button should be toggled ON
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOn()
+
+        // Move cursor to "World" (index 8)
+        textInputNode.performTextInputSelection(TextRange(8))
+
+        // Bold button should be toggled OFF
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOff()
+    }
+
+    @Test
+    fun `typing attributes toggle on collapsed selection`() {
+        composeTestRule.setContent {
+            ArrangerTheme {
+                ChatInputSample()
+            }
+        }
+
+        val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
+
+        // Tap Bold button when empty
+        composeTestRule.onNodeWithContentDescription("Bold").performClick()
+
+        // Button should be toggled ON
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOn()
+
+        // Type text
+        textInputNode.performTextInput("BoldText")
+
+        // Cursor is now at the end of "BoldText", which is bold, so button should remain ON
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOn()
+
+        // Move cursor to beginning (index 0)
+        textInputNode.performTextInputSelection(TextRange(0))
+
+        // Button should be OFF because at index 0, there is no inherited attribute and no typing attribute
+        composeTestRule.onNodeWithContentDescription("Bold").assertIsOff()
     }
 }
