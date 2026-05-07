@@ -59,82 +59,6 @@ public class RichTextState(initialText: RichString) {
                 spans = spans,
             )
 
-    private val currentAttributesState =
-        derivedStateOf {
-            if (!selection.collapsed) {
-                val selStart = selection.min
-                val selEnd = selection.max
-                val selectionLength = selEnd - selStart
-
-                val activeSpans =
-                    spans.filter { span ->
-                        maxOf(selStart, span.range.first) < minOf(selEnd, span.range.last + 1)
-                    }
-                if (activeSpans.isEmpty()) return@derivedStateOf AttributeContainer.empty()
-
-                // Optimization: Instead of filtering spans for every character index (O(n * m)),
-                // we calculate the intersection by tracking the number of characters each
-                // attribute value covers within the selection.
-                // Since spans with the same attribute key do not overlap in the buffer,
-                // if an attribute value's coverage length equals the selection length, it's in the intersection.
-                val attributeCounts = mutableMapOf<AttributeKey<*>, MutableMap<Any, Int>>()
-
-                for (span in activeSpans) {
-                    val overlapStart = maxOf(selStart, span.range.first)
-                    val overlapEnd = minOf(selEnd, span.range.last + 1)
-                    val overlapLength = overlapEnd - overlapStart
-
-                    if (overlapLength > 0) {
-                        for (key in span.attributes.keys) {
-                            @Suppress("UNCHECKED_CAST")
-                            val k = key as AttributeKey<Any>
-                            val value = span.attributes.getOrDefault(k)
-                            val valueCounts = attributeCounts.getOrPut(k) { mutableMapOf() }
-                            valueCounts[value as Any] = valueCounts.getOrDefault(value, 0) + overlapLength
-                        }
-                    }
-                }
-
-                var intersection = AttributeContainer.empty()
-                for ((key, valueCounts) in attributeCounts) {
-                    for ((value, count) in valueCounts) {
-                        if (count == selectionLength) {
-                            @Suppress("UNCHECKED_CAST")
-                            val k = key as AttributeKey<Any>
-                            intersection += k to value
-                        }
-                    }
-                }
-                return@derivedStateOf intersection
-            }
-
-            val cursorPosition = selection.start
-            val typingAttr = typingAttributes
-            val removedAttr = removedTypingAttributes
-
-            val inheritedAttributes =
-                if (cursorPosition > 0 && cursorPosition <= textFieldState.text.length) {
-                    val indexBeforeCursor = cursorPosition - 1
-                    val spansBeforeCursor = spans.filter { indexBeforeCursor in it.range }
-                    spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
-                        acc + span.attributes
-                    }
-                } else {
-                    AttributeContainer.empty()
-                }
-
-            var finalAttrs = inheritedAttributes
-            if (typingAttr != null) {
-                finalAttrs += typingAttr
-            }
-            if (removedAttr != null) {
-                removedAttr.forEach { key ->
-                    finalAttrs -= key
-                }
-            }
-            finalAttrs
-        }
-
     /**
      * The merged attributes at the current cursor position.
      *
@@ -146,8 +70,80 @@ public class RichTextState(initialText: RichString) {
      * - The text is empty
      * - The cursor is at position 0 with no typing attributes
      */
-    public val currentAttributes: AttributeContainer
-        get() = currentAttributesState.value
+    public val currentAttributes: AttributeContainer by derivedStateOf {
+        if (!selection.collapsed) {
+            val selStart = selection.min
+            val selEnd = selection.max
+            val selectionLength = selEnd - selStart
+
+            val activeSpans =
+                spans.filter { span ->
+                    maxOf(selStart, span.range.first) < minOf(selEnd, span.range.last + 1)
+                }
+            if (activeSpans.isEmpty()) return@derivedStateOf AttributeContainer.empty()
+
+            // Optimization: Instead of filtering spans for every character index (O(n * m)),
+            // we calculate the intersection by tracking the number of characters each
+            // attribute value covers within the selection.
+            // Since spans with the same attribute key do not overlap in the buffer,
+            // if an attribute value's coverage length equals the selection length, it's in the intersection.
+            val attributeCounts = mutableMapOf<AttributeKey<*>, MutableMap<Any, Int>>()
+
+            for (span in activeSpans) {
+                val overlapStart = maxOf(selStart, span.range.first)
+                val overlapEnd = minOf(selEnd, span.range.last + 1)
+                val overlapLength = overlapEnd - overlapStart
+
+                if (overlapLength > 0) {
+                    for (key in span.attributes.keys) {
+                        @Suppress("UNCHECKED_CAST")
+                        val k = key as AttributeKey<Any>
+                        val value = span.attributes.getOrDefault(k)
+                        val valueCounts = attributeCounts.getOrPut(k) { mutableMapOf() }
+                        valueCounts[value as Any] = valueCounts.getOrDefault(value, 0) + overlapLength
+                    }
+                }
+            }
+
+            var intersection = AttributeContainer.empty()
+            for ((key, valueCounts) in attributeCounts) {
+                for ((value, count) in valueCounts) {
+                    if (count == selectionLength) {
+                        @Suppress("UNCHECKED_CAST")
+                        val k = key as AttributeKey<Any>
+                        intersection += k to value
+                    }
+                }
+            }
+            return@derivedStateOf intersection
+        }
+
+        val cursorPosition = selection.start
+        val typingAttr = typingAttributes
+        val removedAttr = removedTypingAttributes
+
+        val inheritedAttributes =
+            if (cursorPosition > 0 && cursorPosition <= textFieldState.text.length) {
+                val indexBeforeCursor = cursorPosition - 1
+                val spansBeforeCursor = spans.filter { indexBeforeCursor in it.range }
+                spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
+                    acc + span.attributes
+                }
+            } else {
+                AttributeContainer.empty()
+            }
+
+        var finalAttrs = inheritedAttributes
+        if (typingAttr != null) {
+            finalAttrs += typingAttr
+        }
+        if (removedAttr != null) {
+            removedAttr.forEach { key ->
+                finalAttrs -= key
+            }
+        }
+        finalAttrs
+    }
 
     /**
      * Adds or overwrites a single attribute in the current typing attributes.
