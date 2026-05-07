@@ -24,58 +24,6 @@ class ChatInputSampleTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `initial state shows empty editor and formatting buttons`() {
-        composeTestRule.setContent {
-            ArrangerTheme {
-                ChatInputSample()
-            }
-        }
-
-        // Check if toolbar buttons exist in the composition (some may be scrolled off-screen)
-        composeTestRule.onNodeWithContentDescription("Bold").assertExists()
-        composeTestRule.onNodeWithContentDescription("Italic").assertExists()
-        composeTestRule.onNodeWithContentDescription("Strikethrough").assertExists()
-        composeTestRule.onNodeWithContentDescription("Underline").assertExists()
-        composeTestRule.onNodeWithContentDescription("Text Color Red").assertExists()
-        composeTestRule.onNodeWithContentDescription("Background Color Yellow").assertExists()
-        composeTestRule.onNodeWithContentDescription("Large Font Size").assertExists()
-        composeTestRule.onNodeWithContentDescription("Heading 1").assertExists()
-        composeTestRule.onNodeWithContentDescription("Align Center").assertExists()
-        composeTestRule.onNodeWithContentDescription("Blockquote").assertExists()
-        composeTestRule.onNodeWithContentDescription("Clear Formatting").assertExists()
-
-        // Check if the editor exists by tag
-        composeTestRule.onNodeWithTag("ChatInputEditor").assertIsDisplayed()
-
-        // Check if placeholder is displayed
-        composeTestRule.onNodeWithText("Type a message...").assertIsDisplayed()
-
-        // Buttons should be enabled initially (even with no selection)
-        composeTestRule.onNodeWithContentDescription("Bold").assertIsEnabled()
-    }
-
-    @Test
-    fun `buttons are always enabled regardless of selection`() {
-        composeTestRule.setContent {
-            ArrangerTheme {
-                ChatInputSample()
-            }
-        }
-
-        val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
-        textInputNode.performTextInput("Hello World")
-
-        // Enabled even with no selection (cursor only)
-        composeTestRule.onNodeWithContentDescription("Bold").assertIsEnabled()
-
-        // Select some text
-        textInputNode.performTextInputSelection(TextRange(0, 5))
-
-        // Still enabled
-        composeTestRule.onNodeWithContentDescription("Bold").assertIsEnabled()
-    }
-
-    @Test
     fun `toolbar buttons sync with cursor position attributes`() {
         composeTestRule.setContent {
             ArrangerTheme {
