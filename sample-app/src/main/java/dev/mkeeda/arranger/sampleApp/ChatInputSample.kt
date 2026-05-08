@@ -9,11 +9,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.HorizontalDivider
@@ -53,33 +51,9 @@ import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
-import dev.mkeeda.arranger.richtext.backgroundColor
-import dev.mkeeda.arranger.richtext.blockquote
-import dev.mkeeda.arranger.richtext.bold
-import dev.mkeeda.arranger.richtext.bulletList
-import dev.mkeeda.arranger.richtext.clearBackgroundColor
-import dev.mkeeda.arranger.richtext.clearBlockquote
-import dev.mkeeda.arranger.richtext.clearBold
-import dev.mkeeda.arranger.richtext.clearBulletList
-import dev.mkeeda.arranger.richtext.clearFontSize
-import dev.mkeeda.arranger.richtext.clearHeadingLevel
-import dev.mkeeda.arranger.richtext.clearItalic
-import dev.mkeeda.arranger.richtext.clearOrderedList
-import dev.mkeeda.arranger.richtext.clearStrikethrough
-import dev.mkeeda.arranger.richtext.clearTextAlignment
-import dev.mkeeda.arranger.richtext.clearTextColor
-import dev.mkeeda.arranger.richtext.clearUnderline
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.editAttributes
-import dev.mkeeda.arranger.richtext.fontSize
-import dev.mkeeda.arranger.richtext.headingLevel
-import dev.mkeeda.arranger.richtext.italic
-import dev.mkeeda.arranger.richtext.orderedList
-import dev.mkeeda.arranger.richtext.strikethrough
-import dev.mkeeda.arranger.richtext.textAlignment
-import dev.mkeeda.arranger.richtext.textColor
-import dev.mkeeda.arranger.richtext.underline
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable

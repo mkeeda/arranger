@@ -31,9 +31,7 @@ import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
-import dev.mkeeda.arranger.richtext.BulletListItem
 import dev.mkeeda.arranger.richtext.ListItem
-import dev.mkeeda.arranger.richtext.OrderedListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.extractListItems
 

@@ -45,7 +45,7 @@ private data object SampleList : NavKey
 
 @Serializable
 private enum class SampleDestination(val title: String) : NavKey {
-    BasicUsage("Basic Usage"),
+    DynamicEditing("Dynamic Editing"),
     AdvancedFormatting("Advanced Formatting"),
     CustomAttribute("Custom Attribute"),
     HashtagHighlight("Hashtag Highlight"),
@@ -189,7 +189,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                     .padding(16.dp),
         ) {
             when (destination) {
-                SampleDestination.BasicUsage -> BasicUsageSample()
+                SampleDestination.DynamicEditing -> DynamicEditingSample()
                 SampleDestination.AdvancedFormatting -> AdvancedFormattingSample()
                 SampleDestination.CustomAttribute -> CustomAttributeSample()
                 SampleDestination.HashtagHighlight -> HashtagHighlightSample()
