@@ -173,7 +173,7 @@ class RichTextEditorScreenshotTest {
         val scrollState = ScrollState(150)
 
         composeTestRule.setContent {
-            Box(Modifier.padding(50.dp).background(Color.LightGray)) {
+            Box(modifier = Modifier.padding(50.dp).background(Color.LightGray)) {
                 RichTextEditor(
                     state = state,
                     modifier = Modifier.width(400.dp).height(100.dp).background(Color.White),
