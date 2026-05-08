@@ -197,6 +197,8 @@ internal class RichTextOutputTransformation(
                 resolved.spanStyle?.let { style ->
                     addStyle(spanStyle = style, start = start, end = end)
                 }
+            }
+            if (start <= end) {
                 resolved.paragraphStyle?.let { style ->
                     addStyle(paragraphStyle = style, start = start, end = end)
                 }
