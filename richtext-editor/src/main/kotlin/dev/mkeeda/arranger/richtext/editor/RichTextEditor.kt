@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -83,13 +84,15 @@ public fun RichTextEditor(
     val listItems = remember(state.richString) { state.richString.extractListItems() }
 
     val drawModifier =
-        Modifier.drawBehind {
-            val layoutResult = textLayoutResult ?: return@drawBehind
+        Modifier
+            .clipToBounds()
+            .drawBehind {
+                val layoutResult = textLayoutResult ?: return@drawBehind
 
-            translate(top = -scrollState.value.toFloat()) {
-                drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle, listMarkerResolver)
+                translate(top = -scrollState.value.toFloat()) {
+                    drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle, listMarkerResolver)
+                }
             }
-        }
 
     BasicTextField(
         state = state.textFieldState,
