@@ -31,7 +31,7 @@ While standard `buildAnnotatedString` is perfect for static text decoration, it 
 
 Arranger solves the biggest pain points of traditional rich text handling in Android and Compose.
 
-### 1. No More Manual Index Math (Dynamic Editor State)
+### 1. No More Manual Index Math (Auto-Shifting Spans)
 While standard `buildAnnotatedString` is excellent for decorating static text, it is not designed for dynamic input. If a user inserts or deletes text in the middle of an `AnnotatedString`, all subsequent span indices become misaligned, and you are forced to manually recalculate them. This manual index math is tedious and highly error-prone when building a real-time text editor.
 
 **The Pain (`AnnotatedString`)**
