@@ -1,9 +1,12 @@
 package dev.mkeeda.arranger.richtext
 
+import dev.mkeeda.arranger.richtext.InternalArrangerApi
+
 /**
  * Expands this range to cover the entire paragraph(s) it intersects with
  * in the given [text]. Paragraphs are delimited by '\n'.
  */
+@InternalArrangerApi
 public fun IntRange.snapToParagraphs(text: String): IntRange {
     val start =
         text.lastIndexOf('\n', startIndex = this.first - 1).let {
