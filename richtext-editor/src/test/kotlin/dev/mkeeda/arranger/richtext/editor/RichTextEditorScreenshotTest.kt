@@ -8,9 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
+import com.github.takahirom.roborazzi.captureRoboGif
 import com.github.takahirom.roborazzi.captureRoboImage
 import dev.mkeeda.arranger.richtext.BulletListItem
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -41,7 +45,7 @@ class RichTextEditorScreenshotTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun plainText() {
+    fun `render plain text`() {
         val text =
             "The quick brown fox jumps over the lazy dog.\n" +
                 "Pack my box with five dozen liquor jugs.\n" +
@@ -59,7 +63,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun inlineStyles() {
+    fun `render inline styles`() {
         val text = "Bold Italic Strikethrough Underline Colored Highlighted"
         val state =
             RichTextState(
@@ -85,7 +89,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun paragraphStyles() {
+    fun `render paragraph styles`() {
         val text = "Heading 1\nBody text under H1.\nHeading 3\nBlockquote text\nCenter aligned text"
         val state =
             RichTextState(
@@ -109,7 +113,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun lists() {
+    fun `render multi level lists`() {
         val state = createMultiLevelListState()
 
         composeTestRule.setContent {
@@ -123,7 +127,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun listsWithCustomMarker() {
+    fun `render lists with custom marker`() {
         val state = createMultiLevelListState()
 
         val customMarkerResolver =
@@ -146,7 +150,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun paragraphSpacing() {
+    fun `render paragraph spacing correctly`() {
         val text = "First paragraph with bold text.\n\nSecond paragraph plain.\nThird paragraph with italic.\n\nFourth paragraph plain."
         val state =
             RichTextState(
@@ -168,7 +172,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun scrolledListsMarkerClipping() {
+    fun `clip scrolled list markers`() {
         val state = createMultiLevelListState()
         val scrollState = ScrollState(150)
 
@@ -183,6 +187,44 @@ class RichTextEditorScreenshotTest {
         }
 
         composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @OptIn(com.github.takahirom.roborazzi.ExperimentalRoborazziApi::class)
+    @Test
+    fun `type newline on list item generates marker and indents cursor`() {
+        val text = "Bullet item 1"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
+            )
+        }
+
+        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
+            composeTestRule,
+        ) {
+            // Move cursor to the end
+            state.textFieldState.edit {
+                selection = androidx.compose.ui.text.TextRange(text.length)
+            }
+            composeTestRule.mainClock.advanceTimeByFrame()
+
+            // Type newline
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+
+            // Advance multiple frames to capture cursor blinking
+            for (i in 0..10) {
+                composeTestRule.mainClock.advanceTimeByFrame()
+            }
+        }
     }
 
     private fun createMultiLevelListState(): RichTextState {
