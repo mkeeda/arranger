@@ -17,12 +17,12 @@ class AndroidSpotlessConventionPlugin : Plugin<Project> {
                 kotlin {
                     target("**/*.kt")
                     targetExclude("**/build/**/*.kt")
-                    ktlint(ktlintVersion)
+                    ktlint(ktlintVersion).setEditorConfigPath(target.rootProject.file(".editorconfig"))
                 }
                 kotlinGradle {
                     target("**/*.kts")
                     targetExclude("**/build/**/*.kts")
-                    ktlint(ktlintVersion)
+                    ktlint(ktlintVersion).setEditorConfigPath(target.rootProject.file(".editorconfig"))
                 }
                 format("xml") {
                     target("**/*.xml")
