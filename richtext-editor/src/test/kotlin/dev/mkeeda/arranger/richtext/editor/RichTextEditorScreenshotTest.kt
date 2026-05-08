@@ -1,6 +1,10 @@
 package dev.mkeeda.arranger.richtext.editor
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -158,6 +162,24 @@ class RichTextEditorScreenshotTest {
                 state = state,
                 modifier = Modifier.width(400.dp).background(Color.White),
             )
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun scrolledListsMarkerClipping() {
+        val state = createMultiLevelListState()
+        val scrollState = ScrollState(150)
+
+        composeTestRule.setContent {
+            Box(Modifier.padding(50.dp).background(Color.LightGray)) {
+                RichTextEditor(
+                    state = state,
+                    modifier = Modifier.width(400.dp).height(100.dp).background(Color.White),
+                    scrollState = scrollState,
+                )
+            }
         }
 
         composeTestRule.onRoot().captureRoboImage()
