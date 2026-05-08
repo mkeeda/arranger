@@ -4,14 +4,19 @@ package dev.mkeeda.arranger.richtext
  * Expands this range to cover the entire paragraph(s) it intersects with
  * in the given [text]. Paragraphs are delimited by '\n'.
  */
-internal fun IntRange.snapToParagraphs(text: String): IntRange {
+public fun IntRange.snapToParagraphs(text: String): IntRange {
     val start =
         text.lastIndexOf('\n', startIndex = this.first - 1).let {
             if (it == -1) 0 else it + 1
         }
+    val safeLast = maxOf(this.first, this.last)
     val end =
-        text.indexOf('\n', startIndex = this.last).let {
-            if (it == -1) text.lastIndex else it
+        text.indexOf('\n', startIndex = safeLast).let {
+            if (it != -1) {
+                it
+            } else {
+                if (safeLast >= text.length && text.endsWith('\n')) text.length else text.lastIndex
+            }
         }
     return start..end
 }
@@ -52,8 +57,8 @@ public fun List<RichSpan>.resnapParagraphSpans(text: String): List<RichSpan> {
         }
 
     for (pSpan in pSpans) {
-        val clampedFirst = pSpan.range.first.coerceIn(0, text.lastIndex)
-        val clampedLast = pSpan.range.last.coerceIn(0, text.lastIndex)
+        val clampedFirst = pSpan.range.first.coerceIn(0, text.length)
+        val clampedLast = pSpan.range.last.coerceIn(0, text.length)
         if (clampedFirst <= clampedLast) {
             val snappedRange = (clampedFirst..clampedLast).snapToParagraphs(text)
             resultSpans =

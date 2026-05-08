@@ -115,6 +115,7 @@ public fun RichString.extractListItems(): List<ListItem> {
 
 private fun RichString.paragraphStartIndices(range: IntRange): List<Int> =
     listOf(range.first) +
-        (range.first until range.last)
-            .filter { text[it] == '\n' }
+        (range.first..range.last)
+            .filter { it < text.length && text[it] == '\n' }
             .map { it + 1 }
+            .filter { it in range }

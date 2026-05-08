@@ -61,7 +61,8 @@ public data class RichString(
                 if (!canMerge) {
                     if (currentVal != null) {
                         val range = start..end
-                        yield(RichRun(text.substring(range), range, currentVal))
+                        val safeEnd = minOf(text.length, range.last + 1)
+                        yield(RichRun(text.substring(range.first, safeEnd), range, currentVal))
                         currentVal = null
                     }
                 }
@@ -77,7 +78,8 @@ public data class RichString(
 
             if (currentVal != null) {
                 val range = start..end
-                yield(RichRun(text.substring(range), range, currentVal))
+                val safeEnd = minOf(text.length, range.last + 1)
+                yield(RichRun(text.substring(range.first, safeEnd), range, currentVal))
             }
         }
 
