@@ -1,5 +1,6 @@
 # https://editorconfig.org/
 # This configuration is used by ktlint when spotless invokes it
+root = true
 
 [*.{kt,kts}]
 ij_kotlin_allow_trailing_comma=true
@@ -16,3 +17,4 @@ ktlint_standard_function-type-modifier-spacing = disabled
 ktlint_standard_multiline-loop = disabled
 ktlint_standard_function-signature = disabled
 ktlint_property_naming_constant_naming = pascal_case
+ktlint_standard_no-unused-imports = enabled
