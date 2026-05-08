@@ -7,6 +7,10 @@
 Arranger is a declarative, type-safe rich text editor engine and state management library for Jetpack Compose.
 While standard `buildAnnotatedString` is perfect for static text decoration, it quickly breaks down when building real-time editors where users insert and delete text. Arranger is built specifically for **dynamic text operations**, automatically managing and shifting attribute spans (like bold, colors, or links) as the underlying text mutates.
 
+<div align="center">
+  <img src="./docs/images/dynamic-typing-demo.gif" width="600" alt="Arranger Dynamic Typing Demo"/>
+</div>
+
 > [!WARNING]
 > **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice. We highly welcome your feedback, feature requests, and bug reports via GitHub Issues!
 
