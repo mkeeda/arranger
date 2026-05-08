@@ -1,11 +1,15 @@
-# Arranger - Type-safe Rich Text for Jetpack Compose
+# Arranger - Type-safe Rich Text Editor Engine for Jetpack Compose
 
 [![CI](https://github.com/mkeeda/arranger/actions/workflows/ci.yml/badge.svg)](https://github.com/mkeeda/arranger/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-richtext-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-richtext-editor%22)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Arranger is a declarative, type-safe rich text library for Jetpack Compose (Kotlin Multiplatform support is planned on the roadmap).
-Inspired by SwiftUI's AttributedString, it eliminates the tedious and error-prone index manipulations of traditional AnnotatedString, giving you a modern, immutable, and fully type-safe API for rich text formatting.
+Arranger is a declarative, type-safe rich text editor engine and UI components for Jetpack Compose.
+While standard `buildAnnotatedString` is perfect for static text decoration, it quickly breaks down when building real-time editors where users insert and delete text. Arranger is built specifically for **dynamic text operations**, automatically managing and shifting attribute spans (like bold, colors, or links) as the underlying text mutates.
+
+<div align="center">
+  <img src="./docs/images/dynamic-typing-demo.gif" width="600" alt="Arranger Dynamic Typing Demo"/>
+</div>
 
 > [!WARNING]
 > **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice. We highly welcome your feedback, feature requests, and bug reports via GitHub Issues!
@@ -27,8 +31,8 @@ Inspired by SwiftUI's AttributedString, it eliminates the tedious and error-pron
 
 Arranger solves the biggest pain points of traditional rich text handling in Android and Compose.
 
-### 1. No More Manual Index Math
-When a user types or you programmatically insert text, shifting existing span indices in `AnnotatedString` is tedious and highly error-prone.
+### 1. No More Manual Index Math (Auto-Shifting Spans)
+While standard `buildAnnotatedString` is excellent for decorating static text, it is not designed for dynamic input. If a user inserts or deletes text in the middle of an `AnnotatedString`, all subsequent span indices become misaligned, and you are forced to manually recalculate them. This manual index math is tedious and highly error-prone when building a real-time text editor.
 
 **The Pain (`AnnotatedString`)**
 ```kotlin
@@ -83,20 +87,20 @@ dependencies {
 }
 ```
 
-## Basic Usage (Getting Started)
+## Dynamic Editing (Getting Started)
 
-One of the core strengths of Arranger is that you can programmatically construct and decorate RichText using a clean DSL. Simply create a `RichTextState`, decorate it with `editAttributes`, and pass it to the `RichTextEditor`.
+Arranger's true power lies in its ability to handle dynamic text input gracefully. When a user types in the `RichTextEditor`—or when you programmatically insert text into `RichTextState`—existing spans are automatically maintained and shifted. You don't need to write any custom logic to preserve formatting.
 
 ```kotlin
 @Composable
-fun BasicUsageSample(modifier: Modifier = Modifier) {
-    val initialText = "Welcome to Arranger!\nEnjoy building RichText in Compose programmatically."
+fun DynamicEditingSample(modifier: Modifier = Modifier) {
+    val initialText = "Edit this styled text to see the magic."
 
-    // 1. Initialize state with minimal attributes using the declarative DSL
+    // 1. Initialize state with formatting
     val state = remember {
         RichTextState(
             initialText = RichString(text = initialText).edit {
-                editAttributes(range = initialText.rangeOf("Arranger!")) {
+                editAttributes(range = initialText.rangeOf("styled text")) {
                     bold()
                     textColor(Color(0xFF6200EA)) // Purple
                 }
@@ -105,6 +109,8 @@ fun BasicUsageSample(modifier: Modifier = Modifier) {
     }
 
     // 2. Render natively via Compose 1.7
+    // Try typing in the middle of "styled text"! 
+    // Arranger automatically tracks and shifts the span indices in the background.
     RichTextEditor(
         state = state,
         modifier = Modifier.fillMaxWidth(),
@@ -112,7 +118,7 @@ fun BasicUsageSample(modifier: Modifier = Modifier) {
 }
 ```
 
-<img src="./docs/images/basic-usage.png" width="500" alt="basic usage sample"/>
+<img src="./docs/images/dynamic-typing-demo.gif" width="500" alt="dynamic typing demo"/>
 
 ## Paragraph Styles & Advanced Formatting
 
