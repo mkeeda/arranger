@@ -551,8 +551,6 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ## Development Roadmap
 
-## Development Roadmap
-
 ### Phase 1: Core Foundation (Completed)
 - [x] **Core Data Structures**: Range-based attribute management using interval logic.
 - [x] **Runs API**: Semantic segmentation of text into operable chunks.
