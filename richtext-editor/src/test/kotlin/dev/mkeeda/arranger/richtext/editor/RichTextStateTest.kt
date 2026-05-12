@@ -535,6 +535,40 @@ class RichTextStateTest {
         // The span should now only cover the first paragraph (0..9)
         spans.first().range shouldBe (0..9)
     }
+
+    @Test
+    fun `does not inherit removed paragraph attributes upon newline`() {
+        val initialText = "Bullet item"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, initialText.indices)
+                    },
+            )
+
+        // Select the end of the line
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        // Toggle bullet list off (explicitly disables it)
+        state.removeTypingAttribute(BulletListKey)
+
+        // Type a newline and some text
+        state.textFieldState.edit {
+            replace(length, length, "\nNew line")
+        }
+
+        val expectedText = "Bullet item\nNew line"
+        state.richString.text shouldBe expectedText
+
+        // Only the first line should have the bullet attribute, since it was disabled before the newline
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        spans.first().range shouldBe expectedText.rangeOf("Bullet item")
+        spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
+    }
 }
 
 // --- Test Helpers ---
