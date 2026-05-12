@@ -557,24 +557,23 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 - [x] **Compose Integration**: Native binding with `TextFieldState` and `OutputTransformation`.
 - [x] **Built-in Attributes**: Support for Bold, Italic, Underline, Color, and Headings.
 
-### Phase 2: Advanced Manipulation & Structural Elements
+### Phase 2: The Real "Editor" Engine
 - [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
 - [x] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
-- [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., vertical lines for blockquotes, background boxes for code blocks).
-- [ ] **Material 3 Integration**: Specialized resolvers for M3 Typography and Color Schemes.
-
-### Phase 3: Interoperability & Media
-- [ ] **HTML & Markdown Support**: Import/Export logic (CommonMark and HTML5).
-- [ ] **WYSIWYG Auto-formatting**: Real-time conversion of Markdown syntax during input.
-- [ ] **Inline Media**: Support for images and attachments using Compose `InlineContent`.
-- [ ] **Declarative Constraints**: Restricting allowed formatting (e.g., "Plain text + Links only") for specific use cases.
-
-### Phase 4: Complex Layouts & Enterprise Features
-- [ ] **Table Support**: Implementation of nested structural layouts for grids/tables within the editor.
 - [ ] **Undo/Redo Synchronization**: Full history restoration for both text and complex structural changes.
-- [ ] **Performance Optimization**: Internal migration to Piece Table/Rope structures for document-scale text.
-- [ ] **Kotlin Multiplatform (KMP)**: Full support for iOS, Desktop, and Web.
+- [ ] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
 
+### Phase 3: Multiplatform & Interoperability (The "Killer" Features)
+- [ ] **Kotlin Multiplatform (KMP)**: Full support for iOS, Desktop, and Web.
+- [ ] **Markdown & HTML Support**: Import/Export logic (CommonMark and HTML5).
+- [ ] **WYSIWYG Auto-formatting**: Real-time conversion of Markdown syntax during input (e.g., typing `**bold**` automatically formats the text).
+- [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., custom drawing for blockquotes or code blocks).
+
+### Phase 4: Enterprise Scale & Advanced Layouts
+- [ ] **Inline Media**: Support for images and attachments using Compose `InlineContent`.
+- [ ] **Table Support**: Implementation of nested structural layouts for grids/tables within the editor.
+- [ ] **Declarative Constraints**: Restricting allowed formatting (e.g., "Plain text + Links only") for specific use cases.
+- [ ] **Performance Optimization**: Internal migration to Piece Table/Rope structures for document-scale text.
 
 ## Contributing
 Contributions are welcome! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
