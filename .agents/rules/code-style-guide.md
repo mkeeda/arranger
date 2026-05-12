@@ -32,3 +32,7 @@ Text("ui text")
 
 APIの命名規則は公式のCompose API Guidelinesに従うこと。
 https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-api-guidelines.md
+
+## importルール
+- single importのみを使うこと。*を使って複数のクラスをまとめてimportしない。
+- ファイル内でオブジェクト名の被りがない限り、必ずimport文を書いてクラス名等を短く書く。androidx.compose.ui...などのようにフルパッケージ指定は極力避ける。
