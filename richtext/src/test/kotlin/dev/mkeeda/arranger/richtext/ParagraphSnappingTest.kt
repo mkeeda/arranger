@@ -81,4 +81,21 @@ class ParagraphSnappingTest {
         // Range should be clamped to valid text length
         resnappedSpans.first().range shouldBe (0..4)
     }
+
+    @Test
+    fun `resnapParagraphSpans allows span to cover empty paragraph at the end of text`() {
+        val text = "Line1\n"
+        // text length is 6. The '\n' is at index 5.
+        // Index 6 is the empty paragraph at the end.
+
+        val attributes = attributeContainerOf(BlockquoteKey to Unit)
+        // A span covering the entire text including the trailing empty paragraph
+        val span = RichSpan(range = 0..6, attributes = attributes)
+
+        val resnappedSpans = listOf(span).resnapParagraphSpans(text)
+
+        resnappedSpans shouldHaveSize 1
+        // It should NOT be clamped to 5 (text.lastIndex), but should stay 0..6
+        resnappedSpans.first().range shouldBe (0..6)
+    }
 }

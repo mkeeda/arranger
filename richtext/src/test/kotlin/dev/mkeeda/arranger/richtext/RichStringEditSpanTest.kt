@@ -84,9 +84,9 @@ class RichStringEditSpanTest {
         val richString = RichString(text = "Hello")
         val exception =
             shouldThrow<IllegalArgumentException> {
-                richString.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..5) }
+                richString.edit { setSpanAttribute(TextColorKey, RgbaColor(0xFFFF0000), range = 0..6) }
             }
-        exception.message shouldBe "Range end must be within text bounds: 5 >= 5"
+        exception.message shouldBe "Range end must be within text bounds: 6 <= 5"
     }
 
     @Test

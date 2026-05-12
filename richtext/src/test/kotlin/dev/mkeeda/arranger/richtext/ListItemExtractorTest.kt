@@ -252,4 +252,37 @@ class ListItemExtractorTest {
             ),
         )
     }
+
+    @Test
+    fun `extract list items extracts item for trailing empty paragraph if span covers it`() {
+        val text = "Item 1\n"
+        // Here, the text length is 7. The '\n' is at index 6.
+        // We simulate a span that covers the trailing empty paragraph (0..7).
+        val richString =
+            RichString(
+                text = text,
+                spans =
+                    listOf(
+                        RichSpan(
+                            range = 0..7,
+                            attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1),
+                        ),
+                    ),
+            )
+
+        val items = richString.extractListItems()
+
+        items.shouldContainExactly(
+            BulletListItem(
+                textIndex = 0, // "Item 1\n"
+                indentLevel = ListIndentLevel.Level1,
+                color = null,
+            ),
+            BulletListItem(
+                textIndex = 7, // Trailing empty paragraph
+                indentLevel = ListIndentLevel.Level1,
+                color = null,
+            ),
+        )
+    }
 }

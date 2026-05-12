@@ -146,7 +146,7 @@ public class RichStringScope
             // Span attributes gracefully ignore empty target ranges, while paragraph attributes
             // use the cursor position to snap to the surrounding paragraph bounds.
             require(range.first >= 0) { "Range start must not be negative: ${range.first}" }
-            require(range.last < textLength) { "Range end must be within text bounds: ${range.last} >= $textLength" }
+            require(range.last <= textLength) { "Range end must be within text bounds: ${range.last} <= $textLength" }
         }
 
         @InternalArrangerApi

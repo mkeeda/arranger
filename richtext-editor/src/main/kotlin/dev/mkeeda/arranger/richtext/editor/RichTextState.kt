@@ -17,6 +17,7 @@ import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.mergeSpan
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
+import dev.mkeeda.arranger.richtext.snapToParagraphs
 
 @Stable
 public class RichTextState(initialText: RichString) {
@@ -276,6 +277,39 @@ public class RichTextState(initialText: RichString) {
                             }
                         }
                         updatedSpans = tempBuffer.spans
+                    }
+                }
+
+                // Inherit paragraph attributes when newlines are typed or pasted
+                val insertedText = buffer.asCharSequence().substring(range.min, range.max)
+                if (insertedText.contains('\n')) {
+                    val inheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
+                    val spansBeforeCursor = currentSpans.filter { inheritIndex in it.range }
+                    val attrsBeforeCursor =
+                        spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
+                            acc + span.attributes
+                        }
+                    val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
+                    val effectiveParagraphAttrKeys =
+                        paragraphAttrKeys.filter { key ->
+                            removedAttr == null || key !in removedAttr
+                        }
+                    val paragraphAttr =
+                        effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
+                            @Suppress("UNCHECKED_CAST")
+                            val typedKey = key as AttributeKey<Any>
+                            acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))
+                        }
+
+                    if (paragraphAttr.isNotEmpty()) {
+                        val snappedRange = (range.min..range.max).snapToParagraphs(buffer.toString())
+                        updatedSpans =
+                            updatedSpans.mergeSpan(
+                                RichSpan(
+                                    range = snappedRange,
+                                    attributes = paragraphAttr,
+                                ),
+                            )
                     }
                 }
 

@@ -8,9 +8,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
+import com.github.takahirom.roborazzi.captureRoboGif
 import com.github.takahirom.roborazzi.captureRoboImage
 import dev.mkeeda.arranger.richtext.BulletListItem
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -41,7 +47,7 @@ class RichTextEditorScreenshotTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun plainText() {
+    fun `render plain text`() {
         val text =
             "The quick brown fox jumps over the lazy dog.\n" +
                 "Pack my box with five dozen liquor jugs.\n" +
@@ -59,7 +65,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun inlineStyles() {
+    fun `render inline styles`() {
         val text = "Bold Italic Strikethrough Underline Colored Highlighted"
         val state =
             RichTextState(
@@ -85,7 +91,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun paragraphStyles() {
+    fun `render paragraph styles`() {
         val text = "Heading 1\nBody text under H1.\nHeading 3\nBlockquote text\nCenter aligned text"
         val state =
             RichTextState(
@@ -109,7 +115,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun lists() {
+    fun `render multi level lists`() {
         val state = createMultiLevelListState()
 
         composeTestRule.setContent {
@@ -123,7 +129,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun listsWithCustomMarker() {
+    fun `render lists with custom marker`() {
         val state = createMultiLevelListState()
 
         val customMarkerResolver =
@@ -146,7 +152,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun paragraphSpacing() {
+    fun `render paragraph spacing correctly`() {
         val text = "First paragraph with bold text.\n\nSecond paragraph plain.\nThird paragraph with italic.\n\nFourth paragraph plain."
         val state =
             RichTextState(
@@ -168,7 +174,7 @@ class RichTextEditorScreenshotTest {
     }
 
     @Test
-    fun scrolledListsMarkerClipping() {
+    fun `clip scrolled list markers`() {
         val state = createMultiLevelListState()
         val scrollState = ScrollState(150)
 
@@ -202,5 +208,113 @@ class RichTextEditorScreenshotTest {
                     editAttributes(text.rangeOf("Deep nested ordered")) { orderedList(ListIndentLevel.Level3) }
                 },
         )
+    }
+
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    fun `type continuous newlines generates list markers correctly`() {
+        val text = "Item 1"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Item 1")) { bulletList(ListIndentLevel.Level1) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
+            )
+        }
+
+        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
+            composeTestRule,
+        ) {
+            // Move cursor to the end
+            state.textFieldState.edit {
+                selection = TextRange(text.length)
+            }
+            composeTestRule.waitForIdle()
+
+            // First newline
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+
+            // Second newline
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+        }
+    }
+
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    fun `type newline in nested list aligns markers correctly`() {
+        val text = "Level 1\nLevel 2"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Level 1\n")) { bulletList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Level 2")) { bulletList(ListIndentLevel.Level2) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
+            )
+        }
+
+        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
+            composeTestRule,
+        ) {
+            // Move cursor to the end of Level 1
+            state.textFieldState.edit {
+                selection = TextRange(text.indexOf("\n"))
+            }
+            composeTestRule.waitForIdle()
+
+            // Insert newline between Level 1 and Level 2
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+        }
+    }
+
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    fun `type newline in level 2 list item aligns markers correctly`() {
+        val text = "Level 1\nLevel 2"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Level 1\n")) { bulletList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Level 2")) { bulletList(ListIndentLevel.Level2) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
+            )
+        }
+
+        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
+            composeTestRule,
+        ) {
+            // Move cursor to the end of Level 2
+            state.textFieldState.edit {
+                selection = TextRange(text.length)
+            }
+            composeTestRule.waitForIdle()
+
+            // Insert newline at the end of Level 2
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+        }
     }
 }

@@ -3,11 +3,15 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
+import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.ItalicKey
+import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RgbaColor
+import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.clearBulletList
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -458,10 +462,112 @@ class RichTextStateTest {
         val state = RichTextState(initialText = RichString(text = ""))
 
         state.setTypingAttribute(BoldKey, Unit)
-        state.setTypingAttribute(BlockquoteKey, Unit)
-
         state.clearTypingAttributes()
         state.currentAttributes shouldBe attributeContainerOf()
+    }
+
+    @Test
+    fun `typing newline inherits paragraph attributes to the new empty paragraph`() {
+        val initialText = "List Item"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, range = initialText.indices)
+                    },
+            )
+
+        // Move cursor to the end
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        // Type a newline character
+        state.textFieldState.edit {
+            replace(initialText.length, initialText.length, "\n")
+            selection = TextRange(initialText.length + 1)
+            state.updateRichString(this)
+        }
+
+        val expectedText = "List Item\n"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        // The span should cover up to the end of the text (including the new empty paragraph at index 10)
+        spans.first().range shouldBe (0..10)
+    }
+
+    @Test
+    fun `toggling off paragraph attribute on empty paragraph removes it`() {
+        val initialText = "List Item\n"
+        val state =
+            RichTextState(
+                // Span covers 0..10, which includes the empty paragraph at index 10
+                initialText =
+                    RichString(
+                        text = initialText,
+                        spans =
+                            listOf(
+                                RichSpan(
+                                    range = 0..10,
+                                    attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1),
+                                ),
+                            ),
+                    ),
+            )
+
+        // Cursor is at the empty paragraph (index 10)
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        // Toggle off the paragraph attribute.
+        // It should call removeParagraphAttribute.
+        state.edit {
+            editAttributes(state.selection) {
+                clearBulletList()
+            }
+        }
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        // The span should now only cover the first paragraph (0..9)
+        spans.first().range shouldBe (0..9)
+    }
+
+    @Test
+    fun `does not inherit removed paragraph attributes upon newline`() {
+        val initialText = "Bullet item"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, initialText.indices)
+                    },
+            )
+
+        // Select the end of the line
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        // Toggle bullet list off (explicitly disables it)
+        state.removeTypingAttribute(BulletListKey)
+
+        // Type a newline and some text
+        state.textFieldState.edit {
+            replace(length, length, "\nNew line")
+        }
+
+        val expectedText = "Bullet item\nNew line"
+        state.richString.text shouldBe expectedText
+
+        // Only the first line should have the bullet attribute, since it was disabled before the newline
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        spans.first().range shouldBe expectedText.rangeOf("Bullet item")
+        spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
 }
 
