@@ -62,9 +62,11 @@ public fun RichTextEditor(
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
 ) {
+    val workarounds = remember { ComposeParagraphWorkarounds() }
+
     val outputTransformation =
-        remember(state, styleResolver) {
-            RichTextOutputTransformation(state, styleResolver)
+        remember(state, styleResolver, workarounds) {
+            RichTextOutputTransformation(state, styleResolver, workarounds)
         }
 
     val inputTransformation =
@@ -90,7 +92,7 @@ public fun RichTextEditor(
                 val layoutResult = textLayoutResult ?: return@drawBehind
 
                 translate(top = -scrollState.value.toFloat()) {
-                    drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle, listMarkerResolver)
+                    drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle, listMarkerResolver, workarounds)
                 }
             }
 
@@ -119,9 +121,11 @@ private fun DrawScope.drawListItems(
     textMeasurer: TextMeasurer,
     currentTextStyle: TextStyle,
     listMarkerResolver: ListMarkerResolver,
+    workarounds: ComposeParagraphWorkarounds,
 ) {
     listItems.forEach { item ->
-        val line = layoutResult.getLineForOffset(item.textIndex)
+        val mappedIndex = workarounds.mapCharacterIndex(item.textIndex)
+        val line = layoutResult.getLineForOffset(mappedIndex)
         val top = layoutResult.getLineTop(line)
         val bottom = layoutResult.getLineBottom(line)
         val yCenter = top + (bottom - top) / 2f
@@ -149,9 +153,73 @@ private fun DrawScope.drawListItems(
     }
 }
 
+internal class ComposeParagraphWorkarounds {
+    private var emptyParagraphIndices: List<Int> = emptyList()
+
+    /**
+     * Maps an original character index to its new index in the transformed text buffer.
+     * This is used when targeting a specific character that may have been shifted by insertions.
+     */
+    fun mapCharacterIndex(originalIndex: Int): Int {
+        return originalIndex + emptyParagraphIndices.count { it <= originalIndex }
+    }
+
+    /**
+     * Maps a style boundary offset to its new position in the transformed text buffer.
+     * This is used for ranges where we want the style to cover newly inserted workaround characters.
+     */
+    fun mapStyleOffset(originalOffset: Int): Int {
+        return originalOffset + emptyParagraphIndices.count { it < originalOffset }
+    }
+
+    fun apply(
+        buffer: TextFieldBuffer,
+        getParagraphStyleAt: (Int) -> ParagraphStyle?,
+    ) {
+        val originalText = buffer.asCharSequence().toString()
+        val originalLength = originalText.length
+
+        // Workaround 1: Compose TextLayoutResult ignores ParagraphStyle for completely empty paragraphs.
+        // This breaks cursor positioning (e.g. list indentation) when typing a newline at the end of a list item.
+        // We find all empty paragraphs and insert a Zero-Width Space (\u200B) to force the style application.
+        // We iterate backwards to avoid index shifting during insertion.
+        val emptyIndices = mutableListOf<Int>()
+        for (i in originalLength downTo 0) {
+            val isLineEmpty = (i == originalLength || originalText[i] == '\n') && (i == 0 || originalText[i - 1] == '\n')
+            if (isLineEmpty && getParagraphStyleAt(i) != null) {
+                emptyIndices.add(i)
+                buffer.replace(i, i, "\u200B")
+            }
+        }
+        emptyParagraphIndices = emptyIndices
+
+        // Workaround 2: Compose interprets `\n` within or at the end of a `ParagraphStyle` span as a hard paragraph separator.
+        // When two adjacent lines have different `ParagraphStyle`s, keeping the `\n` between them causes Compose
+        // to render an unintended extra empty line (double spacing).
+        // By replacing the boundary `\n` with a zero-width non-breaking space (`\uFEFF`) right before rendering,
+        // we eliminate the explicit newline character while letting the style change handle the visual line break.
+        var searchStartIndex = 0
+        while (true) {
+            val i = originalText.indexOf('\n', searchStartIndex)
+            if (i == -1) break
+
+            if (i < originalLength - 1) {
+                val styleAtI = getParagraphStyleAt(i)
+                val styleAtNext = getParagraphStyleAt(i + 1)
+                if (styleAtI != styleAtNext) {
+                    val mappedI = mapCharacterIndex(i)
+                    buffer.replace(mappedI, mappedI + 1, "\uFEFF")
+                }
+            }
+            searchStartIndex = i + 1
+        }
+    }
+}
+
 internal class RichTextOutputTransformation(
     private val state: RichTextState,
     private val styleResolver: AttributeStyleResolver,
+    private val workarounds: ComposeParagraphWorkarounds,
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
         // Pre-resolve styles for all spans to avoid redundant object allocations
@@ -165,51 +233,15 @@ internal class RichTextOutputTransformation(
             return resolvedSpan?.second?.paragraphStyle
         }
 
-        val originalText = asCharSequence().toString()
-        val originalLength = originalText.length
+        workarounds.apply(this, ::getParagraphStyleAt)
 
-        // Workaround 1: Compose TextLayoutResult ignores ParagraphStyle for completely empty paragraphs.
-        // This breaks cursor positioning (e.g. list indentation) when typing a newline at the end of a list item.
-        // We find all empty paragraphs and insert a Zero-Width Space (\u200B) to force the style application.
-        // We iterate backwards to avoid index shifting during insertion.
-        val emptyParagraphIndices = mutableListOf<Int>()
-        for (i in originalLength downTo 0) {
-            val isLineEmpty = (i == originalLength || originalText[i] == '\n') && (i == 0 || originalText[i - 1] == '\n')
-            if (isLineEmpty && getParagraphStyleAt(i) != null) {
-                emptyParagraphIndices.add(i)
-                replace(i, i, "\u200B")
-            }
-        }
-
-        // Workaround 2: Compose interprets `\n` within or at the end of a `ParagraphStyle` span as a hard paragraph separator.
-        // When two adjacent lines have different `ParagraphStyle`s, keeping the `\n` between them causes Compose
-        // to render an unintended extra empty line (double spacing).
-        // By replacing the boundary `\n` with a zero-width non-breaking space (`\uFEFF`) right before rendering,
-        // we prevent this extra empty line while the underlying text model and expected visual line break are preserved.
-        var searchStartIndex = 0
-        while (true) {
-            val i = originalText.indexOf('\n', searchStartIndex)
-            if (i == -1) break
-            searchStartIndex = i + 1
-
-            if (i + 1 < originalLength) {
-                val styleAtI = getParagraphStyleAt(i)
-                val styleAtNext = getParagraphStyleAt(i + 1)
-                if (styleAtI != styleAtNext) {
-                    val mappedI = i + emptyParagraphIndices.count { it < i }
-                    replace(mappedI, mappedI + 1, "\uFEFF")
-                }
-            }
-        }
-
-        // Reuse the resolved styles here
-        for ((span, resolved) in resolvedSpans) {
-            // Determine boundaries avoiding out of bounds in case of race conditions or text shrinkage mid-frame.
+        state.richString.spans.forEach { span ->
+            val resolved = resolvedSpans.find { it.first == span }?.second ?: return@forEach
             val originalStart = span.range.first
             val originalEnd = span.range.last + 1
 
-            val start = (originalStart + emptyParagraphIndices.count { it < originalStart }).coerceIn(0, length)
-            val end = (originalEnd + emptyParagraphIndices.count { it < originalEnd }).coerceIn(0, length)
+            val start = workarounds.mapStyleOffset(originalStart).coerceIn(0, length)
+            val end = workarounds.mapStyleOffset(originalEnd).coerceIn(0, length)
 
             if (start < end) {
                 resolved.spanStyle?.let { style ->

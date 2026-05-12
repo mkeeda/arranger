@@ -13,7 +13,9 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureRoboGif
 import com.github.takahirom.roborazzi.captureRoboImage
 import dev.mkeeda.arranger.richtext.BulletListItem
@@ -189,44 +191,6 @@ class RichTextEditorScreenshotTest {
         composeTestRule.onRoot().captureRoboImage()
     }
 
-    @OptIn(com.github.takahirom.roborazzi.ExperimentalRoborazziApi::class)
-    @Test
-    fun `type newline on list item generates marker and indents cursor`() {
-        val text = "Bullet item 1"
-        val state =
-            RichTextState(
-                initialText =
-                    RichString(text).edit {
-                        editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
-                    },
-            )
-
-        composeTestRule.setContent {
-            RichTextEditor(
-                state = state,
-                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
-            )
-        }
-
-        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
-            composeTestRule,
-        ) {
-            // Move cursor to the end
-            state.textFieldState.edit {
-                selection = androidx.compose.ui.text.TextRange(text.length)
-            }
-            composeTestRule.mainClock.advanceTimeByFrame()
-
-            // Type newline
-            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
-
-            // Advance multiple frames to capture cursor blinking
-            for (i in 0..10) {
-                composeTestRule.mainClock.advanceTimeByFrame()
-            }
-        }
-    }
-
     private fun createMultiLevelListState(): RichTextState {
         val text =
             "Bullet item 1\nBullet item 2\nNested bullet\nDeep nested bullet\n" +
@@ -244,5 +208,113 @@ class RichTextEditorScreenshotTest {
                     editAttributes(text.rangeOf("Deep nested ordered")) { orderedList(ListIndentLevel.Level3) }
                 },
         )
+    }
+
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    fun `type continuous newlines generates list markers correctly`() {
+        val text = "Item 1"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Item 1")) { bulletList(ListIndentLevel.Level1) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
+            )
+        }
+
+        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
+            composeTestRule,
+        ) {
+            // Move cursor to the end
+            state.textFieldState.edit {
+                selection = TextRange(text.length)
+            }
+            composeTestRule.waitForIdle()
+
+            // First newline
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+
+            // Second newline
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+        }
+    }
+
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    fun `type newline in nested list aligns markers correctly`() {
+        val text = "Level 1\nLevel 2"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Level 1\n")) { bulletList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Level 2")) { bulletList(ListIndentLevel.Level2) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
+            )
+        }
+
+        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
+            composeTestRule,
+        ) {
+            // Move cursor to the end of Level 1
+            state.textFieldState.edit {
+                selection = TextRange(text.indexOf("\n"))
+            }
+            composeTestRule.waitForIdle()
+
+            // Insert newline between Level 1 and Level 2
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+        }
+    }
+
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    fun `type newline in level 2 list item aligns markers correctly`() {
+        val text = "Level 1\nLevel 2"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Level 1\n")) { bulletList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Level 2")) { bulletList(ListIndentLevel.Level2) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White).testTag("editor"),
+            )
+        }
+
+        composeTestRule.onNode(hasTestTag("editor")).captureRoboGif(
+            composeTestRule,
+        ) {
+            // Move cursor to the end of Level 2
+            state.textFieldState.edit {
+                selection = TextRange(text.length)
+            }
+            composeTestRule.waitForIdle()
+
+            // Insert newline at the end of Level 2
+            composeTestRule.onNode(hasTestTag("editor")).performTextInput("\n")
+            composeTestRule.waitForIdle()
+        }
     }
 }
