@@ -290,8 +290,12 @@ public class RichTextState(initialText: RichString) {
                             acc + span.attributes
                         }
                     val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
+                    val effectiveParagraphAttrKeys =
+                        paragraphAttrKeys.filter { key ->
+                            removedAttr == null || key !in removedAttr
+                        }
                     val paragraphAttr =
-                        paragraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
+                        effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
                             @Suppress("UNCHECKED_CAST")
                             val typedKey = key as AttributeKey<Any>
                             acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))

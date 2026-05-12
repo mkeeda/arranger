@@ -1,7 +1,5 @@
 package dev.mkeeda.arranger.richtext
 
-import dev.mkeeda.arranger.richtext.InternalArrangerApi
-
 /**
  * Expands this range to cover the entire paragraph(s) it intersects with
  * in the given [text]. Paragraphs are delimited by '\n'.

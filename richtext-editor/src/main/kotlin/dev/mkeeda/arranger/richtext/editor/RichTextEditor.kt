@@ -176,6 +176,9 @@ internal class ComposeParagraphWorkarounds {
         buffer: TextFieldBuffer,
         getParagraphStyleAt: (Int) -> ParagraphStyle?,
     ) {
+        // Reset at the start so callers always see a consistent state in case of mid-frame reads
+        emptyParagraphIndices = emptyList()
+
         val originalText = buffer.asCharSequence().toString()
         val originalLength = originalText.length
 
