@@ -105,6 +105,7 @@ public enum class HeadingLevel {
 public object HeadingKey : BlockTypeAttributeKey<HeadingLevel> {
     override val name: String = "heading"
     override val defaultValue: HeadingLevel = HeadingLevel.Unspecified
+    override val enterKeyStrategy: EnterKeyStrategy = HeadingEnterStrategy
 }
 
 /**
@@ -153,6 +154,7 @@ public enum class ListIndentLevel {
 public object BulletListKey : BlockTypeAttributeKey<ListIndentLevel> {
     override val name: String = "bulletList"
     override val defaultValue: ListIndentLevel = ListIndentLevel.Unspecified
+    override val enterKeyStrategy: EnterKeyStrategy = ListEnterStrategy
 }
 
 /**
@@ -161,4 +163,5 @@ public object BulletListKey : BlockTypeAttributeKey<ListIndentLevel> {
 public object OrderedListKey : BlockTypeAttributeKey<ListIndentLevel> {
     override val name: String = "orderedList"
     override val defaultValue: ListIndentLevel = ListIndentLevel.Unspecified
+    override val enterKeyStrategy: EnterKeyStrategy = ListEnterStrategy
 }

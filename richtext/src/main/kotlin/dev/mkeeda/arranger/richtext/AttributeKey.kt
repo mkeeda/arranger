@@ -17,7 +17,14 @@ public interface SpanAttributeKey<T> : AttributeKey<T>
 /**
  * A marker interface indicating that the attribute applies to whole paragraphs.
  */
-public sealed interface ParagraphAttributeKey<T> : AttributeKey<T>
+public sealed interface ParagraphAttributeKey<T> : AttributeKey<T> {
+    /**
+     * Defines the strategy for how a paragraph with this attribute handles an Enter key press.
+     * The default strategy is to inherit the current attributes.
+     */
+    public val enterKeyStrategy: EnterKeyStrategy
+        get() = InheritParagraphStrategy
+}
 
 /**
  * A category interface for paragraph attributes that dictate block structure (e.g., Heading, List, Blockquote).
