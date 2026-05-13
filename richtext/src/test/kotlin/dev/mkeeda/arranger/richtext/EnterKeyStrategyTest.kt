@@ -5,7 +5,7 @@ import org.junit.Test
 
 class EnterKeyStrategyTest {
     @Test
-    fun inheritParagraphStrategy_returnsInheritAttributes() {
+    fun `InheritParagraphStrategy returns InheritAttributes`() {
         val currentAttributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Center)
         val context =
             EnterKeyContext(
@@ -20,7 +20,7 @@ class EnterKeyStrategyTest {
     }
 
     @Test
-    fun headingEnterStrategy_returnsClearAttributes() {
+    fun `HeadingEnterStrategy returns ClearAttributes`() {
         val currentAttributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)
         val context =
             EnterKeyContext(
@@ -35,7 +35,7 @@ class EnterKeyStrategyTest {
     }
 
     @Test
-    fun listEnterStrategy_withText_returnsInheritAttributes() {
+    fun `ListEnterStrategy with text returns InheritAttributes`() {
         val currentAttributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
         val context =
             EnterKeyContext(
@@ -50,7 +50,7 @@ class EnterKeyStrategyTest {
     }
 
     @Test
-    fun listEnterStrategy_emptyLevel1_returnsClearAttributes() {
+    fun `ListEnterStrategy empty Level1 returns Outdent with empty attributes`() {
         val currentAttributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
         val context =
             EnterKeyContext(
@@ -61,11 +61,12 @@ class EnterKeyStrategyTest {
             )
 
         val result = ListEnterStrategy.execute(context)
-        result shouldBe EnterKeyResult.ClearAttributes
+        val expectedAttributes = AttributeContainer.empty()
+        result shouldBe EnterKeyResult.Outdent(expectedAttributes)
     }
 
     @Test
-    fun listEnterStrategy_emptyLevel2_returnsOutdent() {
+    fun `ListEnterStrategy empty Level2 returns Outdent`() {
         val currentAttributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level2)
         val context =
             EnterKeyContext(
@@ -81,7 +82,7 @@ class EnterKeyStrategyTest {
     }
 
     @Test
-    fun listEnterStrategy_emptyLevel3_returnsOutdent() {
+    fun `ListEnterStrategy empty Level3 returns Outdent`() {
         val currentAttributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level3)
         val context =
             EnterKeyContext(

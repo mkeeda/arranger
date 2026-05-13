@@ -86,13 +86,12 @@ public object ListEnterStrategy : EnterKeyStrategy {
 
         val currentLevel = context.currentAttributes.getOrDefault(listKey)
         return if (currentLevel.ordinal > 0) {
-            @Suppress("UNCHECKED_CAST")
             val outdented =
                 context.currentAttributes +
-                    ((listKey as AttributeKey<ListIndentLevel>) to ListIndentLevel.entries[currentLevel.ordinal - 1])
+                    (listKey to ListIndentLevel.entries[currentLevel.ordinal - 1])
             EnterKeyResult.Outdent(outdented)
         } else {
-            EnterKeyResult.ClearAttributes
+            EnterKeyResult.Outdent(context.currentAttributes - listKey)
         }
     }
 }
