@@ -41,16 +41,9 @@ internal object EnterKeyHandler {
         insertedRange: IntRange,
         removedAttr: Set<AttributeKey<*>>?,
     ): List<RichSpan> {
-        val paragraphAttrKeys = attributesToInherit.keys.filterIsInstance<ParagraphAttributeKey<*>>()
-        val effectiveParagraphAttrKeys =
-            paragraphAttrKeys.filter { key ->
-                removedAttr == null || key !in removedAttr
-            }
         val paragraphAttr =
-            effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
-                @Suppress("UNCHECKED_CAST")
-                val typedKey = key as AttributeKey<Any>
-                acc + (typedKey to attributesToInherit.getOrDefault(typedKey))
+            attributesToInherit.filterKeys { key ->
+                key is ParagraphAttributeKey<*> && (removedAttr == null || key !in removedAttr)
             }
 
         if (paragraphAttr.isEmpty()) return spans
@@ -83,14 +76,7 @@ internal object EnterKeyHandler {
         val clearedSpans = tempBuffer.spans
 
         // Inherit everything EXCEPT BlockTypeAttributeKey
-        val attrsToInherit =
-            context.currentAttributes.keys
-                .filter { it !is BlockTypeAttributeKey<*> }
-                .fold(AttributeContainer.empty()) { acc, key ->
-                    @Suppress("UNCHECKED_CAST")
-                    val typedKey = key as AttributeKey<Any>
-                    acc + (typedKey to context.currentAttributes.getOrDefault(typedKey))
-                }
+        val attrsToInherit = context.currentAttributes.filterKeys { it !is BlockTypeAttributeKey<*> }
 
         return applyInheritAttributes(attrsToInherit, clearedSpans, buffer, insertedRange, removedAttr)
     }
