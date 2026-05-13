@@ -55,7 +55,8 @@ internal object EnterKeyHandler {
 
         if (paragraphAttr.isEmpty()) return spans
 
-        val snappedRange = (insertedRange.first..insertedRange.last).snapToParagraphs(buffer.toString())
+        val newParagraphStart = insertedRange.last + 1
+        val snappedRange = (newParagraphStart..newParagraphStart).snapToParagraphs(buffer.toString())
         return spans.mergeSpan(
             RichSpan(
                 range = snappedRange,
@@ -71,6 +72,16 @@ internal object EnterKeyHandler {
         insertedRange: IntRange,
         removedAttr: Set<AttributeKey<*>>?,
     ): List<RichSpan> {
+        val blockKeysToClear = context.currentAttributes.keys.filterIsInstance<BlockTypeAttributeKey<*>>()
+        val newParagraphStart = insertedRange.last + 1
+        val snappedRange = (newParagraphStart..newParagraphStart).snapToParagraphs(buffer.toString())
+        val tempBuffer = dev.mkeeda.arranger.richtext.editor.RichTextBuffer(spans, buffer)
+        blockKeysToClear.forEach { key ->
+            @Suppress("UNCHECKED_CAST")
+            tempBuffer.removeParagraphAttribute(key as ParagraphAttributeKey<Any>, snappedRange)
+        }
+        val clearedSpans = tempBuffer.spans
+
         // Inherit everything EXCEPT BlockTypeAttributeKey
         val attrsToInherit =
             context.currentAttributes.keys
@@ -81,7 +92,7 @@ internal object EnterKeyHandler {
                     acc + (typedKey to context.currentAttributes.getOrDefault(typedKey))
                 }
 
-        return applyInheritAttributes(attrsToInherit, spans, buffer, insertedRange, removedAttr)
+        return applyInheritAttributes(attrsToInherit, clearedSpans, buffer, insertedRange, removedAttr)
     }
 
     private fun applyOutdent(
@@ -105,7 +116,16 @@ internal object EnterKeyHandler {
 
         // 3. Apply the outdented attributes to the current paragraph
         val snappedRange = context.paragraphRange.snapToParagraphs(buffer.toString())
-        return revertedSpans.mergeSpan(
+        val tempBuffer = dev.mkeeda.arranger.richtext.editor.RichTextBuffer(revertedSpans, buffer)
+
+        // Clear all previous block attributes to ensure we don't leak removed attributes (e.g., when completely outdenting to empty)
+        val blockKeysToClear = context.currentAttributes.keys.filterIsInstance<BlockTypeAttributeKey<*>>()
+        blockKeysToClear.forEach { key ->
+            @Suppress("UNCHECKED_CAST")
+            tempBuffer.removeParagraphAttribute(key as ParagraphAttributeKey<Any>, snappedRange)
+        }
+
+        return tempBuffer.spans.mergeSpan(
             RichSpan(
                 range = snappedRange,
                 attributes = attributesToOutdent,

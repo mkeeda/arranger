@@ -283,71 +283,92 @@ public class RichTextState(initialText: RichString) {
                 // Inherit paragraph attributes when newlines are typed or pasted
                 val insertedText = buffer.asCharSequence().substring(range.min, range.max)
                 if (insertedText.contains('\n')) {
-                    val inheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
-                    val spansBeforeCursor = currentSpans.filter { inheritIndex in it.range }
-                    val attrsBeforeCursor =
-                        spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
-                            acc + span.attributes
-                        }
-                    val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
-                    if (insertedText == "\n") {
-                        // Handle Enter key press using Strategy pattern
-                        val paragraphRange = (inheritIndex..inheritIndex).snapToParagraphs(buffer.toString())
-                        val context =
-                            dev.mkeeda.arranger.richtext.EnterKeyContext(
-                                text = buffer.toString(),
-                                cursorPosition = range.min,
-                                paragraphRange = paragraphRange,
-                                currentAttributes = attrsBeforeCursor,
-                            )
-
-                        val strategy =
-                            paragraphAttrKeys
-                                .map { it.enterKeyStrategy }
-                                .firstOrNull { it != dev.mkeeda.arranger.richtext.InheritParagraphStrategy }
-                                ?: dev.mkeeda.arranger.richtext.InheritParagraphStrategy
-
-                        val result = strategy.execute(context)
-                        updatedSpans =
-                            EnterKeyHandler.apply(
-                                result = result,
-                                context = context,
-                                spans = updatedSpans,
-                                buffer = buffer,
-                                insertedRange = range.min..range.max,
-                                removedAttr = removedAttr,
-                            )
-                    } else {
-                        // Handle pasted text containing newlines (fallback to simple inheritance)
-                        val effectiveParagraphAttrKeys =
-                            paragraphAttrKeys.filter { key ->
-                                removedAttr == null || key !in removedAttr
-                            }
-                        val paragraphAttr =
-                            effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
-                                @Suppress("UNCHECKED_CAST")
-                                val typedKey = key as AttributeKey<Any>
-                                acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))
-                            }
-
-                        if (paragraphAttr.isNotEmpty()) {
-                            val snappedRange = (range.min..range.max).snapToParagraphs(buffer.toString())
-                            updatedSpans =
-                                updatedSpans.mergeSpan(
-                                    RichSpan(
-                                        range = snappedRange,
-                                        attributes = paragraphAttr,
-                                    ),
-                                )
-                        }
-                    }
-                } // closes if (insertedText.contains('\n'))
+                    updatedSpans =
+                        handleNewlineInsertion(
+                            insertedText = insertedText,
+                            originalRange = originalRange,
+                            range = range,
+                            currentSpans = currentSpans,
+                            updatedSpans = updatedSpans,
+                            buffer = buffer,
+                            removedAttr = removedAttr,
+                        )
+                }
 
                 updatedSpans
             }
 
         this.spans = newSpans.resnapParagraphSpans(buffer.toString())
         clearTypingAttributes()
+    }
+
+    private fun handleNewlineInsertion(
+        insertedText: String,
+        originalRange: TextRange,
+        range: TextRange,
+        currentSpans: List<RichSpan>,
+        updatedSpans: List<RichSpan>,
+        buffer: TextFieldBuffer,
+        removedAttr: Set<AttributeKey<*>>?,
+    ): List<RichSpan> {
+        val inheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
+        val spansBeforeCursor = currentSpans.filter { inheritIndex in it.range }
+        val attrsBeforeCursor =
+            spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
+                acc + span.attributes
+            }
+        val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
+
+        if (insertedText == "\n") {
+            // Handle Enter key press using Strategy pattern
+            val paragraphRange = (originalRange.min..originalRange.min).snapToParagraphs(buffer.toString())
+            val context =
+                dev.mkeeda.arranger.richtext.EnterKeyContext(
+                    text = buffer.toString(),
+                    cursorPosition = range.min,
+                    paragraphRange = paragraphRange,
+                    currentAttributes = attrsBeforeCursor,
+                )
+
+            val strategy =
+                paragraphAttrKeys
+                    .map { it.enterKeyStrategy }
+                    .firstOrNull { it != dev.mkeeda.arranger.richtext.InheritParagraphStrategy }
+                    ?: dev.mkeeda.arranger.richtext.InheritParagraphStrategy
+
+            val result = strategy.execute(context)
+            return EnterKeyHandler.apply(
+                result = result,
+                context = context,
+                spans = updatedSpans,
+                buffer = buffer,
+                insertedRange = range.min until range.max,
+                removedAttr = removedAttr,
+            )
+        } else {
+            // Handle pasted text containing newlines (fallback to simple inheritance)
+            val effectiveParagraphAttrKeys =
+                paragraphAttrKeys.filter { key ->
+                    removedAttr == null || key !in removedAttr
+                }
+            val paragraphAttr =
+                effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
+                    @Suppress("UNCHECKED_CAST")
+                    val typedKey = key as AttributeKey<Any>
+                    acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))
+                }
+
+            if (paragraphAttr.isNotEmpty()) {
+                val snappedRange = (range.min until range.max).snapToParagraphs(buffer.toString())
+                return updatedSpans.mergeSpan(
+                    RichSpan(
+                        range = snappedRange,
+                        attributes = paragraphAttr,
+                    ),
+                )
+            }
+        }
+        return updatedSpans
     }
 }
 
