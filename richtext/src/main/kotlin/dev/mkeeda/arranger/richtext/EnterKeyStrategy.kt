@@ -45,3 +45,54 @@ public sealed interface EnterKeyResult {
      */
     public data class Outdent(val attributes: AttributeContainer) : EnterKeyResult
 }
+
+/**
+ * A strategy that inherits the current paragraph's attributes for the new paragraph.
+ * This is the default behavior for standard paragraphs and alignment attributes.
+ */
+public object InheritParagraphStrategy : EnterKeyStrategy {
+    override fun execute(context: EnterKeyContext): EnterKeyResult {
+        return EnterKeyResult.InheritAttributes(context.currentAttributes)
+    }
+}
+
+/**
+ * A strategy for headings. When an Enter key is pressed within or at the end of a heading,
+ * the newly created paragraph will be a standard paragraph without the heading attribute.
+ */
+public object HeadingEnterStrategy : EnterKeyStrategy {
+    override fun execute(context: EnterKeyContext): EnterKeyResult {
+        return EnterKeyResult.ClearAttributes
+    }
+}
+
+/**
+ * A strategy for list items. Handles nested lists by outdenting when an empty list item is entered.
+ */
+public object ListEnterStrategy : EnterKeyStrategy {
+    override fun execute(context: EnterKeyContext): EnterKeyResult {
+        val paragraphText = context.text.substring(context.paragraphRange)
+        val isEmpty = paragraphText.isEmpty() || paragraphText == "\n"
+
+        if (!isEmpty) {
+            return EnterKeyResult.InheritAttributes(context.currentAttributes)
+        }
+
+        val listKey =
+            context.currentAttributes.keys
+                .filterIsInstance<BlockTypeAttributeKey<ListIndentLevel>>()
+                .firstOrNull()
+                ?: return EnterKeyResult.ClearAttributes
+
+        val currentLevel = context.currentAttributes.getOrDefault(listKey)
+        return if (currentLevel.ordinal > 0) {
+            @Suppress("UNCHECKED_CAST")
+            val outdented =
+                context.currentAttributes +
+                    ((listKey as AttributeKey<ListIndentLevel>) to ListIndentLevel.entries[currentLevel.ordinal - 1])
+            EnterKeyResult.Outdent(outdented)
+        } else {
+            EnterKeyResult.ClearAttributes
+        }
+    }
+}
