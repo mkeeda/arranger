@@ -290,28 +290,58 @@ public class RichTextState(initialText: RichString) {
                             acc + span.attributes
                         }
                     val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
-                    val effectiveParagraphAttrKeys =
-                        paragraphAttrKeys.filter { key ->
-                            removedAttr == null || key !in removedAttr
-                        }
-                    val paragraphAttr =
-                        effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
-                            @Suppress("UNCHECKED_CAST")
-                            val typedKey = key as AttributeKey<Any>
-                            acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))
-                        }
-
-                    if (paragraphAttr.isNotEmpty()) {
-                        val snappedRange = (range.min..range.max).snapToParagraphs(buffer.toString())
-                        updatedSpans =
-                            updatedSpans.mergeSpan(
-                                RichSpan(
-                                    range = snappedRange,
-                                    attributes = paragraphAttr,
-                                ),
+                    if (insertedText == "\n") {
+                        // Handle Enter key press using Strategy pattern
+                        val paragraphRange = (inheritIndex..inheritIndex).snapToParagraphs(buffer.toString())
+                        val context =
+                            dev.mkeeda.arranger.richtext.EnterKeyContext(
+                                text = buffer.toString(),
+                                cursorPosition = range.min,
+                                paragraphRange = paragraphRange,
+                                currentAttributes = attrsBeforeCursor,
                             )
+
+                        val strategy =
+                            paragraphAttrKeys
+                                .map { it.enterKeyStrategy }
+                                .firstOrNull { it != dev.mkeeda.arranger.richtext.InheritParagraphStrategy }
+                                ?: dev.mkeeda.arranger.richtext.InheritParagraphStrategy
+
+                        val result = strategy.execute(context)
+                        updatedSpans =
+                            EnterKeyHandler.apply(
+                                result = result,
+                                context = context,
+                                spans = updatedSpans,
+                                buffer = buffer,
+                                insertedRange = range.min..range.max,
+                                removedAttr = removedAttr,
+                            )
+                    } else {
+                        // Handle pasted text containing newlines (fallback to simple inheritance)
+                        val effectiveParagraphAttrKeys =
+                            paragraphAttrKeys.filter { key ->
+                                removedAttr == null || key !in removedAttr
+                            }
+                        val paragraphAttr =
+                            effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
+                                @Suppress("UNCHECKED_CAST")
+                                val typedKey = key as AttributeKey<Any>
+                                acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))
+                            }
+
+                        if (paragraphAttr.isNotEmpty()) {
+                            val snappedRange = (range.min..range.max).snapToParagraphs(buffer.toString())
+                            updatedSpans =
+                                updatedSpans.mergeSpan(
+                                    RichSpan(
+                                        range = snappedRange,
+                                        attributes = paragraphAttr,
+                                    ),
+                                )
+                        }
                     }
-                }
+                } // closes if (insertedText.contains('\n'))
 
                 updatedSpans
             }
