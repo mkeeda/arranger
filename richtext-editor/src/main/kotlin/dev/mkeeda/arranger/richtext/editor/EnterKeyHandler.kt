@@ -12,6 +12,12 @@ import dev.mkeeda.arranger.richtext.mergeSpan
 import dev.mkeeda.arranger.richtext.snapToParagraphs
 
 internal object EnterKeyHandler {
+    /**
+     * Applies the given [EnterKeyResult] by returning a new list of spans.
+     *
+     * **Note:** Depending on the [result], this method may mutate [buffer] directly.
+     * Specifically, [EnterKeyResult.Outdent] removes the character at [insertedRange].
+     */
     fun apply(
         result: EnterKeyResult,
         context: EnterKeyContext,
@@ -68,7 +74,7 @@ internal object EnterKeyHandler {
         val blockKeysToClear = context.currentAttributes.keys.filterIsInstance<BlockTypeAttributeKey<*>>()
         val newParagraphStart = insertedRange.last + 1
         val snappedRange = (newParagraphStart..newParagraphStart).snapToParagraphs(buffer.toString())
-        val tempBuffer = dev.mkeeda.arranger.richtext.editor.RichTextBuffer(spans, buffer)
+        val tempBuffer = RichTextBuffer(spans, buffer)
         blockKeysToClear.forEach { key ->
             @Suppress("UNCHECKED_CAST")
             tempBuffer.removeParagraphAttribute(key as ParagraphAttributeKey<Any>, snappedRange)
@@ -81,6 +87,11 @@ internal object EnterKeyHandler {
         return applyInheritAttributes(attrsToInherit, clearedSpans, buffer, insertedRange, removedAttr)
     }
 
+    /**
+     * Applies the Outdent result by removing the inserted newline from [buffer] and shifting spans accordingly.
+     *
+     * **Note:** This method mutates [buffer] directly by removing the character at [insertedRange].
+     */
     private fun applyOutdent(
         attributesToOutdent: AttributeContainer,
         context: EnterKeyContext,
@@ -102,7 +113,7 @@ internal object EnterKeyHandler {
 
         // 3. Apply the outdented attributes to the current paragraph
         val snappedRange = context.paragraphRange.snapToParagraphs(buffer.toString())
-        val tempBuffer = dev.mkeeda.arranger.richtext.editor.RichTextBuffer(revertedSpans, buffer)
+        val tempBuffer = RichTextBuffer(revertedSpans, buffer)
 
         // Clear all previous block attributes to ensure we don't leak removed attributes (e.g., when completely outdenting to empty)
         val blockKeysToClear = context.currentAttributes.keys.filterIsInstance<BlockTypeAttributeKey<*>>()

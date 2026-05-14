@@ -422,7 +422,10 @@ class RichTextEditorTest {
             textAfterEnters,
         ).performTextInputSelection(TextRange(textAfterEnters.length - 1, textAfterEnters.length))
 
-        // Replace it with empty string (simulating Backspace)
+        // Replace it with empty string (simulating Backspace).
+        // Note: We use performTextInput("") instead of performKeyInput { pressKey(Key.Backspace) }
+        // because performKeyInput is an ExperimentalTestApi and can be unreliable for triggering
+        // exact TextFieldBuffer IME deletions in Robolectric environments.
         composeTestRule.onNodeWithText(textAfterEnters).performTextInput("")
 
         // Expected text: "Item 1\nItem 2"

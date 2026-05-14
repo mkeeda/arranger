@@ -11,6 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.EnterKeyContext
+import dev.mkeeda.arranger.richtext.InheritParagraphStrategy
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
@@ -124,39 +126,11 @@ public class RichTextState(initialText: RichString) {
         val removedAttr = removedTypingAttributes
 
         val inheritedAttributes =
-            if (cursorPosition > 0 && cursorPosition <= textFieldState.text.length) {
-                val spanInheritIndex = cursorPosition - 1
-                val paragraphInheritIndex = cursorPosition
-
-                spans.fold(AttributeContainer.empty()) { acc, span ->
-                    val hasSpanAttrs =
-                        spanInheritIndex in span.range &&
-                            span.attributes.keys.any { it is SpanAttributeKey<*> }
-                    val hasParagraphAttrs =
-                        paragraphInheritIndex in span.range &&
-                            span.attributes.keys.any { it is ParagraphAttributeKey<*> }
-
-                    if (!hasSpanAttrs && !hasParagraphAttrs) return@fold acc
-
-                    val filteredAttrs =
-                        span.attributes.filterKeys { key ->
-                            (key is SpanAttributeKey<*> && spanInheritIndex in span.range) ||
-                                (key is ParagraphAttributeKey<*> && paragraphInheritIndex in span.range)
-                        }
-                    acc + filteredAttrs
-                }
-            } else if (cursorPosition == 0 && textFieldState.text.isNotEmpty()) {
-                // At the very beginning of the text, we can only inherit paragraph attributes.
-                spans.fold(AttributeContainer.empty()) { acc, span ->
-                    if (0 in span.range) {
-                        acc + span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
-                    } else {
-                        acc
-                    }
-                }
-            } else {
-                AttributeContainer.empty()
-            }
+            collectInheritedAttributes(
+                spanInheritIndex = cursorPosition - 1,
+                paragraphInheritIndex = cursorPosition,
+                spans = spans,
+            )
 
         var finalAttrs = inheritedAttributes
         if (typingAttr != null) {
@@ -338,32 +312,19 @@ public class RichTextState(initialText: RichString) {
     ): List<RichSpan> {
         val spanInheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
         val paragraphInheritIndex = originalRange.min
-
         val attrsBeforeCursor =
-            currentSpans.fold(AttributeContainer.empty()) { acc, span ->
-                val hasSpanAttrs =
-                    spanInheritIndex in span.range &&
-                        span.attributes.keys.any { it is SpanAttributeKey<*> }
-                val hasParagraphAttrs =
-                    paragraphInheritIndex in span.range &&
-                        span.attributes.keys.any { it is ParagraphAttributeKey<*> }
-
-                if (!hasSpanAttrs && !hasParagraphAttrs) return@fold acc
-
-                val filteredAttrs =
-                    span.attributes.filterKeys { key ->
-                        (key is SpanAttributeKey<*> && spanInheritIndex in span.range) ||
-                            (key is ParagraphAttributeKey<*> && paragraphInheritIndex in span.range)
-                    }
-                acc + filteredAttrs
-            }
+            collectInheritedAttributes(
+                spanInheritIndex = spanInheritIndex,
+                paragraphInheritIndex = paragraphInheritIndex,
+                spans = currentSpans,
+            )
         val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
 
         if (insertedText == "\n") {
             // Handle Enter key press using Strategy pattern
             val paragraphRange = (originalRange.min..originalRange.min).snapToParagraphs(buffer.toString())
             val context =
-                dev.mkeeda.arranger.richtext.EnterKeyContext(
+                EnterKeyContext(
                     text = buffer.toString(),
                     cursorPosition = range.min,
                     paragraphRange = paragraphRange,
@@ -373,8 +334,8 @@ public class RichTextState(initialText: RichString) {
             val strategy =
                 paragraphAttrKeys
                     .map { it.enterKeyStrategy }
-                    .firstOrNull { it != dev.mkeeda.arranger.richtext.InheritParagraphStrategy }
-                    ?: dev.mkeeda.arranger.richtext.InheritParagraphStrategy
+                    .firstOrNull { it != InheritParagraphStrategy }
+                    ?: InheritParagraphStrategy
 
             val result = strategy.execute(context)
             return EnterKeyHandler.apply(
@@ -409,6 +370,30 @@ public class RichTextState(initialText: RichString) {
             }
         }
         return updatedSpans
+    }
+
+    private fun collectInheritedAttributes(
+        spanInheritIndex: Int,
+        paragraphInheritIndex: Int,
+        spans: List<RichSpan>,
+    ): AttributeContainer {
+        return spans.fold(AttributeContainer.empty()) { acc, span ->
+            val hasSpanAttrs =
+                spanInheritIndex in span.range &&
+                    span.attributes.keys.any { it is SpanAttributeKey<*> }
+            val hasParagraphAttrs =
+                paragraphInheritIndex in span.range &&
+                    span.attributes.keys.any { it is ParagraphAttributeKey<*> }
+
+            if (!hasSpanAttrs && !hasParagraphAttrs) return@fold acc
+
+            val filteredAttrs =
+                span.attributes.filterKeys { key ->
+                    (key is SpanAttributeKey<*> && spanInheritIndex in span.range) ||
+                        (key is ParagraphAttributeKey<*> && paragraphInheritIndex in span.range)
+                }
+            acc + filteredAttrs
+        }
     }
 }
 
