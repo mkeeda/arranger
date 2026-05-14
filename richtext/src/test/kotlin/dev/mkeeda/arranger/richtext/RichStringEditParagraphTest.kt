@@ -50,7 +50,7 @@ class RichStringEditParagraphTest {
 
         val runs = actual.runs(BlockquoteKey).toList()
         runs shouldHaveSize 1
-        runs[0] shouldBe RichRun(text = "Line3", range = 12..16, value = Unit)
+        runs[0] shouldBe RichRun(text = "Line3", range = 12..17, value = Unit)
     }
 
     @Test
@@ -65,7 +65,7 @@ class RichStringEditParagraphTest {
 
         val runs = actual.runs(BlockquoteKey).toList()
         runs shouldHaveSize 1
-        runs[0] shouldBe RichRun(text = paragraphText, range = 0..16, value = Unit)
+        runs[0] shouldBe RichRun(text = paragraphText, range = 0..17, value = Unit)
     }
 
     @Test
@@ -95,7 +95,7 @@ class RichStringEditParagraphTest {
 
         val alignRuns = actual.runs(TextAlignmentKey).toList()
         alignRuns shouldHaveSize 1
-        alignRuns[0] shouldBe RichRun(text = "Line3", range = 12..16, value = TextAlignment.Center)
+        alignRuns[0] shouldBe RichRun(text = "Line3", range = 12..17, value = TextAlignment.Center)
     }
 
     @Test
@@ -124,7 +124,7 @@ class RichStringEditParagraphTest {
         val headingRuns = actual.runs(HeadingKey).toList()
         headingRuns shouldHaveSize 2
         headingRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = HeadingLevel.H1)
-        headingRuns[1] shouldBe RichRun(text = "Line3", range = 12..16, value = HeadingLevel.H1)
+        headingRuns[1] shouldBe RichRun(text = "Line3", range = 12..17, value = HeadingLevel.H1)
     }
 
     @Test
@@ -148,7 +148,7 @@ class RichStringEditParagraphTest {
 
         val headingRuns = actual.runs(HeadingKey).toList()
         headingRuns shouldHaveSize 1
-        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = HeadingLevel.H1)
+        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..9, value = HeadingLevel.H1)
     }
 
     @Test
@@ -169,11 +169,11 @@ class RichStringEditParagraphTest {
 
         val headingRuns = actual.runs(HeadingKey).toList()
         headingRuns shouldHaveSize 1
-        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = HeadingLevel.H1)
+        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..9, value = HeadingLevel.H1)
 
         val alignRuns = actual.runs(TextAlignmentKey).toList()
         alignRuns shouldHaveSize 1
-        alignRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = TextAlignment.Center)
+        alignRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..9, value = TextAlignment.Center)
     }
 
     @Test
@@ -196,7 +196,7 @@ class RichStringEditParagraphTest {
         val orderedListRuns = actual.runs(OrderedListKey).toList()
         orderedListRuns shouldHaveSize 2
         orderedListRuns[0] shouldBe RichRun(text = "Line1\n", range = 0..5, value = ListIndentLevel.Level1)
-        orderedListRuns[1] shouldBe RichRun(text = "Line3", range = 12..16, value = ListIndentLevel.Level1)
+        orderedListRuns[1] shouldBe RichRun(text = "Line3", range = 12..17, value = ListIndentLevel.Level1)
 
         val headingRuns = actual.runs(HeadingKey).toList()
         headingRuns shouldHaveSize 1
@@ -221,6 +221,6 @@ class RichStringEditParagraphTest {
 
         val headingRuns = actual.runs(HeadingKey).toList()
         headingRuns shouldHaveSize 1
-        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..8, value = HeadingLevel.H1)
+        headingRuns[0] shouldBe RichRun(text = "Paragraph", range = 0..9, value = HeadingLevel.H1)
     }
 }

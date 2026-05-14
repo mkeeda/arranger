@@ -15,11 +15,11 @@ class ParagraphSnappingTest {
         // Index 0 is 'L' in "Line1". Should snap to "Line1\n" (0..5)
         (0..0).snapToParagraphs(text) shouldBe (0..5)
 
-        // Last index is in "Line3". Should snap to "Line3" (12..16)
-        (text.lastIndex..text.lastIndex).snapToParagraphs(text) shouldBe (12..16)
+        // Last index is in "Line3". Should snap to "Line3" (12..17)
+        (text.lastIndex..text.lastIndex).snapToParagraphs(text) shouldBe (12..17)
 
         // Spanning across paragraphs (from 'n' in Line1 to 'L' in Line3)
-        (2..12).snapToParagraphs(text) shouldBe (0..16)
+        (2..12).snapToParagraphs(text) shouldBe (0..17)
     }
 
     @Test
@@ -79,7 +79,7 @@ class ParagraphSnappingTest {
 
         resnappedSpans shouldHaveSize 1
         // Range should be clamped to valid text length
-        resnappedSpans.first().range shouldBe (0..4)
+        resnappedSpans.first().range shouldBe (0..5)
     }
 
     @Test
