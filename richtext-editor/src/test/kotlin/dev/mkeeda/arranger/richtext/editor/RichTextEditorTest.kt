@@ -385,4 +385,51 @@ class RichTextEditorTest {
         spans.first().range shouldBe (0..4)
         spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
+
+    @Test
+    fun `deleting empty outdented list item with backspace preserves previous item level`() {
+        val state = RichTextState(
+            initialText = RichString(text = "Item 1\nItem 2").edit {
+                setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, 0..6)
+                setParagraphAttribute(BulletListKey, ListIndentLevel.Level2, 7..12)
+            }
+        )
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        val initialText = "Item 1\nItem 2"
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+        
+        // Type a newline to create Level 2 empty item
+        composeTestRule.onNodeWithText(initialText).performTextInput("\n")
+        
+        // Type a newline again to outdent the empty item to Level 1
+        // (Wait, typing \n at empty item consumes the \n and outdents it. So text is still "Item 1\nItem 2\n")
+        val textWithOneEnter = "Item 1\nItem 2\n"
+        composeTestRule.onNodeWithText(textWithOneEnter).performTextInput("\n")
+        
+        // Now the text is "Item 1\nItem 2\n".
+        // The span for "Item 2\n" (index 7..13) should be Level 2.
+        // The span for the empty line at index 14..14 should be Level 1.
+        val textAfterEnters = "Item 1\nItem 2\n"
+        
+        // Select the last newline character
+        composeTestRule.onNodeWithText(textAfterEnters).performTextInputSelection(TextRange(textAfterEnters.length - 1, textAfterEnters.length))
+        
+        // Replace it with empty string (simulating Backspace)
+        composeTestRule.onNodeWithText(textAfterEnters).performTextInput("")
+
+        // Expected text: "Item 1\nItem 2"
+        val expectedText = "Item 1\nItem 2"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 2
+        spans[0].range shouldBe (0..6)
+        spans[0].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
+        spans[1].range shouldBe (7..13)
+        spans[1].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level2)
+    }
 }

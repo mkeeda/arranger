@@ -268,6 +268,7 @@ public class RichTextState(initialText: RichString) {
                         editEnd = originalRange.max,
                         newLength = range.length,
                         offsetDiff = range.length - originalRange.length,
+                        deletedText = buffer.originalText.substring(originalRange.min, originalRange.max),
                     )
 
                 // Apply typing attributes to the inserted text
@@ -416,6 +417,7 @@ internal fun List<RichSpan>.shiftSpans(
     editEnd: Int,
     newLength: Int,
     offsetDiff: Int,
+    deletedText: String = "",
 ): List<RichSpan> =
     flatMap { span ->
         shiftSpan(
@@ -424,6 +426,7 @@ internal fun List<RichSpan>.shiftSpans(
             editEnd = editEnd,
             newLength = newLength,
             offsetDiff = offsetDiff,
+            deletedText = deletedText,
         )
     }
 
@@ -433,19 +436,41 @@ private fun shiftSpan(
     editEnd: Int,
     newLength: Int,
     offsetDiff: Int,
+    deletedText: String,
 ): List<RichSpan> {
     val spanStart = span.range.first
     val spanEnd = span.range.last
 
+    // If this span merges into a previous paragraph due to a newline deletion,
+    // we should strip its paragraph attributes so the top paragraph's attributes win.
+    val isMergedIntoPrevious = if (deletedText.contains('\n')) {
+        val lastDeletedNewlineIndex = editStart + deletedText.lastIndexOf('\n')
+        spanStart > lastDeletedNewlineIndex && spanStart <= editEnd
+    } else {
+        false
+    }
+
+    val spanAttrs = span.attributes.filterKeys { it is SpanAttributeKey<*> }
+    val paraAttrs = if (isMergedIntoPrevious) {
+        AttributeContainer.empty()
+    } else {
+        span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
+    }
+    
+    val effectiveAttributes = spanAttrs + paraAttrs
+    if (effectiveAttributes.isEmpty()) return emptyList()
+    
+    val effectiveSpan = span.copy(attributes = effectiveAttributes)
+
     return when {
         editEnd <= spanStart -> {
             // Edit happens entirely before the span. Shift it securely.
-            listOf(span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff)))
+            listOf(effectiveSpan.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff)))
         }
 
         editStart > spanEnd + 1 -> {
             // Edit happens entirely after the span with a gap. Unaffected.
-            listOf(span)
+            listOf(effectiveSpan)
         }
 
         else -> {
@@ -455,20 +480,17 @@ private fun shiftSpan(
             // we want to extend SpanAttributes, but NOT ParagraphAttributes.
             // ParagraphAttributes should only expand if the edit actually overlaps them.
             if (editStart == spanEnd + 1 && editEnd == spanEnd + 1) {
-                val spanAttrs = span.attributes.filterKeys { it is SpanAttributeKey<*> }
-                val paraAttrs = span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
-
                 val result = mutableListOf<RichSpan>()
 
                 // Paragraph attributes stay unaffected (don't expand into adjacent insertions)
                 if (paraAttrs.isNotEmpty()) {
-                    result.add(span.copy(attributes = paraAttrs))
+                    result.add(effectiveSpan.copy(attributes = paraAttrs))
                 }
 
                 // Span attributes expand to cover the insertion
                 if (spanAttrs.isNotEmpty()) {
                     result.add(
-                        span.copy(
+                        effectiveSpan.copy(
                             range = spanStart..(spanEnd + offsetDiff),
                             attributes = spanAttrs,
                         ),
@@ -495,7 +517,7 @@ private fun shiftSpan(
             if (newStart > newEnd) {
                 emptyList()
             } else {
-                listOf(span.copy(range = newStart..newEnd))
+                listOf(effectiveSpan.copy(range = newStart..newEnd))
             }
         }
     }
