@@ -315,6 +315,21 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
 
 <img src="./docs/images/custom-list-marker.png" width="500" alt="custom list marker sample"/>
 
+## Dynamic Enter Key Handling
+
+Arranger provides intelligent formatting strategies when the user presses the Enter key. By providing an `EnterKeyStrategy` to the `RichTextEditor`, you can control how paragraph attributes are inherited or transformed on new lines.
+
+The library includes three built-in strategies:
+
+| Strategy | Description | Demo |
+| :--- | :--- | :--- |
+| **`InheritParagraphStrategy`**<br>(Default) | Inherits all paragraph attributes (like alignment or blockquote) to the new line. | <img src="./docs/images/enter-key-strategy-inherit.gif" width="500" alt="Inherit Strategy Demo"/> |
+| **`ListEnterStrategy`** | Inherits list attributes and automatically increments ordered list numbers. Useful for creating continuous lists. | <img src="./docs/images/enter-key-strategy-list.gif" width="500" alt="List Strategy Demo"/> |
+| **`HeadingEnterStrategy`** | Automatically removes the heading attribute on the new line, allowing users to quickly start typing normal text after a heading. | <img src="./docs/images/enter-key-strategy-heading.gif" width="500" alt="Heading Strategy Demo"/> |
+
+You can combine these strategies (or create your own custom strategies) to build a seamless editing experience.
+
+
 ## Custom Attribute Mapping
 
 You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
