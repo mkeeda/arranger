@@ -228,9 +228,9 @@ private fun ChatFormattingToolbar(
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
         IndentOutdentButtons(state = state)
+
+        Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
             onClick = {
