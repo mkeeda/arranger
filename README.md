@@ -323,9 +323,9 @@ The library includes three built-in strategies:
 
 | Strategy | Description | Demo |
 | :--- | :--- | :--- |
-| **`InheritParagraphStrategy`**<br>(Default) | Inherits all paragraph attributes (like alignment or blockquote) to the new line. | <img src="./docs/images/enter-key-strategy-inherit.gif" width="500" alt="Inherit Strategy Demo"/> |
-| **`ListEnterStrategy`** | Inherits list attributes and automatically increments ordered list numbers. Pressing Enter on an empty list item will decrease its indentation level (outdent). If the item is at the first level, the list attribute is removed. | <img src="./docs/images/enter-key-strategy-list.gif" width="500" alt="List Strategy Demo"/> |
-| **`HeadingEnterStrategy`** | Automatically removes the heading attribute on the new line, allowing users to quickly start typing normal text after a heading. | <img src="./docs/images/enter-key-strategy-heading.gif" width="500" alt="Heading Strategy Demo"/> |
+| **`InheritParagraphStrategy`**<br>(Default) | Inherits all paragraph attributes (like alignment or blockquote) to the new line. | <img src="./docs/images/enter-key-strategy-inherit.gif" width="250" alt="Inherit Strategy Demo"/> |
+| **`ListEnterStrategy`** | Inherits list attributes and automatically increments ordered list numbers. Pressing Enter on an empty list item will decrease its indentation level (outdent). If the item is at the first level, the list attribute is removed. | <img src="./docs/images/enter-key-strategy-list.gif" width="250" alt="List Strategy Demo"/> |
+| **`HeadingEnterStrategy`** | Automatically removes the heading attribute on the new line, allowing users to quickly start typing normal text after a heading. | <img src="./docs/images/enter-key-strategy-heading.gif" width="250" alt="Heading Strategy Demo"/> |
 
 You can combine these strategies (or create your own custom strategies) to build a seamless editing experience.
 
