@@ -14,8 +14,8 @@ class AttributeContainerTest {
                 TextColorKey to RgbaColor(0xFFFF0000),
             )
 
-        val mention: RgbaColor? = container.getOrNull(BackgroundColorKey)
-        val color: RgbaColor? = container.getOrNull(TextColorKey)
+        val mention: RgbaColor? = container[BackgroundColorKey]
+        val color: RgbaColor? = container[TextColorKey]
 
         mention shouldBe RgbaColor(0xFF00FF00)
         color shouldBe RgbaColor(0xFFFF0000)
@@ -41,9 +41,9 @@ class AttributeContainerTest {
         emptyContainer.getOrDefault(BackgroundColorKey) shouldBe RgbaColor.Unspecified
         emptyContainer.getOrDefault(TextColorKey) shouldBe RgbaColor.Unspecified
 
-        // getOrNull
-        emptyContainer.getOrNull(BackgroundColorKey).shouldBeNull()
-        emptyContainer.getOrNull(TextColorKey).shouldBeNull()
+        // bracket access
+        emptyContainer[BackgroundColorKey].shouldBeNull()
+        emptyContainer[TextColorKey].shouldBeNull()
     }
 
     @Test
@@ -63,13 +63,13 @@ class AttributeContainerTest {
         val c2 = c1.plus(BackgroundColorKey, RgbaColor(0xFF00FFFF))
         val c3 = c2.plus(TextColorKey, RgbaColor(0xFFFF0000))
 
-        c1.getOrNull(BackgroundColorKey).shouldBeNull()
+        c1[BackgroundColorKey].shouldBeNull()
 
-        c2.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FFFF)
-        c2.getOrNull(TextColorKey).shouldBeNull()
+        c2[BackgroundColorKey] shouldBe RgbaColor(0xFF00FFFF)
+        c2[TextColorKey].shouldBeNull()
 
-        c3.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FFFF)
-        c3.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        c3[BackgroundColorKey] shouldBe RgbaColor(0xFF00FFFF)
+        c3[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -98,9 +98,9 @@ class AttributeContainerTest {
 
         val c2 = c1 - TextColorKey
 
-        c1.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        c2.getOrNull(TextColorKey).shouldBeNull()
-        c2.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        c1[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        c2[TextColorKey].shouldBeNull()
+        c2[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
     }
 
     @Test
@@ -117,15 +117,15 @@ class AttributeContainerTest {
         empty.isEmpty() shouldBe true
 
         val onePair = attributeContainerOf(BackgroundColorKey to RgbaColor(0xFF00FF00))
-        onePair.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        onePair[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
 
         val twoPairs =
             attributeContainerOf(
                 BackgroundColorKey to RgbaColor(0xFF00FF00),
                 TextColorKey to RgbaColor(0xFFFF0000),
             )
-        twoPairs.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
-        twoPairs.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        twoPairs[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
+        twoPairs[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test

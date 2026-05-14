@@ -25,7 +25,7 @@ class RichStringEditSpanTest {
         val spans = styled.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -38,7 +38,7 @@ class RichStringEditSpanTest {
         val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFF0000FF)
     }
 
     @Test
@@ -56,17 +56,17 @@ class RichStringEditSpanTest {
 
         val colorSpan =
             spans.first {
-                it.attributes.getOrNull(TextColorKey) != null
+                it.attributes[TextColorKey] != null
             }
         colorSpan.range shouldBe 0..4
-        colorSpan.attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        colorSpan.attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
 
         val mentionSpan =
             spans.first {
-                it.attributes.getOrNull(BackgroundColorKey) != null
+                it.attributes[BackgroundColorKey] != null
             }
         mentionSpan.range shouldBe 7..11
-        mentionSpan.attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        mentionSpan.attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
     }
 
     @Test
@@ -107,7 +107,7 @@ class RichStringEditSpanTest {
         val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 3..3
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFF0000FF)
     }
 
     @Test
@@ -128,16 +128,16 @@ class RichStringEditSpanTest {
         spans shouldHaveSize 3
 
         spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[0].attributes.getOrNull(BackgroundColorKey) shouldBe null
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[0].attributes[BackgroundColorKey] shouldBe null
 
         spans[1].range shouldBe 5..10
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        spans[1].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
 
         spans[2].range shouldBe 11..15
-        spans[2].attributes.getOrNull(TextColorKey) shouldBe null
-        spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        spans[2].attributes[TextColorKey] shouldBe null
+        spans[2].attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
     }
 
     @Test
@@ -158,16 +158,16 @@ class RichStringEditSpanTest {
         spans shouldHaveSize 3
 
         spans[0].range shouldBe 0..2
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[0].attributes.getOrNull(BackgroundColorKey) shouldBe null
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[0].attributes[BackgroundColorKey] shouldBe null
 
         spans[1].range shouldBe 3..7
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        spans[1].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
 
         spans[2].range shouldBe 8..10
-        spans[2].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe null
+        spans[2].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[2].attributes[BackgroundColorKey] shouldBe null
     }
 
     @Test
@@ -183,7 +183,7 @@ class RichStringEditSpanTest {
         val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..10
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFF0000FF)
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFF0000FF)
     }
 
     @Test
@@ -214,14 +214,14 @@ class RichStringEditSpanTest {
         spans[3].range shouldBe 8..10
         spans[4].range shouldBe 11..12
 
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[1].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[1].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
-        spans[2].attributes.getOrNull(TextColorKey) shouldBe null
-        spans[2].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
-        spans[3].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        spans[3].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
-        spans[4].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[1].attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
+        spans[2].attributes[TextColorKey] shouldBe null
+        spans[2].attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
+        spans[3].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        spans[3].attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
+        spans[4].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -236,7 +236,7 @@ class RichStringEditSpanTest {
         val spans = richString.spans
         spans shouldHaveSize 1
         spans[0].range shouldBe 0..10
-        spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -260,7 +260,7 @@ class RichStringEditSpanTest {
 
         // Original remains completely unchanged
         original.spans shouldHaveSize 2
-        original.spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        original.spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
 
         // Edited contains the new attributes
         edited.runs(BackgroundColorKey).toList()[0].range shouldBe 5..14

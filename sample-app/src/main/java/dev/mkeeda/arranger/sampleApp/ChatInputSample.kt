@@ -345,8 +345,8 @@ private fun IndentOutdentButtons(
     IconButton(
         onClick = {
             val currentLevel =
-                state.currentAttributes.getOrNull(BulletListKey)
-                    ?: state.currentAttributes.getOrNull(OrderedListKey)
+                state.currentAttributes[BulletListKey]
+                    ?: state.currentAttributes[OrderedListKey]
             if (currentLevel != null && currentLevel.ordinal > 0) {
                 val prevLevel = ListIndentLevel.entries[currentLevel.ordinal - 1]
                 state.edit {
@@ -379,8 +379,8 @@ private fun IndentOutdentButtons(
     IconButton(
         onClick = {
             val currentLevel =
-                state.currentAttributes.getOrNull(BulletListKey)
-                    ?: state.currentAttributes.getOrNull(OrderedListKey)
+                state.currentAttributes[BulletListKey]
+                    ?: state.currentAttributes[OrderedListKey]
             if (currentLevel != null && currentLevel.ordinal < ListIndentLevel.Level6.ordinal) {
                 val nextLevel = ListIndentLevel.entries[currentLevel.ordinal + 1]
                 state.edit {

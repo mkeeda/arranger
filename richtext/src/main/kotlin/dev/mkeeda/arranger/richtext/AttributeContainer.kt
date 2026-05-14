@@ -24,7 +24,7 @@ public class AttributeContainer private constructor(
      * If not set, it returns null.
      */
     @Suppress("UNCHECKED_CAST")
-    public fun <T> getOrNull(key: AttributeKey<T>): T? {
+    public operator fun <T> get(key: AttributeKey<T>): T? {
         return attributes[key] as T?
     }
 

@@ -55,7 +55,7 @@ public fun RichString.extractListItems(): List<ListItem> {
 
                 startIndices.map { startIndex ->
                     val spanAtStart = spans.firstOrNull { startIndex in it.range }
-                    val color = spanAtStart?.attributes?.getOrNull(TextColorKey)
+                    val color = spanAtStart?.attributes?.get(TextColorKey)
                     BulletListItem(
                         textIndex = startIndex,
                         indentLevel = run.value,
@@ -96,7 +96,7 @@ public fun RichString.extractListItems(): List<ListItem> {
                         currentNumbers[currentLevelOrdinal]++
 
                         val spanAtStart = spans.firstOrNull { startIndex in it.range }
-                        val color = spanAtStart?.attributes?.getOrNull(TextColorKey)
+                        val color = spanAtStart?.attributes?.get(TextColorKey)
 
                         add(
                             OrderedListItem(

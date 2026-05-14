@@ -56,14 +56,14 @@ class RichStringBatchEditTest {
             }
 
         // Query runs that are red
-        val redRuns = original.runs { it.getOrNull(TextColorKey) == RgbaColor(0xFFFF0000) }
+        val redRuns = original.runs { it[TextColorKey] == RgbaColor(0xFFFF0000) }
 
         // Change red runs to blue
         val edited =
             original.edit {
                 editAll(redRuns) { run ->
                     // Ensure run has the expected original value
-                    run.value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+                    run.value[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
                     // Overwrite with Blue
                     textColor(RgbaColor(0xFF0000FF))
                 }

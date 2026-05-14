@@ -75,11 +75,11 @@ class RichStringRunsTest {
                     ),
             )
 
-        val redRuns = fragmentedString.runs { it.getOrNull(TextColorKey) == RgbaColor(0xFFFF0000) }.toList()
+        val redRuns = fragmentedString.runs { it[TextColorKey] == RgbaColor(0xFFFF0000) }.toList()
 
         redRuns shouldHaveSize 1
         redRuns[0].range shouldBe 0..9
-        redRuns[0].value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        redRuns[0].value[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
     }
 
     @Test
@@ -105,24 +105,24 @@ class RichStringRunsTest {
                 }
 
         // Predicate: TextColor is Red
-        val redRuns = richString.runs { it.getOrNull(TextColorKey) == RgbaColor(0xFFFF0000) }.toList()
+        val redRuns = richString.runs { it[TextColorKey] == RgbaColor(0xFFFF0000) }.toList()
 
         redRuns shouldHaveSize 3
 
         // 0..4 and 5..9 are both Red, but they have different attributes (Bold vs Italic), so they are NOT merged.
         redRuns[0].range shouldBe 0..4
-        redRuns[0].value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        redRuns[0].value.getOrNull(BoldKey) shouldBe Unit
+        redRuns[0].value[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        redRuns[0].value[BoldKey] shouldBe Unit
 
         redRuns[1].range shouldBe 5..9
-        redRuns[1].value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        redRuns[1].value.getOrNull(ItalicKey) shouldBe Unit
+        redRuns[1].value[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        redRuns[1].value[ItalicKey] shouldBe Unit
 
         // 10..14 is Blue, so it's skipped.
         // 15..19 is Red, Bold.
         redRuns[2].range shouldBe 15..19
-        redRuns[2].value.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        redRuns[2].value.getOrNull(BoldKey) shouldBe Unit
+        redRuns[2].value[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        redRuns[2].value[BoldKey] shouldBe Unit
     }
 
     @Test
@@ -143,7 +143,7 @@ class RichStringRunsTest {
         val sequence =
             fragmentedString.runs {
                 evaluatedCount++
-                it.getOrNull(TextColorKey) == RgbaColor(0xFFFF0000)
+                it[TextColorKey] == RgbaColor(0xFFFF0000)
             }
 
         evaluatedCount shouldBe 0 // Not evaluated yet
@@ -172,7 +172,7 @@ class RichStringRunsTest {
                     setSpanAttribute(TextColorKey, RgbaColor(0xFF0000FF), range = 5..9)
                 }
 
-        val blueRuns = richString.runs { it.getOrNull(TextColorKey) == RgbaColor(0xFF0000FF) }.toList()
+        val blueRuns = richString.runs { it[TextColorKey] == RgbaColor(0xFF0000FF) }.toList()
 
         blueRuns shouldHaveSize 1
         blueRuns[0].range shouldBe 5..9

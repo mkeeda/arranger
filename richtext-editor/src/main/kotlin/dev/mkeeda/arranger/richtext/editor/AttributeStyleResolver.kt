@@ -75,7 +75,7 @@ public class AttributeStyleBuilder internal constructor() {
         mapper: (T) -> SpanStyle,
     ) {
         spanResolvers.add { container ->
-            val value = container.getOrNull(key)
+            val value = container[key]
             if (value != null) mapper(value) else null
         }
     }
@@ -89,7 +89,7 @@ public class AttributeStyleBuilder internal constructor() {
         mapper: (T) -> ParagraphStyle,
     ) {
         paragraphResolvers.add { container ->
-            val value = container.getOrNull(key)
+            val value = container[key]
             if (value != null) mapper(value) else null
         }
     }

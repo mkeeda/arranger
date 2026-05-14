@@ -19,10 +19,10 @@ class AttributeEditScopeTest {
         val spans = str.spans
         spans.size shouldBe 1
         val attrs = spans.first().attributes
-        attrs.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        attrs.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
-        attrs.getOrNull(FontSizeKey) shouldBe TextSize(16f)
-        attrs.getOrNull(BoldKey) shouldBe Unit
+        attrs[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        attrs[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
+        attrs[FontSizeKey] shouldBe TextSize(16f)
+        attrs[BoldKey] shouldBe Unit
     }
 
     @Test
@@ -48,8 +48,8 @@ class AttributeEditScopeTest {
 
         // 5..10 attrs should remain
         secondSpan.range shouldBe 5..10
-        secondSpan.attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
-        secondSpan.attributes.getOrNull(BoldKey) shouldBe Unit
+        secondSpan.attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
+        secondSpan.attributes[BoldKey] shouldBe Unit
     }
 
     @Test
@@ -63,7 +63,7 @@ class AttributeEditScopeTest {
         val spans = str.spans
         spans.size shouldBe 1
         spans[0].range shouldBe 0..4
-        spans[0].attributes.getOrNull(BoldKey) shouldBe Unit
+        spans[0].attributes[BoldKey] shouldBe Unit
     }
 
     @Test
@@ -72,7 +72,7 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { textColor(RgbaColor(0xFFFF0000)) }
             }
-        str.spans[0].attributes.getOrNull(TextColorKey) shouldBe RgbaColor(0xFFFF0000)
+        str.spans[0].attributes[TextColorKey] shouldBe RgbaColor(0xFFFF0000)
 
         // Passing Unspecified should clear it
         str =
@@ -99,7 +99,7 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { backgroundColor(RgbaColor(0xFF00FF00)) }
             }
-        str.spans[0].attributes.getOrNull(BackgroundColorKey) shouldBe RgbaColor(0xFF00FF00)
+        str.spans[0].attributes[BackgroundColorKey] shouldBe RgbaColor(0xFF00FF00)
 
         str =
             str.edit {
@@ -124,7 +124,7 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { fontSize(TextSize(16f)) }
             }
-        str.spans[0].attributes.getOrNull(FontSizeKey) shouldBe TextSize(16f)
+        str.spans[0].attributes[FontSizeKey] shouldBe TextSize(16f)
 
         str =
             str.edit {
@@ -149,7 +149,7 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { bold() }
             }
-        str.spans[0].attributes.getOrNull(BoldKey) shouldBe Unit
+        str.spans[0].attributes[BoldKey] shouldBe Unit
 
         str =
             str.edit {
@@ -164,7 +164,7 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { underline() }
             }
-        str.spans[0].attributes.getOrNull(UnderlineKey) shouldBe Unit
+        str.spans[0].attributes[UnderlineKey] shouldBe Unit
 
         str =
             str.edit {
@@ -179,7 +179,7 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { italic() }
             }
-        str.spans[0].attributes.getOrNull(ItalicKey) shouldBe Unit
+        str.spans[0].attributes[ItalicKey] shouldBe Unit
 
         str =
             str.edit {
@@ -194,7 +194,7 @@ class AttributeEditScopeTest {
             RichString("Test").edit {
                 editAttributes { strikethrough() }
             }
-        str.spans[0].attributes.getOrNull(StrikethroughKey) shouldBe Unit
+        str.spans[0].attributes[StrikethroughKey] shouldBe Unit
 
         str =
             str.edit {
