@@ -82,6 +82,13 @@ public class AttributeContainer private constructor(
     }
 
     /**
+     * Returns a new [AttributeContainer] containing only the attributes whose keys match the [predicate].
+     */
+    public fun filterKeys(predicate: (AttributeKey<*>) -> Boolean): AttributeContainer {
+        return AttributeContainer(attributes = attributes.filterKeys(predicate))
+    }
+
+    /**
      * Returns a new [AttributeContainer] with the specified [key] mapped to the [value].
      */
     public fun <T> plus(

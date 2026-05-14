@@ -11,6 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.EnterKeyContext
+import dev.mkeeda.arranger.richtext.InheritParagraphStrategy
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
@@ -24,7 +26,7 @@ public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
 
     // The Single Source of Truth for spans
-    private var spans: List<RichSpan> by mutableStateOf(initialText.spans)
+    private var spans: List<RichSpan> by mutableStateOf(initialText.spans.resnapParagraphSpans(initialText.text))
 
     /**
      * Attributes that will be applied to the next character typed via the keyboard.
@@ -101,7 +103,7 @@ public class RichTextState(initialText: RichString) {
                         val k = key as AttributeKey<Any>
                         val value = span.attributes.getOrDefault(k)
                         val valueCounts = attributeCounts.getOrPut(k) { mutableMapOf() }
-                        valueCounts[value as Any] = valueCounts.getOrDefault(value, 0) + overlapLength
+                        valueCounts[value] = valueCounts.getOrDefault(value, 0) + overlapLength
                     }
                 }
             }
@@ -124,15 +126,11 @@ public class RichTextState(initialText: RichString) {
         val removedAttr = removedTypingAttributes
 
         val inheritedAttributes =
-            if (cursorPosition > 0 && cursorPosition <= textFieldState.text.length) {
-                val indexBeforeCursor = cursorPosition - 1
-                val spansBeforeCursor = spans.filter { indexBeforeCursor in it.range }
-                spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
-                    acc + span.attributes
-                }
-            } else {
-                AttributeContainer.empty()
-            }
+            collectInheritedAttributes(
+                spanInheritIndex = cursorPosition - 1,
+                paragraphInheritIndex = cursorPosition,
+                spans = spans,
+            )
 
         var finalAttrs = inheritedAttributes
         if (typingAttr != null) {
@@ -244,6 +242,7 @@ public class RichTextState(initialText: RichString) {
                         editEnd = originalRange.max,
                         newLength = range.length,
                         offsetDiff = range.length - originalRange.length,
+                        deletedText = buffer.originalText.substring(originalRange.min, originalRange.max),
                     )
 
                 // Apply typing attributes to the inserted text
@@ -283,34 +282,16 @@ public class RichTextState(initialText: RichString) {
                 // Inherit paragraph attributes when newlines are typed or pasted
                 val insertedText = buffer.asCharSequence().substring(range.min, range.max)
                 if (insertedText.contains('\n')) {
-                    val inheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
-                    val spansBeforeCursor = currentSpans.filter { inheritIndex in it.range }
-                    val attrsBeforeCursor =
-                        spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
-                            acc + span.attributes
-                        }
-                    val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
-                    val effectiveParagraphAttrKeys =
-                        paragraphAttrKeys.filter { key ->
-                            removedAttr == null || key !in removedAttr
-                        }
-                    val paragraphAttr =
-                        effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
-                            @Suppress("UNCHECKED_CAST")
-                            val typedKey = key as AttributeKey<Any>
-                            acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))
-                        }
-
-                    if (paragraphAttr.isNotEmpty()) {
-                        val snappedRange = (range.min..range.max).snapToParagraphs(buffer.toString())
-                        updatedSpans =
-                            updatedSpans.mergeSpan(
-                                RichSpan(
-                                    range = snappedRange,
-                                    attributes = paragraphAttr,
-                                ),
-                            )
-                    }
+                    updatedSpans =
+                        handleNewlineInsertion(
+                            insertedText = insertedText,
+                            originalRange = originalRange,
+                            range = range,
+                            currentSpans = currentSpans,
+                            updatedSpans = updatedSpans,
+                            buffer = buffer,
+                            removedAttr = removedAttr,
+                        )
                 }
 
                 updatedSpans
@@ -319,6 +300,101 @@ public class RichTextState(initialText: RichString) {
         this.spans = newSpans.resnapParagraphSpans(buffer.toString())
         clearTypingAttributes()
     }
+
+    private fun handleNewlineInsertion(
+        insertedText: String,
+        originalRange: TextRange,
+        range: TextRange,
+        currentSpans: List<RichSpan>,
+        updatedSpans: List<RichSpan>,
+        buffer: TextFieldBuffer,
+        removedAttr: Set<AttributeKey<*>>?,
+    ): List<RichSpan> {
+        val spanInheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
+        val paragraphInheritIndex = originalRange.min
+        val attrsBeforeCursor =
+            collectInheritedAttributes(
+                spanInheritIndex = spanInheritIndex,
+                paragraphInheritIndex = paragraphInheritIndex,
+                spans = currentSpans,
+            )
+        val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
+
+        if (insertedText == "\n") {
+            // Handle Enter key press using Strategy pattern
+            val paragraphRange = (originalRange.min..originalRange.min).snapToParagraphs(buffer.toString())
+            val context =
+                EnterKeyContext(
+                    text = buffer.toString(),
+                    cursorPosition = range.min,
+                    paragraphRange = paragraphRange,
+                    currentAttributes = attrsBeforeCursor,
+                )
+
+            val strategy =
+                paragraphAttrKeys
+                    .map { it.enterKeyStrategy }
+                    .firstOrNull { it != InheritParagraphStrategy }
+                    ?: InheritParagraphStrategy
+
+            val result = strategy.execute(context)
+            return EnterKeyHandler.apply(
+                result = result,
+                context = context,
+                spans = updatedSpans,
+                buffer = buffer,
+                insertedRange = range.min until range.max,
+                removedAttr = removedAttr,
+            )
+        } else {
+            // Handle pasted text containing newlines (fallback to simple inheritance)
+            val effectiveParagraphAttrKeys =
+                paragraphAttrKeys.filter { key ->
+                    removedAttr == null || key !in removedAttr
+                }
+            val paragraphAttr =
+                effectiveParagraphAttrKeys.fold(AttributeContainer.empty()) { acc, key ->
+                    @Suppress("UNCHECKED_CAST")
+                    val typedKey = key as AttributeKey<Any>
+                    acc + (typedKey to attrsBeforeCursor.getOrDefault(typedKey))
+                }
+
+            if (paragraphAttr.isNotEmpty()) {
+                val snappedRange = (range.min until range.max).snapToParagraphs(buffer.toString())
+                return updatedSpans.mergeSpan(
+                    RichSpan(
+                        range = snappedRange,
+                        attributes = paragraphAttr,
+                    ),
+                )
+            }
+        }
+        return updatedSpans
+    }
+
+    private fun collectInheritedAttributes(
+        spanInheritIndex: Int,
+        paragraphInheritIndex: Int,
+        spans: List<RichSpan>,
+    ): AttributeContainer {
+        return spans.fold(AttributeContainer.empty()) { acc, span ->
+            val hasSpanAttrs =
+                spanInheritIndex in span.range &&
+                    span.attributes.keys.any { it is SpanAttributeKey<*> }
+            val hasParagraphAttrs =
+                paragraphInheritIndex in span.range &&
+                    span.attributes.keys.any { it is ParagraphAttributeKey<*> }
+
+            if (!hasSpanAttrs && !hasParagraphAttrs) return@fold acc
+
+            val filteredAttrs =
+                span.attributes.filterKeys { key ->
+                    (key is SpanAttributeKey<*> && spanInheritIndex in span.range) ||
+                        (key is ParagraphAttributeKey<*> && paragraphInheritIndex in span.range)
+                }
+            acc + filteredAttrs
+        }
+    }
 }
 
 internal fun List<RichSpan>.shiftSpans(
@@ -326,14 +402,16 @@ internal fun List<RichSpan>.shiftSpans(
     editEnd: Int,
     newLength: Int,
     offsetDiff: Int,
+    deletedText: String = "",
 ): List<RichSpan> =
-    mapNotNull { span ->
+    flatMap { span ->
         shiftSpan(
             span = span,
             editStart = editStart,
             editEnd = editEnd,
             newLength = newLength,
             offsetDiff = offsetDiff,
+            deletedText = deletedText,
         )
     }
 
@@ -343,25 +421,73 @@ private fun shiftSpan(
     editEnd: Int,
     newLength: Int,
     offsetDiff: Int,
-): RichSpan? {
+    deletedText: String,
+): List<RichSpan> {
     val spanStart = span.range.first
     val spanEnd = span.range.last
+
+    // If this span merges into a previous paragraph due to a newline deletion,
+    // we should strip its paragraph attributes so the top paragraph's attributes win.
+    val isMergedIntoPrevious =
+        if (deletedText.contains('\n')) {
+            val lastDeletedNewlineIndex = editStart + deletedText.lastIndexOf('\n')
+            spanStart > lastDeletedNewlineIndex && spanStart <= editEnd
+        } else {
+            false
+        }
+
+    val spanAttrs = span.attributes.filterKeys { it is SpanAttributeKey<*> }
+    val paraAttrs =
+        if (isMergedIntoPrevious) {
+            AttributeContainer.empty()
+        } else {
+            span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
+        }
+
+    val effectiveAttributes = spanAttrs + paraAttrs
+    if (effectiveAttributes.isEmpty()) return emptyList()
+
+    val effectiveSpan = span.copy(attributes = effectiveAttributes)
 
     return when {
         editEnd <= spanStart -> {
             // Edit happens entirely before the span. Shift it securely.
-            span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff))
+            listOf(effectiveSpan.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff)))
         }
 
         editStart > spanEnd + 1 -> {
             // Edit happens entirely after the span with a gap. Unaffected.
-            // When editStart == spanEnd + 1, it falls through to the overlap branch
-            // so that adjacent insertions can inherit the span's attributes.
-            span
+            listOf(effectiveSpan)
         }
 
         else -> {
-            // Edit overlaps with the span.
+            // Edit overlaps with the span, or is exactly adjacent (editStart == spanEnd + 1).
+
+            // If it's an adjacent insertion (typing exactly at the end of the span),
+            // we want to extend SpanAttributes, but NOT ParagraphAttributes.
+            // ParagraphAttributes should only expand if the edit actually overlaps them.
+            if (editStart == spanEnd + 1 && editEnd == spanEnd + 1) {
+                val result = mutableListOf<RichSpan>()
+
+                // Paragraph attributes stay unaffected (don't expand into adjacent insertions)
+                if (paraAttrs.isNotEmpty()) {
+                    result.add(effectiveSpan.copy(attributes = paraAttrs))
+                }
+
+                // Span attributes expand to cover the insertion
+                if (spanAttrs.isNotEmpty()) {
+                    result.add(
+                        effectiveSpan.copy(
+                            range = spanStart..(spanEnd + offsetDiff),
+                            attributes = spanAttrs,
+                        ),
+                    )
+                }
+
+                return result
+            }
+
+            // Normal overlap
             val newStart =
                 when {
                     spanStart < editStart -> spanStart
@@ -372,19 +498,13 @@ private fun shiftSpan(
             val newEnd =
                 when {
                     spanEnd >= editEnd -> spanEnd + offsetDiff
-
-                    // Adjacent insertion (e.g., typing right after a bold word) inherits the span's attributes.
-                    // This matches common rich-text editor behavior where continuing to type at the end
-                    // of a styled region extends the style.
-                    editStart == spanEnd + 1 && editEnd == spanEnd + 1 -> spanEnd + offsetDiff
-
                     else -> editStart + newLength - 1
                 }
 
             if (newStart > newEnd) {
-                null
+                emptyList()
             } else {
-                span.copy(range = newStart..newEnd)
+                listOf(effectiveSpan.copy(range = newStart..newEnd))
             }
         }
     }

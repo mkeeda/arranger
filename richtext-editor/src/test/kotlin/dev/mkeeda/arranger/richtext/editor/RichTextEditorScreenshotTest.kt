@@ -212,7 +212,7 @@ class RichTextEditorScreenshotTest {
 
     @OptIn(ExperimentalRoborazziApi::class)
     @Test
-    fun `type continuous newlines generates list markers correctly`() {
+    fun `type continuous newlines outdents list correctly`() {
         val text = "Item 1"
         val state =
             RichTextState(

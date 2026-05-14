@@ -16,7 +16,7 @@ public fun IntRange.snapToParagraphs(text: String): IntRange {
             if (it != -1) {
                 it
             } else {
-                if (safeLast >= text.length && text.endsWith('\n')) text.length else text.lastIndex
+                text.length
             }
         }
     return start..end
