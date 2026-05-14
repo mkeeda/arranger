@@ -36,12 +36,16 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.bulletList
+import dev.mkeeda.arranger.richtext.clearBulletList
+import dev.mkeeda.arranger.richtext.clearOrderedList
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
+import dev.mkeeda.arranger.richtext.orderedList
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.RichString
@@ -341,8 +345,8 @@ private fun IndentOutdentButtons(
 ) {
     IconButton(
         onClick = {
-            val currentLevel = state.currentAttributes[BulletListKey] as? ListIndentLevel
-                ?: state.currentAttributes[OrderedListKey] as? ListIndentLevel
+            val currentLevel = state.currentAttributes.getOrNull(BulletListKey)
+                ?: state.currentAttributes.getOrNull(OrderedListKey)
             if (currentLevel != null && currentLevel.ordinal > 0) {
                 val prevLevel = ListIndentLevel.entries[currentLevel.ordinal - 1]
                 state.edit {
@@ -374,8 +378,8 @@ private fun IndentOutdentButtons(
 
     IconButton(
         onClick = {
-            val currentLevel = state.currentAttributes[BulletListKey] as? ListIndentLevel
-                ?: state.currentAttributes[OrderedListKey] as? ListIndentLevel
+            val currentLevel = state.currentAttributes.getOrNull(BulletListKey)
+                ?: state.currentAttributes.getOrNull(OrderedListKey)
             if (currentLevel != null && currentLevel.ordinal < ListIndentLevel.Level6.ordinal) {
                 val nextLevel = ListIndentLevel.entries[currentLevel.ordinal + 1]
                 state.edit {
