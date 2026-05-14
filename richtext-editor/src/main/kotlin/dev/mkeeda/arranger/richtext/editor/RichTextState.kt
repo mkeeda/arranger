@@ -443,23 +443,25 @@ private fun shiftSpan(
 
     // If this span merges into a previous paragraph due to a newline deletion,
     // we should strip its paragraph attributes so the top paragraph's attributes win.
-    val isMergedIntoPrevious = if (deletedText.contains('\n')) {
-        val lastDeletedNewlineIndex = editStart + deletedText.lastIndexOf('\n')
-        spanStart > lastDeletedNewlineIndex && spanStart <= editEnd
-    } else {
-        false
-    }
+    val isMergedIntoPrevious =
+        if (deletedText.contains('\n')) {
+            val lastDeletedNewlineIndex = editStart + deletedText.lastIndexOf('\n')
+            spanStart > lastDeletedNewlineIndex && spanStart <= editEnd
+        } else {
+            false
+        }
 
     val spanAttrs = span.attributes.filterKeys { it is SpanAttributeKey<*> }
-    val paraAttrs = if (isMergedIntoPrevious) {
-        AttributeContainer.empty()
-    } else {
-        span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
-    }
-    
+    val paraAttrs =
+        if (isMergedIntoPrevious) {
+            AttributeContainer.empty()
+        } else {
+            span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
+        }
+
     val effectiveAttributes = spanAttrs + paraAttrs
     if (effectiveAttributes.isEmpty()) return emptyList()
-    
+
     val effectiveSpan = span.copy(attributes = effectiveAttributes)
 
     return when {

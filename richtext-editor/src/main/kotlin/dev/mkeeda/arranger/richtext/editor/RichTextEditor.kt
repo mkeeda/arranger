@@ -206,14 +206,26 @@ internal class ComposeParagraphWorkarounds {
             val i = originalText.indexOf('\n', searchStartIndex)
             if (i == -1) break
 
-            if (i < originalLength - 1) {
-                val styleAtI = getParagraphStyleAt(i)
-                val styleAtNext = getParagraphStyleAt(i + 1)
-                if (styleAtI != styleAtNext) {
-                    val mappedI = mapCharacterIndex(i)
-                    buffer.replace(mappedI, mappedI + 1, "\uFEFF")
+            val styleAtI = getParagraphStyleAt(i)
+            val styleAtNext = getParagraphStyleAt(i + 1)
+
+            val isBoundary = styleAtI != styleAtNext
+            // If the `\n` is the very last character in the text, replacing it would completely remove the trailing
+            // empty line (since there is no text after it to break to).
+            // We only replace it if there is a `ParagraphStyle` spanning the empty region after the `\n`,
+            // because that empty style block itself will force Compose to render the trailing empty line.
+            val isSafeToReplace =
+                if (i == originalLength - 1) {
+                    styleAtNext != null
+                } else {
+                    true
                 }
+
+            if (isBoundary && isSafeToReplace) {
+                val mappedI = mapCharacterIndex(i)
+                buffer.replace(mappedI, mappedI + 1, "\uFEFF")
             }
+
             searchStartIndex = i + 1
         }
     }
