@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -224,6 +225,57 @@ private fun ChatFormattingToolbar(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+
+        TextButton(
+            onClick = {
+                val currentLevel = state.currentAttributes[BulletListKey] as? ListIndentLevel
+                    ?: state.currentAttributes[OrderedListKey] as? ListIndentLevel
+                if (currentLevel != null && currentLevel.ordinal > 0) {
+                    val prevLevel = ListIndentLevel.entries[currentLevel.ordinal - 1]
+                    state.edit {
+                        editAttributes(state.selection) {
+                            if (state.currentAttributes.containsKey(BulletListKey)) {
+                                bulletList(prevLevel)
+                            } else {
+                                orderedList(prevLevel)
+                            }
+                        }
+                    }
+                } else if (currentLevel != null) {
+                    state.edit {
+                        editAttributes(state.selection) {
+                            clearBulletList()
+                            clearOrderedList()
+                        }
+                    }
+                }
+            },
+            enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey)
+        ) {
+            Text("Outdent")
+        }
+
+        TextButton(
+            onClick = {
+                val currentLevel = state.currentAttributes[BulletListKey] as? ListIndentLevel
+                    ?: state.currentAttributes[OrderedListKey] as? ListIndentLevel
+                if (currentLevel != null && currentLevel.ordinal < ListIndentLevel.Level6.ordinal) {
+                    val nextLevel = ListIndentLevel.entries[currentLevel.ordinal + 1]
+                    state.edit {
+                        editAttributes(state.selection) {
+                            if (state.currentAttributes.containsKey(BulletListKey)) {
+                                bulletList(nextLevel)
+                            } else {
+                                orderedList(nextLevel)
+                            }
+                        }
+                    }
+                }
+            },
+            enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey)
+        ) {
+            Text("Indent")
+        }
 
         IconButton(
             onClick = {
