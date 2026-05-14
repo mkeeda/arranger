@@ -24,7 +24,7 @@ public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
 
     // The Single Source of Truth for spans
-    private var spans: List<RichSpan> by mutableStateOf(initialText.spans)
+    private var spans: List<RichSpan> by mutableStateOf(initialText.spans.resnapParagraphSpans(initialText.text))
 
     /**
      * Attributes that will be applied to the next character typed via the keyboard.
@@ -125,10 +125,34 @@ public class RichTextState(initialText: RichString) {
 
         val inheritedAttributes =
             if (cursorPosition > 0 && cursorPosition <= textFieldState.text.length) {
-                val indexBeforeCursor = cursorPosition - 1
-                val spansBeforeCursor = spans.filter { indexBeforeCursor in it.range }
-                spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
-                    acc + span.attributes
+                val spanInheritIndex = cursorPosition - 1
+                val paragraphInheritIndex = cursorPosition
+
+                spans.fold(AttributeContainer.empty()) { acc, span ->
+                    val hasSpanAttrs =
+                        spanInheritIndex in span.range &&
+                            span.attributes.keys.any { it is SpanAttributeKey<*> }
+                    val hasParagraphAttrs =
+                        paragraphInheritIndex in span.range &&
+                            span.attributes.keys.any { it is ParagraphAttributeKey<*> }
+
+                    if (!hasSpanAttrs && !hasParagraphAttrs) return@fold acc
+
+                    val filteredAttrs =
+                        span.attributes.filterKeys { key ->
+                            (key is SpanAttributeKey<*> && spanInheritIndex in span.range) ||
+                                (key is ParagraphAttributeKey<*> && paragraphInheritIndex in span.range)
+                        }
+                    acc + filteredAttrs
+                }
+            } else if (cursorPosition == 0 && textFieldState.text.isNotEmpty()) {
+                // At the very beginning of the text, we can only inherit paragraph attributes.
+                spans.fold(AttributeContainer.empty()) { acc, span ->
+                    if (0 in span.range) {
+                        acc + span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
+                    } else {
+                        acc
+                    }
                 }
             } else {
                 AttributeContainer.empty()
@@ -311,11 +335,26 @@ public class RichTextState(initialText: RichString) {
         buffer: TextFieldBuffer,
         removedAttr: Set<AttributeKey<*>>?,
     ): List<RichSpan> {
-        val inheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
-        val spansBeforeCursor = currentSpans.filter { inheritIndex in it.range }
+        val spanInheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
+        val paragraphInheritIndex = originalRange.min
+
         val attrsBeforeCursor =
-            spansBeforeCursor.fold(AttributeContainer.empty()) { acc, span ->
-                acc + span.attributes
+            currentSpans.fold(AttributeContainer.empty()) { acc, span ->
+                val hasSpanAttrs =
+                    spanInheritIndex in span.range &&
+                        span.attributes.keys.any { it is SpanAttributeKey<*> }
+                val hasParagraphAttrs =
+                    paragraphInheritIndex in span.range &&
+                        span.attributes.keys.any { it is ParagraphAttributeKey<*> }
+
+                if (!hasSpanAttrs && !hasParagraphAttrs) return@fold acc
+
+                val filteredAttrs =
+                    span.attributes.filterKeys { key ->
+                        (key is SpanAttributeKey<*> && spanInheritIndex in span.range) ||
+                            (key is ParagraphAttributeKey<*> && paragraphInheritIndex in span.range)
+                    }
+                acc + filteredAttrs
             }
         val paragraphAttrKeys = attrsBeforeCursor.keys.filterIsInstance<ParagraphAttributeKey<*>>()
 

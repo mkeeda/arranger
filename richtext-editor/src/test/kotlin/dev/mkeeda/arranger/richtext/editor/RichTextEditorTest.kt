@@ -319,8 +319,7 @@ class RichTextEditorTest {
 
         val spans = state.richString.spans
         spans.size shouldBe 1
-        // The List attribute SHOULD cover both paragraphs, so they are merged into one span
-        spans.first().range shouldBe expectedText.rangeOf("Item 1\nItem 2")
+        spans.first().range shouldBe (0..expectedText.length)
         spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
 

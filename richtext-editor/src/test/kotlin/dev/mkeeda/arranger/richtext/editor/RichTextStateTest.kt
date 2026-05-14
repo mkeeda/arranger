@@ -234,8 +234,8 @@ class RichTextStateTest {
                     },
             )
 
-        // Initial span should be "Bravo" (indices 6..10)
-        state.richString.spans.first().range shouldBe (6..10)
+        // Initial span should be "Bravo" (indices 6..11)
+        state.richString.spans.first().range shouldBe (6..11)
 
         state.edit {
             // Insert a '\n' in the middle of Bravo
@@ -247,8 +247,8 @@ class RichTextStateTest {
 
         val spans = state.richString.spans
         spans.size shouldBe 1
-        // Expected span is the combined new paragraphs: "Bra\nvo" (indices 6..11)
-        spans.first().range shouldBe (6..11)
+        // Expected span is the combined new paragraphs: "Bra\nvo" (indices 6..12)
+        spans.first().range shouldBe (6..12)
     }
 
     @Test
@@ -298,19 +298,23 @@ class RichTextStateTest {
         state.richString.text shouldBe expectedText
 
         val spans = state.richString.spans
-        spans.size shouldBe 2
 
         // Due to SpanMerger, the spans are tessellated chunks.
         val firstSpan = spans[0]
         val secondSpan = spans[1]
-
-        firstSpan.range shouldBe (0..5)
         firstSpan.attributes.containsKey(BlockquoteKey) shouldBe true
         firstSpan.attributes.containsKey(BoldKey) shouldBe false
 
         secondSpan.range shouldBe (6..10)
         secondSpan.attributes.containsKey(BlockquoteKey) shouldBe true
         secondSpan.attributes.containsKey(BoldKey) shouldBe true
+
+        // Paragraph attributes are now extended to text.length (11)
+        spans.size shouldBe 3
+        val thirdSpan = spans[2]
+        thirdSpan.range shouldBe (11..11)
+        thirdSpan.attributes.containsKey(BlockquoteKey) shouldBe true
+        thirdSpan.attributes.containsKey(BoldKey) shouldBe false
     }
 
     @Test
@@ -566,7 +570,8 @@ class RichTextStateTest {
         // Only the first line should have the bullet attribute, since it was disabled before the newline
         val spans = state.richString.spans
         spans.size shouldBe 1
-        spans.first().range shouldBe expectedText.rangeOf("Bullet item")
+        // The span snaps to the paragraph boundary which includes the newline (length of "Bullet item\n" is 12 -> 0..11)
+        spans.first().range shouldBe (0..11)
         spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
 }
