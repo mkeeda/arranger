@@ -51,9 +51,13 @@ import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
+import dev.mkeeda.arranger.richtext.bulletList
+import dev.mkeeda.arranger.richtext.clearBulletList
+import dev.mkeeda.arranger.richtext.clearOrderedList
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.editAttributes
+import dev.mkeeda.arranger.richtext.orderedList
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
@@ -223,6 +227,8 @@ private fun ChatFormattingToolbar(
             }
         }
 
+        IndentOutdentButtons(state = state)
+
         Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
@@ -328,5 +334,72 @@ private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) 
 fun ChatInputSamplePreview() {
     ArrangerTheme {
         ChatInputSample()
+    }
+}
+
+@Composable
+private fun IndentOutdentButtons(
+    state: RichTextState,
+    modifier: Modifier = Modifier,
+) {
+    IconButton(
+        onClick = {
+            val currentLevel =
+                state.currentAttributes.getOrNull(BulletListKey)
+                    ?: state.currentAttributes.getOrNull(OrderedListKey)
+            if (currentLevel != null && currentLevel.ordinal > 0) {
+                val prevLevel = ListIndentLevel.entries[currentLevel.ordinal - 1]
+                state.edit {
+                    editAttributes(state.selection) {
+                        if (state.currentAttributes.containsKey(BulletListKey)) {
+                            bulletList(prevLevel)
+                        } else {
+                            orderedList(prevLevel)
+                        }
+                    }
+                }
+            } else if (currentLevel != null) {
+                state.edit {
+                    editAttributes(state.selection) {
+                        clearBulletList()
+                        clearOrderedList()
+                    }
+                }
+            }
+        },
+        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
+        modifier = modifier,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.format_indent_decrease),
+            contentDescription = "Outdent",
+        )
+    }
+
+    IconButton(
+        onClick = {
+            val currentLevel =
+                state.currentAttributes.getOrNull(BulletListKey)
+                    ?: state.currentAttributes.getOrNull(OrderedListKey)
+            if (currentLevel != null && currentLevel.ordinal < ListIndentLevel.Level6.ordinal) {
+                val nextLevel = ListIndentLevel.entries[currentLevel.ordinal + 1]
+                state.edit {
+                    editAttributes(state.selection) {
+                        if (state.currentAttributes.containsKey(BulletListKey)) {
+                            bulletList(nextLevel)
+                        } else {
+                            orderedList(nextLevel)
+                        }
+                    }
+                }
+            }
+        },
+        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
+        modifier = modifier,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.format_indent_increase),
+            contentDescription = "Indent",
+        )
     }
 }

@@ -80,10 +80,10 @@ Arranger is published to Maven Central. Add the following dependencies to your m
 dependencies {
     // For Compose UI integration (RichTextEditor).
     // This automatically includes the core 'arranger-richtext' module.
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha02")
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha03")
 
     // Or, if you only need the core data structures without Compose UI:
-    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha02")
+    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha03")
 }
 ```
 
@@ -314,6 +314,21 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
 </details>
 
 <img src="./docs/images/custom-list-marker.png" width="500" alt="custom list marker sample"/>
+
+## Dynamic Enter Key Handling
+
+Arranger provides intelligent formatting strategies when the user presses the Enter key. By providing an `EnterKeyStrategy` to the `RichTextEditor`, you can control how paragraph attributes are inherited or transformed on new lines.
+
+The library includes three built-in strategies:
+
+| Strategy | Description | Demo |
+| :--- | :--- | :--- |
+| **`InheritParagraphStrategy`**<br>(Default) | Inherits all paragraph attributes (like alignment or blockquote) to the new line. | <img src="./docs/images/enter-key-strategy-inherit.gif" width="250" alt="Inherit Strategy Demo"/> |
+| **`ListEnterStrategy`** | Inherits list attributes and automatically increments ordered list numbers. Pressing Enter on an empty list item will decrease its indentation level (outdent). If the item is at the first level, the list attribute is removed. | <img src="./docs/images/enter-key-strategy-list.gif" width="250" alt="List Strategy Demo"/> |
+| **`HeadingEnterStrategy`** | Automatically removes the heading attribute on the new line, allowing users to quickly start typing normal text after a heading. | <img src="./docs/images/enter-key-strategy-heading.gif" width="250" alt="Heading Strategy Demo"/> |
+
+You can combine these strategies (or create your own custom strategies) to build a seamless editing experience.
+
 
 ## Custom Attribute Mapping
 
