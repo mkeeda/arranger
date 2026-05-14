@@ -278,16 +278,50 @@ class RichTextEditorTest {
         // Move cursor to the end
         composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
 
-        // Type a newline
+        // Type a newline and some text on the new paragraph sequentially
         composeTestRule.onNodeWithText(initialText).performTextInput("\n")
+        composeTestRule.onNodeWithText("$initialText\n").performTextInput("New Paragraph")
 
-        val expectedText = "Heading\n"
+        val expectedText = "Heading\nNew Paragraph"
         state.richString.text shouldBe expectedText
 
         val spans = state.richString.spans
         spans.size shouldBe 1
+        // The Heading attribute should NOT cover "New Paragraph" (index 8 onwards)
         spans.first().range shouldBe expectedText.rangeOf("Heading\n")
         spans.first().attributes shouldBe attributeContainerOf(HeadingKey to HeadingLevel.H1)
+    }
+
+    @Test
+    fun `typing newline in list item inherits list attribute for the new paragraph`() {
+        val initialText = "Item 1"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, initialText.indices)
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Move cursor to the end
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Type a newline and some text on the new paragraph sequentially
+        composeTestRule.onNodeWithText(initialText).performTextInput("\n")
+        composeTestRule.onNodeWithText("$initialText\n").performTextInput("Item 2")
+
+        val expectedText = "Item 1\nItem 2"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        // The List attribute SHOULD cover both paragraphs, so they are merged into one span
+        spans.first().range shouldBe expectedText.rangeOf("Item 1\nItem 2")
+        spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
 
     @Test

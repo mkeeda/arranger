@@ -101,7 +101,7 @@ public class RichTextState(initialText: RichString) {
                         val k = key as AttributeKey<Any>
                         val value = span.attributes.getOrDefault(k)
                         val valueCounts = attributeCounts.getOrPut(k) { mutableMapOf() }
-                        valueCounts[value as Any] = valueCounts.getOrDefault(value, 0) + overlapLength
+                        valueCounts[value] = valueCounts.getOrDefault(value, 0) + overlapLength
                     }
                 }
             }
@@ -378,7 +378,7 @@ internal fun List<RichSpan>.shiftSpans(
     newLength: Int,
     offsetDiff: Int,
 ): List<RichSpan> =
-    mapNotNull { span ->
+    flatMap { span ->
         shiftSpan(
             span = span,
             editStart = editStart,
@@ -394,25 +394,52 @@ private fun shiftSpan(
     editEnd: Int,
     newLength: Int,
     offsetDiff: Int,
-): RichSpan? {
+): List<RichSpan> {
     val spanStart = span.range.first
     val spanEnd = span.range.last
 
     return when {
         editEnd <= spanStart -> {
             // Edit happens entirely before the span. Shift it securely.
-            span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff))
+            listOf(span.copy(range = (spanStart + offsetDiff)..(spanEnd + offsetDiff)))
         }
 
         editStart > spanEnd + 1 -> {
             // Edit happens entirely after the span with a gap. Unaffected.
-            // When editStart == spanEnd + 1, it falls through to the overlap branch
-            // so that adjacent insertions can inherit the span's attributes.
-            span
+            listOf(span)
         }
 
         else -> {
-            // Edit overlaps with the span.
+            // Edit overlaps with the span, or is exactly adjacent (editStart == spanEnd + 1).
+
+            // If it's an adjacent insertion (typing exactly at the end of the span),
+            // we want to extend SpanAttributes, but NOT ParagraphAttributes.
+            // ParagraphAttributes should only expand if the edit actually overlaps them.
+            if (editStart == spanEnd + 1 && editEnd == spanEnd + 1) {
+                val spanAttrs = span.attributes.filterKeys { it is SpanAttributeKey<*> }
+                val paraAttrs = span.attributes.filterKeys { it is ParagraphAttributeKey<*> }
+
+                val result = mutableListOf<RichSpan>()
+
+                // Paragraph attributes stay unaffected (don't expand into adjacent insertions)
+                if (paraAttrs.isNotEmpty()) {
+                    result.add(span.copy(attributes = paraAttrs))
+                }
+
+                // Span attributes expand to cover the insertion
+                if (spanAttrs.isNotEmpty()) {
+                    result.add(
+                        span.copy(
+                            range = spanStart..(spanEnd + offsetDiff),
+                            attributes = spanAttrs,
+                        ),
+                    )
+                }
+
+                return result
+            }
+
+            // Normal overlap
             val newStart =
                 when {
                     spanStart < editStart -> spanStart
@@ -423,19 +450,13 @@ private fun shiftSpan(
             val newEnd =
                 when {
                     spanEnd >= editEnd -> spanEnd + offsetDiff
-
-                    // Adjacent insertion (e.g., typing right after a bold word) inherits the span's attributes.
-                    // This matches common rich-text editor behavior where continuing to type at the end
-                    // of a styled region extends the style.
-                    editStart == spanEnd + 1 && editEnd == spanEnd + 1 -> spanEnd + offsetDiff
-
                     else -> editStart + newLength - 1
                 }
 
             if (newStart > newEnd) {
-                null
+                emptyList()
             } else {
-                span.copy(range = newStart..newEnd)
+                listOf(span.copy(range = newStart..newEnd))
             }
         }
     }
