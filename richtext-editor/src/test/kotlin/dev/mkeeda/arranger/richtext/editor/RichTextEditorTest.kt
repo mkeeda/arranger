@@ -8,7 +8,12 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import dev.mkeeda.arranger.richtext.BoldKey
+import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.HeadingKey
+import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
@@ -253,5 +258,98 @@ class RichTextEditorTest {
         boldSpans.size shouldBe 2
         boldSpans[0].range shouldBe 0..2
         boldSpans[1].range shouldBe 4..5
+    }
+
+    @Test
+    fun `typing newline in heading clears heading attribute for the new paragraph`() {
+        val initialText = "Heading"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setParagraphAttribute(HeadingKey, HeadingLevel.H1, initialText.indices)
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Move cursor to the end
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Type a newline
+        composeTestRule.onNodeWithText(initialText).performTextInput("\n")
+
+        val expectedText = "Heading\n"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        spans.first().range shouldBe expectedText.rangeOf("Heading\n")
+        spans.first().attributes shouldBe attributeContainerOf(HeadingKey to HeadingLevel.H1)
+    }
+
+    @Test
+    fun `typing newline in an empty list item outdents the list level`() {
+        val initialText = "List\n"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setParagraphAttribute(BulletListKey, ListIndentLevel.Level2, 0..initialText.length)
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Move cursor to the end (at the empty paragraph)
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Type a newline
+        composeTestRule.onNodeWithText(initialText).performTextInput("\n")
+
+        // The newline should be consumed by the outdent operation
+        val expectedText = "List\n"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 2
+        spans[0].range shouldBe expectedText.rangeOf("List\n")
+        spans[0].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level2)
+        spans[1].range shouldBe (5..5)
+        spans[1].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
+    }
+
+    @Test
+    fun `typing newline in an empty level 1 list item clears the list attribute`() {
+        val initialText = "List\n"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, 0..initialText.length)
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Move cursor to the end (at the empty paragraph)
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Type a newline
+        composeTestRule.onNodeWithText(initialText).performTextInput("\n")
+
+        val expectedText = "List\n"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        spans.first().range shouldBe (0..4)
+        spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
 }
