@@ -32,7 +32,7 @@ public data class RichString(
      * into a single [RichRun], ignoring differences in other attributes.
      */
     public fun <T : Any> runs(key: AttributeKey<T>): Sequence<RichRun<T>> {
-        return extractRuns { attributes -> attributes.getOrNull(key) }
+        return extractRuns { attributes -> attributes[key] }
     }
 
     /**
