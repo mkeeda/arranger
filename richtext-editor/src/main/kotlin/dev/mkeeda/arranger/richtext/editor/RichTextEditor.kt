@@ -25,6 +25,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
@@ -93,6 +101,37 @@ public fun RichTextEditor(
 
                 translate(top = -scrollState.value.toFloat()) {
                     drawListItems(listItems, layoutResult, textMeasurer, currentTextStyle, listMarkerResolver, workarounds)
+                }
+            }
+            .onPreviewKeyEvent { event ->
+                if (event.type == KeyEventType.KeyDown) {
+                    val isCommandOrCtrl = event.isCtrlPressed || event.isMetaPressed
+                    if (isCommandOrCtrl) {
+                        when {
+                            event.key == Key.Z && event.isShiftPressed -> {
+                                if (state.canRedo) state.redo()
+                                true
+                            }
+
+                            event.key == Key.Z -> {
+                                if (state.canUndo) state.undo()
+                                true
+                            }
+
+                            event.key == Key.Y -> {
+                                if (state.canRedo) state.redo()
+                                true
+                            }
+
+                            else -> {
+                                false
+                            }
+                        }
+                    } else {
+                        false
+                    }
+                } else {
+                    false
                 }
             }
 
