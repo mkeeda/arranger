@@ -64,6 +64,8 @@ public class RichTextUndoState internal constructor(
     /**
      * Clears both the undo and redo history.
      * This resets [canUndo] and [canRedo] to `false`.
+     *
+     * Note: This also clears the internal [TextFieldState] undo history to keep both in sync.
      */
     @OptIn(ExperimentalFoundationApi::class)
     public fun clearHistory() {

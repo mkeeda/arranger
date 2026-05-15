@@ -25,8 +25,6 @@ import dev.mkeeda.arranger.richtext.snapToParagraphs
 public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
 
-    internal val undoManager = RichTextUndoManager()
-
     // The Single Source of Truth for spans
     private var spans: List<RichSpan> by mutableStateOf(initialText.spans.resnapParagraphSpans(initialText.text))
 

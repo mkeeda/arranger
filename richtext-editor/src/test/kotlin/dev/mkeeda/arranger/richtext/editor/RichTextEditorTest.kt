@@ -472,10 +472,8 @@ class RichTextEditorTest {
         }
         composeTestRule.waitForIdle()
 
-        // Because " World" involves space and word, we might need two undos,
-        // but wait, `performTextInput(" World")` might be delivered as a single string replacing it.
-        // Wait, `simulateTypingAtEnd` sends char by char. `performTextInput` replaces the whole thing.
-        // Let's check what state we are in. If we just verify state.richString.text == "Hello" it's fine.
+        // `performTextInput(" World")` is delivered as a single bulk operation, creating one undo entry.
+        // A single Ctrl+Z should therefore revert the entire " World" addition.
         state.richString.text shouldBe "Hello"
 
         // Simulate Ctrl+Shift+Z (Redo)

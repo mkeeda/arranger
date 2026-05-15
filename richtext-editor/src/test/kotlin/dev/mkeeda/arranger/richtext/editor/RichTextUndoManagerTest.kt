@@ -146,7 +146,8 @@ class RichTextUndoManagerTest {
         var lastUndone: EditorSnapshot? = null
         val current = createSnapshot("106")
         for (i in 1..100) {
-            lastUndone = manager.undo(if (i == 1) current else lastUndone!!)
+            val prev = if (i == 1) current else requireNotNull(lastUndone) { "undo stack exhausted earlier than expected" }
+            lastUndone = manager.undo(prev)
         }
 
         lastUndone?.text shouldBe "6"
