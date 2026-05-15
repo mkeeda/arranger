@@ -585,12 +585,12 @@ class RichTextStateTest {
     @Test
     fun `undo after text edit restores previous text and spans`() {
         val state = RichTextState(initialText = RichString(text = "Hello"))
-        
+
         state.simulateTypingAtEnd("World")
-        
+
         state.richString.text shouldBe "HelloWorld"
         state.canUndo shouldBe true
-        
+
         state.undo()
         state.richString.text shouldBe "Hello"
         state.canRedo shouldBe true
@@ -611,7 +611,7 @@ class RichTextStateTest {
         state.simulateTypingAtEnd("a")
         state.simulateTypingAtEnd("b")
         state.simulateTypingAtEnd("c")
-        
+
         state.undo()
         state.richString.text shouldBe ""
     }
@@ -623,11 +623,11 @@ class RichTextStateTest {
         state.simulateTypingAtEnd("b")
         state.simulateTypingAtEnd(" ")
         state.simulateTypingAtEnd("c")
-        
+
         state.undo()
         // 'c' should be reverted, space and 'ab' should be kept
         state.richString.text shouldBe "ab "
-        
+
         state.undo()
         // space should be reverted
         state.richString.text shouldBe "ab"
@@ -637,9 +637,9 @@ class RichTextStateTest {
     fun `undo restores selection`() {
         val state = RichTextState(initialText = RichString(text = "Hello"))
         state.textFieldState.edit { selection = TextRange(2) }
-        
+
         state.simulateTypingAtEnd("!") // Selection becomes 6
-        
+
         state.undo()
         state.textFieldState.selection.start shouldBe 2
     }
@@ -647,14 +647,14 @@ class RichTextStateTest {
     @Test
     fun `deletion always creates separate undo entry`() {
         val state = RichTextState(initialText = RichString(text = "Hello"))
-        
+
         // Simulating backspace
         state.textFieldState.edit {
             replace(4, 5, "")
             selection = TextRange(4)
             state.updateRichString(this)
         }
-        
+
         state.richString.text shouldBe "Hell"
         state.undo()
         state.richString.text shouldBe "Hello"

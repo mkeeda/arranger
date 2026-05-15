@@ -315,7 +315,7 @@ public class RichTextState(initialText: RichString) {
         return EditorSnapshot(
             text = textFieldState.text.toString(),
             spans = spans,
-            selection = textFieldState.selection
+            selection = textFieldState.selection,
         )
     }
 
@@ -554,21 +554,21 @@ private fun shiftSpan(
 @OptIn(ExperimentalFoundationApi::class)
 internal fun resolveMergePolicy(buffer: TextFieldBuffer): UndoMergePolicy {
     if (buffer.changes.changeCount != 1) return UndoMergePolicy.SEPARATE
-    
+
     val range = buffer.changes.getRange(0)
     val originalRange = buffer.changes.getOriginalRange(0)
-    
+
     val insertedText = buffer.asCharSequence().substring(range.min, range.max)
     val deletedLength = originalRange.length
-    
+
     // Deletion always creates a new undo entry
     if (deletedLength > 0) return UndoMergePolicy.SEPARATE
-    
+
     // Paste (multiple characters) always creates a new undo entry
     if (insertedText.length > 1) return UndoMergePolicy.SEPARATE
-    
+
     // Space or newline creates a new undo entry
     if (insertedText.any { it.isWhitespace() }) return UndoMergePolicy.SEPARATE
-    
+
     return UndoMergePolicy.MERGE
 }

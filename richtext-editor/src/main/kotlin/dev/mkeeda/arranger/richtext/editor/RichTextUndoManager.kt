@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 internal class RichTextUndoManager(
-    private val maxSize: Int = 100
+    private val maxSize: Int = 100,
 ) {
     private val undoStack = ArrayDeque<EditorSnapshot>()
     private val redoStack = ArrayDeque<EditorSnapshot>()
@@ -25,17 +25,18 @@ internal class RichTextUndoManager(
                     undoStack.addLast(snapshot)
                 }
             }
+
             UndoMergePolicy.SEPARATE -> {
                 undoStack.addLast(snapshot)
             }
         }
-        
+
         lastMergePolicy = mergePolicy
-        
+
         if (undoStack.size > maxSize) {
             undoStack.removeFirst()
         }
-        
+
         redoStack.clear()
         updateFlags()
     }

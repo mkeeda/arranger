@@ -11,12 +11,11 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class RichTextUndoManagerTest {
-
     private fun createSnapshot(text: String): EditorSnapshot {
         return EditorSnapshot(
             text = text,
             spans = emptyList(),
-            selection = TextRange.Zero
+            selection = TextRange.Zero,
         )
     }
 
@@ -44,7 +43,7 @@ class RichTextUndoManagerTest {
         val manager = RichTextUndoManager()
         manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.SEPARATE)
         manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.MERGE)
-        
+
         val undone = manager.undo(createSnapshot("ABC"))
         undone?.text shouldBe "AB"
     }
@@ -55,7 +54,7 @@ class RichTextUndoManagerTest {
         manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.SEPARATE)
         manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.MERGE)
         manager.pushSnapshot(createSnapshot("ABC"), UndoMergePolicy.MERGE) // Should be ignored
-        
+
         val undone = manager.undo(createSnapshot("ABCD"))
         // It pops "AB" because "ABC" was ignored
         undone?.text shouldBe "AB"
@@ -66,7 +65,7 @@ class RichTextUndoManagerTest {
         val manager = RichTextUndoManager()
         manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.MERGE)
         manager.canUndo.shouldBeTrue()
-        
+
         val undone = manager.undo(createSnapshot("AB"))
         undone?.text shouldBe "A"
     }
@@ -87,10 +86,10 @@ class RichTextUndoManagerTest {
     fun undo_movesCurrentSnapshotToRedoStack() {
         val manager = RichTextUndoManager()
         manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.SEPARATE)
-        
+
         val current = createSnapshot("2")
         manager.undo(current)
-        
+
         manager.canRedo.shouldBeTrue()
         val redone = manager.redo(createSnapshot("1"))
         redone shouldBe current
@@ -101,10 +100,10 @@ class RichTextUndoManagerTest {
         val manager = RichTextUndoManager()
         val original = createSnapshot("1")
         manager.pushSnapshot(original, UndoMergePolicy.SEPARATE)
-        
+
         val current = createSnapshot("2")
         manager.undo(current)
-        
+
         val redone = manager.redo(createSnapshot("1"))
         redone shouldBe current
     }
@@ -114,9 +113,9 @@ class RichTextUndoManagerTest {
         val manager = RichTextUndoManager()
         manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.SEPARATE)
         manager.undo(createSnapshot("2"))
-        
+
         manager.canRedo.shouldBeTrue()
-        
+
         manager.pushSnapshot(createSnapshot("3"), UndoMergePolicy.SEPARATE)
         manager.canRedo.shouldBeFalse()
     }
@@ -141,7 +140,7 @@ class RichTextUndoManagerTest {
         for (i in 1..105) {
             manager.pushSnapshot(createSnapshot(i.toString()), UndoMergePolicy.SEPARATE)
         }
-        
+
         // 100 entries should be kept, so the oldest 5 (1, 2, 3, 4, 5) are dropped.
         // We do 100 undos and the last one should be snapshot "6"
         var lastUndone: EditorSnapshot? = null
@@ -149,7 +148,7 @@ class RichTextUndoManagerTest {
         for (i in 1..100) {
             lastUndone = manager.undo(if (i == 1) current else lastUndone!!)
         }
-        
+
         lastUndone?.text shouldBe "6"
         manager.canUndo.shouldBeFalse() // Stack should be empty now
     }
@@ -159,9 +158,9 @@ class RichTextUndoManagerTest {
         val manager = RichTextUndoManager()
         manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.SEPARATE)
         manager.undo(createSnapshot("2"))
-        
+
         manager.clear()
-        
+
         manager.canUndo.shouldBeFalse()
         manager.canRedo.shouldBeFalse()
     }
