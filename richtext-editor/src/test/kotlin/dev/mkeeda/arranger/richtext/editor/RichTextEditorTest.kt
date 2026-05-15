@@ -1,6 +1,7 @@
 package dev.mkeeda.arranger.richtext.editor
 
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
@@ -442,7 +443,7 @@ class RichTextEditorTest {
         spans[1].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level2)
     }
 
-    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun `undo and redo via keyboard shortcuts`() {
         val initialText = "Hello"

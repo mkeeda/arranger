@@ -551,7 +551,7 @@ private fun shiftSpan(
     }
 }
 
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 internal fun resolveMergePolicy(buffer: TextFieldBuffer): UndoMergePolicy {
     if (buffer.changes.changeCount != 1) return UndoMergePolicy.Separate
 
