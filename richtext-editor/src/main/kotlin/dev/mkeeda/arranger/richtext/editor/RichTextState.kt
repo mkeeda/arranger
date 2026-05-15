@@ -305,6 +305,10 @@ public class RichTextState(initialText: RichString) {
         clearTypingAttributes()
     }
 
+    /**
+     * Manages the undo and redo history for this state.
+     * Use this property to programmatically trigger undo/redo operations or observe their availability.
+     */
     public val undoState: RichTextUndoState =
         RichTextUndoState(
             textFieldState = textFieldState,
