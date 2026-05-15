@@ -27,9 +27,6 @@ public class RichTextState(initialText: RichString) {
 
     internal val undoManager = RichTextUndoManager()
 
-    public val canUndo: Boolean get() = undoManager.canUndo
-    public val canRedo: Boolean get() = undoManager.canRedo
-
     // The Single Source of Truth for spans
     private var spans: List<RichSpan> by mutableStateOf(initialText.spans.resnapParagraphSpans(initialText.text))
 
@@ -330,16 +327,29 @@ public class RichTextState(initialText: RichString) {
         clearTypingAttributes()
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
-    public fun undo() {
-        val undoneSnapshot = undoManager.undo(takeSnapshot()) ?: return
-        restoreSnapshot(undoneSnapshot)
-    }
+    public val undoState: RichTextUndoState = RichTextUndoState()
 
-    @OptIn(ExperimentalFoundationApi::class)
-    public fun redo() {
-        val redoneSnapshot = undoManager.redo(takeSnapshot()) ?: return
-        restoreSnapshot(redoneSnapshot)
+    public inner class RichTextUndoState {
+        public val canUndo: Boolean get() = undoManager.canUndo
+        public val canRedo: Boolean get() = undoManager.canRedo
+
+        @OptIn(ExperimentalFoundationApi::class)
+        public fun undo() {
+            val undoneSnapshot = undoManager.undo(takeSnapshot()) ?: return
+            restoreSnapshot(undoneSnapshot)
+        }
+
+        @OptIn(ExperimentalFoundationApi::class)
+        public fun redo() {
+            val redoneSnapshot = undoManager.redo(takeSnapshot()) ?: return
+            restoreSnapshot(redoneSnapshot)
+        }
+
+        @OptIn(ExperimentalFoundationApi::class)
+        public fun clearHistory() {
+            undoManager.clear()
+            textFieldState.undoState.clearHistory()
+        }
     }
 
     private fun handleNewlineInsertion(

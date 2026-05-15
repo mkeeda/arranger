@@ -578,8 +578,8 @@ class RichTextStateTest {
     @Test
     fun `canUndo is false initially`() {
         val state = RichTextState(initialText = RichString(text = "Hello"))
-        state.canUndo shouldBe false
-        state.canRedo shouldBe false
+        state.undoState.canUndo shouldBe false
+        state.undoState.canRedo shouldBe false
     }
 
     @Test
@@ -589,19 +589,19 @@ class RichTextStateTest {
         state.simulateTypingAtEnd("World")
 
         state.richString.text shouldBe "HelloWorld"
-        state.canUndo shouldBe true
+        state.undoState.canUndo shouldBe true
 
-        state.undo()
+        state.undoState.undo()
         state.richString.text shouldBe "Hello"
-        state.canRedo shouldBe true
+        state.undoState.canRedo shouldBe true
     }
 
     @Test
     fun `redo after undo restores text and spans`() {
         val state = RichTextState(initialText = RichString(text = "A"))
         state.simulateTypingAtEnd("B")
-        state.undo()
-        state.redo()
+        state.undoState.undo()
+        state.undoState.redo()
         state.richString.text shouldBe "AB"
     }
 
@@ -612,7 +612,7 @@ class RichTextStateTest {
         state.simulateTypingAtEnd("b")
         state.simulateTypingAtEnd("c")
 
-        state.undo()
+        state.undoState.undo()
         state.richString.text shouldBe ""
     }
 
@@ -624,11 +624,11 @@ class RichTextStateTest {
         state.simulateTypingAtEnd(" ")
         state.simulateTypingAtEnd("c")
 
-        state.undo()
+        state.undoState.undo()
         // 'c' should be reverted, space and 'ab' should be kept
         state.richString.text shouldBe "ab "
 
-        state.undo()
+        state.undoState.undo()
         // space should be reverted
         state.richString.text shouldBe "ab"
     }
@@ -640,7 +640,7 @@ class RichTextStateTest {
 
         state.simulateTypingAtEnd("!") // Selection becomes 6
 
-        state.undo()
+        state.undoState.undo()
         state.textFieldState.selection.start shouldBe 2
     }
 
@@ -656,7 +656,7 @@ class RichTextStateTest {
         }
 
         state.richString.text shouldBe "Hell"
-        state.undo()
+        state.undoState.undo()
         state.richString.text shouldBe "Hello"
     }
 }

@@ -109,12 +109,12 @@ public fun RichTextEditor(
                     if (isCommandOrCtrl) {
                         when {
                             event.key == Key.Z && event.isShiftPressed -> {
-                                if (state.canRedo) state.redo()
+                                if (state.undoState.canRedo) state.undoState.redo()
                                 true
                             }
 
                             event.key == Key.Z -> {
-                                if (state.canUndo) state.undo()
+                                if (state.undoState.canUndo) state.undoState.undo()
                                 true
                             }
 
