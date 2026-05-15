@@ -574,6 +574,101 @@ class RichTextStateTest {
         spans.first().range shouldBe (0..11)
         spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
+
+    @Test
+    fun `canUndo is false initially`() {
+        val state = RichTextState(initialText = RichString(text = "Hello"))
+        state.canUndo shouldBe false
+        state.canRedo shouldBe false
+    }
+
+    @Test
+    fun `undo after text edit restores previous text and spans`() {
+        val state = RichTextState(initialText = RichString(text = "Hello"))
+        
+        state.simulateTypingAtEnd("World")
+        
+        state.richString.text shouldBe "HelloWorld"
+        state.canUndo shouldBe true
+        
+        state.undo()
+        state.richString.text shouldBe "Hello"
+        state.canRedo shouldBe true
+    }
+
+    @Test
+    fun `redo after undo restores text and spans`() {
+        val state = RichTextState(initialText = RichString(text = "A"))
+        state.simulateTypingAtEnd("B")
+        state.undo()
+        state.redo()
+        state.richString.text shouldBe "AB"
+    }
+
+    @Test
+    fun `continuous char input is grouped into single undo entry`() {
+        val state = RichTextState(initialText = RichString(text = ""))
+        state.simulateTypingAtEnd("a")
+        state.simulateTypingAtEnd("b")
+        state.simulateTypingAtEnd("c")
+        
+        state.undo()
+        state.richString.text shouldBe ""
+    }
+
+    @Test
+    fun `space insertion creates separate undo entry`() {
+        val state = RichTextState(initialText = RichString(text = ""))
+        state.simulateTypingAtEnd("a")
+        state.simulateTypingAtEnd("b")
+        state.simulateTypingAtEnd(" ")
+        state.simulateTypingAtEnd("c")
+        
+        state.undo()
+        // 'c' should be reverted, space and 'ab' should be kept
+        state.richString.text shouldBe "ab "
+        
+        state.undo()
+        // space should be reverted
+        state.richString.text shouldBe "ab"
+    }
+
+    @Test
+    fun `undo restores selection`() {
+        val state = RichTextState(initialText = RichString(text = "Hello"))
+        state.textFieldState.edit { selection = TextRange(2) }
+        
+        state.simulateTypingAtEnd("!") // Selection becomes 6
+        
+        state.undo()
+        state.textFieldState.selection.start shouldBe 2
+    }
+
+    @Test
+    fun `deletion always creates separate undo entry`() {
+        val state = RichTextState(initialText = RichString(text = "Hello"))
+        
+        // Simulating backspace
+        state.textFieldState.edit {
+            replace(4, 5, "")
+            selection = TextRange(4)
+            state.updateRichString(this)
+        }
+        
+        state.richString.text shouldBe "Hell"
+        state.undo()
+        state.richString.text shouldBe "Hello"
+    }
+}
+
+private fun RichTextState.simulateTypingAtEnd(text: String) {
+    for (char in text) {
+        textFieldState.edit {
+            replace(length, length, char.toString())
+            selection = TextRange(length) // move cursor
+            updateRichString(this)
+        }
+    }
 }
 
 // --- Test Helpers ---

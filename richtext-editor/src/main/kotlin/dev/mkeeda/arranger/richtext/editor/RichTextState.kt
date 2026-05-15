@@ -25,6 +25,11 @@ import dev.mkeeda.arranger.richtext.snapToParagraphs
 public class RichTextState(initialText: RichString) {
     internal val textFieldState = TextFieldState(initialText.text)
 
+    internal val undoManager = RichTextUndoManager()
+
+    public val canUndo: Boolean get() = undoManager.canUndo
+    public val canRedo: Boolean get() = undoManager.canRedo
+
     // The Single Source of Truth for spans
     private var spans: List<RichSpan> by mutableStateOf(initialText.spans.resnapParagraphSpans(initialText.text))
 
@@ -228,6 +233,9 @@ public class RichTextState(initialText: RichString) {
             return
         }
 
+        val snapshotBefore = takeSnapshot()
+        val mergePolicy = resolveMergePolicy(buffer)
+
         val typingAttr = typingAttributes
         val removedAttr = removedTypingAttributes
 
@@ -299,6 +307,39 @@ public class RichTextState(initialText: RichString) {
 
         this.spans = newSpans.resnapParagraphSpans(buffer.toString())
         clearTypingAttributes()
+
+        undoManager.pushSnapshot(snapshotBefore, mergePolicy)
+    }
+
+    private fun takeSnapshot(): EditorSnapshot {
+        return EditorSnapshot(
+            text = textFieldState.text.toString(),
+            spans = spans,
+            selection = textFieldState.selection
+        )
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    private fun restoreSnapshot(snapshot: EditorSnapshot) {
+        textFieldState.edit {
+            replace(0, length, snapshot.text)
+            selection = snapshot.selection
+        }
+        textFieldState.undoState.clearHistory()
+        this.spans = snapshot.spans
+        clearTypingAttributes()
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    public fun undo() {
+        val undoneSnapshot = undoManager.undo(takeSnapshot()) ?: return
+        restoreSnapshot(undoneSnapshot)
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    public fun redo() {
+        val redoneSnapshot = undoManager.redo(takeSnapshot()) ?: return
+        restoreSnapshot(redoneSnapshot)
     }
 
     private fun handleNewlineInsertion(
@@ -508,4 +549,26 @@ private fun shiftSpan(
             }
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+internal fun resolveMergePolicy(buffer: TextFieldBuffer): UndoMergePolicy {
+    if (buffer.changes.changeCount != 1) return UndoMergePolicy.SEPARATE
+    
+    val range = buffer.changes.getRange(0)
+    val originalRange = buffer.changes.getOriginalRange(0)
+    
+    val insertedText = buffer.asCharSequence().substring(range.min, range.max)
+    val deletedLength = originalRange.length
+    
+    // Deletion always creates a new undo entry
+    if (deletedLength > 0) return UndoMergePolicy.SEPARATE
+    
+    // Paste (multiple characters) always creates a new undo entry
+    if (insertedText.length > 1) return UndoMergePolicy.SEPARATE
+    
+    // Space or newline creates a new undo entry
+    if (insertedText.any { it.isWhitespace() }) return UndoMergePolicy.SEPARATE
+    
+    return UndoMergePolicy.MERGE
 }

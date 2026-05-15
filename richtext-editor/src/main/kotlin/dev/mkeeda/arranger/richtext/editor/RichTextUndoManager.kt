@@ -16,12 +16,12 @@ internal class RichTextUndoManager(
     var canRedo: Boolean by mutableStateOf(false)
         private set
 
+    private var lastMergePolicy: UndoMergePolicy? = null
+
     fun pushSnapshot(snapshot: EditorSnapshot, mergePolicy: UndoMergePolicy) {
         when (mergePolicy) {
             UndoMergePolicy.MERGE -> {
-                if (undoStack.isNotEmpty()) {
-                    undoStack[undoStack.lastIndex] = snapshot
-                } else {
+                if (lastMergePolicy != UndoMergePolicy.MERGE || undoStack.isEmpty()) {
                     undoStack.addLast(snapshot)
                 }
             }
@@ -29,6 +29,8 @@ internal class RichTextUndoManager(
                 undoStack.addLast(snapshot)
             }
         }
+        
+        lastMergePolicy = mergePolicy
         
         if (undoStack.size > maxSize) {
             undoStack.removeFirst()
@@ -42,6 +44,7 @@ internal class RichTextUndoManager(
         if (undoStack.isEmpty()) return null
         val previousSnapshot = undoStack.removeLast()
         redoStack.addLast(currentSnapshot)
+        lastMergePolicy = null // Reset merging after undo
         updateFlags()
         return previousSnapshot
     }
@@ -50,6 +53,7 @@ internal class RichTextUndoManager(
         if (redoStack.isEmpty()) return null
         val nextSnapshot = redoStack.removeLast()
         undoStack.addLast(currentSnapshot)
+        lastMergePolicy = null // Reset merging after redo
         updateFlags()
         return nextSnapshot
     }
@@ -57,6 +61,7 @@ internal class RichTextUndoManager(
     fun clear() {
         undoStack.clear()
         redoStack.clear()
+        lastMergePolicy = null
         updateFlags()
     }
 

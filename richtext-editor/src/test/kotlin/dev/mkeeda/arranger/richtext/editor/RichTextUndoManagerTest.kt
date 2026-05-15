@@ -40,7 +40,7 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun pushSnapshot_MERGE_overwritesTopEntry() {
+    fun pushSnapshot_MERGE_addsNewEntryIfLastWasSeparate() {
         val manager = RichTextUndoManager()
         manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.SEPARATE)
         manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.MERGE)
@@ -50,7 +50,19 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun pushSnapshot_MERGE_onEmptyStack_behavesAsSEPARATE() {
+    fun pushSnapshot_MERGE_ignoresIfLastWasMerge() {
+        val manager = RichTextUndoManager()
+        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.MERGE)
+        manager.pushSnapshot(createSnapshot("ABC"), UndoMergePolicy.MERGE) // Should be ignored
+        
+        val undone = manager.undo(createSnapshot("ABCD"))
+        // It pops "AB" because "ABC" was ignored
+        undone?.text shouldBe "AB"
+    }
+
+    @Test
+    fun pushSnapshot_MERGE_onEmptyStack_addsEntry() {
         val manager = RichTextUndoManager()
         manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.MERGE)
         manager.canUndo.shouldBeTrue()
