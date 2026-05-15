@@ -584,7 +584,14 @@ class RichTextStateTest {
 
     @Test
     fun `undo after text edit restores previous text and spans`() {
-        val state = RichTextState(initialText = RichString(text = "Hello"))
+        val initialText = "Hello"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("Hello"))
+                    },
+            )
 
         state.simulateTypingAtEnd("World")
 
@@ -593,16 +600,26 @@ class RichTextStateTest {
 
         state.undoState.undo()
         state.richString.text shouldBe "Hello"
+        state.richString.spans.size shouldBe 1
+        state.richString.spans.first().range shouldBe (0..4)
+        state.richString.spans.first().attributes shouldBe attributeContainerOf(BoldKey to Unit)
         state.undoState.canRedo shouldBe true
     }
 
     @Test
     fun `redo after undo restores text and spans`() {
         val state = RichTextState(initialText = RichString(text = "A"))
+
+        state.setTypingAttribute(BoldKey, Unit)
         state.simulateTypingAtEnd("B")
+
         state.undoState.undo()
         state.undoState.redo()
+
         state.richString.text shouldBe "AB"
+        state.richString.spans.size shouldBe 1
+        state.richString.spans.first().range shouldBe (1..1) // "B" should be bold
+        state.richString.spans.first().attributes shouldBe attributeContainerOf(BoldKey to Unit)
     }
 
     @Test
