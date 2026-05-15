@@ -20,40 +20,40 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun canUndo_returnsFalse_whenStackIsEmpty() {
+    fun `canUndo returns false when stack is empty`() {
         val manager = RichTextUndoManager()
         manager.canUndo.shouldBeFalse()
     }
 
     @Test
-    fun canRedo_returnsFalse_whenStackIsEmpty() {
+    fun `canRedo returns false when stack is empty`() {
         val manager = RichTextUndoManager()
         manager.canRedo.shouldBeFalse()
     }
 
     @Test
-    fun pushSnapshot_SEPARATE_makesCanUndoTrue() {
+    fun `pushSnapshot with Separate makes canUndo true`() {
         val manager = RichTextUndoManager()
-        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.Separate)
         manager.canUndo.shouldBeTrue()
     }
 
     @Test
-    fun pushSnapshot_MERGE_addsNewEntryIfLastWasSeparate() {
+    fun `pushSnapshot with Merge adds new entry if last was Separate`() {
         val manager = RichTextUndoManager()
-        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.SEPARATE)
-        manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.MERGE)
+        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.Separate)
+        manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.Merge)
 
         val undone = manager.undo(createSnapshot("ABC"))
         undone?.text shouldBe "AB"
     }
 
     @Test
-    fun pushSnapshot_MERGE_ignoresIfLastWasMerge() {
+    fun `pushSnapshot with Merge ignores if last was Merge`() {
         val manager = RichTextUndoManager()
-        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.SEPARATE)
-        manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.MERGE)
-        manager.pushSnapshot(createSnapshot("ABC"), UndoMergePolicy.MERGE) // Should be ignored
+        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.Separate)
+        manager.pushSnapshot(createSnapshot("AB"), UndoMergePolicy.Merge)
+        manager.pushSnapshot(createSnapshot("ABC"), UndoMergePolicy.Merge) // Should be ignored
 
         val undone = manager.undo(createSnapshot("ABCD"))
         // It pops "AB" because "ABC" was ignored
@@ -61,9 +61,9 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun pushSnapshot_MERGE_onEmptyStack_addsEntry() {
+    fun `pushSnapshot with Merge on empty stack adds entry`() {
         val manager = RichTextUndoManager()
-        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.MERGE)
+        manager.pushSnapshot(createSnapshot("A"), UndoMergePolicy.Merge)
         manager.canUndo.shouldBeTrue()
 
         val undone = manager.undo(createSnapshot("AB"))
@@ -71,21 +71,21 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun undo_returnsTheLastPushedSnapshot() {
+    fun `undo returns the last pushed snapshot`() {
         val manager = RichTextUndoManager()
         val snapshot1 = createSnapshot("1")
         val snapshot2 = createSnapshot("2")
-        manager.pushSnapshot(snapshot1, UndoMergePolicy.SEPARATE)
-        manager.pushSnapshot(snapshot2, UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(snapshot1, UndoMergePolicy.Separate)
+        manager.pushSnapshot(snapshot2, UndoMergePolicy.Separate)
 
         val undone = manager.undo(createSnapshot("3"))
         undone shouldBe snapshot2
     }
 
     @Test
-    fun undo_movesCurrentSnapshotToRedoStack() {
+    fun `undo moves current snapshot to redo stack`() {
         val manager = RichTextUndoManager()
-        manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.Separate)
 
         val current = createSnapshot("2")
         manager.undo(current)
@@ -96,10 +96,10 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun redo_returnsTheUndoneSnapshot() {
+    fun `redo returns the undone snapshot`() {
         val manager = RichTextUndoManager()
         val original = createSnapshot("1")
-        manager.pushSnapshot(original, UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(original, UndoMergePolicy.Separate)
 
         val current = createSnapshot("2")
         manager.undo(current)
@@ -109,36 +109,36 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun pushAfterUndo_clearsRedoStack() {
+    fun `push after undo clears redo stack`() {
         val manager = RichTextUndoManager()
-        manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.Separate)
         manager.undo(createSnapshot("2"))
 
         manager.canRedo.shouldBeTrue()
 
-        manager.pushSnapshot(createSnapshot("3"), UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(createSnapshot("3"), UndoMergePolicy.Separate)
         manager.canRedo.shouldBeFalse()
     }
 
     @Test
-    fun undo_returnsNull_whenStackIsEmpty() {
+    fun `undo returns null when stack is empty`() {
         val manager = RichTextUndoManager()
         val undone = manager.undo(createSnapshot("1"))
         undone.shouldBeNull()
     }
 
     @Test
-    fun redo_returnsNull_whenStackIsEmpty() {
+    fun `redo returns null when stack is empty`() {
         val manager = RichTextUndoManager()
         val redone = manager.redo(createSnapshot("1"))
         redone.shouldBeNull()
     }
 
     @Test
-    fun stackIsCappedAtMaxSize() {
+    fun `stack is capped at maxSize`() {
         val manager = RichTextUndoManager()
         for (i in 1..105) {
-            manager.pushSnapshot(createSnapshot(i.toString()), UndoMergePolicy.SEPARATE)
+            manager.pushSnapshot(createSnapshot(i.toString()), UndoMergePolicy.Separate)
         }
 
         // 100 entries should be kept, so the oldest 5 (1, 2, 3, 4, 5) are dropped.
@@ -154,9 +154,9 @@ class RichTextUndoManagerTest {
     }
 
     @Test
-    fun clear_resetsBothStacks() {
+    fun `clear resets both stacks`() {
         val manager = RichTextUndoManager()
-        manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.SEPARATE)
+        manager.pushSnapshot(createSnapshot("1"), UndoMergePolicy.Separate)
         manager.undo(createSnapshot("2"))
 
         manager.clear()

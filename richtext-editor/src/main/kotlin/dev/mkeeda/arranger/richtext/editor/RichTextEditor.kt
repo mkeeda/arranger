@@ -118,11 +118,6 @@ public fun RichTextEditor(
                                 true
                             }
 
-                            event.key == Key.Y -> {
-                                if (state.canRedo) state.redo()
-                                true
-                            }
-
                             else -> {
                                 false
                             }

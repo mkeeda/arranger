@@ -1,5 +1,6 @@
 package dev.mkeeda.arranger.richtext.editor
 
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
@@ -441,7 +442,7 @@ class RichTextEditorTest {
         spans[1].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level2)
     }
 
-    @androidx.compose.ui.test.ExperimentalTestApi
+    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
     @Test
     fun `undo and redo via keyboard shortcuts`() {
         val initialText = "Hello"
@@ -463,10 +464,10 @@ class RichTextEditorTest {
 
         // Simulate Ctrl+Z (Undo)
         composeTestRule.onNodeWithText(expectedNewText).performKeyInput {
-            keyDown(androidx.compose.ui.input.key.Key.CtrlLeft)
-            keyDown(androidx.compose.ui.input.key.Key.Z)
-            keyUp(androidx.compose.ui.input.key.Key.Z)
-            keyUp(androidx.compose.ui.input.key.Key.CtrlLeft)
+            keyDown(Key.CtrlLeft)
+            keyDown(Key.Z)
+            keyUp(Key.Z)
+            keyUp(Key.CtrlLeft)
         }
         composeTestRule.waitForIdle()
 
@@ -478,12 +479,12 @@ class RichTextEditorTest {
 
         // Simulate Ctrl+Shift+Z (Redo)
         composeTestRule.onNodeWithText("Hello").performKeyInput {
-            keyDown(androidx.compose.ui.input.key.Key.CtrlLeft)
-            keyDown(androidx.compose.ui.input.key.Key.ShiftLeft)
-            keyDown(androidx.compose.ui.input.key.Key.Z)
-            keyUp(androidx.compose.ui.input.key.Key.Z)
-            keyUp(androidx.compose.ui.input.key.Key.ShiftLeft)
-            keyUp(androidx.compose.ui.input.key.Key.CtrlLeft)
+            keyDown(Key.CtrlLeft)
+            keyDown(Key.ShiftLeft)
+            keyDown(Key.Z)
+            keyUp(Key.Z)
+            keyUp(Key.ShiftLeft)
+            keyUp(Key.CtrlLeft)
         }
         composeTestRule.waitForIdle()
 

@@ -20,13 +20,13 @@ internal class RichTextUndoManager(
 
     fun pushSnapshot(snapshot: EditorSnapshot, mergePolicy: UndoMergePolicy) {
         when (mergePolicy) {
-            UndoMergePolicy.MERGE -> {
-                if (lastMergePolicy != UndoMergePolicy.MERGE || undoStack.isEmpty()) {
+            UndoMergePolicy.Merge -> {
+                if (lastMergePolicy != UndoMergePolicy.Merge || undoStack.isEmpty()) {
                     undoStack.addLast(snapshot)
                 }
             }
 
-            UndoMergePolicy.SEPARATE -> {
+            UndoMergePolicy.Separate -> {
                 undoStack.addLast(snapshot)
             }
         }

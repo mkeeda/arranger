@@ -551,9 +551,9 @@ private fun shiftSpan(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 internal fun resolveMergePolicy(buffer: TextFieldBuffer): UndoMergePolicy {
-    if (buffer.changes.changeCount != 1) return UndoMergePolicy.SEPARATE
+    if (buffer.changes.changeCount != 1) return UndoMergePolicy.Separate
 
     val range = buffer.changes.getRange(0)
     val originalRange = buffer.changes.getOriginalRange(0)
@@ -562,13 +562,13 @@ internal fun resolveMergePolicy(buffer: TextFieldBuffer): UndoMergePolicy {
     val deletedLength = originalRange.length
 
     // Deletion always creates a new undo entry
-    if (deletedLength > 0) return UndoMergePolicy.SEPARATE
+    if (deletedLength > 0) return UndoMergePolicy.Separate
 
     // Paste (multiple characters) always creates a new undo entry
-    if (insertedText.length > 1) return UndoMergePolicy.SEPARATE
+    if (insertedText.length > 1) return UndoMergePolicy.Separate
 
     // Space or newline creates a new undo entry
-    if (insertedText.any { it.isWhitespace() }) return UndoMergePolicy.SEPARATE
+    if (insertedText.any { it.isWhitespace() }) return UndoMergePolicy.Separate
 
-    return UndoMergePolicy.MERGE
+    return UndoMergePolicy.Merge
 }
