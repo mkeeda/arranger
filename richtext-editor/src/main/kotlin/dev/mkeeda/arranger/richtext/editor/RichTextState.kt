@@ -308,6 +308,8 @@ public class RichTextState(initialText: RichString) {
     /**
      * Manages the undo and redo history for this state.
      * Use this property to programmatically trigger undo/redo operations or observe their availability.
+     *
+     * See [RichTextUndoState] for details on how the snapshot history is automatically recorded.
      */
     public val undoState: RichTextUndoState =
         RichTextUndoState(

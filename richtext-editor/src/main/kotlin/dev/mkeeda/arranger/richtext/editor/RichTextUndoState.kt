@@ -11,6 +11,12 @@ import dev.mkeeda.arranger.richtext.RichSpan
  *
  * This state allows you to programmatically trigger [undo], [redo], and [clearHistory] operations,
  * as well as observe the availability of these operations via [canUndo] and [canRedo].
+ *
+ * ### Snapshot Granularity
+ * The undo history is recorded automatically based on the following rules:
+ * - Consecutive single-character typing (e.g., typing "abc") is merged into a single undo step.
+ * - Whitespace, newlines, text deletions (e.g., Backspace, Delete), and pasting multiple
+ *   characters always create a separate undo step.
  */
 @Stable
 public class RichTextUndoState internal constructor(
