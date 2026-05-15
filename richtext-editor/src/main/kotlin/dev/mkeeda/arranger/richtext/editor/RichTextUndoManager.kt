@@ -1,20 +1,18 @@
 package dev.mkeeda.arranger.richtext.editor
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateListOf
 
 internal class RichTextUndoManager(
     private val maxSize: Int = 100,
 ) {
-    private val undoStack = ArrayDeque<EditorSnapshot>()
-    private val redoStack = ArrayDeque<EditorSnapshot>()
+    private val undoStack = mutableStateListOf<EditorSnapshot>()
+    private val redoStack = mutableStateListOf<EditorSnapshot>()
 
-    var canUndo: Boolean by mutableStateOf(false)
-        private set
+    val canUndo: Boolean
+        get() = undoStack.isNotEmpty()
 
-    var canRedo: Boolean by mutableStateOf(false)
-        private set
+    val canRedo: Boolean
+        get() = redoStack.isNotEmpty()
 
     private var lastMergePolicy: UndoMergePolicy? = null
 
@@ -22,40 +20,37 @@ internal class RichTextUndoManager(
         when (mergePolicy) {
             UndoMergePolicy.Merge -> {
                 if (lastMergePolicy != UndoMergePolicy.Merge || undoStack.isEmpty()) {
-                    undoStack.addLast(snapshot)
+                    undoStack.add(snapshot)
                 }
             }
 
             UndoMergePolicy.Separate -> {
-                undoStack.addLast(snapshot)
+                undoStack.add(snapshot)
             }
         }
 
         lastMergePolicy = mergePolicy
 
         if (undoStack.size > maxSize) {
-            undoStack.removeFirst()
+            undoStack.removeAt(0)
         }
 
         redoStack.clear()
-        updateFlags()
     }
 
     fun undo(currentSnapshot: EditorSnapshot): EditorSnapshot? {
         if (undoStack.isEmpty()) return null
-        val previousSnapshot = undoStack.removeLast()
-        redoStack.addLast(currentSnapshot)
+        val previousSnapshot = undoStack.removeAt(undoStack.lastIndex)
+        redoStack.add(currentSnapshot)
         lastMergePolicy = null // Reset merging after undo
-        updateFlags()
         return previousSnapshot
     }
 
     fun redo(currentSnapshot: EditorSnapshot): EditorSnapshot? {
         if (redoStack.isEmpty()) return null
-        val nextSnapshot = redoStack.removeLast()
-        undoStack.addLast(currentSnapshot)
+        val nextSnapshot = redoStack.removeAt(redoStack.lastIndex)
+        undoStack.add(currentSnapshot)
         lastMergePolicy = null // Reset merging after redo
-        updateFlags()
         return nextSnapshot
     }
 
@@ -63,11 +58,5 @@ internal class RichTextUndoManager(
         undoStack.clear()
         redoStack.clear()
         lastMergePolicy = null
-        updateFlags()
-    }
-
-    private fun updateFlags() {
-        canUndo = undoStack.isNotEmpty()
-        canRedo = redoStack.isNotEmpty()
     }
 }
