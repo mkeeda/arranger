@@ -608,7 +608,7 @@ fun UndoRedoSample(modifier: Modifier = Modifier) {
 
 </details>
 
-<img src="./docs/images/undo-redo.png" width="500" alt="undo redo sample"/>
+<img src="./docs/images/undo-redo.gif" width="500" alt="undo redo sample"/>
 
 ## Practical Examples
 
