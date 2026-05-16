@@ -63,21 +63,12 @@ import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 fun DocumentEditorSample(modifier: Modifier = Modifier) {
     val state = remember { RichTextState(initialText = RichString("")) }
 
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .imePadding(),
-    ) {
-        Text(
-            text = "Document Editor: Full screen with Undo/Redo support.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-
-        DocumentEditorBox(state = state, modifier = Modifier.weight(1f))
-    }
+    DocumentEditorBox(
+        state = state,
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding(),
+    )
 }
 
 @Composable
@@ -126,7 +117,7 @@ private fun DocumentFormattingToolbar(
             enabled = state.undoState.canUndo,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.baseline_undo_24),
+                painter = painterResource(id = R.drawable.undo),
                 contentDescription = "Undo",
             )
         }
@@ -135,7 +126,7 @@ private fun DocumentFormattingToolbar(
             enabled = state.undoState.canRedo,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.baseline_redo_24),
+                painter = painterResource(id = R.drawable.redo),
                 contentDescription = "Redo",
             )
         }
