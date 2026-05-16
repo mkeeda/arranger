@@ -1,4 +1,5 @@
 package dev.mkeeda.arranger.sampleApp
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -265,8 +266,6 @@ private fun FormatToggleButton(
             checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         )
-    val painter = painterResource(id = iconRes)
-
     IconToggleButton(
         checked = isActive,
         onCheckedChange = { onClick() },
@@ -274,7 +273,7 @@ private fun FormatToggleButton(
         colors = colors,
     ) {
         Icon(
-            painter = painter,
+            painter = painterResource(id = iconRes),
             contentDescription = contentDescription,
         )
     }

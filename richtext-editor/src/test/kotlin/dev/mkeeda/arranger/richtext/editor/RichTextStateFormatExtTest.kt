@@ -178,6 +178,25 @@ class RichTextStateFormatExtTest {
     }
 
     @Test
+    fun `removeFormat removes paragraph attribute when selection is collapsed`() {
+        val initialText = "Paragraph 1\nParagraph 2"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(HeadingKey, HeadingLevel.H1, range = initialText.rangeOf("Paragraph 1"))
+                    },
+            )
+
+        // Cursor is collapsed within "Paragraph 1"
+        state.textFieldState.edit { selection = TextRange(5) }
+
+        state.removeFormat(HeadingKey)
+
+        state.richString.spans.isEmpty() shouldBe true
+    }
+
+    @Test
     fun `clearFormats clears all typing attributes`() {
         val state = RichTextState(initialText = RichString("Test"))
 

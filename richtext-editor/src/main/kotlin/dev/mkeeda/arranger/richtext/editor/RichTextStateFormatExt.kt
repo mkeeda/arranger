@@ -85,8 +85,10 @@ public fun <T : Any> RichTextState.applyFormat(key: ParagraphAttributeKey<T>, va
 /**
  * Removes the format associated with the given [key].
  *
- * If text is selected, the format is removed from the selection.
- * If no text is selected (cursor is collapsed), the format is removed from the typing attributes.
+ * - If [key] is a [SpanAttributeKey] and the selection is collapsed, the format is removed
+ *   from the typing attributes for the next input.
+ * - Otherwise (text is selected, or [key] is a [ParagraphAttributeKey]), the format is
+ *   removed from the overlapping selection or paragraph(s).
  */
 public fun RichTextState.removeFormat(key: AttributeKey<*>) {
     if (selection.collapsed && key is SpanAttributeKey<*>) {

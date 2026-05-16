@@ -1,6 +1,8 @@
 package dev.mkeeda.arranger.richtext.editor.material3
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -23,7 +25,7 @@ class Material3AttributeStyleResolverTest {
     @Test
     fun `heading maps to display and headline typography from MaterialTheme`() {
         var resolver: AttributeStyleResolver? = null
-        var typography: androidx.compose.material3.Typography? = null
+        var typography: Typography? = null
 
         composeTestRule.setContent {
             MaterialTheme {
@@ -48,8 +50,8 @@ class Material3AttributeStyleResolverTest {
     @Test
     fun `blockquote maps to bodyMedium style with onSurfaceVariant color`() {
         var resolver: AttributeStyleResolver? = null
-        var typography: androidx.compose.material3.Typography? = null
-        var colorScheme: androidx.compose.material3.ColorScheme? = null
+        var typography: Typography? = null
+        var colorScheme: ColorScheme? = null
 
         composeTestRule.setContent {
             MaterialTheme {
