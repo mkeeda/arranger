@@ -9,6 +9,7 @@ import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
+import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 
 /**
  * Creates and remembers an [AttributeStyleResolver] that maps Arranger attributes
@@ -23,7 +24,7 @@ public fun rememberMaterial3AttributeStyleResolver(): AttributeStyleResolver {
     val colorScheme = MaterialTheme.colorScheme
 
     return remember(typography, colorScheme) {
-        AttributeStyleResolver {
+        AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
             // Heading levels map to Material 3 display/headline/title typography
             paragraphStyle(HeadingKey) { level ->
                 when (level) {
