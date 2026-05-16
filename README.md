@@ -588,6 +588,7 @@ fun UndoRedoSample(modifier: Modifier = Modifier) {
             Button(
                 onClick = {
                     state.edit {
+                        // textLength is a property of the edit block's receiver — the full character count
                         editAttributes(range = 0 until textLength) { bold() }
                     }
                 }

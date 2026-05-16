@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.bold
@@ -43,7 +42,7 @@ fun UndoRedoSample(modifier: Modifier = Modifier) {
         }
 
     Column(modifier = modifier.padding(16.dp)) {
-        Text("Undo / Redo", fontWeight = FontWeight.Bold)
+        Text("Undo / Redo", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -78,7 +77,7 @@ fun UndoRedoSample(modifier: Modifier = Modifier) {
 
         RichTextEditor(
             state = state,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             textStyle = MaterialTheme.typography.bodyLarge,
         )
     }
