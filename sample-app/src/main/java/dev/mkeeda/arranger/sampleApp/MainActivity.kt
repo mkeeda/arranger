@@ -51,7 +51,8 @@ private enum class SampleDestination(val title: String) : NavKey {
     HashtagHighlight("Hashtag Highlight"),
     AttributeBatchEdit("Attribute Batch Edit"),
     ListFormatting("List Formatting"),
-    ChatInput("Chat Input"),
+    UndoRedo("Undo / Redo"),
+    DocumentEditor("Document Editor"),
 }
 
 class MainActivity : ComponentActivity() {
@@ -194,8 +195,9 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.CustomAttribute -> CustomAttributeSample()
                 SampleDestination.HashtagHighlight -> HashtagHighlightSample()
                 SampleDestination.AttributeBatchEdit -> AttributeBatchEditSample()
-                SampleDestination.ChatInput -> ChatInputSample()
                 SampleDestination.ListFormatting -> ListFormattingSample()
+                SampleDestination.UndoRedo -> UndoRedoSample()
+                SampleDestination.DocumentEditor -> DocumentEditorSample()
             }
         }
     }

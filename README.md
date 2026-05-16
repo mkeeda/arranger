@@ -8,7 +8,7 @@ Arranger is a declarative, type-safe rich text editor engine and UI components f
 While standard `buildAnnotatedString` is perfect for static text decoration, it quickly breaks down when building real-time editors where users insert and delete text. Arranger is built specifically for **dynamic text operations**, automatically managing and shifting attribute spans (like bold, colors, or links) as the underlying text mutates.
 
 <div align="center">
-  <img src="./docs/images/dynamic-typing-demo.gif" width="600" alt="Arranger Dynamic Typing Demo"/>
+  <img src="./docs/images/rich-text-editor-demo.gif" width="300" alt="Arranger Rich Text Editor Demo"/>
 </div>
 
 > [!WARNING]
@@ -541,13 +541,83 @@ fun AtomicMutationSample(modifier: Modifier = Modifier) {
 
 </details>
 
+## Undo / Redo
+
+Arranger provides a built-in, robust Undo/Redo engine that automatically records text mutations and attribute changes. The history state is exposed via `state.undoState`, allowing you to easily build undo/redo toolbars or handle keyboard shortcuts.
+
+The engine correctly manages complex operations like batch attribute application or atomic text replacements as single undoable actions.
+
+<details>
+<summary><b>Show Code</b></summary>
+
+```kotlin
+@Composable
+fun UndoRedoSample(modifier: Modifier = Modifier) {
+    val initialText = "Type something here, make changes, and use Undo/Redo buttons."
+    val state =
+        remember {
+            RichTextState(
+                initialText = RichString(text = initialText).edit {
+                    val range = initialText.rangeOf("Undo/Redo")
+                    editAttributes(range = range) {
+                        bold()
+                        textColor(Color(0xFF1976D2)) // Blue
+                    }
+                }
+            )
+        }
+
+    Column(modifier = modifier.padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = { state.undoState.undo() },
+                enabled = state.undoState.canUndo
+            ) {
+                Text("Undo")
+            }
+            Button(
+                onClick = { state.undoState.redo() },
+                enabled = state.undoState.canRedo
+            ) {
+                Text("Redo")
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = {
+                    state.edit {
+                        // textLength is a property of the edit block's receiver — the full character count
+                        editAttributes(range = 0 until textLength) { bold() }
+                    }
+                }
+            ) {
+                Text("Make All Bold")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth().weight(1f),
+        )
+    }
+}
+```
+
+</details>
+
+<img src="./docs/images/undo-redo.gif" width="500" alt="undo redo sample"/>
+
 ## Practical Examples
 
 Arranger can be used to build rich and complex text input interfaces. Below are some real-world use cases demonstrating how to integrate Arranger into your applications.
 
 | Sample | Screenshot |
 | --- | --- |
-| **[Chat UI with Rich Formatting](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/ChatInputSample.kt)**<br><br>This sample demonstrates a comprehensive chat input UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, apply various built-in attributes (like bold, colors, headings, and alignments), and manage keyboard interactions seamlessly within Jetpack Compose. | <img src="./docs/images/chat-ui.png" width="400" alt="chat UI sample"/> |
+| **[Document Editor with Full UI](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, apply various built-in attributes (like bold, colors, headings, alignments), manage undo/redo history, and handle keyboard interactions seamlessly within Jetpack Compose. | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
 
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
@@ -575,7 +645,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 ### Phase 2: The Real "Editor" Engine
 - [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
 - [x] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
-- [ ] **Undo/Redo Synchronization**: Full history restoration for both text and complex structural changes.
+- [x] **Undo/Redo Synchronization**: Full history restoration for both text and complex structural changes.
 - [ ] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
 
 ### Phase 3: Multiplatform & Interoperability (The "Killer" Features)

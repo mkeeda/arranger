@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class ChatInputSampleTest {
+class DocumentEditorSampleTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -24,11 +24,11 @@ class ChatInputSampleTest {
     fun `toolbar buttons toggle formatting on selection when clicked`() {
         composeTestRule.setContent {
             ArrangerTheme {
-                ChatInputSample()
+                DocumentEditorSample()
             }
         }
 
-        val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
+        val textInputNode = composeTestRule.onNodeWithTag("DocumentEditor")
         textInputNode.performTextInput("Hello World")
 
         // Select "Hello"
@@ -47,11 +47,11 @@ class ChatInputSampleTest {
     fun `toolbar buttons sync with cursor position attributes`() {
         composeTestRule.setContent {
             ArrangerTheme {
-                ChatInputSample()
+                DocumentEditorSample()
             }
         }
 
-        val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
+        val textInputNode = composeTestRule.onNodeWithTag("DocumentEditor")
         textInputNode.performTextInput("Hello World")
 
         // Select "Hello" and apply Bold
@@ -75,11 +75,11 @@ class ChatInputSampleTest {
     fun `typing attributes toggle on collapsed selection`() {
         composeTestRule.setContent {
             ArrangerTheme {
-                ChatInputSample()
+                DocumentEditorSample()
             }
         }
 
-        val textInputNode = composeTestRule.onNodeWithTag("ChatInputEditor")
+        val textInputNode = composeTestRule.onNodeWithTag("DocumentEditor")
 
         // Tap Bold button when empty
         composeTestRule.onNodeWithContentDescription("Bold").performClick()
