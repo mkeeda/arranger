@@ -47,10 +47,12 @@ import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextFormatController
 import dev.mkeeda.arranger.richtext.editor.RichTextState
+import dev.mkeeda.arranger.richtext.editor.applyFormat
+import dev.mkeeda.arranger.richtext.editor.clearFormats
 import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.rememberRichTextFormatController
+import dev.mkeeda.arranger.richtext.editor.removeFormat
+import dev.mkeeda.arranger.richtext.editor.toggleFormat
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
@@ -68,8 +70,6 @@ fun DocumentEditorSample(modifier: Modifier = Modifier) {
 
 @Composable
 private fun DocumentEditorBox(state: RichTextState, modifier: Modifier = Modifier) {
-    val formatController = rememberRichTextFormatController(state)
-
     Column(
         modifier =
             modifier
@@ -84,7 +84,6 @@ private fun DocumentEditorBox(state: RichTextState, modifier: Modifier = Modifie
     ) {
         DocumentFormattingToolbar(
             state = state,
-            formatController = formatController,
         )
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -96,7 +95,6 @@ private fun DocumentEditorBox(state: RichTextState, modifier: Modifier = Modifie
 @Composable
 private fun DocumentFormattingToolbar(
     state: RichTextState,
-    formatController: RichTextFormatController,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -131,114 +129,114 @@ private fun DocumentFormattingToolbar(
                 FormatAction(
                     iconRes = R.drawable.format_bold,
                     contentDescription = "Bold",
-                    isActive = formatController.isActive(BoldKey),
-                    onClick = { formatController.toggle(BoldKey) },
+                    isActive = state.currentAttributes.containsKey(BoldKey),
+                    onClick = { state.toggleFormat(BoldKey) },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_italic,
                     contentDescription = "Italic",
-                    isActive = formatController.isActive(ItalicKey),
-                    onClick = { formatController.toggle(ItalicKey) },
+                    isActive = state.currentAttributes.containsKey(ItalicKey),
+                    onClick = { state.toggleFormat(ItalicKey) },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_underlined,
                     contentDescription = "Underline",
-                    isActive = formatController.isActive(UnderlineKey),
-                    onClick = { formatController.toggle(UnderlineKey) },
+                    isActive = state.currentAttributes.containsKey(UnderlineKey),
+                    onClick = { state.toggleFormat(UnderlineKey) },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_strikethrough,
                     contentDescription = "Strikethrough",
-                    isActive = formatController.isActive(StrikethroughKey),
-                    onClick = { formatController.toggle(StrikethroughKey) },
+                    isActive = state.currentAttributes.containsKey(StrikethroughKey),
+                    onClick = { state.toggleFormat(StrikethroughKey) },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_color_text,
                     contentDescription = "Text Color Red",
-                    isActive = formatController.getCurrentValue(TextColorKey) == RgbaColor(0xFFFF0000),
+                    isActive = state.currentAttributes[TextColorKey] == RgbaColor(0xFFFF0000),
                     onClick = {
-                        if (formatController.getCurrentValue(TextColorKey) == RgbaColor(0xFFFF0000)) {
-                            formatController.remove(TextColorKey)
+                        if (state.currentAttributes[TextColorKey] == RgbaColor(0xFFFF0000)) {
+                            state.removeFormat(TextColorKey)
                         } else {
-                            formatController.apply(TextColorKey, RgbaColor(0xFFFF0000))
+                            state.applyFormat(TextColorKey, RgbaColor(0xFFFF0000))
                         }
                     },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_color_fill,
                     contentDescription = "Background Color Yellow",
-                    isActive = formatController.getCurrentValue(BackgroundColorKey) == RgbaColor(0xFFFFFF00),
+                    isActive = state.currentAttributes[BackgroundColorKey] == RgbaColor(0xFFFFFF00),
                     onClick = {
-                        if (formatController.getCurrentValue(BackgroundColorKey) == RgbaColor(0xFFFFFF00)) {
-                            formatController.remove(BackgroundColorKey)
+                        if (state.currentAttributes[BackgroundColorKey] == RgbaColor(0xFFFFFF00)) {
+                            state.removeFormat(BackgroundColorKey)
                         } else {
-                            formatController.apply(BackgroundColorKey, RgbaColor(0xFFFFFF00))
+                            state.applyFormat(BackgroundColorKey, RgbaColor(0xFFFFFF00))
                         }
                     },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_size,
                     contentDescription = "Large Font Size",
-                    isActive = formatController.getCurrentValue(FontSizeKey) == TextSize(24f),
+                    isActive = state.currentAttributes[FontSizeKey] == TextSize(24f),
                     onClick = {
-                        if (formatController.getCurrentValue(FontSizeKey) == TextSize(24f)) {
-                            formatController.remove(FontSizeKey)
+                        if (state.currentAttributes[FontSizeKey] == TextSize(24f)) {
+                            state.removeFormat(FontSizeKey)
                         } else {
-                            formatController.apply(FontSizeKey, TextSize(24f))
+                            state.applyFormat(FontSizeKey, TextSize(24f))
                         }
                     },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_h1,
                     contentDescription = "Heading 1",
-                    isActive = formatController.getCurrentValue(HeadingKey) == HeadingLevel.H1,
+                    isActive = state.currentAttributes[HeadingKey] == HeadingLevel.H1,
                     onClick = {
-                        if (formatController.getCurrentValue(HeadingKey) == HeadingLevel.H1) {
-                            formatController.remove(HeadingKey)
+                        if (state.currentAttributes[HeadingKey] == HeadingLevel.H1) {
+                            state.removeFormat(HeadingKey)
                         } else {
-                            formatController.apply(HeadingKey, HeadingLevel.H1)
+                            state.applyFormat(HeadingKey, HeadingLevel.H1)
                         }
                     },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_align_center,
                     contentDescription = "Align Center",
-                    isActive = formatController.getCurrentValue(TextAlignmentKey) == TextAlignment.Center,
+                    isActive = state.currentAttributes[TextAlignmentKey] == TextAlignment.Center,
                     onClick = {
-                        if (formatController.getCurrentValue(TextAlignmentKey) == TextAlignment.Center) {
-                            formatController.remove(TextAlignmentKey)
+                        if (state.currentAttributes[TextAlignmentKey] == TextAlignment.Center) {
+                            state.removeFormat(TextAlignmentKey)
                         } else {
-                            formatController.apply(TextAlignmentKey, TextAlignment.Center)
+                            state.applyFormat(TextAlignmentKey, TextAlignment.Center)
                         }
                     },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_quote,
                     contentDescription = "Blockquote",
-                    isActive = formatController.isActive(BlockquoteKey),
-                    onClick = { formatController.toggle(BlockquoteKey) },
+                    isActive = state.currentAttributes.containsKey(BlockquoteKey),
+                    onClick = { state.toggleFormat(BlockquoteKey) },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_list_bulleted,
                     contentDescription = "Bullet List",
-                    isActive = formatController.isActive(BulletListKey),
+                    isActive = state.currentAttributes.containsKey(BulletListKey),
                     onClick = {
-                        if (formatController.isActive(BulletListKey)) {
-                            formatController.remove(BulletListKey)
+                        if (state.currentAttributes.containsKey(BulletListKey)) {
+                            state.removeFormat(BulletListKey)
                         } else {
-                            formatController.apply(BulletListKey, ListIndentLevel.Level1)
+                            state.applyFormat(BulletListKey, ListIndentLevel.Level1)
                         }
                     },
                 ),
                 FormatAction(
                     iconRes = R.drawable.format_list_numbered,
                     contentDescription = "Ordered List",
-                    isActive = formatController.isActive(OrderedListKey),
+                    isActive = state.currentAttributes.containsKey(OrderedListKey),
                     onClick = {
-                        if (formatController.isActive(OrderedListKey)) {
-                            formatController.remove(OrderedListKey)
+                        if (state.currentAttributes.containsKey(OrderedListKey)) {
+                            state.removeFormat(OrderedListKey)
                         } else {
-                            formatController.apply(OrderedListKey, ListIndentLevel.Level1)
+                            state.applyFormat(OrderedListKey, ListIndentLevel.Level1)
                         }
                     },
                 ),
@@ -262,12 +260,12 @@ private fun DocumentFormattingToolbar(
             }
         }
 
-        IndentOutdentButtons(state = state, formatController = formatController)
+        IndentOutdentButtons(state = state)
 
         Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
-            onClick = { formatController.clearAll() },
+            onClick = { state.clearFormats() },
             enabled = true,
         ) {
             Icon(
@@ -326,27 +324,26 @@ fun DocumentEditorSamplePreview() {
 @Composable
 private fun IndentOutdentButtons(
     state: RichTextState,
-    formatController: RichTextFormatController,
     modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = {
             val currentLevel =
-                formatController.getCurrentValue(BulletListKey)
-                    ?: formatController.getCurrentValue(OrderedListKey)
+                state.currentAttributes[BulletListKey]
+                    ?: state.currentAttributes[OrderedListKey]
             if (currentLevel != null && currentLevel.ordinal > 0) {
                 val prevLevel = ListIndentLevel.entries[currentLevel.ordinal - 1]
-                if (formatController.isActive(BulletListKey)) {
-                    formatController.apply(BulletListKey, prevLevel)
+                if (state.currentAttributes.containsKey(BulletListKey)) {
+                    state.applyFormat(BulletListKey, prevLevel)
                 } else {
-                    formatController.apply(OrderedListKey, prevLevel)
+                    state.applyFormat(OrderedListKey, prevLevel)
                 }
             } else if (currentLevel != null) {
-                formatController.remove(BulletListKey)
-                formatController.remove(OrderedListKey)
+                state.removeFormat(BulletListKey)
+                state.removeFormat(OrderedListKey)
             }
         },
-        enabled = formatController.isActive(BulletListKey) || formatController.isActive(OrderedListKey),
+        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
         modifier = modifier,
     ) {
         Icon(
@@ -358,18 +355,18 @@ private fun IndentOutdentButtons(
     IconButton(
         onClick = {
             val currentLevel =
-                formatController.getCurrentValue(BulletListKey)
-                    ?: formatController.getCurrentValue(OrderedListKey)
+                state.currentAttributes[BulletListKey]
+                    ?: state.currentAttributes[OrderedListKey]
             if (currentLevel != null && currentLevel.ordinal < ListIndentLevel.Level6.ordinal) {
                 val nextLevel = ListIndentLevel.entries[currentLevel.ordinal + 1]
-                if (formatController.isActive(BulletListKey)) {
-                    formatController.apply(BulletListKey, nextLevel)
+                if (state.currentAttributes.containsKey(BulletListKey)) {
+                    state.applyFormat(BulletListKey, nextLevel)
                 } else {
-                    formatController.apply(OrderedListKey, nextLevel)
+                    state.applyFormat(OrderedListKey, nextLevel)
                 }
             }
         },
-        enabled = formatController.isActive(BulletListKey) || formatController.isActive(OrderedListKey),
+        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
         modifier = modifier,
     ) {
         Icon(
