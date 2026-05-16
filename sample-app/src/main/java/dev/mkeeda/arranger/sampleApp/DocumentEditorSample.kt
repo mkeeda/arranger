@@ -38,7 +38,6 @@ import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RgbaColor
-import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.TextAlignmentKey
@@ -56,7 +55,7 @@ import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
 fun DocumentEditorSample(modifier: Modifier = Modifier) {
-    val state = remember { RichTextState(initialText = RichString("")) }
+    val state = remember { RichTextState() }
 
     DocumentEditorBox(
         state = state,
@@ -311,14 +310,6 @@ private fun DocumentEditorField(state: RichTextState, modifier: Modifier = Modif
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DocumentEditorSamplePreview() {
-    ArrangerTheme {
-        DocumentEditorSample()
-    }
-}
-
 @Composable
 private fun IndentOutdentButtons(
     state: RichTextState,
@@ -341,7 +332,7 @@ private fun IndentOutdentButtons(
                 state.removeFormat(OrderedListKey)
             }
         },
-        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
+        enabled = state.currentAttributes.containsAny(BulletListKey, OrderedListKey),
         modifier = modifier,
     ) {
         Icon(
@@ -364,12 +355,20 @@ private fun IndentOutdentButtons(
                 }
             }
         },
-        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
+        enabled = state.currentAttributes.containsAny(BulletListKey, OrderedListKey),
         modifier = modifier,
     ) {
         Icon(
             painter = painterResource(id = R.drawable.format_indent_increase),
             contentDescription = "Indent",
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DocumentEditorSamplePreview() {
+    ArrangerTheme {
+        DocumentEditorSample()
     }
 }

@@ -22,7 +22,7 @@ import dev.mkeeda.arranger.richtext.resnapParagraphSpans
 import dev.mkeeda.arranger.richtext.snapToParagraphs
 
 @Stable
-public class RichTextState(initialText: RichString) {
+public class RichTextState(initialText: RichString = RichString("")) {
     internal val textFieldState = TextFieldState(initialText.text)
 
     // The Single Source of Truth for spans
