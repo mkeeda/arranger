@@ -553,8 +553,19 @@ The engine correctly manages complex operations like batch attribute application
 ```kotlin
 @Composable
 fun UndoRedoSample(modifier: Modifier = Modifier) {
-    val initialText = "Type something, make changes, and use Undo/Redo to see the history."
-    val state = remember { RichTextState(initialText = RichString(initialText)) }
+    val initialText = "Type something here, make changes, and use Undo/Redo buttons."
+    val state =
+        remember {
+            RichTextState(
+                initialText = RichString(text = initialText).edit {
+                    val range = initialText.rangeOf("Undo/Redo")
+                    editAttributes(range = range) {
+                        bold()
+                        textColor(Color(0xFF1976D2)) // Blue
+                    }
+                }
+            )
+        }
 
     Column(modifier = modifier.padding(16.dp)) {
         Row(
