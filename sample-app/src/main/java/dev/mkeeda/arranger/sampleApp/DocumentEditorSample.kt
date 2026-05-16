@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,7 +60,7 @@ import dev.mkeeda.arranger.richtext.orderedList
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
-fun ChatInputSample(modifier: Modifier = Modifier) {
+fun DocumentEditorSample(modifier: Modifier = Modifier) {
     val state = remember { RichTextState(initialText = RichString("")) }
 
     Column(
@@ -71,19 +70,18 @@ fun ChatInputSample(modifier: Modifier = Modifier) {
                 .imePadding(),
     ) {
         Text(
-            text = "Select text and use the toolbar to format it, or use the toolbar before typing.",
+            text = "Document Editor: Full screen with Undo/Redo support.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp),
         )
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        ChatInputBox(state = state)
+        DocumentEditorBox(state = state, modifier = Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun ChatInputBox(state: RichTextState, modifier: Modifier = Modifier) {
+private fun DocumentEditorBox(state: RichTextState, modifier: Modifier = Modifier) {
     // Toolbar buttons are enabled only when text is selected (selection length > 0)
     val hasSelection = !state.selection.collapsed
 
@@ -99,19 +97,19 @@ private fun ChatInputBox(state: RichTextState, modifier: Modifier = Modifier) {
                 )
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest),
     ) {
-        ChatInputField(state = state)
-
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-        ChatFormattingToolbar(
+        DocumentFormattingToolbar(
             state = state,
             hasSelection = hasSelection,
         )
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+        DocumentEditorField(state = state, modifier = Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun ChatFormattingToolbar(
+private fun DocumentFormattingToolbar(
     state: RichTextState,
     hasSelection: Boolean,
     modifier: Modifier = Modifier,
@@ -122,6 +120,27 @@ private fun ChatFormattingToolbar(
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 2.dp),
     ) {
+        // Undo / Redo Buttons
+        IconButton(
+            onClick = { state.undoState.undo() },
+            enabled = state.undoState.canUndo,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_undo_24),
+                contentDescription = "Undo",
+            )
+        }
+        IconButton(
+            onClick = { state.undoState.redo() },
+            enabled = state.undoState.canRedo,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_redo_24),
+                contentDescription = "Redo",
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+
         val formatActions =
             listOf(
                 FormatAction.Span(
@@ -300,7 +319,7 @@ private sealed interface FormatAction<T : Any> {
 }
 
 @Composable
-private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) {
+private fun DocumentEditorField(state: RichTextState, modifier: Modifier = Modifier) {
     Box(
         modifier =
             modifier
@@ -309,7 +328,7 @@ private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) 
     ) {
         if (state.richString.text.isEmpty()) {
             Text(
-                text = "Type a message...",
+                text = "Type your document...",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
             )
@@ -318,22 +337,22 @@ private fun ChatInputField(state: RichTextState, modifier: Modifier = Modifier) 
             state = state,
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .testTag("ChatInputEditor"),
+                    .fillMaxSize()
+                    .testTag("DocumentEditor"),
             textStyle =
                 MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                 ),
-            lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1, maxHeightInLines = 5),
+            // Removed lineLimits to allow taking up the full remaining space
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ChatInputSamplePreview() {
+fun DocumentEditorSamplePreview() {
     ArrangerTheme {
-        ChatInputSample()
+        DocumentEditorSample()
     }
 }
 
