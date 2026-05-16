@@ -57,6 +57,7 @@ import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.editAttributes
 import dev.mkeeda.arranger.richtext.orderedList
+import dev.mkeeda.arranger.sampleApp.FormatAction.Span
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
@@ -135,43 +136,43 @@ private fun DocumentFormattingToolbar(
 
         val formatActions =
             listOf(
-                FormatAction.Span(
+                Span(
                     iconRes = R.drawable.format_bold,
                     contentDescription = "Bold",
                     key = BoldKey,
                     value = Unit,
                 ),
-                FormatAction.Span(
+                Span(
                     iconRes = R.drawable.format_italic,
                     contentDescription = "Italic",
                     key = ItalicKey,
                     value = Unit,
                 ),
-                FormatAction.Span(
+                Span(
                     iconRes = R.drawable.format_underlined,
                     contentDescription = "Underline",
                     key = UnderlineKey,
                     value = Unit,
                 ),
-                FormatAction.Span(
+                Span(
                     iconRes = R.drawable.format_strikethrough,
                     contentDescription = "Strikethrough",
                     key = StrikethroughKey,
                     value = Unit,
                 ),
-                FormatAction.Span(
+                Span(
                     iconRes = R.drawable.format_color_text,
                     contentDescription = "Text Color Red",
                     key = TextColorKey,
-                    value = RgbaColor(0xFFFF0000.toLong()),
+                    value = RgbaColor(0xFFFF0000),
                 ),
-                FormatAction.Span(
+                Span(
                     iconRes = R.drawable.format_color_fill,
                     contentDescription = "Background Color Yellow",
                     key = BackgroundColorKey,
-                    value = RgbaColor(0xFFFFFF00.toLong()),
+                    value = RgbaColor(0xFFFFFF00),
                 ),
-                FormatAction.Span(
+                Span(
                     iconRes = R.drawable.format_size,
                     contentDescription = "Large Font Size",
                     key = FontSizeKey,
