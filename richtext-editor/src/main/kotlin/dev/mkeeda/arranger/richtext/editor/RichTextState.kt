@@ -228,6 +228,8 @@ public class RichTextState(initialText: RichString) {
             return
         }
 
+        undoState.captureSnapshotBeforeChange(buffer)
+
         val typingAttr = typingAttributes
         val removedAttr = removedTypingAttributes
 
@@ -300,6 +302,20 @@ public class RichTextState(initialText: RichString) {
         this.spans = newSpans.resnapParagraphSpans(buffer.toString())
         clearTypingAttributes()
     }
+
+    /**
+     * Manages the undo and redo history for this state.
+     * Use this property to programmatically trigger undo/redo operations or observe their availability.
+     *
+     * See [RichTextUndoState] for details on how the snapshot history is automatically recorded.
+     */
+    public val undoState: RichTextUndoState =
+        RichTextUndoState(
+            textFieldState = textFieldState,
+            getSpans = { spans },
+            setSpans = { spans = it },
+            clearTypingAttributes = { clearTypingAttributes() },
+        )
 
     private fun handleNewlineInsertion(
         insertedText: String,

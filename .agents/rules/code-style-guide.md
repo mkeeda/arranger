@@ -36,3 +36,7 @@ https://android.googlesource.com/platform/frameworks/support/+/androidx-main/com
 ## importルール
 - single importのみを使うこと。*を使って複数のクラスをまとめてimportしない。
 - ファイル内でオブジェクト名の被りがない限り、必ずimport文を書いてクラス名等を短く書く。androidx.compose.ui...などのようにフルパッケージ指定は極力避ける。
+
+## テストケース名の表現
+- テスト関数名は英語で記載する
+- ``を使い、スペースを含めた完全な英文にする

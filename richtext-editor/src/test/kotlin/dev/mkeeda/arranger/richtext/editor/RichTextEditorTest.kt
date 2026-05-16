@@ -1,7 +1,10 @@
 package dev.mkeeda.arranger.richtext.editor
 
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.SpanStyle
@@ -438,5 +441,52 @@ class RichTextEditorTest {
         spans[0].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
         spans[1].range shouldBe (7..13)
         spans[1].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level2)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun `undo and redo via keyboard shortcuts`() {
+        val initialText = "Hello"
+        val state = RichTextState(initialText = RichString(text = initialText))
+
+        composeTestRule.setContent {
+            RichTextEditor(state = state)
+        }
+
+        // Move cursor to the end
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Type " World"
+        composeTestRule.onNodeWithText(initialText).performTextInput(" World")
+        composeTestRule.waitForIdle()
+
+        val expectedNewText = "Hello World"
+        state.richString.text shouldBe expectedNewText
+
+        // Simulate Ctrl+Z (Undo)
+        composeTestRule.onNodeWithText(expectedNewText).performKeyInput {
+            keyDown(Key.CtrlLeft)
+            keyDown(Key.Z)
+            keyUp(Key.Z)
+            keyUp(Key.CtrlLeft)
+        }
+        composeTestRule.waitForIdle()
+
+        // `performTextInput(" World")` is delivered as a single bulk operation, creating one undo entry.
+        // A single Ctrl+Z should therefore revert the entire " World" addition.
+        state.richString.text shouldBe "Hello"
+
+        // Simulate Ctrl+Shift+Z (Redo)
+        composeTestRule.onNodeWithText("Hello").performKeyInput {
+            keyDown(Key.CtrlLeft)
+            keyDown(Key.ShiftLeft)
+            keyDown(Key.Z)
+            keyUp(Key.Z)
+            keyUp(Key.ShiftLeft)
+            keyUp(Key.CtrlLeft)
+        }
+        composeTestRule.waitForIdle()
+
+        state.richString.text shouldBe "Hello World"
     }
 }
