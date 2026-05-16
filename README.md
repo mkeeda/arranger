@@ -8,7 +8,7 @@ Arranger is a declarative, type-safe rich text editor engine and UI components f
 While standard `buildAnnotatedString` is perfect for static text decoration, it quickly breaks down when building real-time editors where users insert and delete text. Arranger is built specifically for **dynamic text operations**, automatically managing and shifting attribute spans (like bold, colors, or links) as the underlying text mutates.
 
 <div align="center">
-  <img src="./docs/images/rich-text-editor-demo.gif" width="600" alt="Arranger Rich Text Editor Demo"/>
+  <img src="./docs/images/rich-text-editor-demo.gif" width="300" alt="Arranger Rich Text Editor Demo"/>
 </div>
 
 > [!WARNING]
