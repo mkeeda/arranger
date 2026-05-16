@@ -65,9 +65,10 @@ fun DocumentEditorSample(modifier: Modifier = Modifier) {
 
     DocumentEditorBox(
         state = state,
-        modifier = modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .imePadding(),
     )
 }
 
