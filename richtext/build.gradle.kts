@@ -1,13 +1,19 @@
 plugins {
-    id("arranger.android.library")
+    id("arranger.kmp.library")
     id("arranger.maven.publish")
 }
 
-android {
-    namespace = "dev.mkeeda.arranger.richtext"
-}
-
-dependencies {
-    testImplementation(libs.junit)
-    testImplementation(libs.kotest.assertions.core)
+kotlin {
+    android {
+        namespace = "dev.mkeeda.arranger.richtext"
+        withHostTest {}
+    }
+    sourceSets {
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.junit)
+                implementation(libs.kotest.assertions.core)
+            }
+        }
+    }
 }
