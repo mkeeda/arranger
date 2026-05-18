@@ -15,10 +15,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 internal fun Project.configureKotlinMultiplatformAndroid(
     extension: KotlinMultiplatformExtension,
 ) {
-    extensions.configure<KotlinMultiplatformAndroidLibraryExtension>("kotlinMultiplatformAndroidLibrary") {
+    (extension as org.gradle.api.plugins.ExtensionAware).extensions.configure("android", org.gradle.api.Action<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension> {
         compileSdk = 37
         minSdk = 26
-    }
+    })
     
     // Lock Kotlin/Java versions via Java Toolchain
     extensions.configure<JavaPluginExtension> {
@@ -27,12 +27,11 @@ internal fun Project.configureKotlinMultiplatformAndroid(
         }
     }
     
-    // Free compiler args for KMP android target
-    extension.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget>().configureEach {
+    // Free compiler args for KMP targets
+    extension.targets.configureEach {
         compilations.configureEach {
             compileTaskProvider.configure {
                 compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_21)
                     freeCompilerArgs.addAll(
                         "-opt-in=kotlin.RequiresOptIn",
                         "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",

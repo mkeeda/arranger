@@ -23,10 +23,6 @@ gradlePlugin {
             id = "arranger.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
-        register("androidLibrary") {
-            id = "arranger.android.library"
-            implementationClass = "AndroidLibraryConventionPlugin"
-        }
         register("kmpLibrary") {
             id = "arranger.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"

@@ -16,7 +16,6 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
-                androidTarget()
                 explicitApi()
                 configureKotlinMultiplatformAndroid(this)
             }
