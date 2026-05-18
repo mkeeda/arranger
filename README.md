@@ -656,7 +656,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 - [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
 - [x] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
 - [x] **Undo/Redo Synchronization**: Full history restoration for both text and complex structural changes.
-- [ ] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
+- [x] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
 
 ### Phase 3: Multiplatform & Interoperability (The "Killer" Features)
 - [ ] **Kotlin Multiplatform (KMP)**: Full support for iOS, Desktop, and Web.
