@@ -27,6 +27,10 @@ gradlePlugin {
             id = "arranger.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
         }
+        register("kmpLibrary") {
+            id = "arranger.kmp.library"
+            implementationClass = "KmpLibraryConventionPlugin"
+        }
         register("androidSpotless") {
             id = "arranger.android.spotless"
             implementationClass = "AndroidSpotlessConventionPlugin"

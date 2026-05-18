@@ -29,13 +29,26 @@ class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
                         }
                     }
                 }
+                extensions.configure<RoborazziExtension> {
+                    outputDir.set(project.file("src/test/screenshots"))
+                }
+            }
+            
+            pluginManager.withPlugin("com.android.library") {
+                extensions.configure<RoborazziExtension> {
+                    outputDir.set(project.file("src/test/screenshots"))
+                }
             }
 
-            // Screenshot output directory: <module>/src/test/screenshots/
-            // file() resolves relative to each module's project directory,
-            // so this automatically separates output per module.
-            extensions.configure<RoborazziExtension> {
-                outputDir.set(project.file("src/test/screenshots"))
+            pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
+                extensions.configure<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension>("kotlinMultiplatformAndroidLibrary") {
+                    withHostTest {
+                        isIncludeAndroidResources = true
+                    }
+                }
+                extensions.configure<RoborazziExtension> {
+                    outputDir.set(project.file("src/androidHostTest/screenshots"))
+                }
             }
 
             val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")

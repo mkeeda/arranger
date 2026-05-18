@@ -29,4 +29,10 @@ internal fun Project.configureAndroidLint() {
             lint(configureLint)
         }
     }
+
+    pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
+        extensions.configure<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension>("kotlinMultiplatformAndroidLibrary") {
+            lint(configureLint)
+        }
+    }
 }

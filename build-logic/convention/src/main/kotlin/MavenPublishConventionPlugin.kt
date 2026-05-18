@@ -17,7 +17,12 @@ class MavenPublishConventionPlugin : Plugin<Project> {
                 //   - Maven Central (Central Portal) does not require a javadoc jar.
                 //   - IDE quick-docs work fine via the sources jar.
                 // TODO: Re-enable javadoc generation once migrating to Dokka K2 engine.
-                configure(AndroidSingleVariantLibrary(javadocJar = JavadocJar.None()))
+                pluginManager.withPlugin("com.android.library") {
+                    configure(AndroidSingleVariantLibrary(javadocJar = JavadocJar.None()))
+                }
+                pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
+                    configure(com.vanniktech.maven.publish.KotlinMultiplatform(javadocJar = JavadocJar.None()))
+                }
             }
         }
     }
