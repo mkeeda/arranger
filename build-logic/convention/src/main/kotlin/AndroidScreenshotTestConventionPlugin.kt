@@ -64,16 +64,6 @@ class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
                 }
             }
 
-            pluginManager.withPlugin("com.android.library") {
-                dependencies {
-                    add("testImplementation", libs.findLibrary("roborazzi").get())
-                    add("testImplementation", libs.findLibrary("roborazzi-compose").get())
-                    add("testImplementation", libs.findLibrary("robolectric").get())
-                    add("testImplementation", libs.findLibrary("androidx-compose-ui-test-junit4").get())
-                    add("debugImplementation", libs.findLibrary("androidx-compose-ui-test-manifest").get())
-                }
-            }
-
             pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
                 extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
                     sourceSets.named("androidHostTest").configure {

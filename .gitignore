@@ -16,3 +16,5 @@ build/
 local.properties
 bin/
 .idea/deploymentTargetSelector.xml
+.kotlin/
+.kotlin/

@@ -24,12 +24,6 @@ internal fun Project.configureAndroidLint() {
         }
     }
 
-    pluginManager.withPlugin("com.android.library") {
-        extensions.configure<LibraryExtension> {
-            lint(configureLint)
-        }
-    }
-
     pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
         extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
             (this as org.gradle.api.plugins.ExtensionAware).extensions.configure("android", org.gradle.api.Action<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension> {
