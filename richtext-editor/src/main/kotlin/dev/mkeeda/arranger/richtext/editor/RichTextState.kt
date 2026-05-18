@@ -21,8 +21,17 @@ import dev.mkeeda.arranger.richtext.mergeSpan
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
 import dev.mkeeda.arranger.richtext.snapToParagraphs
 
+/**
+ * A state object that can be hoisted to control and observe changes to [RichTextEditor].
+ *
+ * This state manages the underlying [RichString], including the raw text and its associated
+ * formatting attributes ([RichSpan]s). It acts as the single source of truth for the editor,
+ * integrating seamlessly with standard Compose text APIs.
+ *
+ * @param initialText The initial [RichString] to display in the editor. Defaults to an empty [RichString].
+ */
 @Stable
-public class RichTextState(initialText: RichString) {
+public class RichTextState(initialText: RichString = RichString("")) {
     internal val textFieldState = TextFieldState(initialText.text)
 
     // The Single Source of Truth for spans

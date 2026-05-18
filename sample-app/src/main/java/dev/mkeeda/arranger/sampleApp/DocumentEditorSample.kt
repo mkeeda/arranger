@@ -28,8 +28,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.mkeeda.arranger.richtext.AttributeEditScope
-import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
@@ -40,29 +38,25 @@ import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
-import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RgbaColor
-import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
-import dev.mkeeda.arranger.richtext.bulletList
-import dev.mkeeda.arranger.richtext.clearBulletList
-import dev.mkeeda.arranger.richtext.clearOrderedList
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.editAttributes
-import dev.mkeeda.arranger.richtext.orderedList
-import dev.mkeeda.arranger.sampleApp.FormatAction.Span
+import dev.mkeeda.arranger.richtext.editor.applyFormat
+import dev.mkeeda.arranger.richtext.editor.clearFormats
+import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
+import dev.mkeeda.arranger.richtext.editor.removeFormat
+import dev.mkeeda.arranger.richtext.editor.toggleFormat
 import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
 
 @Composable
 fun DocumentEditorSample(modifier: Modifier = Modifier) {
-    val state = remember { RichTextState(initialText = RichString("")) }
+    val state = remember { RichTextState() }
 
     DocumentEditorBox(
         state = state,
@@ -75,9 +69,6 @@ fun DocumentEditorSample(modifier: Modifier = Modifier) {
 
 @Composable
 private fun DocumentEditorBox(state: RichTextState, modifier: Modifier = Modifier) {
-    // Toolbar buttons are enabled only when text is selected (selection length > 0)
-    val hasSelection = !state.selection.collapsed
-
     Column(
         modifier =
             modifier
@@ -92,7 +83,6 @@ private fun DocumentEditorBox(state: RichTextState, modifier: Modifier = Modifie
     ) {
         DocumentFormattingToolbar(
             state = state,
-            hasSelection = hasSelection,
         )
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -104,7 +94,6 @@ private fun DocumentEditorBox(state: RichTextState, modifier: Modifier = Modifie
 @Composable
 private fun DocumentFormattingToolbar(
     state: RichTextState,
-    hasSelection: Boolean,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -134,127 +123,127 @@ private fun DocumentFormattingToolbar(
         }
         Spacer(modifier = Modifier.width(8.dp))
 
-        val formatActions =
-            listOf(
-                Span(
-                    iconRes = R.drawable.format_bold,
-                    contentDescription = "Bold",
-                    key = BoldKey,
-                    value = Unit,
-                ),
-                Span(
-                    iconRes = R.drawable.format_italic,
-                    contentDescription = "Italic",
-                    key = ItalicKey,
-                    value = Unit,
-                ),
-                Span(
-                    iconRes = R.drawable.format_underlined,
-                    contentDescription = "Underline",
-                    key = UnderlineKey,
-                    value = Unit,
-                ),
-                Span(
-                    iconRes = R.drawable.format_strikethrough,
-                    contentDescription = "Strikethrough",
-                    key = StrikethroughKey,
-                    value = Unit,
-                ),
-                Span(
-                    iconRes = R.drawable.format_color_text,
-                    contentDescription = "Text Color Red",
-                    key = TextColorKey,
-                    value = RgbaColor(0xFFFF0000),
-                ),
-                Span(
-                    iconRes = R.drawable.format_color_fill,
-                    contentDescription = "Background Color Yellow",
-                    key = BackgroundColorKey,
-                    value = RgbaColor(0xFFFFFF00),
-                ),
-                Span(
-                    iconRes = R.drawable.format_size,
-                    contentDescription = "Large Font Size",
-                    key = FontSizeKey,
-                    value = TextSize(24f),
-                ),
-                FormatAction.Paragraph(
-                    iconRes = R.drawable.format_h1,
-                    contentDescription = "Heading 1",
-                    key = HeadingKey,
-                    value = HeadingLevel.H1,
-                ),
-                FormatAction.Paragraph(
-                    iconRes = R.drawable.format_align_center,
-                    contentDescription = "Align Center",
-                    key = TextAlignmentKey,
-                    value = TextAlignment.Center,
-                ),
-                FormatAction.Paragraph(
-                    iconRes = R.drawable.format_quote,
-                    contentDescription = "Blockquote",
-                    key = BlockquoteKey,
-                    value = Unit,
-                ),
-                FormatAction.Paragraph(
-                    iconRes = R.drawable.format_list_bulleted,
-                    contentDescription = "Bullet List",
-                    key = BulletListKey,
-                    value = ListIndentLevel.Level1,
-                ),
-                FormatAction.Paragraph(
-                    iconRes = R.drawable.format_list_numbered,
-                    contentDescription = "Ordered List",
-                    key = OrderedListKey,
-                    value = ListIndentLevel.Level1,
-                ),
-            )
-
-        formatActions.forEach { action ->
-            val isActive = state.currentAttributes.containsKey(action.key)
-            IconToggleButton(
-                checked = isActive,
-                onCheckedChange = {
-                    if (hasSelection) {
-                        state.edit {
-                            editAttributes(state.selection) {
-                                action.applyAttribute(this, isActive)
-                            }
-                        }
-                    } else {
-                        action.toggleTyping(state, isActive)
-                    }
-                },
-                enabled = true,
-                colors =
-                    IconButtonDefaults.iconToggleButtonColors(
-                        checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-            ) {
-                Icon(
-                    painter = painterResource(id = action.iconRes),
-                    contentDescription = action.contentDescription,
-                )
-            }
-        }
+        FormatToggleButton(
+            iconRes = R.drawable.format_bold,
+            contentDescription = "Bold",
+            isActive = state.currentAttributes.containsKey(BoldKey),
+            onClick = { state.toggleFormat(BoldKey) },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_italic,
+            contentDescription = "Italic",
+            isActive = state.currentAttributes.containsKey(ItalicKey),
+            onClick = { state.toggleFormat(ItalicKey) },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_underlined,
+            contentDescription = "Underline",
+            isActive = state.currentAttributes.containsKey(UnderlineKey),
+            onClick = { state.toggleFormat(UnderlineKey) },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_strikethrough,
+            contentDescription = "Strikethrough",
+            isActive = state.currentAttributes.containsKey(StrikethroughKey),
+            onClick = { state.toggleFormat(StrikethroughKey) },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_color_text,
+            contentDescription = "Text Color Red",
+            isActive = state.currentAttributes[TextColorKey] == RgbaColor(0xFFFF0000),
+            onClick = {
+                if (state.currentAttributes[TextColorKey] == RgbaColor(0xFFFF0000)) {
+                    state.removeFormat(TextColorKey)
+                } else {
+                    state.applyFormat(TextColorKey, RgbaColor(0xFFFF0000))
+                }
+            },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_color_fill,
+            contentDescription = "Background Color Yellow",
+            isActive = state.currentAttributes[BackgroundColorKey] == RgbaColor(0xFFFFFF00),
+            onClick = {
+                if (state.currentAttributes[BackgroundColorKey] == RgbaColor(0xFFFFFF00)) {
+                    state.removeFormat(BackgroundColorKey)
+                } else {
+                    state.applyFormat(BackgroundColorKey, RgbaColor(0xFFFFFF00))
+                }
+            },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_size,
+            contentDescription = "Large Font Size",
+            isActive = state.currentAttributes[FontSizeKey] == TextSize(24f),
+            onClick = {
+                if (state.currentAttributes[FontSizeKey] == TextSize(24f)) {
+                    state.removeFormat(FontSizeKey)
+                } else {
+                    state.applyFormat(FontSizeKey, TextSize(24f))
+                }
+            },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_h1,
+            contentDescription = "Heading 1",
+            isActive = state.currentAttributes[HeadingKey] == HeadingLevel.H1,
+            onClick = {
+                if (state.currentAttributes[HeadingKey] == HeadingLevel.H1) {
+                    state.removeFormat(HeadingKey)
+                } else {
+                    state.applyFormat(HeadingKey, HeadingLevel.H1)
+                }
+            },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_align_center,
+            contentDescription = "Align Center",
+            isActive = state.currentAttributes[TextAlignmentKey] == TextAlignment.Center,
+            onClick = {
+                if (state.currentAttributes[TextAlignmentKey] == TextAlignment.Center) {
+                    state.removeFormat(TextAlignmentKey)
+                } else {
+                    state.applyFormat(TextAlignmentKey, TextAlignment.Center)
+                }
+            },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_quote,
+            contentDescription = "Blockquote",
+            isActive = state.currentAttributes.containsKey(BlockquoteKey),
+            onClick = { state.toggleFormat(BlockquoteKey) },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_list_bulleted,
+            contentDescription = "Bullet List",
+            isActive = state.currentAttributes.containsKey(BulletListKey),
+            onClick = {
+                if (state.currentAttributes.containsKey(BulletListKey)) {
+                    state.removeFormat(BulletListKey)
+                } else {
+                    state.applyFormat(BulletListKey, ListIndentLevel.Level1)
+                }
+            },
+        )
+        FormatToggleButton(
+            iconRes = R.drawable.format_list_numbered,
+            contentDescription = "Ordered List",
+            isActive = state.currentAttributes.containsKey(OrderedListKey),
+            onClick = {
+                if (state.currentAttributes.containsKey(OrderedListKey)) {
+                    state.removeFormat(OrderedListKey)
+                } else {
+                    state.applyFormat(OrderedListKey, ListIndentLevel.Level1)
+                }
+            },
+        )
 
         IndentOutdentButtons(state = state)
 
         Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
-            onClick = {
-                if (hasSelection) {
-                    state.edit {
-                        editAttributes(state.selection) {
-                            clearAll()
-                        }
-                    }
-                } else {
-                    state.clearTypingAttributes()
-                }
-            },
+            onClick = { state.clearFormats() },
             enabled = true,
         ) {
             Icon(
@@ -265,49 +254,28 @@ private fun DocumentFormattingToolbar(
     }
 }
 
-private sealed interface FormatAction<T : Any> {
-    val iconRes: Int
-    val contentDescription: String
-    val key: AttributeKey<T>
-
-    fun applyAttribute(scope: AttributeEditScope, isActive: Boolean)
-
-    fun toggleTyping(state: RichTextState, isActive: Boolean)
-
-    data class Span<T : Any>(
-        @DrawableRes override val iconRes: Int,
-        override val contentDescription: String,
-        override val key: SpanAttributeKey<T>,
-        val value: T,
-    ) : FormatAction<T> {
-        override fun applyAttribute(scope: AttributeEditScope, isActive: Boolean) {
-            scope.setSpanAttribute(key, if (isActive) null else value)
-        }
-
-        override fun toggleTyping(state: RichTextState, isActive: Boolean) {
-            if (isActive) state.removeTypingAttribute(key) else state.setTypingAttribute(key, value)
-        }
-    }
-
-    data class Paragraph<T : Any>(
-        @DrawableRes override val iconRes: Int,
-        override val contentDescription: String,
-        override val key: ParagraphAttributeKey<T>,
-        val value: T,
-    ) : FormatAction<T> {
-        override fun applyAttribute(scope: AttributeEditScope, isActive: Boolean) {
-            scope.setParagraphAttribute(key, if (isActive) null else value)
-        }
-
-        override fun toggleTyping(state: RichTextState, isActive: Boolean) {
-            // Paragraph attributes logically apply to the whole paragraph immediately.
-            // There's no need to delay it as a typing attribute.
-            state.edit {
-                editAttributes(state.selection) {
-                    applyAttribute(this, isActive)
-                }
-            }
-        }
+@Composable
+private fun FormatToggleButton(
+    @DrawableRes iconRes: Int,
+    contentDescription: String,
+    isActive: Boolean,
+    onClick: () -> Unit,
+) {
+    val colors =
+        IconButtonDefaults.iconToggleButtonColors(
+            checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    IconToggleButton(
+        checked = isActive,
+        onCheckedChange = { onClick() },
+        enabled = true,
+        colors = colors,
+    ) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = contentDescription,
+        )
     }
 }
 
@@ -336,16 +304,8 @@ private fun DocumentEditorField(state: RichTextState, modifier: Modifier = Modif
                 MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                 ),
-            // Removed lineLimits to allow taking up the full remaining space
+            styleResolver = rememberMaterial3AttributeStyleResolver(),
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DocumentEditorSamplePreview() {
-    ArrangerTheme {
-        DocumentEditorSample()
     }
 }
 
@@ -361,25 +321,17 @@ private fun IndentOutdentButtons(
                     ?: state.currentAttributes[OrderedListKey]
             if (currentLevel != null && currentLevel.ordinal > 0) {
                 val prevLevel = ListIndentLevel.entries[currentLevel.ordinal - 1]
-                state.edit {
-                    editAttributes(state.selection) {
-                        if (state.currentAttributes.containsKey(BulletListKey)) {
-                            bulletList(prevLevel)
-                        } else {
-                            orderedList(prevLevel)
-                        }
-                    }
+                if (state.currentAttributes.containsKey(BulletListKey)) {
+                    state.applyFormat(BulletListKey, prevLevel)
+                } else {
+                    state.applyFormat(OrderedListKey, prevLevel)
                 }
             } else if (currentLevel != null) {
-                state.edit {
-                    editAttributes(state.selection) {
-                        clearBulletList()
-                        clearOrderedList()
-                    }
-                }
+                state.removeFormat(BulletListKey)
+                state.removeFormat(OrderedListKey)
             }
         },
-        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
+        enabled = state.currentAttributes.containsAny(BulletListKey, OrderedListKey),
         modifier = modifier,
     ) {
         Icon(
@@ -395,23 +347,27 @@ private fun IndentOutdentButtons(
                     ?: state.currentAttributes[OrderedListKey]
             if (currentLevel != null && currentLevel.ordinal < ListIndentLevel.Level6.ordinal) {
                 val nextLevel = ListIndentLevel.entries[currentLevel.ordinal + 1]
-                state.edit {
-                    editAttributes(state.selection) {
-                        if (state.currentAttributes.containsKey(BulletListKey)) {
-                            bulletList(nextLevel)
-                        } else {
-                            orderedList(nextLevel)
-                        }
-                    }
+                if (state.currentAttributes.containsKey(BulletListKey)) {
+                    state.applyFormat(BulletListKey, nextLevel)
+                } else {
+                    state.applyFormat(OrderedListKey, nextLevel)
                 }
             }
         },
-        enabled = state.currentAttributes.containsKey(BulletListKey) || state.currentAttributes.containsKey(OrderedListKey),
+        enabled = state.currentAttributes.containsAny(BulletListKey, OrderedListKey),
         modifier = modifier,
     ) {
         Icon(
             painter = painterResource(id = R.drawable.format_indent_increase),
             contentDescription = "Indent",
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DocumentEditorSamplePreview() {
+    ArrangerTheme {
+        DocumentEditorSample()
     }
 }

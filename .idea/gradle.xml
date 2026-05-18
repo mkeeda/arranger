@@ -25,6 +25,7 @@
             <option value="$PROJECT_DIR$/build-logic/convention" />
             <option value="$PROJECT_DIR$/richtext" />
             <option value="$PROJECT_DIR$/richtext-editor" />
+            <option value="$PROJECT_DIR$/richtext-editor-material3" />
             <option value="$PROJECT_DIR$/sample-app" />
           </set>
         </option>

@@ -334,6 +334,16 @@ You can combine these strategies (or create your own custom strategies) to build
 
 You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
 
+> [!TIP]
+> If you are building a Material 3 application, consider using `rememberMaterial3AttributeStyleResolver()` from the `arranger-richtext-editor-material3` artifact. It automatically resolves standard text formats (like headings and blockquotes) using your app's `MaterialTheme` typography and color schemes.
+> 
+> To use it, add the following dependency to your module's `build.gradle.kts`:
+> ```kotlin
+> dependencies {
+>     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.2.0-alpha04")
+> }
+> ```
+
 <details>
 <summary><b>Show Code</b></summary>
 
@@ -617,7 +627,7 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 
 | Sample | Screenshot |
 | --- | --- |
-| **[Document Editor with Full UI](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, apply various built-in attributes (like bold, colors, headings, alignments), manage undo/redo history, and handle keyboard interactions seamlessly within Jetpack Compose. | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
+| **[Document Editor with Full UI](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, and seamlessly integrate state with Jetpack Compose.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
 
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
@@ -646,7 +656,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 - [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
 - [x] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
 - [x] **Undo/Redo Synchronization**: Full history restoration for both text and complex structural changes.
-- [ ] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
+- [x] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
 
 ### Phase 3: Multiplatform & Interoperability (The "Killer" Features)
 - [ ] **Kotlin Multiplatform (KMP)**: Full support for iOS, Desktop, and Web.
