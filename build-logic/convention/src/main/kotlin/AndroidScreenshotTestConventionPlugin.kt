@@ -82,6 +82,7 @@ class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
                             implementation(libs.findLibrary("roborazzi-compose").get())
                             implementation(libs.findLibrary("robolectric").get())
                             implementation(libs.findLibrary("androidx-compose-ui-test-junit4").get())
+                            implementation(libs.findLibrary("androidx-compose-ui-test-manifest").get())
                         }
                     }
                 }

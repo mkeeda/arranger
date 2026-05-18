@@ -25,6 +25,7 @@ kotlin {
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.robolectric)
                 implementation(libs.androidx.compose.ui.test.junit4)
+                implementation(libs.androidx.compose.ui.test.manifest)
                 implementation(libs.androidx.activity.compose)
             }
         }
