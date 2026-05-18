@@ -334,6 +334,9 @@ You can combine these strategies (or create your own custom strategies) to build
 
 You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
 
+> [!TIP]
+> If you are building a Material 3 application, consider using `rememberMaterial3AttributeStyleResolver()` from the `arranger-richtext-editor-material3` artifact. It automatically resolves standard text formats (like headings and blockquotes) using your app's `MaterialTheme` typography and color schemes.
+
 <details>
 <summary><b>Show Code</b></summary>
 
@@ -617,7 +620,7 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 
 | Sample | Screenshot |
 | --- | --- |
-| **[Document Editor with Full UI](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, apply various built-in attributes (like bold, colors, headings, alignments), manage undo/redo history, and handle keyboard interactions seamlessly within Jetpack Compose. | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
+| **[Document Editor with Full UI](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, and seamlessly integrate state with Jetpack Compose.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
 
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
