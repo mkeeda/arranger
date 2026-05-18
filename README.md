@@ -80,10 +80,10 @@ Arranger is published to Maven Central. Add the following dependencies to your m
 dependencies {
     // For Compose UI integration (RichTextEditor).
     // This automatically includes the core 'arranger-richtext' module.
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha04")
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha05")
 
     // Or, if you only need the core data structures without Compose UI:
-    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha04")
+    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha05")
 }
 ```
 
@@ -340,7 +340,7 @@ You can define custom attribute keys and map them to Compose styles. Below shows
 > To use it, add the following dependency to your module's `build.gradle.kts`:
 > ```kotlin
 > dependencies {
->     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.2.0-alpha04")
+>     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.2.0-alpha05")
 > }
 > ```
 
