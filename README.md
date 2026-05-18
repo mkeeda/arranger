@@ -336,6 +336,13 @@ You can define custom attribute keys and map them to Compose styles. Below shows
 
 > [!TIP]
 > If you are building a Material 3 application, consider using `rememberMaterial3AttributeStyleResolver()` from the `arranger-richtext-editor-material3` artifact. It automatically resolves standard text formats (like headings and blockquotes) using your app's `MaterialTheme` typography and color schemes.
+> 
+> To use it, add the following dependency to your module's `build.gradle.kts`:
+> ```kotlin
+> dependencies {
+>     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.2.0-alpha04")
+> }
+> ```
 
 <details>
 <summary><b>Show Code</b></summary>
