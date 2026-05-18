@@ -10,7 +10,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                apply("arranger.android.spotless")
+                apply("arranger.spotless")
             }
 
             extensions.configure<ApplicationExtension> {

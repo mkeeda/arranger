@@ -12,7 +12,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.kotlin.multiplatform.library")
                 apply("org.jetbrains.kotlin.multiplatform")
-                apply("arranger.android.spotless")
+                apply("arranger.spotless")
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
