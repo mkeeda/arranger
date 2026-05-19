@@ -22,4 +22,4 @@ description: プロジェクト内のKotlinおよびComposeコードを一定の
 
 ### 動作の前提事項
 - `.editorconfig` に `android_studio` スタイルと末尾カンマ (`Trailing commas`) の有効化などのルールが定義されており、これに基づいて自動フォーマットが適用されます。
-- `arranger.android.spotless` プラグインが Convention Plugin 内で定義・提供されています。
+- `arranger.spotless` プラグインが Convention Plugin 内で定義・提供されています。
