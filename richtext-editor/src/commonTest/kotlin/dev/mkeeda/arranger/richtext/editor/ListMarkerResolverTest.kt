@@ -5,7 +5,7 @@ import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class ListMarkerResolverTest {
     @Test

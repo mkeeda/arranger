@@ -8,14 +8,11 @@ plugins {
 kotlin {
     android {
         namespace = "dev.mkeeda.arranger.richtext"
-        withHostTest {}
     }
     sourceSets {
-        val androidHostTest by getting {
-            dependencies {
-                implementation(libs.junit)
-                implementation(libs.kotest.assertions.core)
-            }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotest.assertions.core)
         }
     }
 }

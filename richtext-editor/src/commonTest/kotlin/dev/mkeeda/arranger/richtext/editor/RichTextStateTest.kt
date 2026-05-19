@@ -14,7 +14,7 @@ import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.clearBulletList
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class RichTextStateTest {
     @Test

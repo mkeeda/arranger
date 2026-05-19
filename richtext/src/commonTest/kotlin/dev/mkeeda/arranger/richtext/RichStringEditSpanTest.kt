@@ -5,7 +5,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.junit.Test
+import kotlin.test.Test
 
 class RichStringEditSpanTest {
     @Test

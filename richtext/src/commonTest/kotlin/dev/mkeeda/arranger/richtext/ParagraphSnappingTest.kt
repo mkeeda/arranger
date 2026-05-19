@@ -2,7 +2,7 @@ package dev.mkeeda.arranger.richtext
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class ParagraphSnappingTest {
     @Test

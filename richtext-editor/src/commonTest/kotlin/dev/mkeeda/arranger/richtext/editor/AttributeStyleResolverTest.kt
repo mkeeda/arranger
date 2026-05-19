@@ -12,7 +12,7 @@ import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class AttributeStyleResolverTest {
     private object TestSpanKey : SpanAttributeKey<String> {

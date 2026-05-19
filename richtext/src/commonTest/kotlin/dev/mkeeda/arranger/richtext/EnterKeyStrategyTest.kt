@@ -1,7 +1,7 @@
 package dev.mkeeda.arranger.richtext
 
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class EnterKeyStrategyTest {
     @Test

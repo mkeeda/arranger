@@ -9,9 +9,6 @@ plugins {
 kotlin {
     android {
         namespace = "dev.mkeeda.arranger.richtext.editor.material3"
-        withHostTest {
-            isIncludeAndroidResources = true
-        }
     }
     sourceSets {
         val commonMain by getting {
@@ -20,14 +17,15 @@ kotlin {
                 api(compose.material3)
             }
         }
-        val androidHostTest by getting {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotest.assertions.core)
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.uiTest)
+        }
+        val jvmTest by getting {
             dependencies {
-                implementation(libs.junit)
-                implementation(libs.kotest.assertions.core)
-                implementation(libs.robolectric)
-                implementation(libs.androidx.compose.ui.test.junit4)
-                implementation(libs.androidx.compose.ui.test.manifest)
-                implementation(libs.androidx.activity.compose)
+                implementation(compose.desktop.currentOs)
             }
         }
     }

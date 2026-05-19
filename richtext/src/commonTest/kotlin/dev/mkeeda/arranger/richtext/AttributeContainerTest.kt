@@ -3,7 +3,7 @@ package dev.mkeeda.arranger.richtext
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
-import org.junit.Test
+import kotlin.test.Test
 
 class AttributeContainerTest {
     @Test

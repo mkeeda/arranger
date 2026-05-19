@@ -3,7 +3,7 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class ListIndentLevelTest {
     @Test

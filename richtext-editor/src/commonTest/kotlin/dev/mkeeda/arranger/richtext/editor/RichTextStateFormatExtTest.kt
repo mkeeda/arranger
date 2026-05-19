@@ -11,7 +11,7 @@ import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class RichTextStateFormatExtTest {
     @Test

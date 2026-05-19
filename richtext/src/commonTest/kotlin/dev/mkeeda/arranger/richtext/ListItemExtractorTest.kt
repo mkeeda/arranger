@@ -1,7 +1,7 @@
 package dev.mkeeda.arranger.richtext
 
 import io.kotest.matchers.collections.shouldContainExactly
-import org.junit.Test
+import kotlin.test.Test
 
 class ListItemExtractorTest {
     @Test

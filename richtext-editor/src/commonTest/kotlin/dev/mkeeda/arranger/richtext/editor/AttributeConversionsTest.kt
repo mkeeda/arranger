@@ -5,7 +5,7 @@ import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.TextSize
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import kotlin.test.Test
 
 class AttributeConversionsTest {
     @Test

@@ -21,7 +21,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(libs.junit)
+                implementation(kotlin("test"))
                 implementation(libs.kotest.assertions.core)
             }
         }
