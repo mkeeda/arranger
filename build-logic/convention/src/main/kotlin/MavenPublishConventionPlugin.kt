@@ -14,12 +14,11 @@ class MavenPublishConventionPlugin : Plugin<Project> {
                 publishToMavenCentral()
                 // Dokka (K1 engine) fails to resolve opt-in annotation markers (e.g., @InternalArrangerApi)
                 // used in richtext-editor, causing the javadoc generation task to crash.
-                // JavadocJar.None() skips javadoc jar generation, which is acceptable because:
-                //   - Maven Central (Central Portal) does not require a javadoc jar.
-                //   - IDE quick-docs work fine via the sources jar.
+                // JavadocJar.Empty() generates an empty javadoc jar to satisfy Maven Central validation.
+                // IDE quick-docs work fine via the sources jar.
                 // TODO: Re-enable javadoc generation once migrating to Dokka K2 engine.
                 pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
-                    configure(KotlinMultiplatform(javadocJar = JavadocJar.None()))
+                    configure(KotlinMultiplatform(javadocJar = JavadocJar.Empty()))
                 }
             }
         }
