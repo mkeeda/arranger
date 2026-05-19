@@ -1,21 +1,22 @@
-import dev.mkeeda.arranger.buildlogic.configureKmpCommonOptions
+import dev.mkeeda.arranger.buildlogic.configureAndroidLint
+import dev.mkeeda.arranger.buildlogic.configureAndroidTarget
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-class KmpLibraryConventionPlugin : Plugin<Project> {
+class AndroidTargetConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("org.jetbrains.kotlin.multiplatform")
-                apply("arranger.spotless")
+                apply("com.android.kotlin.multiplatform.library")
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
-                explicitApi()
-                configureKmpCommonOptions(this)
+                configureAndroidTarget(this)
             }
+
+            configureAndroidLint()
         }
     }
 }
