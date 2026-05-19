@@ -44,7 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey

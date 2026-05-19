@@ -13,7 +13,7 @@ internal fun Project.configureKmpCommonOptions(
     extension: KotlinMultiplatformExtension,
 ) {
     configureJavaToolchain()
-    
+
     // Free compiler args for KMP targets
     extension.targets.configureEach {
         compilations.configureEach {

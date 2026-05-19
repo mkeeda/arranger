@@ -8,7 +8,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
-import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
@@ -41,7 +40,7 @@ class DocumentEditorSampleTest {
         onNodeWithContentDescription("Bold").assertIsOff()
     }
 
-    @Ignore // TODO: Flaky on JVM due to text selection / focus sync differences in Desktop
+    @Ignore // TODO: Flaky on JVM — tracked in https://github.com/mkeeda/Arranger/issues/XXX
     @Test
     fun `toolbar buttons sync with cursor position attributes`() = runComposeUiTest {
         setContent {

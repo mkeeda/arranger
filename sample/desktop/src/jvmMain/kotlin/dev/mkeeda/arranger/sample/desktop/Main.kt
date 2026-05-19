@@ -68,7 +68,7 @@ fun main() = application {
 
 @Composable
 private fun SampleApp() {
-    var currentDestination by remember { mutableStateOf<SampleDestination?>(SampleDestination.DocumentEditor) }
+    var currentDestination by remember { mutableStateOf(SampleDestination.DocumentEditor) }
 
     Row(modifier = Modifier.fillMaxSize()) {
         SampleListPane(
@@ -127,13 +127,13 @@ private fun SampleListPane(
 @Composable
 private fun SampleDetailPane(
     modifier: Modifier = Modifier,
-    currentDestination: SampleDestination?
+    currentDestination: SampleDestination
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(currentDestination?.title ?: "") },
+                title = { Text(currentDestination.title) },
             )
         }
     ) { innerPadding ->
@@ -149,11 +149,6 @@ private fun SampleDetailPane(
                 SampleDestination.ListFormatting -> ListFormattingSample()
                 SampleDestination.UndoRedo -> UndoRedoSample()
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
-                null -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Select a sample from the list")
-                    }
-                }
             }
         }
     }

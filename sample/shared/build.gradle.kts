@@ -13,13 +13,13 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":richtext-editor-material3"))
-                api(project(":richtext-editor"))
-                api(compose.components.resources)
-                api(compose.components.uiToolingPreview)
-                api(compose.foundation)
-                api(compose.material3)
-                api(compose.ui)
+                implementation(project(":richtext-editor-material3"))
+                implementation(project(":richtext-editor"))
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
             }
         }
         val commonTest by getting {
