@@ -1,8 +1,10 @@
 plugins {
     id("arranger.kmp.library")
+    id("arranger.android.target")
+    id("arranger.desktop.target")
+    id("arranger.kmp.compose")
     id("arranger.maven.publish")
     id("arranger.android.screenshot")
-    alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
@@ -10,17 +12,21 @@ kotlin {
         namespace = "dev.mkeeda.arranger.richtext.editor"
     }
     sourceSets {
-        val androidMain by getting {
+        val commonMain by getting {
             dependencies {
                 api(project(":richtext"))
-                api(project.dependencies.platform(libs.androidx.compose.bom))
-                api(libs.androidx.compose.foundation)
+                api(compose.foundation)
+                api(compose.ui)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotest.assertions.core)
             }
         }
         val androidHostTest by getting {
             dependencies {
-                implementation(libs.junit)
-                implementation(libs.kotest.assertions.core)
                 implementation(libs.androidx.activity.compose)
             }
         }

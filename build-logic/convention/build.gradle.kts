@@ -12,6 +12,7 @@ java {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    implementation(libs.compose.gradlePlugin)
     compileOnly(libs.spotless.gradlePlugin)
     implementation(libs.vanniktech.maven.publish.gradlePlugin)
     implementation(libs.roborazzi.gradlePlugin)
@@ -26,6 +27,22 @@ gradlePlugin {
         register("kmpLibrary") {
             id = "arranger.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"
+        }
+        register("kmpCompose") {
+            id = "arranger.kmp.compose"
+            implementationClass = "KmpComposeConventionPlugin"
+        }
+        register("androidTarget") {
+            id = "arranger.android.target"
+            implementationClass = "AndroidTargetConventionPlugin"
+        }
+        register("desktopTarget") {
+            id = "arranger.desktop.target"
+            implementationClass = "DesktopTargetConventionPlugin"
+        }
+        register("desktopApplication") {
+            id = "arranger.desktop.app"
+            implementationClass = "DesktopApplicationConventionPlugin"
         }
         register("spotless") {
             id = "arranger.spotless"

@@ -1,32 +1,33 @@
 plugins {
     id("arranger.kmp.library")
+    id("arranger.android.target")
+    id("arranger.desktop.target")
+    id("arranger.kmp.compose")
     id("arranger.maven.publish")
-    alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
     android {
         namespace = "dev.mkeeda.arranger.richtext.editor.material3"
-        withHostTest {
-            isIncludeAndroidResources = true
-        }
     }
     sourceSets {
-        val androidMain by getting {
+        val commonMain by getting {
             dependencies {
                 api(project(":richtext-editor"))
-                api(project.dependencies.platform(libs.androidx.compose.bom))
-                api(libs.androidx.compose.material3)
+                api(compose.material3)
             }
         }
-        val androidHostTest by getting {
+        val commonTest by getting {
             dependencies {
-                implementation(libs.junit)
+                implementation(libs.kotlin.test)
                 implementation(libs.kotest.assertions.core)
-                implementation(libs.robolectric)
-                implementation(libs.androidx.compose.ui.test.junit4)
-                implementation(libs.androidx.compose.ui.test.manifest)
-                implementation(libs.androidx.activity.compose)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
             }
         }
     }

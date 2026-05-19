@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="richtext">
+    <output-path>$PROJECT_DIR$/richtext/build/libs</output-path>
+    <root id="archive" name="richtext.jar">
+      <element id="module-output" name="Arranger.richtext.androidMain" />
+    </root>
+  </artifact>
+</component>

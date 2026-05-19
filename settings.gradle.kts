@@ -24,7 +24,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "Arranger"
 includeBuild("build-logic")
-include(":sample-app")
+include(":sample:android")
+include(":sample:desktop")
+include(":sample:shared")
 include(":richtext")
 include(":richtext-editor")
 include(":richtext-editor-material3")
