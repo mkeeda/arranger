@@ -6,6 +6,7 @@ import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.TextSize
 import io.kotest.matchers.shouldBe
 import org.junit.Test
+
 class AttributeConversionsTest {
     @Test
     fun `RgbaColor toColor returns expected Color`() {
