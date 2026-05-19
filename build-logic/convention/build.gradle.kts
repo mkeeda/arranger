@@ -23,13 +23,13 @@ gradlePlugin {
             id = "arranger.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
-        register("androidLibrary") {
-            id = "arranger.android.library"
-            implementationClass = "AndroidLibraryConventionPlugin"
+        register("kmpLibrary") {
+            id = "arranger.kmp.library"
+            implementationClass = "KmpLibraryConventionPlugin"
         }
-        register("androidSpotless") {
-            id = "arranger.android.spotless"
-            implementationClass = "AndroidSpotlessConventionPlugin"
+        register("spotless") {
+            id = "arranger.spotless"
+            implementationClass = "SpotlessConventionPlugin"
         }
         register("mavenPublish") {
             id = "arranger.maven.publish"

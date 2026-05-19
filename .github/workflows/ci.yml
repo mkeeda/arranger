@@ -24,7 +24,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run Verification (Lint, Spotless, Tests, Screenshot Verify)
-        run: ./gradlew lint spotlessCheck testDebugUnitTest verifyRoborazziDebug
+        run: ./gradlew lint spotlessCheck test verifyRoborazzi
 
       - name: Upload Verification Reports
         uses: actions/upload-artifact@v7

@@ -5,7 +5,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 
-class AndroidSpotlessConventionPlugin : Plugin<Project> {
+class SpotlessConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("com.diffplug.spotless")
