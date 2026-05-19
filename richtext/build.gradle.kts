@@ -1,5 +1,7 @@
 plugins {
     id("arranger.kmp.library")
+    id("arranger.android.target")
+    id("arranger.desktop.target")
     id("arranger.maven.publish")
 }
 

@@ -1,7 +1,9 @@
 plugins {
     id("arranger.kmp.library")
+    id("arranger.android.target")
+    id("arranger.desktop.target")
+    id("arranger.kmp.compose")
     id("arranger.maven.publish")
-    alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
@@ -12,11 +14,10 @@ kotlin {
         }
     }
     sourceSets {
-        val androidMain by getting {
+        val commonMain by getting {
             dependencies {
                 api(project(":richtext-editor"))
-                api(project.dependencies.platform(libs.androidx.compose.bom))
-                api(libs.androidx.compose.material3)
+                api(compose.material3)
             }
         }
         val androidHostTest by getting {
@@ -31,3 +32,4 @@ kotlin {
         }
     }
 }
+
