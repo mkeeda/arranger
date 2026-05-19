@@ -81,16 +81,32 @@ state.edit {
 
 ## Installation
 
-Arranger is published to Maven Central. Add the following dependencies to your module's `build.gradle.kts`:
+Arranger is published to Maven Central.
+
+### For Compose Multiplatform (KMP) Projects
+Add the dependencies to your `commonMain` source set in `build.gradle.kts`:
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // For Compose UI integration (RichTextEditor).
+            // This automatically includes the core 'arranger-richtext' module.
+            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha05")
+
+            // Optional: If you only need the core data structures without Compose UI:
+            // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha05")
+        }
+    }
+}
+```
+
+### For Android-only Projects
+Add the dependencies to your top-level `dependencies` block in `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    // For Compose UI integration (RichTextEditor).
-    // This automatically includes the core 'arranger-richtext' module.
     implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha05")
-
-    // Or, if you only need the core data structures without Compose UI:
-    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha05")
 }
 ```
 
