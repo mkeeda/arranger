@@ -40,7 +40,7 @@ class DocumentEditorSampleTest {
         onNodeWithContentDescription("Bold").assertIsOff()
     }
 
-    @Ignore // TODO: Flaky on JVM — tracked in https://github.com/mkeeda/Arranger/issues/XXX
+    @Ignore // TODO: Flaky on JVM — tracked in https://github.com/mkeeda/arranger/issues/65
     @Test
     fun `toolbar buttons sync with cursor position attributes`() = runComposeUiTest {
         setContent {
