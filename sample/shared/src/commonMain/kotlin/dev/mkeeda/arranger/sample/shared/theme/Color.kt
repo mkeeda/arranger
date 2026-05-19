@@ -1,4 +1,4 @@
-package dev.mkeeda.arranger.sampleApp.theme
+package dev.mkeeda.arranger.sample.shared.theme
 
 import androidx.compose.ui.graphics.Color
 

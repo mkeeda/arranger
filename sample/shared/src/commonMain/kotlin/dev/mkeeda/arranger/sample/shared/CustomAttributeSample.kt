@@ -1,4 +1,4 @@
-package dev.mkeeda.arranger.sampleApp
+package dev.mkeeda.arranger.sample.shared
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
@@ -15,7 +14,7 @@ import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.rangeOf
-import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
+import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 // 1. Define Custom Attribute Key
 public object HighlightKey : SpanAttributeKey<Unit> {
@@ -59,10 +58,3 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun CustomAttributeSamplePreview() {
-    ArrangerTheme {
-        CustomAttributeSample()
-    }
-}

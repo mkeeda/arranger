@@ -37,7 +37,15 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
+import dev.mkeeda.arranger.sample.shared.AdvancedFormattingSample
+import dev.mkeeda.arranger.sample.shared.AttributeBatchEditSample
+import dev.mkeeda.arranger.sample.shared.CustomAttributeSample
+import dev.mkeeda.arranger.sample.shared.DocumentEditorSample
+import dev.mkeeda.arranger.sample.shared.DynamicEditingSample
+import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
+import dev.mkeeda.arranger.sample.shared.ListFormattingSample
+import dev.mkeeda.arranger.sample.shared.UndoRedoSample
+import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 import kotlinx.serialization.Serializable
 
 @Serializable

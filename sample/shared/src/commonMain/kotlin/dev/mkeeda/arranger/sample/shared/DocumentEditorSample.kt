@@ -1,6 +1,9 @@
-package dev.mkeeda.arranger.sampleApp
+package dev.mkeeda.arranger.sample.shared
 
-import androidx.annotation.DrawableRes
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import arranger.sample.shared.generated.resources.Res
+import arranger.sample.shared.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -25,8 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
@@ -52,7 +54,7 @@ import dev.mkeeda.arranger.richtext.editor.clearFormats
 import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.removeFormat
 import dev.mkeeda.arranger.richtext.editor.toggleFormat
-import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
+import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 @Composable
 fun DocumentEditorSample(modifier: Modifier = Modifier) {
@@ -108,7 +110,7 @@ private fun DocumentFormattingToolbar(
             enabled = state.undoState.canUndo,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.undo),
+                painter = painterResource(Res.drawable.undo),
                 contentDescription = "Undo",
             )
         }
@@ -117,38 +119,38 @@ private fun DocumentFormattingToolbar(
             enabled = state.undoState.canRedo,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.redo),
+                painter = painterResource(Res.drawable.redo),
                 contentDescription = "Redo",
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
 
         FormatToggleButton(
-            iconRes = R.drawable.format_bold,
+            iconRes = Res.drawable.format_bold,
             contentDescription = "Bold",
             isActive = state.currentAttributes.containsKey(BoldKey),
             onClick = { state.toggleFormat(BoldKey) },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_italic,
+            iconRes = Res.drawable.format_italic,
             contentDescription = "Italic",
             isActive = state.currentAttributes.containsKey(ItalicKey),
             onClick = { state.toggleFormat(ItalicKey) },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_underlined,
+            iconRes = Res.drawable.format_underlined,
             contentDescription = "Underline",
             isActive = state.currentAttributes.containsKey(UnderlineKey),
             onClick = { state.toggleFormat(UnderlineKey) },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_strikethrough,
+            iconRes = Res.drawable.format_strikethrough,
             contentDescription = "Strikethrough",
             isActive = state.currentAttributes.containsKey(StrikethroughKey),
             onClick = { state.toggleFormat(StrikethroughKey) },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_color_text,
+            iconRes = Res.drawable.format_color_text,
             contentDescription = "Text Color Red",
             isActive = state.currentAttributes[TextColorKey] == RgbaColor(0xFFFF0000),
             onClick = {
@@ -160,7 +162,7 @@ private fun DocumentFormattingToolbar(
             },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_color_fill,
+            iconRes = Res.drawable.format_color_fill,
             contentDescription = "Background Color Yellow",
             isActive = state.currentAttributes[BackgroundColorKey] == RgbaColor(0xFFFFFF00),
             onClick = {
@@ -172,7 +174,7 @@ private fun DocumentFormattingToolbar(
             },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_size,
+            iconRes = Res.drawable.format_size,
             contentDescription = "Large Font Size",
             isActive = state.currentAttributes[FontSizeKey] == TextSize(24f),
             onClick = {
@@ -184,7 +186,7 @@ private fun DocumentFormattingToolbar(
             },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_h1,
+            iconRes = Res.drawable.format_h1,
             contentDescription = "Heading 1",
             isActive = state.currentAttributes[HeadingKey] == HeadingLevel.H1,
             onClick = {
@@ -196,7 +198,7 @@ private fun DocumentFormattingToolbar(
             },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_align_center,
+            iconRes = Res.drawable.format_align_center,
             contentDescription = "Align Center",
             isActive = state.currentAttributes[TextAlignmentKey] == TextAlignment.Center,
             onClick = {
@@ -208,13 +210,13 @@ private fun DocumentFormattingToolbar(
             },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_quote,
+            iconRes = Res.drawable.format_quote,
             contentDescription = "Blockquote",
             isActive = state.currentAttributes.containsKey(BlockquoteKey),
             onClick = { state.toggleFormat(BlockquoteKey) },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_list_bulleted,
+            iconRes = Res.drawable.format_list_bulleted,
             contentDescription = "Bullet List",
             isActive = state.currentAttributes.containsKey(BulletListKey),
             onClick = {
@@ -226,7 +228,7 @@ private fun DocumentFormattingToolbar(
             },
         )
         FormatToggleButton(
-            iconRes = R.drawable.format_list_numbered,
+            iconRes = Res.drawable.format_list_numbered,
             contentDescription = "Ordered List",
             isActive = state.currentAttributes.containsKey(OrderedListKey),
             onClick = {
@@ -247,7 +249,7 @@ private fun DocumentFormattingToolbar(
             enabled = true,
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.format_clear),
+                painter = painterResource(Res.drawable.format_clear),
                 contentDescription = "Clear Formatting",
             )
         }
@@ -256,7 +258,7 @@ private fun DocumentFormattingToolbar(
 
 @Composable
 private fun FormatToggleButton(
-    @DrawableRes iconRes: Int,
+    iconRes: DrawableResource,
     contentDescription: String,
     isActive: Boolean,
     onClick: () -> Unit,
@@ -273,7 +275,7 @@ private fun FormatToggleButton(
         colors = colors,
     ) {
         Icon(
-            painter = painterResource(id = iconRes),
+            painter = painterResource(iconRes),
             contentDescription = contentDescription,
         )
     }
@@ -335,7 +337,7 @@ private fun IndentOutdentButtons(
         modifier = modifier,
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.format_indent_decrease),
+            painter = painterResource(Res.drawable.format_indent_decrease),
             contentDescription = "Outdent",
         )
     }
@@ -358,16 +360,9 @@ private fun IndentOutdentButtons(
         modifier = modifier,
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.format_indent_increase),
+            painter = painterResource(Res.drawable.format_indent_increase),
             contentDescription = "Indent",
         )
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DocumentEditorSamplePreview() {
-    ArrangerTheme {
-        DocumentEditorSample()
-    }
-}

@@ -1,4 +1,4 @@
-package dev.mkeeda.arranger.sampleApp
+package dev.mkeeda.arranger.sample.shared
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

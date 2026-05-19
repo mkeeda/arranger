@@ -1,18 +1,17 @@
-package dev.mkeeda.arranger.sampleApp
+package dev.mkeeda.arranger.sample.shared
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.textColor
 import dev.mkeeda.arranger.richtext.rangeOf
-import dev.mkeeda.arranger.sampleApp.theme.ArrangerTheme
+import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 @Composable
 fun DynamicEditingSample(modifier: Modifier = Modifier) {
@@ -41,10 +40,3 @@ fun DynamicEditingSample(modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DynamicEditingSamplePreview() {
-    ArrangerTheme {
-        DynamicEditingSample()
-    }
-}
