@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import io.github.takahirom.roborazzi.RoborazziExtension
 import org.gradle.api.Action
@@ -16,7 +17,7 @@ class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
             pluginManager.apply("io.github.takahirom.roborazzi")
 
             pluginManager.withPlugin("com.android.application") {
-                extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
+                extensions.configure<ApplicationExtension> {
                     testOptions {
                         unitTests {
                             isIncludeAndroidResources = true

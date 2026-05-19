@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -18,7 +19,7 @@ class MavenPublishConventionPlugin : Plugin<Project> {
                 //   - IDE quick-docs work fine via the sources jar.
                 // TODO: Re-enable javadoc generation once migrating to Dokka K2 engine.
                 pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
-                    configure(com.vanniktech.maven.publish.KotlinMultiplatform(javadocJar = JavadocJar.None()))
+                    configure(KotlinMultiplatform(javadocJar = JavadocJar.None()))
                 }
             }
         }
