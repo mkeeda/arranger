@@ -1,10 +1,10 @@
-# Arranger - Type-safe Rich Text Editor Engine for Jetpack Compose
+# Arranger - Type-safe Rich Text Editor Engine for Compose Multiplatform
 
 [![CI](https://github.com/mkeeda/arranger/actions/workflows/ci.yml/badge.svg)](https://github.com/mkeeda/arranger/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-richtext-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-richtext-editor%22)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Arranger is a declarative, type-safe rich text editor engine and UI components for Jetpack Compose.
+Arranger is a declarative, type-safe rich text editor engine and UI components for Compose Multiplatform.
 While standard `buildAnnotatedString` is perfect for static text decoration, it quickly breaks down when building real-time editors where users insert and delete text. Arranger is built specifically for **dynamic text operations**, automatically managing and shifting attribute spans (like bold, colors, or links) as the underlying text mutates.
 
 <div align="center">
@@ -14,9 +14,16 @@ While standard `buildAnnotatedString` is perfect for static text decoration, it 
 > [!WARNING]
 > **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice. We highly welcome your feedback, feature requests, and bug reports via GitHub Issues!
 
+## Supported Platforms
+
+| Platform | Support Status | Target |
+| :--- | :---: | :--- |
+| **Android** | ✅ Supported | API Level 26+ |
+| **Desktop (JVM)** | ✅ Supported | macOS, Windows, Linux |
+| **iOS** | 🚧 Planned | - |
+| **Web (Wasm/JS)** | 🚧 Planned | - |
+
 ## Requirements
-* **Android API Level 26+**
-* **Jetpack Compose 1.7+**
 * **Kotlin 2.3.20+**
 
 ## Core Features
@@ -25,11 +32,11 @@ While standard `buildAnnotatedString` is perfect for static text decoration, it 
 * 🔄 **Atomic Mutations:** Safely insert, delete, and replace text. Arranger automatically tracks and shifts span indices, eliminating manual calculation errors.
 * 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes). This allows for semantic iteration, searching, and batch editing.
 * 🎨 **Declarative Constraints (Planned):** Provide a way to declaratively define constraints (e.g., "This text field only allows bold text and links") to automatically strip unwanted styles.
-* 🧩 **Native Compose Integration (1.7+):** Elegantly separate state management and UI rendering by leveraging the latest `TextFieldState` and `OutputTransformation`.
+* 🧩 **Native Compose Multiplatform Integration:** Elegantly separate state management and UI rendering by leveraging the latest `TextFieldState` and `OutputTransformation`.
 
 ## Why Arranger?
 
-Arranger solves the biggest pain points of traditional rich text handling in Android and Compose.
+Arranger solves the biggest pain points of traditional rich text handling in Compose Multiplatform.
 
 ### 1. No More Manual Index Math (Auto-Shifting Spans)
 While standard `buildAnnotatedString` is excellent for decorating static text, it is not designed for dynamic input. If a user inserts or deletes text in the middle of an `AnnotatedString`, all subsequent span indices become misaligned, and you are forced to manually recalculate them. This manual index math is tedious and highly error-prone when building a real-time text editor.
@@ -74,16 +81,32 @@ state.edit {
 
 ## Installation
 
-Arranger is published to Maven Central. Add the following dependencies to your module's `build.gradle.kts`:
+Arranger is published to Maven Central.
+
+### For Compose Multiplatform (KMP) Projects
+Add the dependencies to your `commonMain` source set in `build.gradle.kts`:
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // For Compose UI integration (RichTextEditor).
+            // This automatically includes the core 'arranger-richtext' module.
+            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha05")
+
+            // Optional: If you only need the core data structures without Compose UI:
+            // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha05")
+        }
+    }
+}
+```
+
+### For Android-only Projects
+Add the dependencies to your top-level `dependencies` block in `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    // For Compose UI integration (RichTextEditor).
-    // This automatically includes the core 'arranger-richtext' module.
     implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.2.0-alpha05")
-
-    // Or, if you only need the core data structures without Compose UI:
-    // implementation("dev.mkeeda.arranger:arranger-richtext:0.2.0-alpha05")
 }
 ```
 
@@ -627,7 +650,7 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 
 | Sample | Screenshot |
 | --- | --- |
-| **[Document Editor with Full UI](./sample-app/src/main/java/dev/mkeeda/arranger/sampleApp/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, and seamlessly integrate state with Jetpack Compose.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
+| **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as both an Android app and a Desktop (macOS, Windows, Linux) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
 
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
@@ -659,7 +682,7 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 - [x] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
 
 ### Phase 3: Multiplatform & Interoperability (The "Killer" Features)
-- [ ] **Kotlin Multiplatform (KMP)**: Full support for iOS, Desktop, and Web.
+- [x] **Kotlin Multiplatform (KMP)**: Core architecture migration. (See Supported Platforms for current status).
 - [ ] **Markdown & HTML Support**: Import/Export logic (CommonMark and HTML5).
 - [ ] **WYSIWYG Auto-formatting**: Real-time conversion of Markdown syntax during input (e.g., typing `**bold**` automatically formats the text).
 - [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., custom drawing for blockquotes or code blocks).

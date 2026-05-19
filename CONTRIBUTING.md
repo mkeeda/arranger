@@ -11,7 +11,7 @@ To help us resolve issues quickly, please include the following information:
 * **Expected behavior**: What did you expect to happen?
 * **Actual behavior**: What actually happened? (Include screenshots or GIFs if it's a UI issue).
 * **Steps to reproduce**: A clear and concise list of steps to reproduce the issue.
-* **Environment**: Your Android OS version, Compose version, and device/emulator details.
+* **Environment**: Your OS version (Android/macOS/Windows/etc.), Compose Multiplatform version, and device/emulator details.
 
 **For Feature Requests:**
 * **Use case**: Why do you need this feature? What problem does it solve?

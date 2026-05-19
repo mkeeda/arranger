@@ -15,7 +15,7 @@ public value class RgbaColor(public val value: Long) {
 }
 
 /**
- * Represents a text size in scaled pixels (sp) without depending on Jetpack Compose.
+ * Represents a text size in scaled pixels (sp) without depending on Compose.
  */
 @JvmInline
 public value class TextSize(public val sp: Float) {
