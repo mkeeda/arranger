@@ -1,25 +1,19 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import io.github.takahirom.roborazzi.RoborazziExtension
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("io.github.takahirom.roborazzi")
-
-            pluginManager.withPlugin("com.android.library") {
-                extensions.configure<com.android.build.api.dsl.LibraryExtension> {
-                    testOptions {
-                        unitTests {
-                            isIncludeAndroidResources = true
-                        }
-                    }
-                }
-            }
 
             pluginManager.withPlugin("com.android.application") {
                 extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
@@ -33,16 +27,10 @@ class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
                     outputDir.set(project.file("src/test/screenshots"))
                 }
             }
-            
-            pluginManager.withPlugin("com.android.library") {
-                extensions.configure<RoborazziExtension> {
-                    outputDir.set(project.file("src/test/screenshots"))
-                }
-            }
 
             pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
-                extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
-                    (this as org.gradle.api.plugins.ExtensionAware).extensions.configure("android", org.gradle.api.Action<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension> {
+                extensions.configure<KotlinMultiplatformExtension> {
+                    (this as ExtensionAware).extensions.configure("android", Action<KotlinMultiplatformAndroidLibraryExtension> {
                         withHostTest {
                             isIncludeAndroidResources = true
                         }
@@ -65,7 +53,7 @@ class AndroidScreenshotTestConventionPlugin : Plugin<Project> {
             }
 
             pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
-                extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+                extensions.configure<KotlinMultiplatformExtension> {
                     sourceSets.named("androidHostTest").configure {
                         dependencies {
                             implementation(libs.findLibrary("roborazzi").get())

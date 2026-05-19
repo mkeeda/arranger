@@ -1,10 +1,14 @@
 package dev.mkeeda.arranger.buildlogic
 
 import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.Lint
+import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 internal fun Project.configureAndroidLint() {
     val configureLint: Lint.() -> Unit = {
@@ -25,8 +29,8 @@ internal fun Project.configureAndroidLint() {
     }
 
     pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
-        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
-            (this as org.gradle.api.plugins.ExtensionAware).extensions.configure("android", org.gradle.api.Action<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension> {
+        extensions.configure<KotlinMultiplatformExtension> {
+            (this as ExtensionAware).extensions.configure("android", Action<KotlinMultiplatformAndroidLibraryExtension> {
                 lint(configureLint)
             })
         }
