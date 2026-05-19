@@ -17,11 +17,13 @@ kotlin {
                 api(compose.material3)
             }
         }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(libs.kotest.assertions.core)
-            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-            implementation(compose.uiTest)
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotest.assertions.core)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
+            }
         }
         val jvmTest by getting {
             dependencies {

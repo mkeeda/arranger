@@ -10,9 +10,11 @@ kotlin {
         namespace = "dev.mkeeda.arranger.richtext"
     }
     sourceSets {
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(libs.kotest.assertions.core)
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotest.assertions.core)
+            }
         }
     }
 }
