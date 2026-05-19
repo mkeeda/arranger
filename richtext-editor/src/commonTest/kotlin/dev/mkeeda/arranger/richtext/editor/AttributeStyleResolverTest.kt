@@ -13,10 +13,7 @@ import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class AttributeStyleResolverTest {
     private object TestSpanKey : SpanAttributeKey<String> {
         override val name: String = "TestSpan"
