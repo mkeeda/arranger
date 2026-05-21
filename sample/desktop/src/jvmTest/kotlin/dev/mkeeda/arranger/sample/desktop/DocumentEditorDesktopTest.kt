@@ -33,13 +33,13 @@ class DocumentEditorDesktopTest {
         textInputNode.performTextInputSelection(TextRange(0, 12))
         textInputNode.assertIsFocused()
 
-        // Toggle Bold on
-        // Assert initial state
+        // Assert initial state (Bold is OFF)
         onNodeWithContentDescription("Bold").assertIsOff()
 
+        // Toggle Bold on
         onNodeWithContentDescription("Bold").performClick()
-        
-        // Assert Bold is applied (button remains toggled ON after click)
+
+        // Assert Bold is applied (button remains toggled ON)
         onNodeWithContentDescription("Bold").assertIsOn()
         textInputNode.assertIsFocused()
     }

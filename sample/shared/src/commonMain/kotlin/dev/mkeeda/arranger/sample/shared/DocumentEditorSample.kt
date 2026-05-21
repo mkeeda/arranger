@@ -271,7 +271,8 @@ private fun DocumentFormattingToolbar(
             modifier = unfocusableModifier,
         )
 
-        IndentOutdentButtons(state = state, modifier = unfocusableModifier)
+        OutdentButton(state = state, modifier = unfocusableModifier)
+        IndentButton(state = state, modifier = unfocusableModifier)
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -346,7 +347,7 @@ private fun DocumentEditorField(state: RichTextState, modifier: Modifier = Modif
 }
 
 @Composable
-private fun IndentOutdentButtons(
+private fun OutdentButton(
     state: RichTextState,
     modifier: Modifier = Modifier,
 ) {
@@ -375,7 +376,13 @@ private fun IndentOutdentButtons(
             contentDescription = "Outdent",
         )
     }
+}
 
+@Composable
+private fun IndentButton(
+    state: RichTextState,
+    modifier: Modifier = Modifier,
+) {
     IconButton(
         onClick = {
             val currentLevel =
