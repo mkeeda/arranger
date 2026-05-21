@@ -13,6 +13,8 @@ internal fun Project.configureAndroidTarget(
     (extension as ExtensionAware).extensions.configure("android", Action<KotlinMultiplatformAndroidLibraryExtension> {
         compileSdk = 37
         minSdk = 26
+        @Suppress("UnstableApiUsage")
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     })
 }
 
