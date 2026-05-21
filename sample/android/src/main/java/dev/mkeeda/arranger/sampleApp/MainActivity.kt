@@ -49,10 +49,10 @@ import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
-private data object SampleList : NavKey
+internal data object SampleList : NavKey
 
 @Serializable
-private enum class SampleDestination(val title: String) : NavKey {
+internal enum class SampleDestination(val title: String) : NavKey {
     DynamicEditing("Dynamic Editing"),
     AdvancedFormatting("Advanced Formatting"),
     CustomAttribute("Custom Attribute"),
