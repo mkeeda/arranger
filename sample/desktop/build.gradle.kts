@@ -16,6 +16,14 @@ kotlin {
                 implementation(compose.ui)
             }
         }
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
+                implementation(compose.desktop.uiTestJUnit4)
+            }
+        }
     }
 }
 
