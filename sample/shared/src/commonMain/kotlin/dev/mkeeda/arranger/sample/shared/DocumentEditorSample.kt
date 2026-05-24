@@ -43,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
@@ -113,6 +114,7 @@ private fun DocumentFormattingToolbar(
     state: RichTextState,
     modifier: Modifier = Modifier,
 ) {
+    val unfocusableModifier = Modifier.focusProperties { canFocus = false }
     FlowRow(
         modifier =
             modifier
@@ -123,6 +125,7 @@ private fun DocumentFormattingToolbar(
         IconButton(
             onClick = { state.undoState.undo() },
             enabled = state.undoState.canUndo,
+            modifier = unfocusableModifier,
         ) {
             Icon(
                 painter = painterResource(Res.drawable.undo),
@@ -132,6 +135,7 @@ private fun DocumentFormattingToolbar(
         IconButton(
             onClick = { state.undoState.redo() },
             enabled = state.undoState.canRedo,
+            modifier = unfocusableModifier,
         ) {
             Icon(
                 painter = painterResource(Res.drawable.redo),
@@ -145,24 +149,28 @@ private fun DocumentFormattingToolbar(
             contentDescription = "Bold",
             isActive = state.currentAttributes.containsKey(BoldKey),
             onClick = { state.toggleFormat(BoldKey) },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_italic,
             contentDescription = "Italic",
             isActive = state.currentAttributes.containsKey(ItalicKey),
             onClick = { state.toggleFormat(ItalicKey) },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_underlined,
             contentDescription = "Underline",
             isActive = state.currentAttributes.containsKey(UnderlineKey),
             onClick = { state.toggleFormat(UnderlineKey) },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_strikethrough,
             contentDescription = "Strikethrough",
             isActive = state.currentAttributes.containsKey(StrikethroughKey),
             onClick = { state.toggleFormat(StrikethroughKey) },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_color_text,
@@ -175,6 +183,7 @@ private fun DocumentFormattingToolbar(
                     state.applyFormat(TextColorKey, RgbaColor(0xFFFF0000))
                 }
             },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_color_fill,
@@ -187,6 +196,7 @@ private fun DocumentFormattingToolbar(
                     state.applyFormat(BackgroundColorKey, RgbaColor(0xFFFFFF00))
                 }
             },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_size,
@@ -199,6 +209,7 @@ private fun DocumentFormattingToolbar(
                     state.applyFormat(FontSizeKey, TextSize(24f))
                 }
             },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_h1,
@@ -211,6 +222,7 @@ private fun DocumentFormattingToolbar(
                     state.applyFormat(HeadingKey, HeadingLevel.H1)
                 }
             },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_align_center,
@@ -223,12 +235,14 @@ private fun DocumentFormattingToolbar(
                     state.applyFormat(TextAlignmentKey, TextAlignment.Center)
                 }
             },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_quote,
             contentDescription = "Blockquote",
             isActive = state.currentAttributes.containsKey(BlockquoteKey),
             onClick = { state.toggleFormat(BlockquoteKey) },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_list_bulleted,
@@ -241,6 +255,7 @@ private fun DocumentFormattingToolbar(
                     state.applyFormat(BulletListKey, ListIndentLevel.Level1)
                 }
             },
+            modifier = unfocusableModifier,
         )
         FormatToggleButton(
             iconRes = Res.drawable.format_list_numbered,
@@ -253,15 +268,18 @@ private fun DocumentFormattingToolbar(
                     state.applyFormat(OrderedListKey, ListIndentLevel.Level1)
                 }
             },
+            modifier = unfocusableModifier,
         )
 
-        IndentOutdentButtons(state = state)
+        OutdentButton(state = state, modifier = unfocusableModifier)
+        IndentButton(state = state, modifier = unfocusableModifier)
 
         Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
             onClick = { state.clearFormats() },
             enabled = true,
+            modifier = unfocusableModifier,
         ) {
             Icon(
                 painter = painterResource(Res.drawable.format_clear),
@@ -277,6 +295,7 @@ private fun FormatToggleButton(
     contentDescription: String,
     isActive: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors =
         IconButtonDefaults.iconToggleButtonColors(
@@ -288,6 +307,7 @@ private fun FormatToggleButton(
         onCheckedChange = { onClick() },
         enabled = true,
         colors = colors,
+        modifier = modifier,
     ) {
         Icon(
             painter = painterResource(iconRes),
@@ -327,7 +347,7 @@ private fun DocumentEditorField(state: RichTextState, modifier: Modifier = Modif
 }
 
 @Composable
-private fun IndentOutdentButtons(
+private fun OutdentButton(
     state: RichTextState,
     modifier: Modifier = Modifier,
 ) {
@@ -356,7 +376,13 @@ private fun IndentOutdentButtons(
             contentDescription = "Outdent",
         )
     }
+}
 
+@Composable
+private fun IndentButton(
+    state: RichTextState,
+    modifier: Modifier = Modifier,
+) {
     IconButton(
         onClick = {
             val currentLevel =
