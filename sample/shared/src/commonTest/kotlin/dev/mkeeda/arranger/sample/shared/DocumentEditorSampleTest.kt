@@ -11,7 +11,6 @@ import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
@@ -40,7 +39,6 @@ class DocumentEditorSampleTest {
         onNodeWithContentDescription("Bold").assertIsOff()
     }
 
-    @Ignore // TODO: Flaky on JVM — tracked in https://github.com/mkeeda/arranger/issues/65
     @Test
     fun `toolbar buttons sync with cursor position attributes`() = runComposeUiTest {
         setContent {
@@ -51,24 +49,19 @@ class DocumentEditorSampleTest {
 
         val textInputNode = onNodeWithTag("DocumentEditor")
         textInputNode.performTextInput("Hello World")
-        waitForIdle()
 
         // Select "Hello" and apply Bold
         textInputNode.performTextInputSelection(TextRange(0, 5))
-        waitForIdle()
         onNodeWithContentDescription("Bold").performClick()
-        waitForIdle()
 
         // Move cursor to "Hello" (index 3)
         textInputNode.performTextInputSelection(TextRange(3))
-        waitForIdle()
 
         // Bold button should be toggled ON
         onNodeWithContentDescription("Bold").assertIsOn()
 
         // Move cursor to "World" (index 8)
         textInputNode.performTextInputSelection(TextRange(8))
-        waitForIdle()
 
         // Bold button should be toggled OFF
         onNodeWithContentDescription("Bold").assertIsOff()
