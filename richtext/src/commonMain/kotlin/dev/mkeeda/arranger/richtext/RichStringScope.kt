@@ -19,6 +19,7 @@ public class RichStringScope
          * Applies the specified character span attribute [key] and [value] to the given [range].
          * Any existing span attributes of the same key within this range are completely overwritten.
          */
+        @OptIn(InternalArrangerApi::class)
         public fun <T> setSpanAttribute(
             key: SpanAttributeKey<T>,
             value: T,
@@ -34,6 +35,7 @@ public class RichStringScope
         /**
          * Removes any character span attributes associated with the specified [key] within the given [range].
          */
+        @OptIn(InternalArrangerApi::class)
         public fun <T> removeSpanAttribute(
             key: SpanAttributeKey<T>,
             range: IntRange = 0 until textLength,
@@ -50,6 +52,7 @@ public class RichStringScope
          * The [range] is automatically expanded to span the entire paragraphs (separated by `\n`)
          * it intersects with.
          */
+        @OptIn(InternalArrangerApi::class)
         public fun <T> setParagraphAttribute(
             key: ParagraphAttributeKey<T>,
             value: T,
@@ -69,6 +72,7 @@ public class RichStringScope
          * The [range] is automatically expanded to span the entire paragraphs (separated by `\n`)
          * it intersects with.
          */
+        @OptIn(InternalArrangerApi::class)
         public fun <T> removeParagraphAttribute(
             key: ParagraphAttributeKey<T>,
             range: IntRange = 0 until textLength,
@@ -85,6 +89,7 @@ public class RichStringScope
          * Removes all attributes (both span and paragraph level) within the given [range].
          * Paragraph attributes will be cleared from their entire respective paragraphs.
          */
+        @OptIn(InternalArrangerApi::class)
         public fun clearAllAttributes(range: IntRange = 0 until textLength) {
             checkRange(range)
 
