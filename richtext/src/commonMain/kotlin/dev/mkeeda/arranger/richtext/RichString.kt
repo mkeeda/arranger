@@ -87,6 +87,7 @@ public data class RichString(
      * Executes the given [block] on a [RichStringScope] scoped to this [RichString],
      * and returns a completely new [RichString] carrying the modifications.
      */
+    @OptIn(InternalArrangerApi::class)
     public fun edit(block: RichStringScope.() -> Unit): RichString {
         val scope = RichStringScope(currentSpans = spans, text = text)
         scope.block()
