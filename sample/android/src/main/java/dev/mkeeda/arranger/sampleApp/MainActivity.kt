@@ -23,7 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
             ArrangerTheme {
                 val backStack = rememberNavBackStack(SampleList)
 
-                val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+                val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
                 val directive =
                     remember(windowAdaptiveInfo) {
                         calculatePaneScaffoldDirective(windowAdaptiveInfo)

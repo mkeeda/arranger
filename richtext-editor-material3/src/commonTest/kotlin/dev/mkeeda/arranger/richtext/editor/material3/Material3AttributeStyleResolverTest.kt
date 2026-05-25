@@ -6,7 +6,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.HeadingKey
@@ -30,17 +30,20 @@ class Material3AttributeStyleResolverTest {
                 }
             }
 
+            val currentResolver = requireNotNull(resolver)
+            val currentTypography = requireNotNull(typography)
+
             // H1 -> displayLarge
-            var resolved = resolver!!.resolve(AttributeContainer.empty() + (HeadingKey to HeadingLevel.H1))
-            resolved.spanStyle?.fontSize shouldBe typography!!.displayLarge.fontSize
+            var resolved = currentResolver.resolve(AttributeContainer.empty() + (HeadingKey to HeadingLevel.H1))
+            resolved.spanStyle?.fontSize shouldBe currentTypography.displayLarge.fontSize
 
             // H3 -> headlineLarge
-            resolved = resolver!!.resolve(AttributeContainer.empty() + (HeadingKey to HeadingLevel.H3))
-            resolved.spanStyle?.fontSize shouldBe typography!!.headlineLarge.fontSize
+            resolved = currentResolver.resolve(AttributeContainer.empty() + (HeadingKey to HeadingLevel.H3))
+            resolved.spanStyle?.fontSize shouldBe currentTypography.headlineLarge.fontSize
 
             // H6 -> titleMedium
-            resolved = resolver!!.resolve(AttributeContainer.empty() + (HeadingKey to HeadingLevel.H6))
-            resolved.spanStyle?.fontWeight shouldBe typography!!.titleMedium.fontWeight
+            resolved = currentResolver.resolve(AttributeContainer.empty() + (HeadingKey to HeadingLevel.H6))
+            resolved.spanStyle?.fontWeight shouldBe currentTypography.titleMedium.fontWeight
         }
 
     @Test
@@ -58,10 +61,14 @@ class Material3AttributeStyleResolverTest {
                 }
             }
 
-            val resolved = resolver!!.resolve(AttributeContainer.empty() + (BlockquoteKey to Unit))
+            val currentResolver = requireNotNull(resolver)
+            val currentTypography = requireNotNull(typography)
+            val currentColor = requireNotNull(colorScheme)
 
-            resolved.spanStyle?.fontSize shouldBe typography!!.bodyMedium.fontSize
-            resolved.spanStyle?.color shouldBe colorScheme!!.onSurfaceVariant
+            val resolved = currentResolver.resolve(AttributeContainer.empty() + (BlockquoteKey to Unit))
+
+            resolved.spanStyle?.fontSize shouldBe currentTypography.bodyMedium.fontSize
+            resolved.spanStyle?.color shouldBe currentColor.onSurfaceVariant
         }
 
     @Test
@@ -79,7 +86,8 @@ class Material3AttributeStyleResolverTest {
                 }
             }
 
-            val resolved = resolver!!.resolve(AttributeContainer.empty() + (BlockquoteKey to Unit))
+            val currentResolver = requireNotNull(resolver)
+            val resolved = currentResolver.resolve(AttributeContainer.empty() + (BlockquoteKey to Unit))
             resolved.spanStyle?.color shouldBe Color.Red
         }
 }

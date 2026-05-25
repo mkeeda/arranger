@@ -19,9 +19,9 @@ internal fun Project.configureKmpCommonOptions(
         compilations.configureEach {
             compileTaskProvider.configure {
                 compilerOptions {
+                    allWarningsAsErrors.set(true)
                     freeCompilerArgs.addAll(
                         "-opt-in=kotlin.RequiresOptIn",
-                        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                         "-opt-in=dev.mkeeda.arranger.richtext.InternalArrangerApi",
                     )
                 }
@@ -37,10 +37,9 @@ internal fun Project.configureKotlin() {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
+            allWarningsAsErrors.set(true)
             freeCompilerArgs.addAll(
                 "-opt-in=kotlin.RequiresOptIn",
-                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-opt-in=dev.mkeeda.arranger.richtext.InternalArrangerApi",
             )
         }
     }
