@@ -40,7 +40,6 @@ internal fun Project.configureKotlin() {
             allWarningsAsErrors.set(true)
             freeCompilerArgs.addAll(
                 "-opt-in=kotlin.RequiresOptIn",
-                "-opt-in=dev.mkeeda.arranger.richtext.InternalArrangerApi",
             )
         }
     }
