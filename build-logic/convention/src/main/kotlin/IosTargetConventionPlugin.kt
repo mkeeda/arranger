@@ -7,10 +7,8 @@ class IosTargetConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             extensions.configure<KotlinMultiplatformExtension> {
-                listOf(
-                    iosArm64(),
-                    iosSimulatorArm64()
-                )
+                iosArm64()
+                iosSimulatorArm64()
             }
         }
     }
