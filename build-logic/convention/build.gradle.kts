@@ -44,6 +44,10 @@ gradlePlugin {
             id = "arranger.desktop.app"
             implementationClass = "DesktopApplicationConventionPlugin"
         }
+        register("iosTarget") {
+            id = "arranger.ios.target"
+            implementationClass = "IosTargetConventionPlugin"
+        }
         register("spotless") {
             id = "arranger.spotless"
             implementationClass = "SpotlessConventionPlugin"
