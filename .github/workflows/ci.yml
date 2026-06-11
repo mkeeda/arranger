@@ -6,8 +6,12 @@ on:
       - main
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  jvm-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,15 +27,43 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Run Verification (Lint, Spotless, Tests, Screenshot Verify)
-        run: ./gradlew lint spotlessCheck test allTests verifyRoborazzi
+      - name: Run Verification (Check, Screenshot Verify)
+        run: ./gradlew check verifyRoborazzi
 
-      - name: Upload Verification Reports
+      - name: Upload JVM Verification Reports
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: verification-reports
+          name: jvm-verification-reports
           path: |
             **/build/reports/
             **/build/test-results/
             **/build/outputs/roborazzi/
+
+  ios-test:
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v6
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run iOS Simulator Tests
+        run: ./gradlew iosSimulatorArm64Test -Pkotlin.native.tests.device="iPhone 15"
+
+      - name: Upload iOS Verification Reports
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: ios-verification-reports
+          path: |
+            **/build/reports/
+            **/build/test-results/

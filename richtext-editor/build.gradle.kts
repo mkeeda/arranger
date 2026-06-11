@@ -2,6 +2,7 @@ plugins {
     id("arranger.kmp.library")
     id("arranger.android.target")
     id("arranger.desktop.target")
+    id("arranger.ios.target")
     id("arranger.kmp.compose")
     id("arranger.maven.publish")
     id("arranger.android.screenshot")
@@ -15,8 +16,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":richtext"))
-                api(compose.foundation)
-                api(compose.ui)
+                api(libs.jetbrains.compose.foundation)
+                api(libs.jetbrains.compose.ui)
             }
         }
         val commonTest by getting {

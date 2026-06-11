@@ -112,7 +112,7 @@ public class RichTextState(initialText: RichString = RichString("")) {
                         val k = key as AttributeKey<Any>
                         val value = span.attributes.getOrDefault(k)
                         val valueCounts = attributeCounts.getOrPut(k) { mutableMapOf() }
-                        valueCounts[value] = valueCounts.getOrDefault(value, 0) + overlapLength
+                        valueCounts[value] = (valueCounts[value] ?: 0) + overlapLength
                     }
                 }
             }

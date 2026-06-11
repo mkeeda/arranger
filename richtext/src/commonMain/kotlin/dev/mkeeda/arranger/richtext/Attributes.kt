@@ -1,5 +1,7 @@
 package dev.mkeeda.arranger.richtext
 
+import kotlin.jvm.JvmInline
+
 /**
  * Represents a color using a 64-bit ULong to keep the model platform-independent.
  * It perfectly aligns with Compose's Color representation or an ARGB bitmask.

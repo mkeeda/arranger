@@ -1,3 +1,4 @@
+
 plugins {
     kotlin("multiplatform")
     id("arranger.android.target")
@@ -15,22 +16,23 @@ kotlin {
             dependencies {
                 implementation(project(":richtext-editor-material3"))
                 implementation(project(":richtext-editor"))
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.ui)
+                implementation(libs.jetbrains.compose.components.resources)
+                implementation(libs.jetbrains.compose.components.uiToolingPreview)
+                implementation(libs.jetbrains.compose.foundation)
+                implementation(libs.jetbrains.compose.material3)
+                implementation(libs.jetbrains.compose.ui)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.uiTest)
+                implementation(libs.jetbrains.compose.uiTest)
             }
         }
         val jvmTest by getting {
             dependencies {
+                // TODO: Remove and use single desktop dependency once CMP-9175 is resolved
+                // https://youtrack.jetbrains.com/issue/CMP-9175/Introduce-a-single-desktop-dependency-for-all-platforms
                 implementation(compose.desktop.currentOs)
             }
         }
