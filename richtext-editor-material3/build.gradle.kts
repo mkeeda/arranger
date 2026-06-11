@@ -23,7 +23,6 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotest.assertions.core)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(libs.jetbrains.compose.uiTest)
             }
         }

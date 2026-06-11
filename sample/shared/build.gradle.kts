@@ -26,7 +26,6 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(libs.jetbrains.compose.uiTest)
             }
         }
