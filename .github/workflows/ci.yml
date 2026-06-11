@@ -26,11 +26,11 @@ jobs:
       - name: Run Verification (Check, Screenshot Verify)
         run: ./gradlew check verifyRoborazzi
 
-      - name: Upload Verification Reports
+      - name: Upload JVM Verification Reports
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: verification-reports
+          name: jvm-verification-reports
           path: |
             **/build/reports/
             **/build/test-results/
