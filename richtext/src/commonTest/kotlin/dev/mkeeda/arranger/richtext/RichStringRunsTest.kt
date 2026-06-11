@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class RichStringRunsTest {
     @Test
-    fun `runs returns continuous chunks of the same queried attribute value, ignoring other attributes`() {
+    fun `runs returns continuous chunks of the same queried attribute value and ignoring other attributes`() {
         // [0..4] Color=Red
         // [5..9] Mention=@user
         // [10..15] Mention=@user, Color=Blue
