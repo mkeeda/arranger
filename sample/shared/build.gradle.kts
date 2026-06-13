@@ -18,7 +18,7 @@ kotlin {
     listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
         target.binaries.framework {
             baseName = "shared"
-            isStatic = true
+            isStatic = false
             xcFramework.add(this)
         }
     }
@@ -47,6 +47,17 @@ kotlin {
                 // https://youtrack.jetbrains.com/issue/CMP-9175/Introduce-a-single-desktop-dependency-for-all-platforms
                 implementation(compose.desktop.currentOs)
             }
+        }
+    }
+}
+
+// Automatically copy Compose Multiplatform resources to the SwiftPM project
+tasks.named("assembleSharedDebugXCFramework").configure {
+    doLast {
+        val srcDir = layout.buildDirectory.dir("XCFrameworks/debug/shared.xcframework/ios-arm64-simulator/shared.framework/composeResources").get().asFile
+        val dstDir = file("../ios/ArrangerSample.swiftpm/Sources/ArrangerSample/compose-resources/composeResources")
+        if (srcDir.exists()) {
+            srcDir.copyRecursively(dstDir, overwrite = true)
         }
     }
 }

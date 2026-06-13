@@ -19,7 +19,10 @@ let package = Package(
         .executableTarget(
             name: "ArrangerSample",
             dependencies: ["shared"],
-            path: "Sources/ArrangerSample"
+            path: "Sources/ArrangerSample",
+            resources: [
+                .copy("compose-resources")
+            ]
         ),
         .binaryTarget(
             name: "shared",
