@@ -59,14 +59,15 @@ fun MainViewController() = ComposeUIViewController(
 @Composable
 private fun IosArrangerSampleApp() {
     var currentDestination by remember { mutableStateOf<SampleDestination?>(null) }
+    val destination = currentDestination
 
-    if (currentDestination == null) {
+    if (destination == null) {
         SampleListScreen(
             onSampleSelected = { currentDestination = it }
         )
     } else {
         SampleDetailScreen(
-            destination = currentDestination!!,
+            destination = destination,
             onBack = { currentDestination = null }
         )
     }
