@@ -41,7 +41,9 @@ private enum class SampleDestination(val title: String) {
     DocumentEditor("Document Editor"),
 }
 
-fun MainViewController() = ComposeUIViewController {
+fun MainViewController() = ComposeUIViewController(
+    configure = { enforceStrictPlistSanityCheck = false }
+) {
     ArrangerTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
