@@ -29,9 +29,4 @@ You can open the project by either:
 
 Select a target simulator (e.g., iPhone 16) from the Xcode toolbar and press **Run (Cmd + R)**.
 
----
 
-## Technical Notes
-
-- **120Hz Display Crash Fix**: To prevent crashes related to implicit `Info.plist` checks for 120Hz displays on ProMotion devices, `enforceStrictPlistSanityCheck = false` is explicitly set within `MainViewController.kt`.
-- **Resource Loading**: To prevent `MissingResourceException` when loading images, a custom Gradle task automatically copies the `compose-resources` folder after building the XCFramework, and it is explicitly bundled in `Package.swift`.

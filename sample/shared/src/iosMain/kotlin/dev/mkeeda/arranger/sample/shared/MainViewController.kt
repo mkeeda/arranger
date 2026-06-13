@@ -41,6 +41,8 @@ private enum class SampleDestination(val title: String) {
     DocumentEditor("Document Editor"),
 }
 
+// Disable PlistSanityCheck to prevent crashes related to implicit Info.plist checks 
+// for 120Hz displays on ProMotion devices when using SwiftPM.
 fun MainViewController() = ComposeUIViewController(
     configure = { enforceStrictPlistSanityCheck = false }
 ) {

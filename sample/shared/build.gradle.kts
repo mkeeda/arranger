@@ -51,7 +51,9 @@ kotlin {
     }
 }
 
-// Automatically copy Compose Multiplatform resources to the SwiftPM project
+// Automatically copy Compose Multiplatform resources to the SwiftPM project.
+// This prevents MissingResourceException when loading images, as the XCFramework
+// does not automatically bundle them for iOS SwiftPM targets.
 tasks.named("assembleSharedDebugXCFramework").configure {
     doLast {
         val srcDir = layout.buildDirectory.dir("XCFrameworks/debug/shared.xcframework/ios-arm64-simulator/shared.framework/composeResources").get().asFile
