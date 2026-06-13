@@ -1,14 +1,26 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+
 
 plugins {
     kotlin("multiplatform")
     id("arranger.android.target")
     id("arranger.desktop.target")
+    id("arranger.ios.target")
     id("arranger.kmp.compose")
 }
 
 kotlin {
     android {
         namespace = "dev.mkeeda.arranger.sample.shared"
+    }
+
+    val xcFramework = XCFramework(xcFrameworkName = "shared")
+    listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
+        target.binaries.framework {
+            baseName = "shared"
+            isStatic = false
+            xcFramework.add(this)
+        }
     }
 
     sourceSets {
@@ -35,6 +47,21 @@ kotlin {
                 // https://youtrack.jetbrains.com/issue/CMP-9175/Introduce-a-single-desktop-dependency-for-all-platforms
                 implementation(compose.desktop.currentOs)
             }
+        }
+    }
+}
+
+// Automatically copy Compose Multiplatform resources to the SwiftPM project.
+// This prevents MissingResourceException when loading images, as the XCFramework
+// does not automatically bundle them for iOS SwiftPM targets.
+tasks.named("assembleSharedDebugXCFramework").configure {
+    doLast {
+        // Note: This copies resources only for the Apple Silicon simulator slice.
+        // Physical device builds are not currently supported by this script.
+        val srcDir = layout.buildDirectory.dir("XCFrameworks/debug/shared.xcframework/ios-arm64-simulator/shared.framework/composeResources").get().asFile
+        val dstDir = file("../ios/ArrangerSample.swiftpm/Sources/ArrangerSample/compose-resources/composeResources")
+        if (srcDir.exists()) {
+            srcDir.copyRecursively(dstDir, overwrite = true)
         }
     }
 }
