@@ -4,7 +4,7 @@ import AppleProductTypes
 
 let package = Package(
     name: "ArrangerSample",
-    platforms: [.iOS(.v16)],
+    platforms: [.iOS("18.5")],
     products: [
         .iOSApplication(
             name: "ArrangerSample",
