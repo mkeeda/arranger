@@ -4,6 +4,8 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.HeadingKey
+import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RgbaColor
@@ -675,6 +677,146 @@ class RichTextStateTest {
         state.richString.text shouldBe "Hell"
         state.undoState.undo()
         state.richString.text shouldBe "Hello"
+    }
+
+    @Test
+    fun `IME word replacement correctly narrows span expansion`() {
+        val initialText = "qwertyui"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("ertyui"))
+                    },
+            )
+
+        // Select the end
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        // Toggle OFF Bold
+        state.removeTypingAttribute(BoldKey)
+
+        // iOS IME replaces the entire word
+        state.textFieldState.edit {
+            replace(0, 8, "qwertyuiredf")
+            selection = TextRange(12)
+            state.updateRichString(this)
+        }
+
+        val expectedText = "qwertyuiredf"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        // The span for "ertyui" (2..7) should remain unchanged because the actual insertion was at the end
+        spans.first().range shouldBe (2..7)
+        spans.first().attributes shouldBe attributeContainerOf(BoldKey to Unit)
+    }
+
+    @Test
+    fun `IME Return key replacement triggers EnterKeyStrategy`() {
+        val initialText = "Heading"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(
+                            HeadingKey,
+                            HeadingLevel.H1,
+                            range = initialText.indices,
+                        )
+                    },
+            )
+
+        // Move to the end
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        // iOS IME replaces the whole word with "Heading\n"
+        state.textFieldState.edit {
+            replace(0, 7, "Heading\n")
+            selection = TextRange(8)
+            state.updateRichString(this)
+        }
+
+        val expectedText = "Heading\n"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        // The Heading should only apply to the first paragraph (0..7), not the new empty paragraph
+        spans.first().range shouldBe (0..7)
+    }
+
+    @Test
+    fun `Pasting text with newlines over matching prefix falls back to paragraph inheritance`() {
+        val initialText = "Heading"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(
+                            HeadingKey,
+                            HeadingLevel.H1,
+                            range = initialText.indices,
+                        )
+                    },
+            )
+
+        // Select the end
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        // Paste "Heading\nNew Paragraph" over "Heading"
+        state.textFieldState.edit {
+            replace(0, 7, "Heading\nNew Paragraph")
+            selection = TextRange(21)
+            state.updateRichString(this)
+        }
+
+        val expectedText = "Heading\nNew Paragraph"
+        state.richString.text shouldBe expectedText
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        // Since it's a multi-character paste with a newline, the paragraph attribute should inherit to both lines
+        spans.first().range shouldBe (0..21)
+        spans.first().attributes shouldBe
+            attributeContainerOf(
+                HeadingKey to HeadingLevel.H1,
+            )
+    }
+
+    @Test
+    fun `Pasting text over matching prefix and suffix replaces only the delta`() {
+        val initialText = "abc"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, range = initialText.rangeOf("b"))
+                    },
+            )
+
+        // Paste "axc" over "abc"
+        state.textFieldState.edit {
+            replace(0, 3, "axc")
+            selection = TextRange(3)
+            state.updateRichString(this)
+        }
+
+        val expectedText = "axc"
+        state.richString.text shouldBe expectedText
+
+        // The "b" was replaced by "x" (which is an overlap edit), so the new text inherits the span.
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+        spans.first().range shouldBe (1..1)
+        spans.first().attributes shouldBe attributeContainerOf(BoldKey to Unit)
     }
 }
 

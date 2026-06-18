@@ -244,8 +244,15 @@ public class RichTextState(initialText: RichString = RichString("")) {
 
         val newSpans =
             (0 until buffer.changes.changeCount).fold(spans) { currentSpans, i ->
-                val originalRange = buffer.changes.getOriginalRange(i)
-                val range = buffer.changes.getRange(i)
+                val delta =
+                    getNarrowedDelta(
+                        originalText = buffer.originalText,
+                        newText = buffer.asCharSequence(),
+                        rawOriginalRange = buffer.changes.getOriginalRange(i),
+                        rawRange = buffer.changes.getRange(i),
+                    )
+                val originalRange = delta.originalRange
+                val range = delta.range
 
                 var updatedSpans =
                     currentSpans.shiftSpans(
@@ -533,4 +540,44 @@ private fun shiftSpan(
             }
         }
     }
+}
+
+private data class ChangeDelta(
+    val originalRange: TextRange,
+    val range: TextRange,
+)
+
+private fun getNarrowedDelta(
+    originalText: CharSequence,
+    newText: CharSequence,
+    rawOriginalRange: TextRange,
+    rawRange: TextRange,
+): ChangeDelta {
+    val origStart = rawOriginalRange.min
+    val origEnd = rawOriginalRange.max
+    val newStart = rawRange.min
+    val newEnd = rawRange.max
+
+    val origLen = origEnd - origStart
+    val newLen = newEnd - newStart
+    val minLength = minOf(origLen, newLen)
+
+    var prefixLength = 0
+    while (prefixLength < minLength && originalText[origStart + prefixLength] == newText[newStart + prefixLength]) {
+        prefixLength++
+    }
+
+    var suffixLength = 0
+    val maxSuffixLength = minLength - prefixLength
+    while (
+        suffixLength < maxSuffixLength &&
+        originalText[origEnd - 1 - suffixLength] == newText[newEnd - 1 - suffixLength]
+    ) {
+        suffixLength++
+    }
+
+    return ChangeDelta(
+        originalRange = TextRange(origStart + prefixLength, origEnd - suffixLength),
+        range = TextRange(newStart + prefixLength, newEnd - suffixLength),
+    )
 }
