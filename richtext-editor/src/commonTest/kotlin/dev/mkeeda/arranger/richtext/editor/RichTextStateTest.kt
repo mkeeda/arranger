@@ -4,6 +4,8 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.HeadingKey
+import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RgbaColor
@@ -721,8 +723,8 @@ class RichTextStateTest {
                 initialText =
                     RichString(text = initialText).edit {
                         setParagraphAttribute(
-                            dev.mkeeda.arranger.richtext.HeadingKey,
-                            dev.mkeeda.arranger.richtext.HeadingLevel.H1,
+                            HeadingKey,
+                            HeadingLevel.H1,
                             range = initialText.indices,
                         )
                     },
@@ -757,8 +759,8 @@ class RichTextStateTest {
                 initialText =
                     RichString(text = initialText).edit {
                         setParagraphAttribute(
-                            dev.mkeeda.arranger.richtext.HeadingKey,
-                            dev.mkeeda.arranger.richtext.HeadingLevel.H1,
+                            HeadingKey,
+                            HeadingLevel.H1,
                             range = initialText.indices,
                         )
                     },
@@ -785,7 +787,7 @@ class RichTextStateTest {
         spans.first().range shouldBe (0..21)
         spans.first().attributes shouldBe
             attributeContainerOf(
-                dev.mkeeda.arranger.richtext.HeadingKey to dev.mkeeda.arranger.richtext.HeadingLevel.H1,
+                HeadingKey to HeadingLevel.H1,
             )
     }
 
