@@ -1,0 +1,10 @@
+# Xcode user-specific files
+xcuserdata/
+*.xcuserstate
+
+# Build products
+build/
+DerivedData/
+
+# Compose Multiplatform resources (auto-copied by Gradle task)
+compose-resources/
