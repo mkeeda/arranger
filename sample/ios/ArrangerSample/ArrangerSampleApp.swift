@@ -1,3 +1,10 @@
+//
+//  ArrangerSampleApp.swift
+//  ArrangerSample
+//
+//  Created by Ippei Mukaida on 2026/06/18.
+//
+
 import SwiftUI
 
 @main
