@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 
 plugins {
@@ -14,12 +13,10 @@ kotlin {
         namespace = "dev.mkeeda.arranger.sample.shared"
     }
 
-    val xcFramework = XCFramework(xcFrameworkName = "shared")
     listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
         target.binaries.framework {
             baseName = "shared"
             isStatic = false
-            xcFramework.add(this)
         }
     }
 
