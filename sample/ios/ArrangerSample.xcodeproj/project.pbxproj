@@ -6,28 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		6F0FBC2E2FE3E15B00A9604E /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0FBC2D2FE3E15B00A9604E /* shared.xcframework */; };
-		6F0FBC2F2FE3E15C00A9604E /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0FBC2D2FE3E15B00A9604E /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		6F0FBC302FE3E15C00A9604E /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				6F0FBC2F2FE3E15C00A9604E /* shared.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
+
 
 /* Begin PBXFileReference section */
 		6F0FBC182FE3DFD800A9604E /* ArrangerSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArrangerSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6F0FBC2D2FE3E15B00A9604E /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../../shared/build/XCFrameworks/debug/shared.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -43,7 +27,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F0FBC2E2FE3E15B00A9604E /* shared.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,7 +37,6 @@
 			isa = PBXGroup;
 			children = (
 				6F0FBC1A2FE3DFD800A9604E /* ArrangerSample */,
-				6F0FBC2C2FE3E15B00A9604E /* Frameworks */,
 				6F0FBC192FE3DFD800A9604E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -67,14 +49,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6F0FBC2C2FE3E15B00A9604E /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				6F0FBC2D2FE3E15B00A9604E /* shared.xcframework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
+
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -87,7 +62,6 @@
 				6F0FBC142FE3DFD800A9604E /* Sources */,
 				6F0FBC152FE3DFD800A9604E /* Frameworks */,
 				6F0FBC162FE3DFD800A9604E /* Resources */,
-				6F0FBC302FE3E15C00A9604E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -164,7 +138,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "RESOURCES_SRC=\"${SRCROOT}/../../shared/build/XCFrameworks/debug/shared.xcframework/ios-arm64-simulator/shared.framework/composeResources\"\nRESOURCES_DST=\"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/compose-resources\"\n\nif [ -d \"$RESOURCES_SRC\" ]; then\n    cp -R \"$RESOURCES_SRC\" \"$RESOURCES_DST\"\nfi\n";
+			shellScript = "RESOURCES_SRC=\"${SRCROOT}/../shared/build/XCFrameworks/debug/shared.xcframework/ios-arm64-simulator/shared.framework/composeResources\"\nRESOURCES_DST=\"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/compose-resources\"\n\nif [ -d \"$RESOURCES_SRC\" ]; then\n    cp -R \"$RESOURCES_SRC\" \"$RESOURCES_DST\"\nfi\n";
 		};
 		6F0FBC322FE3E22B00A9604E /* Build KMP modules */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -183,7 +157,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n    echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n    exit 0\nfi\ncd \"$SRCROOT/../../..\"\n./gradlew :sample:shared:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n    echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n    exit 0\nfi\ncd \"$SRCROOT/../..\"\n./gradlew :sample:shared:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
