@@ -244,8 +244,37 @@ public class RichTextState(initialText: RichString = RichString("")) {
 
         val newSpans =
             (0 until buffer.changes.changeCount).fold(spans) { currentSpans, i ->
-                val originalRange = buffer.changes.getOriginalRange(i)
-                val range = buffer.changes.getRange(i)
+                val rawOriginalRange = buffer.changes.getOriginalRange(i)
+                val rawRange = buffer.changes.getRange(i)
+                val originalStr = buffer.originalText.substring(rawOriginalRange.min, rawOriginalRange.max)
+                val newStr = buffer.asCharSequence().substring(rawRange.min, rawRange.max)
+
+                // Narrow down the delta by finding the common prefix and suffix
+                var prefixLength = 0
+                val minLength = minOf(originalStr.length, newStr.length)
+                while (prefixLength < minLength && originalStr[prefixLength] == newStr[prefixLength]) {
+                    prefixLength++
+                }
+
+                var suffixLength = 0
+                val maxSuffixLength = minLength - prefixLength
+                while (
+                    suffixLength < maxSuffixLength &&
+                    originalStr[originalStr.length - 1 - suffixLength] == newStr[newStr.length - 1 - suffixLength]
+                ) {
+                    suffixLength++
+                }
+
+                val originalRange =
+                    TextRange(
+                        rawOriginalRange.min + prefixLength,
+                        rawOriginalRange.max - suffixLength,
+                    )
+                val range =
+                    TextRange(
+                        rawRange.min + prefixLength,
+                        rawRange.max - suffixLength,
+                    )
 
                 var updatedSpans =
                     currentSpans.shiftSpans(
