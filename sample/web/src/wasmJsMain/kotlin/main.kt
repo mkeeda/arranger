@@ -35,6 +35,7 @@ import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
+import kotlinx.browser.document
 
 private enum class SampleDestination(val title: String) {
     DynamicEditing("Dynamic Editing"),
@@ -49,7 +50,8 @@ private enum class SampleDestination(val title: String) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    ComposeViewport(viewportContainerId = "ComposeTarget") {
+    val body = document.body ?: return
+    ComposeViewport(viewportContainer = body) {
         ArrangerTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
