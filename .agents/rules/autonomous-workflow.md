@@ -5,6 +5,7 @@ trigger: always_on
 # Arranger Autonomous Development Workflow Rules
 
 AntigravityエージェントがArrangerプロジェクトの開発を自律的かつ長期持続可能に進めるための行動原則および開発ガバナンス規範です。
+セッションを開始した親エージェントは自らを **Orchestrator（統括司令塔）** と位置づけ、本ルールに従って各専門サブエージェントをディスパッチして開発を進行してください。
 
 ---
 
@@ -17,27 +18,26 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ## 2. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
 
-役割ごとのコンテキスト分離と客観的な品質維持のため、各フェーズにおいて必ず `invoke_subagent` を用いて独立したサブエージェントをディスパッチし、作業を分担すること。
+役割ごとのコンテキスト分離と客観的な品質維持のため、親エージェント（Orchestrator）自身が単体でコード実装やレビューを一気通貫で行ってはならない。
+各フェーズにおいて必ず `invoke_subagent` を用いて独立したサブエージェントをディスパッチし、作業を分担すること。
 
-- **プランニング**: 独立した `planner` サブエージェントをディスパッチする。
-- **実装・TDD**: 独立した `developer` サブエージェントをディスパッチする。
-- **品質検証**: 独立した `qa-engineer` サブエージェントをディスパッチする。
-- **コード査定**: 独立した `reviewer` サブエージェントをディスパッチする。
+- **プランニング**: 独立した `planner` サブエージェントを `invoke_subagent` でディスパッチする。
+- **実装・TDD**: 独立した `developer` サブエージェントを `invoke_subagent` でディスパッチする。
+- **品質検証**: 独立した `qa-engineer` サブエージェントを `invoke_subagent` でディスパッチする。
+- **コード査定**: 独立した `reviewer` サブエージェントを `invoke_subagent` でディスパッチする。
 
 ---
 
-## 3. 開発思想と行動規範
+## 3. サブエージェントの動的モデル選定 (Model Selection Principle)
 
-### 1. テストファースト (TDD)
-- 実装コードを書く前に、必ず意図する振る舞いを表現したテストコード（`commonTest` または Compose UI テスト）を作成すること。
+サブエージェントを `invoke_subagent` で起動する際は、タスクの難易度に応じて `Model` パラメータを切り替えること：
 
-### 2. 相互フィードバック駆動イテレーション
-- ウォーターフォール型の単方向実行は厳禁。実装やテスト作成の過程で「設計の不備」「未知のエッジケース」「APIの使いにくさ」等の新しい知見が得られた場合は、**即座に上位の設計（Plan）やQA戦略にフィードバックし、イテレーションと計画を柔軟に更新**すること。
-
-### 3. 動的モデル選定 (Model Selection Principle)
-- サブエージェントディスパッチ時はスピードと推論深度のバランスを動的に最適化する。
-  - 通常の実装・QA・レビュー: 親モデル（Gemini 3.6 Flash High等, `'inherit'`）でスピード重視で実行。
-  - 複雑なアーキテクチャ設計・難易度の高いバグ解析・大型リファクタリング: 推論特化モデル（`'pro'`）を指定してディスパッチする。
+| タスクの性質 | サブエージェント | 指定する `Model` | 目的・理由 |
+| :--- | :--- | :--- | :--- |
+| **通常の機能追加・バグ修正・TDD実装** | `developer`, `qa-engineer`, `reviewer` | **`'inherit'`** | メインモデル（Gemini 3.6 Flash High等）を継承しスピード重視で実行 |
+| **複雑な設計・仕様策定・壁打ち** | `planner` | **`'pro'`** | Gemini 3.1 Pro High等の高度推論モデルを活用し、漏れのない設計立案 |
+| **難易度の高い深層バグ解析・大規模構造刷新** | `developer` / `planner` | **`'pro'`** | 高度な多段階推論とコード解析能力をフル活用 |
+| **ユーザーからの明確なモデル指定時** | 該当サブエージェント | ユーザー指定モデル | 例: 「Proでじっくり考えて」→ `'pro'`、「Flashで素早く」→ `'inherit'` |
 
 ---
 
@@ -51,9 +51,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 5. マルチエージェント体制の概念図
-
-全体統括を **Orchestrator** が担当し、専門タスクを `.agents/subagents/` に定義されたサブエージェント（`planner`, `developer`, `qa-engineer`, `reviewer`）へディスパッチして進めます。
+## 5. Orchestrator のオペレーション手順 (Execution Steps)
 
 ```
 [Orchestrator]
@@ -64,3 +62,25 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
    ├── 5. Orchestrator : pr-creator スキルによる Pull Request 作成（英語）
    └── 6. Orchestrator : Walkthrough (MD/HTML) 提示 & gh issue create による英語タスク起票
 ```
+
+### Step 1. プランニングの委任 (`invoke_subagent`)
+- `invoke_subagent` で Subagent `planner` を起動（複雑な設計時は `Model: 'pro'` を指定）。要件明確化と `implementation_plan.md` を作成。
+- 作成された計画をユーザーに提示し、承認（Proceed）を得る。
+
+### Step 2. TDD実装の委任 (`invoke_subagent`)
+- 承認後、`invoke_subagent` で Subagent `developer` を起動（通常は `Model: 'inherit'`、複雑リファクタリング時は `Model: 'pro'`）。
+- `commonTest` の追加と `commonMain` への実装を実行。
+
+### Step 3. 品質保証の委任 (`invoke_subagent`)
+- `invoke_subagent` で Subagent `qa-engineer` を起動（`Model: 'inherit'`）。`./gradlew test` / Roborazzi / `spotlessCheck` を実行させて結果を検証。
+
+### Step 4. コード査定の委任 (`invoke_subagent`)
+- `invoke_subagent` で Subagent `reviewer` を起動（`Model: 'inherit'`）。
+- `architecture-principles.md` および `code-style-guide.md` に対する査定レポートを作成させる。
+
+### Step 5. Pull Request の起票
+- `pr-creator` スキルを呼び出し、コミット内容とテスト結果をまとめた英語の Pull Request を作成。
+
+### Step 6. 報告と Issue 起票
+- Artifact `walkthrough.md` (必要に応じてHTMLデモ) に成果・動作ログ・PR URL を記載してユーザーに報告。
+- レビュー結果や残課題を取りまとめ、`gh issue create` コマンドで GitHub 上に英語で Issue を登録。
