@@ -48,6 +48,10 @@ gradlePlugin {
             id = "arranger.ios.target"
             implementationClass = "IosTargetConventionPlugin"
         }
+        register("wasmJsTarget") {
+            id = "arranger.wasmjs.target"
+            implementationClass = "WasmJsTargetConventionPlugin"
+        }
         register("spotless") {
             id = "arranger.spotless"
             implementationClass = "SpotlessConventionPlugin"

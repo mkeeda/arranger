@@ -17,3 +17,4 @@ local.properties
 bin/
 .idea/deploymentTargetSelector.xml
 **/.kotlin/
+kotlin-js-store/

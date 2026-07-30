@@ -3,6 +3,7 @@ plugins {
     id("arranger.android.target")
     id("arranger.desktop.target")
     id("arranger.ios.target")
+    id("arranger.wasmjs.target")
     id("arranger.maven.publish")
 }
 
