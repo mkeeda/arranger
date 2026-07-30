@@ -99,8 +99,9 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
    ├── 2. Developer    : Howの設計・TDD実装 ──> commonTest作成 ──> commonMain実装 ──> 分割コミット (Model: 'inherit' or 'pro')
    ├── 3. QA Engineer  : Howのテスト拡充・./gradlew test + Roborazzi + a11y/Perf検証 (Model: 'inherit')
    ├── 4. Reviewer     : コードスタイル・設計原則の査定評価 (Model: 'inherit')
-   ├── 5. Orchestrator : pr-creator スキルによる Pull Request 作成（英語）
-   └── 6. Orchestrator : Walkthrough (MD/HTML) 提示 & gh issue create による英語タスク起票
+   ├── 5. Orchestrator : 成果物 Walkthrough (MD/HTML) の提示 & ユーザーレビュー受け取り (ターン停止)
+   ├── 6. Orchestrator : (ユーザー指摘時) Planner/Developer へのフィードバック＆コード再修正イテレーション
+   └── 7. Orchestrator : 【ユーザー最終合格後】 pr-creator による PR 作成（英語）& gh issue create による次タスク英語起票
 ```
 
 ### Step 1. プランニングの委任 (`invoke_subagent`)
@@ -119,9 +120,13 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 - `invoke_subagent` で Subagent `reviewer` を起動（`Model: 'inherit'`）。
 - `architecture-principles.md` および `code-style-guide.md` に対する査定レポートを作成させる。
 
-### Step 5. Pull Request の起票
-- `pr-creator` スキルを呼び出し、コミット内容とテスト結果をまとめた英語の Pull Request を作成。
+### Step 5. ユーザーへの成果報告とレビュー受け取り (Walkthrough)
+- 査定完了後、PRを作成せずに、まず Artifact `walkthrough.md` (必要に応じてHTMLデモ) に成果・動作ログ・テスト結果を記載してユーザーへ報告。
+- **ツールの呼び出しを停止し、ユーザーからのレビュー（フィードバック・修正指示）を待つ。**
 
-### Step 6. 報告と Issue 起票
-- Artifact `walkthrough.md` (必要に応じてHTMLデモ) に成果・動作ログ・PR URL を記載してユーザーに報告。
-- レビュー結果や残課題を取りまとめ、`gh issue create` コマンドで GitHub 上に英語で Issue を登録。
+### Step 6. ユーザーレビューに基づく再修正イテレーション
+- ユーザーから修正・改善の指摘があった場合、`planner` や `developer` へフィードバックして修正計画を立て、コードに反映・再検証を行う。
+
+### Step 7. ユーザー最終合格後の PR 作成 & Issue 起票
+- **ユーザーの最終レビューに合格（最終承認）した後**、`pr-creator` スキルを呼び出して GitHub 上に**英語**で Pull Request を作成する。
+- ユーザーとのやり取りや Orchestrator の判断で見つかった改善案・残課題をタスク化する場合、**PR作成と同一のタイミングで `gh issue create` コマンドを用いて GitHub 上に英語で Issue を登録**する。
