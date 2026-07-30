@@ -23,7 +23,18 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 3. 責務の分離原則: Why/What vs How (Separation of Concerns)
+## 3. アジャイル・フィードバックループと順応的再ディスパッチ (Agile Feedback Loop Protocol)
+
+- **一方通行の厳禁**: 開発プロセスを固定的なウォーターフォール（Plan -> Dev -> QA -> Review）として扱ってはならない。
+- **問題・知見の即時フィードバック**: サブエージェント（`developer`, `qa-engineer`, `reviewer`）は、作業中に以下に遭遇した場合、問題を抱え込まず即座に Orchestrator へ情報を共有・報告しなければならない：
+  - 設計上の考慮漏れや新しいエッジケースの発見
+  - テスト失敗やライブラリ制約などの技術的ブロック
+  - 当初の仕様の使いにくさやリファクタリングの必要性
+- **Orchestrator による柔軟な再評価と指示出し**: Orchestrator はサブエージェントからのフィードバックを受け取った際、柔軟に計画を再評価し、`planner` に Plan (`implementation_plan.md`) の更新を依頼したり、ユーザーへ判断を仰いだり、後続指示を変更して順応的に進めなければならない。
+
+---
+
+## 4. 責務の分離原則: Why/What vs How (Separation of Concerns)
 
 各サブエージェントは明確な責務の境界を保持し、後続エージェントの自律的な思考や判断を奪ってはならない。
 
@@ -36,7 +47,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 4. コミット粒度と分割のルール (Meaningful Commit Strategy)
+## 5. コミット粒度と分割のルール (Meaningful Commit Strategy)
 
 - **コミットの分割・単位**: 差分は必ず意味のある適切な単位（Atomic / Meaningful Units）で小分けにしてコミットすること。
 - **アンチパターンの禁止**: 異なる目的の作業や複数のファイル変更を一括で1つのコミットにまとめたり、直前のコミットへ安易に `amend` して差分を崩すことを禁止する。
@@ -44,7 +55,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 5. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
+## 6. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
 
 役割ごとのコンテキスト分離と客観的な品質維持のため、親エージェント（Orchestrator）自身が単体でコード実装やレビューを一気通貫で行ってはならない。
 各フェーズにおいて必ず `invoke_subagent` を用いて独立したサブエージェントをディスパッチし、作業を分担すること。
@@ -56,7 +67,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 6. サブエージェントの動的モデル選定 (Model Selection Principle)
+## 7. サブエージェントの動的モデル選定 (Model Selection Principle)
 
 サブエージェントを `invoke_subagent` で起動する際は、タスクの難易度に応じて `Model` パラメータを切り替えること：
 
@@ -69,7 +80,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 7. 必須品質ゲート (Quality Gates)
+## 8. 必須品質ゲート (Quality Gates)
 
 すべての変更は以下の品質チェックを通過しなければならない：
 
@@ -79,7 +90,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 8. Orchestrator のオペレーション手順 (Execution Steps)
+## 9. Orchestrator のオペレーション手順 (Execution Steps)
 
 ```
 [Orchestrator]
