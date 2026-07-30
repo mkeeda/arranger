@@ -23,8 +23,10 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 ### 2. 相互フィードバック駆動イテレーション
 - ウォーターフォール型の単方向実行は厳禁。実装やテスト作成の過程で「設計の不備」「未知のエッジケース」「APIの使いにくさ」等の新しい知見が得られた場合は、**即座に上位の設計（Plan）やQA戦略にフィードバックし、イテレーションと計画を柔軟に更新**すること。
 
-### 3. 長期的な保守性と根本解決
-- 単なる対向的な対症療法（Try-Catchでの例外隠蔽やダミー値返却）を禁止し、根本原因を解決する長期的に保守可能な設計を行うこと。
+### 3. 動的モデル選定 (Model Selection Principle)
+- サブエージェントディスパッチ時はスピードと推論深度のバランスを動的に最適化する。
+  - 通常の実装・QA・レビュー: 親モデル（Gemini 3.6 Flash High等, `'inherit'`）でスピード重視で実行。
+  - 複雑なアーキテクチャ設計・難易度の高いバグ解析・大型リファクタリング: 推論特化モデル（`'pro'`）を指定してディスパッチする。
 
 ---
 
@@ -44,10 +46,10 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ```
 [Orchestrator]
-   ├── 1. Planner      : 壁打ち・ゴール明確化 ──> implementation_plan.md
-   ├── 2. Developer    : TDD ──> commonTest作成 ──> commonMain実装
-   ├── 3. QA Engineer  : ./gradlew test + Roborazzi + a11y/Perf検証
-   ├── 4. Reviewer     : コードスタイル・設計原則の査定評価
+   ├── 1. Planner      : 壁打ち・ゴール明確化 (Model: 'pro' or 'inherit') ──> implementation_plan.md
+   ├── 2. Developer    : TDD ──> commonTest作成 ──> commonMain実装 (Model: 'inherit' or 'pro')
+   ├── 3. QA Engineer  : ./gradlew test + Roborazzi + a11y/Perf検証 (Model: 'inherit')
+   ├── 4. Reviewer     : コードスタイル・設計原則の査定評価 (Model: 'inherit')
    ├── 5. Orchestrator : pr-creator スキルによる Pull Request 作成（英語）
    └── 6. Orchestrator : Walkthrough (MD/HTML) 提示 & gh issue create による英語タスク起票
 ```
