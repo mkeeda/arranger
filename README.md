@@ -21,7 +21,7 @@ While standard `buildAnnotatedString` is perfect for static text decoration, it 
 | **Android** | ✅ Supported | API Level 26+ |
 | **Desktop (JVM)** | ✅ Supported | macOS, Windows, Linux |
 | **iOS** | ✅ Supported | - |
-| **Web (Wasm/JS)** | 🚧 Planned | - |
+| **Web (Wasm)** | ✅ Supported | WasmJs |
 
 ## Requirements
 * **Kotlin 2.3.20+**
@@ -650,7 +650,15 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 
 | Sample | Screenshot |
 | --- | --- |
-| **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as an Android, iOS, and Desktop (macOS, Windows, Linux) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
+| **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as an Android, iOS, Desktop (macOS, Windows, Linux), and Web (Wasm) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
+
+### Running the Sample Applications
+
+You can run the sample application on any of the supported platforms using Gradle:
+
+- **Web (Wasm):** `./gradlew :sample:web:wasmJsBrowserDevelopmentRun`
+- **Desktop:** `./gradlew :sample:desktop:run`
+- **Android:** Open the project in Android Studio and run the `:sample:android` configuration.
 
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
