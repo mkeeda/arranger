@@ -16,7 +16,15 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 2. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
+## 2. コミット粒度と分割のルール (Meaningful Commit Strategy)
+
+- **コミットの分割・単位**: 差分は必ず意味のある適切な単位（Atomic / Meaningful Units）で小分けにしてコミットすること。
+- **アンチパターンの禁止**: 異なる目的の作業や複数のファイル変更を一括で1つのコミットにまとめたり、直前のコミットへ安易に `amend` して差分を崩すことを禁止する。
+- **コミット形式**: コミットメッセージは Conventional Commits 仕様に準拠し、英語で記述すること（例: `feat(editor): ...`, `test(richtext): ...`）。
+
+---
+
+## 3. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
 
 役割ごとのコンテキスト分離と客観的な品質維持のため、親エージェント（Orchestrator）自身が単体でコード実装やレビューを一気通貫で行ってはならない。
 各フェーズにおいて必ず `invoke_subagent` を用いて独立したサブエージェントをディスパッチし、作業を分担すること。
@@ -28,7 +36,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 3. サブエージェントの動的モデル選定 (Model Selection Principle)
+## 4. サブエージェントの動的モデル選定 (Model Selection Principle)
 
 サブエージェントを `invoke_subagent` で起動する際は、タスクの難易度に応じて `Model` パラメータを切り替えること：
 
@@ -41,7 +49,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 4. 必須品質ゲート (Quality Gates)
+## 5. 必須品質ゲート (Quality Gates)
 
 すべての変更は以下の品質チェックを通過しなければならない：
 
@@ -51,12 +59,12 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 5. Orchestrator のオペレーション手順 (Execution Steps)
+## 6. Orchestrator のオペレーション手順 (Execution Steps)
 
 ```
 [Orchestrator]
    ├── 1. Planner      : 壁打ち・ゴール明確化 (Model: 'pro' or 'inherit') ──> implementation_plan.md
-   ├── 2. Developer    : TDD ──> commonTest作成 ──> commonMain実装 (Model: 'inherit' or 'pro')
+   ├── 2. Developer    : TDD ──> commonTest作成 ──> commonMain実装 ──> 適切な単位でコミット分割 (Model: 'inherit' or 'pro')
    ├── 3. QA Engineer  : ./gradlew test + Roborazzi + a11y/Perf検証 (Model: 'inherit')
    ├── 4. Reviewer     : コードスタイル・設計原則の査定評価 (Model: 'inherit')
    ├── 5. Orchestrator : pr-creator スキルによる Pull Request 作成（英語）
@@ -70,6 +78,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 ### Step 2. TDD実装の委任 (`invoke_subagent`)
 - 承認後、`invoke_subagent` で Subagent `developer` を起動（通常は `Model: 'inherit'`、複雑リファクタリング時は `Model: 'pro'`）。
 - `commonTest` の追加と `commonMain` への実装を実行。
+- **変更差分は意味のある単位で適切にコミット分割**すること。
 
 ### Step 3. 品質保証の委任 (`invoke_subagent`)
 - `invoke_subagent` で Subagent `qa-engineer` を起動（`Model: 'inherit'`）。`./gradlew test` / Roborazzi / `spotlessCheck` を実行させて結果を検証。
