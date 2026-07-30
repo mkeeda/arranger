@@ -21,7 +21,7 @@ While standard `buildAnnotatedString` is perfect for static text decoration, it 
 | **Android** | ✅ Supported | API Level 26+ |
 | **Desktop (JVM)** | ✅ Supported | macOS, Windows, Linux |
 | **iOS** | ✅ Supported | - |
-| **Web (Wasm)** | ✅ Supported | WasmJs |
+| **Web** | ✅ Supported | WasmJs |
 
 ## Requirements
 * **Kotlin 2.3.20+**
