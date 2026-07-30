@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="richtext-wasm-js">
+    <output-path>$PROJECT_DIR$/richtext/build/libs</output-path>
+    <root id="archive" name="richtext-wasm-js.jar">
+      <element id="module-output" name="Arranger.richtext.wasmJsMain" />
+    </root>
+  </artifact>
+</component>

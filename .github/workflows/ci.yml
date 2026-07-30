@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  jvm-test:
+  jvm-wasm-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,11 +33,11 @@ jobs:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx8192m -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
         run: ./gradlew check verifyRoborazzi -Pkotlin.daemon.jvmargs="-Xmx4096m"
 
-      - name: Upload JVM Verification Reports
+      - name: Upload JVM & Wasm Verification Reports
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: jvm-verification-reports
+          name: jvm-wasm-verification-reports
           path: |
             **/build/reports/
             **/build/test-results/

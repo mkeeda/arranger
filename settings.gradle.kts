@@ -15,7 +15,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         google()
         mavenCentral()
@@ -27,6 +27,7 @@ includeBuild("build-logic")
 include(":sample:android")
 include(":sample:desktop")
 include(":sample:shared")
+include(":sample:web")
 include(":richtext")
 include(":richtext-editor")
 include(":richtext-editor-material3")
