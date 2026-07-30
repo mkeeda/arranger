@@ -28,7 +28,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run Verification (Check, Screenshot Verify)
-        run: ./gradlew check verifyRoborazzi
+        env:
+          ORG_GRADLE_PROJECT_org.gradle.workers.max: 4
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx8192m -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+        run: ./gradlew check verifyRoborazzi -Pkotlin.daemon.jvmargs="-Xmx4096m"
 
       - name: Upload JVM & Wasm Verification Reports
         uses: actions/upload-artifact@v7
@@ -57,7 +60,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run iOS Simulator Tests
-        run: ./gradlew iosSimulatorArm64Test -Pkotlin.native.tests.device="iPhone 15"
+        env:
+          ORG_GRADLE_PROJECT_kotlin.native.binary.threadCount: 3
+          ORG_GRADLE_PROJECT_org.gradle.workers.max: 3
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx5120m -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+        run: ./gradlew iosSimulatorArm64Test -Pkotlin.native.tests.device="iPhone 15" -Pkotlin.daemon.jvmargs="-Xmx3072m"
 
       - name: Upload iOS Verification Reports
         uses: actions/upload-artifact@v7

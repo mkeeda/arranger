@@ -27,6 +27,16 @@ public data class RichString(
     )
 
     /**
+     * Returns `true` if this rich string's text is empty.
+     */
+    public fun isEmpty(): Boolean = text.isEmpty()
+
+    /**
+     * Returns `true` if this rich string's text is empty or consists solely of whitespace characters.
+     */
+    public fun isBlank(): Boolean = text.isBlank()
+
+    /**
      * Retrieves all contiguous runs of the requested attribute [key], merging internally split spans.
      * Adjacent internal spans that possess the EXACT SAME attribute value for [key] will be combined
      * into a single [RichRun], ignoring differences in other attributes.
