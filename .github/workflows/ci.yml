@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  jvm-test:
+  jvm-wasm-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,11 +30,11 @@ jobs:
       - name: Run Verification (Check, Screenshot Verify)
         run: ./gradlew check verifyRoborazzi
 
-      - name: Upload JVM Verification Reports
+      - name: Upload JVM & Wasm Verification Reports
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: jvm-verification-reports
+          name: jvm-wasm-verification-reports
           path: |
             **/build/reports/
             **/build/test-results/
