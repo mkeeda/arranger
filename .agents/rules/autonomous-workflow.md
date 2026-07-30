@@ -16,7 +16,20 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 2. コミット粒度と分割のルール (Meaningful Commit Strategy)
+## 2. 責務の分離原則: Why/What vs How (Separation of Concerns)
+
+各サブエージェントは明確な責務の境界を保持し、後続エージェントの自律的な思考や判断を奪ってはならない。
+
+- **Planner (Why & What に特化)**:
+  - 目的（Why）、達成すべき振る舞い・スコープ（What）、およびプロダクトレベルの検証観点を定義する。
+  - 具体的な関数の実装詳細や具体的なテストコードの書き方（How）には過度に踏み込まない。
+- **Developer & QA Engineer (How を主体的に判断・設計)**:
+  - **Developer**: Plannerの Why/What を受け、最適なデータ構造・内部アルゴリズム・具体テストコード（How）を主体的に設計・実装する。
+  - **QA Engineer**: Plannerの「検証観点」を受け、境界値・エッジケーステストの拡充、Roborazzi画面検証、a11y/Perfアサーション（How）を自律的に設計・実行する。
+
+---
+
+## 3. コミット粒度と分割のルール (Meaningful Commit Strategy)
 
 - **コミットの分割・単位**: 差分は必ず意味のある適切な単位（Atomic / Meaningful Units）で小分けにしてコミットすること。
 - **アンチパターンの禁止**: 異なる目的の作業や複数のファイル変更を一括で1つのコミットにまとめたり、直前のコミットへ安易に `amend` して差分を崩すことを禁止する。
@@ -24,7 +37,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 3. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
+## 4. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
 
 役割ごとのコンテキスト分離と客観的な品質維持のため、親エージェント（Orchestrator）自身が単体でコード実装やレビューを一気通貫で行ってはならない。
 各フェーズにおいて必ず `invoke_subagent` を用いて独立したサブエージェントをディスパッチし、作業を分担すること。
@@ -36,7 +49,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 4. サブエージェントの動的モデル選定 (Model Selection Principle)
+## 5. サブエージェントの動的モデル選定 (Model Selection Principle)
 
 サブエージェントを `invoke_subagent` で起動する際は、タスクの難易度に応じて `Model` パラメータを切り替えること：
 
@@ -49,7 +62,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 5. 必須品質ゲート (Quality Gates)
+## 6. 必須品質ゲート (Quality Gates)
 
 すべての変更は以下の品質チェックを通過しなければならない：
 
@@ -59,29 +72,29 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 6. Orchestrator のオペレーション手順 (Execution Steps)
+## 7. Orchestrator のオペレーション手順 (Execution Steps)
 
 ```
 [Orchestrator]
-   ├── 1. Planner      : 壁打ち・ゴール明確化 (Model: 'pro' or 'inherit') ──> implementation_plan.md
-   ├── 2. Developer    : TDD ──> commonTest作成 ──> commonMain実装 ──> 適切な単位でコミット分割 (Model: 'inherit' or 'pro')
-   ├── 3. QA Engineer  : ./gradlew test + Roborazzi + a11y/Perf検証 (Model: 'inherit')
+   ├── 1. Planner      : 壁打ち・Why/What定義・検証観点提示 (Model: 'pro' or 'inherit') ──> implementation_plan.md
+   ├── 2. Developer    : Howの設計・TDD実装 ──> commonTest作成 ──> commonMain実装 ──> 分割コミット (Model: 'inherit' or 'pro')
+   ├── 3. QA Engineer  : Howのテスト拡充・./gradlew test + Roborazzi + a11y/Perf検証 (Model: 'inherit')
    ├── 4. Reviewer     : コードスタイル・設計原則の査定評価 (Model: 'inherit')
    ├── 5. Orchestrator : pr-creator スキルによる Pull Request 作成（英語）
    └── 6. Orchestrator : Walkthrough (MD/HTML) 提示 & gh issue create による英語タスク起票
 ```
 
 ### Step 1. プランニングの委任 (`invoke_subagent`)
-- `invoke_subagent` で Subagent `planner` を起動（複雑な設計時は `Model: 'pro'` を指定）。要件明確化と `implementation_plan.md` を作成。
+- `invoke_subagent` で Subagent `planner` を起動（複雑な設計時は `Model: 'pro'` を指定）。Why/Whatと検証観点を整理した `implementation_plan.md` を作成。
 - 作成された計画をユーザーに提示し、承認（Proceed）を得る。
 
 ### Step 2. TDD実装の委任 (`invoke_subagent`)
 - 承認後、`invoke_subagent` で Subagent `developer` を起動（通常は `Model: 'inherit'`、複雑リファクタリング時は `Model: 'pro'`）。
-- `commonTest` の追加と `commonMain` への実装を実行。
+- Plannerの観点を受けてHowを主体的に設計し、`commonTest` の追加と `commonMain` への実装を実行。
 - **変更差分は意味のある単位で適切にコミット分割**すること。
 
 ### Step 3. 品質保証の委任 (`invoke_subagent`)
-- `invoke_subagent` で Subagent `qa-engineer` を起動（`Model: 'inherit'`）。`./gradlew test` / Roborazzi / `spotlessCheck` を実行させて結果を検証。
+- `invoke_subagent` で Subagent `qa-engineer` を起動（`Model: 'inherit'`）。テストシナリオの拡充・エッジケース追加を行い、`./gradlew test` / Roborazzi / `spotlessCheck` を実行させて結果を検証。
 
 ### Step 4. コード査定の委任 (`invoke_subagent`)
 - `invoke_subagent` で Subagent `reviewer` を起動（`Model: 'inherit'`）。
