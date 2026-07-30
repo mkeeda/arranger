@@ -654,11 +654,12 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 
 ### Running the Sample Applications
 
-You can run the sample application on any of the supported platforms using Gradle:
+You can run the sample application on any of the supported platforms:
 
 - **Web (Wasm):** `./gradlew :sample:web:wasmJsBrowserDevelopmentRun`
 - **Desktop:** `./gradlew :sample:desktop:run`
 - **Android:** Open the project in Android Studio and run the `:sample:android` configuration.
+- **iOS:** Open `sample/ios/ArrangerSample.xcodeproj` in Xcode and press **Run (Cmd + R)**.
 
 ## Core Architecture Overview
 To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
