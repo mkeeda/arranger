@@ -52,6 +52,10 @@ gradlePlugin {
             id = "arranger.wasmjs.target"
             implementationClass = "WasmJsTargetConventionPlugin"
         }
+        register("wasmJsApplication") {
+            id = "arranger.wasmjs.app"
+            implementationClass = "WasmJsApplicationConventionPlugin"
+        }
         register("spotless") {
             id = "arranger.spotless"
             implementationClass = "SpotlessConventionPlugin"
