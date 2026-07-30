@@ -28,7 +28,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run Verification (Check, Screenshot Verify)
-        run: ./gradlew check verifyRoborazzi
+        env:
+          ORG_GRADLE_PROJECT_org.gradle.workers.max: 4
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx8192m -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+        run: ./gradlew check verifyRoborazzi -Pkotlin.daemon.jvmargs="-Xmx4096m"
 
       - name: Upload JVM Verification Reports
         uses: actions/upload-artifact@v7
