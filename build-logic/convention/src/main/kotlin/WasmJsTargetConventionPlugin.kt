@@ -11,6 +11,7 @@ class WasmJsTargetConventionPlugin : Plugin<Project> {
             extensions.configure<KotlinMultiplatformExtension> {
                 wasmJs {
                     browser()
+                    binaries.executable()
                 }
             }
         }
