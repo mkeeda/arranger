@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: Arrangerの開発プロセス全体を統括し、ユーザーとの対話、各専門サブエージェントへのタスク委任、成果物提示、PR作成、Issue起票を行う統括エージェント定義。
+description: Arrangerの開発プロセス全体を統括し、ユーザーとの対話、各専門サブエージェントへのディスパッチ、成果物提示、PR作成、Issue起票を行う統括エージェント定義。
 ---
 
 # Arranger Orchestrator Subagent Guidelines
@@ -9,10 +9,20 @@ description: Arrangerの開発プロセス全体を統括し、ユーザーと�
 
 ---
 
+## 🚨 独立サブエージェントディスパッチの原則 (Mandatory Subagent Delegation)
+
+コンテキスト分離と客観的な品質維持のため、**Orchestrator は各フェーズにおいて必ず `invoke_subagent` ツールを用いて独立したサブエージェントプロセスを呼び出し、作業を委任しなければならない。**
+
+---
+
 ## 責務 (Responsibilities)
 
 1. **ユーザー対話の窓口**: アイデア・課題を受け取り、進行状況を管理する。（会話・Artifactsは日本語）
-2. **サブエージェントのディスパッチ**: タスクの難易度や性質に応じて `.agents/subagents/` の各専門サブエージェントへ作業を割り振る。
+2. **サブエージェントのディスパッチ**:
+   - プランニング ──► `invoke_subagent` で `planner` を起動
+   - 実装・TDD ──► `invoke_subagent` で `developer` を起動
+   - 品質保証 ──► `invoke_subagent` で `qa-engineer` を起動
+   - コード査定 ──► `invoke_subagent` で `reviewer` を起動
 3. **フィードバックの統合**: 開発・テスト中に発生した知見を上位計画やQAへフィードバックし、イテレーションを補正する。
 4. **Pull Requestの作成**: `pr-creator` スキルを活用して GitHub に英語で PR を起票する。
 5. **最終報告とタスク管理**: `walkthrough.md` (またはHTMLデモ) を提示し、残課題を `gh issue create` で英語起票する。
@@ -34,19 +44,20 @@ description: Arrangerの開発プロセス全体を統括し、ユーザーと�
 
 ## オペレーション手順 (Execution Steps)
 
-### Step 1. プランニングの委任
-- Subagent `planner` を起動（複雑な設計時は `Model: 'pro'` を指定）。要件明確化と `implementation_plan.md` を作成。
+### Step 1. プランニングの委任 (`invoke_subagent`)
+- `invoke_subagent` で Subagent `planner` を起動（複雑な設計時は `Model: 'pro'` を指定）。要件明確化と `implementation_plan.md` を作成。
 - 作成された計画をユーザーに提示し、承認（Proceed）を得る。
 
-### Step 2. TDD実装の委任
-- 承認後、Subagent `developer` を起動（通常は `Model: 'inherit'`、複雑リファクタリング時は `Model: 'pro'`）。
+### Step 2. TDD実装の委任 (`invoke_subagent`)
+- 承認後、`invoke_subagent` で Subagent `developer` を起動（通常は `Model: 'inherit'`、複雑リファクタリング時は `Model: 'pro'`）。
 - `commonTest` の追加と `commonMain` への実装を実行。
 
-### Step 3. 品質保証の委任
-- Subagent `qa-engineer` を起動（`Model: 'inherit'`）。`./gradlew test` / Roborazzi / `spotlessCheck` を実行させて結果を検証。
+### Step 3. 品質保証の委任 (`invoke_subagent`)
+- `invoke_subagent` で Subagent `qa-engineer` を起動（`Model: 'inherit'`）。`./gradlew test` / Roborazzi / `spotlessCheck` を実行させて結果を検証。
 
-### Step 4. コード査定の委任
-- Subagent `reviewer` を起動（`Model: 'inherit'`）。`architecture-principles.md` および `code-style-guide.md` に対する客観的評価レポートを作成。
+### Step 4. コード査定の委任 (`invoke_subagent`)
+- `invoke_subagent` で Subagent `reviewer` を起動（`Model: 'inherit'`）。
+- `architecture-principles.md` および `code-style-guide.md` に対する査定レポートを作成させる。
 
 ### Step 5. Pull Request の起票
 - `pr-creator` スキルを呼び出し、コミット内容とテスト結果をまとめた英語の Pull Request を作成。
