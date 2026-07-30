@@ -16,7 +16,14 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 2. 責務の分離原則: Why/What vs How (Separation of Concerns)
+## 2. 人間承認ゲートの必須化 (Human Approval Gate)
+
+- **自動進行の厳禁**: `Step 1 (Planner)` による `implementation_plan.md` の作成完了後、Orchestrator は**即座にツール呼び出しを停止してターンを終了し、ユーザーからの明示的な承認（Proceedボタン押下・承認メッセージ）を待たなければならない**。
+- **フライングの禁止**: ユーザーから承認を得る前に、後続の `developer` サブエージェントを起動したり、コードの実装・変更を開始することを厳格に禁止する。
+
+---
+
+## 3. 責務の分離原則: Why/What vs How (Separation of Concerns)
 
 各サブエージェントは明確な責務の境界を保持し、後続エージェントの自律的な思考や判断を奪ってはならない。
 
@@ -29,7 +36,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 3. コミット粒度と分割のルール (Meaningful Commit Strategy)
+## 4. コミット粒度と分割のルール (Meaningful Commit Strategy)
 
 - **コミットの分割・単位**: 差分は必ず意味のある適切な単位（Atomic / Meaningful Units）で小分けにしてコミットすること。
 - **アンチパターンの禁止**: 異なる目的の作業や複数のファイル変更を一括で1つのコミットにまとめたり、直前のコミットへ安易に `amend` して差分を崩すことを禁止する。
@@ -37,7 +44,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 4. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
+## 5. 独立サブエージェントによる役割分離の徹底 (Mandatory Subagent Delegation)
 
 役割ごとのコンテキスト分離と客観的な品質維持のため、親エージェント（Orchestrator）自身が単体でコード実装やレビューを一気通貫で行ってはならない。
 各フェーズにおいて必ず `invoke_subagent` を用いて独立したサブエージェントをディスパッチし、作業を分担すること。
@@ -49,7 +56,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 5. サブエージェントの動的モデル選定 (Model Selection Principle)
+## 6. サブエージェントの動的モデル選定 (Model Selection Principle)
 
 サブエージェントを `invoke_subagent` で起動する際は、タスクの難易度に応じて `Model` パラメータを切り替えること：
 
@@ -62,7 +69,7 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 6. 必須品質ゲート (Quality Gates)
+## 7. 必須品質ゲート (Quality Gates)
 
 すべての変更は以下の品質チェックを通過しなければならない：
 
@@ -72,11 +79,12 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ---
 
-## 7. Orchestrator のオペレーション手順 (Execution Steps)
+## 8. Orchestrator のオペレーション手順 (Execution Steps)
 
 ```
 [Orchestrator]
    ├── 1. Planner      : 壁打ち・Why/What定義・検証観点提示 (Model: 'pro' or 'inherit') ──> implementation_plan.md
+   ├── 🛑 STOP         : ユーザー承認ゲート (Proceed待ち)
    ├── 2. Developer    : Howの設計・TDD実装 ──> commonTest作成 ──> commonMain実装 ──> 分割コミット (Model: 'inherit' or 'pro')
    ├── 3. QA Engineer  : Howのテスト拡充・./gradlew test + Roborazzi + a11y/Perf検証 (Model: 'inherit')
    ├── 4. Reviewer     : コードスタイル・設計原則の査定評価 (Model: 'inherit')
@@ -86,10 +94,10 @@ AntigravityエージェントがArrangerプロジェクトの開発を自律的�
 
 ### Step 1. プランニングの委任 (`invoke_subagent`)
 - `invoke_subagent` で Subagent `planner` を起動（複雑な設計時は `Model: 'pro'` を指定）。Why/Whatと検証観点を整理した `implementation_plan.md` を作成。
-- 作成された計画をユーザーに提示し、承認（Proceed）を得る。
+- **Plan作成後、ツール呼び出しを停止してターンを終え、ユーザーへ提示して承認（Proceed）を必ず待つ。**
 
 ### Step 2. TDD実装の委任 (`invoke_subagent`)
-- 承認後、`invoke_subagent` で Subagent `developer` を起動（通常は `Model: 'inherit'`、複雑リファクタリング時は `Model: 'pro'`）。
+- **ユーザーの承認を得てから**、`invoke_subagent` で Subagent `developer` を起動（通常は `Model: 'inherit'`、複雑リファクタリング時は `Model: 'pro'`）。
 - Plannerの観点を受けてHowを主体的に設計し、`commonTest` の追加と `commonMain` への実装を実行。
 - **変更差分は意味のある単位で適切にコミット分割**すること。
 
