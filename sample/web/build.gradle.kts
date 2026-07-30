@@ -1,17 +1,20 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+
 plugins {
     kotlin("multiplatform")
     id("arranger.kmp.compose")
 }
 
 kotlin {
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         outputModuleName.set("sample-web")
         browser {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "sample-web.js"
-                devServer = (devServer ?: org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer()).apply {
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static(projectDirPath)
                 }
             }
