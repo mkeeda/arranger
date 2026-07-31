@@ -678,29 +678,11 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ## Development Roadmap
 
-### Phase 1: Core Foundation (Completed)
-- [x] **Core Data Structures**: Range-based attribute management using interval logic.
-- [x] **Runs API**: Semantic segmentation of text into operable chunks.
-- [x] **Compose Integration**: Native binding with `TextFieldState` and `OutputTransformation`.
-- [x] **Built-in Attributes**: Support for Bold, Italic, Underline, Color, and Headings.
+Arranger is actively evolving towards a stable **v1.0.0 (Production-Ready Release)**.
 
-### Phase 2: The Real "Editor" Engine
-- [x] **Rich Text Mutation API**: Support for `insert`, `delete`, and `replace` within `edit {}` with automatic span tracking.
-- [x] **List Support**: Implementation of `BulletList` and `OrderedList` with auto-indent and prefix management.
-- [x] **Undo/Redo Synchronization**: Full history restoration for both text and complex structural changes.
-- [x] **Material 3 UI Components**: Ready-to-use formatting toolbars, toggle buttons, and M3 Typography/Color scheme integration for building instant editor UIs.
+With **Phase 3 (KMP Architecture Migration)** successfully completed, we are currently transitioning into **v0.4.0 (Phase 4: Interoperability & Rich Features)**, focusing on Markdown/HTML import/export, WYSIWYG auto-formatting, visual block decorations, and hyperlink support.
 
-### Phase 3: Multiplatform & Interoperability (The "Killer" Features)
-- [x] **Kotlin Multiplatform (KMP)**: Core architecture migration. (See Supported Platforms for current status).
-- [ ] **Markdown & HTML Support**: Import/Export logic (CommonMark and HTML5).
-- [ ] **WYSIWYG Auto-formatting**: Real-time conversion of Markdown syntax during input (e.g., typing `**bold**` automatically formats the text).
-- [ ] **Visual Decorations**: Implementation of `TextFieldDecorator` for advanced visuals (e.g., custom drawing for blockquotes or code blocks).
-
-### Phase 4: Enterprise Scale & Advanced Layouts
-- [ ] **Inline Media**: Support for images and attachments using Compose `InlineContent`.
-- [ ] **Table Support**: Implementation of nested structural layouts for grids/tables within the editor.
-- [ ] **Declarative Constraints**: Restricting allowed formatting (e.g., "Plain text + Links only") for specific use cases.
-- [ ] **Performance Optimization**: Internal migration to Piece Table/Rope structures for document-scale text.
+For the complete version release plan, detailed milestones, and post-1.0.0 roadmap, please see [ROADMAP.md](ROADMAP.md).
 
 ## Contributing
 Contributions are welcome! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
