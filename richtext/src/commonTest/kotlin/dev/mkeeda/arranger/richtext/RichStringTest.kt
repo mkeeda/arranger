@@ -10,6 +10,4 @@ class RichStringTest {
 
         richString.text shouldBe "Hello, World!"
     }
-
-
 }

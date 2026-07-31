@@ -26,7 +26,6 @@ public data class RichString(
             },
     )
 
-
     /**
      * Retrieves all contiguous runs of the requested attribute [key], merging internally split spans.
      * Adjacent internal spans that possess the EXACT SAME attribute value for [key] will be combined
