@@ -11,8 +11,8 @@ Antigravityエージェント（あなた）が Arranger プロジェクトの�
 
 ## 1. 自然言語とコミュニケーションに関する原則
 
-- **ユーザーとのコミュニケーション**: 会話、思考プロセス、およびローカル Artifact（`implementation_plan.md` や `walkthrough.md` 等）の記載はすべて**日本語**で行うこと。
-- **GitHub・コード上の記述**: OSSプロジェクトであるため、GitHub上に公開・表示されるすべての情報（コミットメッセージ、Pull Request、GitHub Issue、コード内コメント、KDocドキュメント、テスト関数名、コード変更）はすべて**英語**で記述すること。
+- **ユーザーとのコミュニケーション & ハーネス設定**: 会話、思考プロセス、ローカル Artifact（`implementation_plan.md` や `walkthrough.md` 等）、および AIハーネス設定（`.agents/` 配下のスキル定義やプロンプト指示書）の記述はすべて**日本語**を標準とする。
+- **GitHub・コード上の記述**: OSSプロジェクトであるため、GitHub上に公開・表示されるすべての情報（コミットメッセージ、Pull Request、GitHub Issue、コード内コメント、KDocドキュメント、テスト関数名、プロダクションコード）はすべて**英語**で記述すること。
 
 ---
 
@@ -60,7 +60,9 @@ Antigravity アプリケーション上で変更差分（Review タブ）を一�
 以下のシンプルな5ステップで開発を進行してください。
 
 ### Step 1. プランニング (`implementation_plan.md` 作成)
-- 必要に応じて Architect (`planner`) と壁打ちしつつ、機能要件(What)や検証観点を整理した `implementation_plan.md` を作成する。
+- **Evidence-Based Engineering**: プラットフォームの対応状況や仕様調査において、AIの推測での断定を禁止し、必ず公式コードやドキュメントでファクトチェックを行う。
+- **Public API-First**: 機能要件(What)や検証観点に加え、ライブラリ利用者が記述する直感的な Public API シグネチャ（DSLや拡張関数等）を明示的に計画に含める。
+- 必要に応じて Architect (`planner`) と壁打ちしつつ、機能要件や検証観点を整理した `implementation_plan.md` を作成する。
 - **作成後、ツール呼び出しを停止してユーザーへ提示し、承認（Proceed）を必ず待つ。**
 
 ### Step 2. TDD実装と品質保証（あなたが担当）
