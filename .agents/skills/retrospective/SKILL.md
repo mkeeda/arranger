@@ -1,65 +1,65 @@
 ---
 name: retrospective
-description: Conducts a retrospective analysis of recent Antigravity session logs, abstracts user feedback and learnings into generalized development principles, refactors the AI harness (.agents/ rules, skills, subagents), and automatically creates a Pull Request.
+description: 直近のAntigravityセッションログを解析し、ユーザーの指示・フィードバック・学びを本質的な開発原則へ抽象化・汎用化して、AIハーネス（.agents/ 配下のルール・スキル・サブエージェント）の再構築および Pull Request 作成を自動で行うスキルです。
 ---
 
-# AI Harness Retrospective Skill
+# AIハーネス振り返り・自動改善スキル (Retrospective Skill)
 
-This skill provides an automated, end-to-end retrospective workflow to continuously optimize and refactor the AI harness (`.agents/` rules, skills, subagents, and workflows) based on empirical interaction logs from recent Antigravity sessions.
+このスキルは、直近の Antigravity 開発セッションログ（`transcript.jsonl`等）からユーザーからの反復指示、注意・指導された事項、および開発を通して得られた知見を自動解析し、それらを汎用的な開発原則へ昇華させた上で AIハーネス（`.agents/` 配下の rules, skills, subagents）の再構築および Pull Request 作成までを一気通貫で進めるためのワークフロー定義です。
 
-## Core Philosophy
+## 基本理念と行動原則
 
-1. **Deep Abstraction (Concrete ➔ Essence ➔ Generalization)**:
-   Never copy raw user prompts directly into rules. Always perform root-cause analysis (e.g., context gap, rule conflict, tool misusage) and abstract the findings into broad, reusable development principles.
-2. **Full Lifecycle Refactoring (Create, Modify, Delete, Consolidate)**:
-   Do not just append new rules. Maintain a clean harness by removing outdated or redundant rules, consolidating overlapping skills, and introducing new specialized subagents when necessary.
-3. **Antigravity Ecosystem Maximization**:
-   Leverage the full spectrum of Antigravity capabilities: Rules (`.agents/rules/`), Skills (`.agents/skills/`), Subagents (`.agents/subagents/`), Artifacts, MCP tools, Timers/Cron, and Slash Commands.
-4. **Human Approval Gate**:
-   Always present a comprehensive refactoring proposal (`implementation_plan.md`) to the user and stop execution to wait for explicit user approval before applying file modifications.
+1. **具体 ➔ 本質 ➔ 汎用化の抽象化プロセス**:
+   ユーザーの発言や指示をそのまま単発のローカルルールとしてメモ書き・追加しないでください。なぜその問題が発生したのか（前提コンテキストの不足、ルールの競合、ツールの誤用など）を Pro モデルでディープ解析し、将来のあらゆる開発で再現・適用可能な「汎用的な開発原則」へと昇華させてからハーネスに反映します。
+2. **全ライフサイクルのハーネス管理（追加・改修・削除・統合）**:
+   ハーネスの最適化はルールの継ぎ足しだけではありません。形骸化した古いルールや不要になった制約の**「削除」**、類似スキルの**「統合」**、および新しい専門サブエージェントの**「定義・新設」**も柔軟に検討・実施します。
+3. **Antigravityエコシステムの最大活用**:
+   Rules (`.agents/rules/`), Skills (`.agents/skills/`), Subagents (`.agents/subagents/`), Artifacts, MCP tools, Timers/Cron, Slash Commands などの全機能を連携・活用します。
+4. **人間承認ゲート (Human Approval Gate) の徹底**:
+   ハーネスの再構築計画（`implementation_plan.md`）を作成した段階で、**必ずツール呼び出しを停止してターンを終了し、ユーザーからの明示的な承認を得てから** 実際のファイル編集やPR作成に進みます。
 
 ---
 
-## Workflow Steps
+## ワークフロー手順
 
-### Step 1. Discovery & Log Extraction
-- Execute the session log analysis helper script:
+### Step 1. ログ収集と情報探索
+- セッションログ解析用ヘルパースクリプトを実行し、直近の会話ログを取得します：
   ```bash
   python3 .agents/skills/retrospective/scripts/analyze_logs.py --max-sessions 5
   ```
-- Inspect recent session transcripts (`transcript.jsonl`) under `~/.gemini/antigravity/brain/` for:
-  - Repeated user requests or directives.
-  - Critical feedback, corrections, or rule violations noticed by the user.
-  - Architectural decisions, troubleshooting insights, or domain knowledge gained during development.
-- Review existing harness assets in `.agents/rules/`, `.agents/skills/`, and `.agents/subagents/`.
+- `~/.gemini/antigravity/brain/` 配下の直近セッションログ (`transcript.jsonl`) から以下を抽出・整理します：
+  - ユーザーが繰り返し行った指示や要請
+  - ユーザーから注意・指摘されたルール違反や期待外れの行動
+  - 開発プロセスの中で得られた設計原則やトラブルシューティングの知見
+- 現在の `.agents/rules/`, `.agents/skills/`, `.agents/subagents/` の一覧を確認します。
 
-### Step 2. Deep Analysis & Abstraction (Invoke Pro Subagent)
-- Delegate the analysis to a Pro model subagent (`invoke_subagent` with `Model: 'pro'`) to synthesize findings using the abstraction framework:
-  1. **Identify Raw Signals**: Extract specific user inputs and agent mistakes.
-  2. **Analyze Root Causes**: Determine why the issue occurred (e.g., missing context, conflicting rules, improper tool usage).
-  3. **Elevate to Principles**: Transform specific findings into generalized, durable guidelines (e.g., state hoisting invariants, TDD verification bounds).
-  4. **Determine Target Component**: Decide whether to update Rules, Skills, Subagents, or Workflows, including identifying candidates for **deletion** or **consolidation**.
+### Step 2. Proモデルによるディープ解析と抽象化
+- Proモデルのサブエージェント（`invoke_subagent` の `Model: 'pro'`）を起動し、収集したログの抽象化分析を行います：
+  1. **生のシグナル特定**: ユーザー入力や試行錯誤のログを抽出。
+  2. **根本原因分析**: なぜエージェントがミスしたか（コンテキスト不足、ツールの選択ミス、既存ルールの硬直化など）を分析。
+  3. **原則への昇華**: 個別バグではなく、汎用的な開発ガイドライン（状態管理の原則、TDD検証範囲など）へ昇華。
+  4. **対象コンポーネントの選定**: Rules / Skills / Subagents のどこに配置・反映するかを決定し、**削除や統合の対象**も特定。
 
-### Step 3. Proposal Generation (`implementation_plan.md`)
-- Create an `implementation_plan.md` artifact outlining:
-  - **Abstracted Principles**: High-level engineering guidelines derived from logs.
-  - **Harness Modification Matrix**:
-    - `[NEW]`: New rules, skills, or subagent definitions.
-    - `[MODIFY]`: Specific updates to existing harness files.
-    - `[DELETE]`: Obsolete or redundant rules/skills to be removed.
-    - `[CONSOLIDATE]`: Merging overlapping skills or rules.
-- Set `RequestFeedback: true`, `UserFacing: true`, and provide a descriptive `Summary` in the artifact metadata.
+### Step 3. 再構築計画案の提示 (`implementation_plan.md`)
+- `implementation_plan.md` アーティファクトを作成し、以下を記述します：
+  - **抽出された汎用開発原則**: ログ分析から得られた本質的ガイドライン。
+  - **ハーネス変更マトリクス**:
+    - `[NEW]`: 新規作成するルール・スキル・サブエージェント
+    - `[MODIFY]`: 改修する既存ファイル
+    - `[DELETE]`: 削除・廃止する不要ルール/スキル
+    - `[CONSOLIDATE]`: 統合する重複スキル/ルール
+- ArtifactMetadata に `RequestFeedback: true`, `UserFacing: true`, および詳細な `Summary` を設定します。
 
-### Step 4. Human Approval Gate
-- **CRITICAL**: Stop tool calls and end your turn immediately after presenting the plan.
-- Wait for explicit user approval (Proceed button or user approval message) before making any modifications to harness files.
+### Step 4. 人間承認ゲート (Human Approval Gate)
+- **重要**: 計画案の提示完了後、**即座にツール呼び出しを停止してターンを終了**します。
+- ユーザーからの明示的な承認（Proceedボタン押下または承認メッセージ）が得られるまで、ファイル編集を行わないでください。
 
-### Step 5. Execution & Verification
-- Once approved, checkout the latest default branch (`main` or equivalent), pull the latest changes, and create a fresh topic branch (e.g., `refactor/harness-retrospective-YYYYMMDD`).
-- Apply the approved additions, modifications, deletions, and consolidations across `.agents/`.
-- Ensure all comments, KDocs, skill files, and code in the repository adhere to project guidelines (e.g., English documentation in `.agents/`).
-- Create `walkthrough.md` to summarize the changes made and the validation steps completed.
+### Step 5. ハーネスの自律的再構築と検証
+- 承認が得られたら、最新のデフォルトブランチ（`main` 等）を pull してから作業ブランチ（例: `refactor/harness-retrospective-YYYYMMDD`）を作成します。
+- 承認された計画に基づき、`.agents/` 配下のファイルの追加・改修・削除・統合を実行します。
+- リポジトリのフォーマットチェック（`./gradlew spotlessCheck test` 等）を実行して健全性を検証します。
+- `walkthrough.md` を作成し、実施した変更と検証結果をまとめます。
 
-### Step 6. Automated PR Creation
-- Invoke the `pr-creator` skill to automatically generate a Pull Request on GitHub.
-- Write clear, professional English PR titles and descriptions detailing the rationale, abstracted principles, and harness modifications.
+### Step 6. PR自動作成
+- `pr-creator` スキルを呼び出し、GitHub 上に Pull Request を自動作成します。
+- PRのタイトルおよび本文には、変更の背景、昇華された汎用原則、およびハーネスの変更内容を分かりやすく記述します。

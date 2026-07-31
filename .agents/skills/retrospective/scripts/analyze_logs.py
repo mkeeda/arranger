@@ -7,8 +7,8 @@ from pathlib import Path
 
 def find_session_logs(brain_dir: Path, max_sessions: int = 5):
     """
-    Find recent session log files in the brain directory.
-    Sort by directory modification time.
+    brain ディレクトリから直近のセッションログを探索し、
+    更新日時の新しい順にソートして返します。
     """
     if not brain_dir.exists():
         return []
@@ -26,7 +26,7 @@ def find_session_logs(brain_dir: Path, max_sessions: int = 5):
 
 def parse_transcript(transcript_path: Path):
     """
-    Parse transcript.jsonl and extract user input messages and key agent events.
+    transcript.jsonl を読み込み、ユーザーの入力メッセージを抽出します。
     """
     user_inputs = []
     step_count = 0
@@ -43,7 +43,6 @@ def parse_transcript(transcript_path: Path):
                     
                     if step_type == "USER_INPUT":
                         content = data.get("content", "")
-                        # Handle content if it's a list or string
                         if isinstance(content, list):
                             text_parts = []
                             for part in content:
@@ -62,20 +61,20 @@ def parse_transcript(transcript_path: Path):
                 except json.JSONDecodeError:
                     continue
     except Exception as e:
-        sys.stderr.write(f"Error reading {transcript_path}: {e}\n")
+        sys.stderr.write(f"ログファイル読込エラー {transcript_path}: {e}\n")
 
     return user_inputs
 
 def main():
-    parser = argparse.ArgumentParser(description="Analyze Antigravity session logs for retrospective.")
+    parser = argparse.ArgumentParser(description="Antigravityセッションログの振り返り用解析スクリプト")
     parser.add_argument("--brain-dir", type=str, default=os.path.expanduser("~/.gemini/antigravity/brain"),
-                        help="Path to the brain directory containing session logs.")
+                        help="セッションログが保存されている brain ディレクトリのパス")
     parser.add_argument("--max-sessions", type=int, default=5,
-                        help="Maximum number of recent session logs to inspect.")
+                        help="解析対象とする直近セッションの最大数")
     parser.add_argument("--session-id", type=str, default=None,
-                        help="Specific session ID to analyze.")
+                        help="特定セッションのみを解析する場合のセッションID")
     parser.add_argument("--json", action="store_true",
-                        help="Output in JSON format.")
+                        help="JSON形式で結果を出力")
 
     args = parser.parse_args()
     brain_dir = Path(args.brain_dir)
@@ -83,7 +82,7 @@ def main():
     if args.session_id:
         target_log = brain_dir / args.session_id / ".system_generated" / "logs" / "transcript.jsonl"
         if not target_log.exists():
-            sys.stderr.write(f"Session log not found: {target_log}\n")
+            sys.stderr.write(f"指定されたセッションログが見つかりません: {target_log}\n")
             sys.exit(1)
         sessions = [(0, args.session_id, target_log)]
     else:
@@ -103,9 +102,9 @@ def main():
     if args.json:
         print(json.dumps(results, ensure_ascii=False, indent=2))
     else:
-        print(f"=== Antigravity Session Logs Retrospective Analysis ({len(results)} sessions) ===")
+        print(f"=== Antigravity セッションログ振り返り解析 (対象: {len(results)} 件のセッション) ===")
         for res in results:
-            print(f"\n--- Session ID: {res['session_id']} ({res['user_inputs_count']} user inputs) ---")
+            print(f"\n--- セッション ID: {res['session_id']} (ユーザー入力: {res['user_inputs_count']} 件) ---")
             for u_in in res['user_inputs']:
                 print(f"[Step {u_in['step_index']}] {u_in['content'].strip()}")
 
