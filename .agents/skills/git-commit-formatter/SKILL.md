@@ -1,12 +1,16 @@
 ---
 name: git-commit-formatter
-description: Conventional Commits 仕様に従って git のコミットメッセージを生成します。ユーザーが変更をコミットしたいときや、コミットメッセージの作成を求めたときに使用してください。
+description: Conventional Commits 仕様に従って git のコミットメッセージを生成します。ユーザーから指示された時のほか、実装作業が一段落し、エージェント自身の判断で変更差分を意味のある単位に分割して自律的にコミットを作成したい時に使用してください。
 ---
 
 # Git Commit Formatter Skill
 
 Gitのコミットメッセージを作成する際は、必ず以下の **Conventional Commits** 仕様に従ってください。
 また、**コミットメッセージは必ず英語で記述すること。**
+## コミット粒度と分割のルール (Meaningful Commit Strategy)
+
+- **コミットの分割・単位**: 差分は必ず意味のある適切な単位（Atomic / Meaningful Units）で小分けにしてコミットすること。
+- **アンチパターンの禁止**: 異なる目的の作業や複数のファイル変更を一括で1つのコミットにまとめたり、直前のコミットへ安易に `amend` して差分を崩すことを禁止する。
 
 ## フォーマット
 `<type>[optional scope]: <description>`
