@@ -2,6 +2,12 @@ package dev.mkeeda.arranger.richtext
 
 /**
  * Represents a URL discovered within a text sequence.
+ *
+ * @property range The index range within the original text where the URL was found.
+ * @property rawUrl The exact string matched in the text (e.g. "www.google.com").
+ *                  Useful if you need to know exactly what the user typed.
+ * @property url The normalized, actionable URL (e.g. "https://www.google.com").
+ *               This ensures the URL can be safely passed to a UriHandler or WebView.
  */
 public data class DiscoveredUrl(
     public val range: IntRange,
