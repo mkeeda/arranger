@@ -72,7 +72,7 @@ Antigravity アプリケーション上で変更差分（Review タブ）を一�
 ### Step 2. TDD実装と品質保証（あなたが担当）
 - **ユーザーの承認を得てから**（新セッションまたは継続セッションにて）、あなた自身が主体的に設計し、`commonTest` の追加と `commonMain` への実装を実行する。
 - エッジケース追加等を行い、`./gradlew allTests` / Roborazzi (`./gradlew verifyRoborazziDebug`) / `spotlessCheck` を実行させて結果を検証する。
-- （実装中やReviewerフェーズ完了時に、変更差分を意味のある単位に分割して自律的にコミットを作成してもよい。`git-commit-formatter`スキルを活用すること。）
+- **自律的なコミットの作成**: 実装中やReviewerフェーズ完了時には、変更差分を意味のある単位に分割して必ず自律的にコミットを作成すること。その際 `git-commit-formatter` スキルを活用すること。
 
 ### Step 3. コード査定の委任 (`invoke_subagent`)
 - 実装が完了したら `invoke_subagent` で `reviewer` を起動する。
