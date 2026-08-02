@@ -12,15 +12,21 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusProperties
@@ -36,6 +42,7 @@ import arranger.sample.shared.generated.resources.format_h1
 import arranger.sample.shared.generated.resources.format_indent_decrease
 import arranger.sample.shared.generated.resources.format_indent_increase
 import arranger.sample.shared.generated.resources.format_italic
+import arranger.sample.shared.generated.resources.format_link
 import arranger.sample.shared.generated.resources.format_list_bulleted
 import arranger.sample.shared.generated.resources.format_list_numbered
 import arranger.sample.shared.generated.resources.format_quote
@@ -114,6 +121,9 @@ private fun DocumentFormattingToolbar(
     state: RichTextState,
     modifier: Modifier = Modifier,
 ) {
+    var showLinkDialog by remember { mutableStateOf(false) }
+    var linkUrl by remember { mutableStateOf("") }
+
     val unfocusableModifier = Modifier.focusProperties { canFocus = false }
     FlowRow(
         modifier =
@@ -173,14 +183,14 @@ private fun DocumentFormattingToolbar(
             modifier = unfocusableModifier,
         )
         FormatToggleButton(
-            iconRes = Res.drawable.format_underlined,
+            iconRes = Res.drawable.format_link,
             contentDescription = "Hyperlink",
             isActive = state.currentAttributes.containsKey(LinkKey),
             onClick = {
                 if (state.currentAttributes.containsKey(LinkKey)) {
                     state.removeFormat(LinkKey)
                 } else {
-                    state.applyFormat(LinkKey, "https://example.com")
+                    showLinkDialog = true
                 }
             },
             modifier = unfocusableModifier,
@@ -300,6 +310,44 @@ private fun DocumentFormattingToolbar(
                 contentDescription = "Clear Formatting",
             )
         }
+    }
+
+    if (showLinkDialog) {
+        AlertDialog(
+            onDismissRequest = { showLinkDialog = false },
+            title = { Text("Insert Link") },
+            text = {
+                OutlinedTextField(
+                    value = linkUrl,
+                    onValueChange = { linkUrl = it },
+                    label = { Text("URL") },
+                    singleLine = true,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (linkUrl.isNotBlank()) {
+                            state.applyFormat(LinkKey, linkUrl)
+                        }
+                        showLinkDialog = false
+                        linkUrl = ""
+                    },
+                ) {
+                    Text("Apply")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showLinkDialog = false
+                        linkUrl = ""
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 }
 
