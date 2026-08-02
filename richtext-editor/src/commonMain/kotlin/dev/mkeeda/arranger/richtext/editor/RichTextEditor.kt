@@ -172,7 +172,7 @@ private fun Modifier.linkTapHandler(
     pointerInput(state, textLayoutResult, uriHandler) {
         awaitPointerEventScope {
             while (true) {
-                val event = awaitPointerEvent(PointerEventPass.Main)
+                val event = awaitPointerEvent(PointerEventPass.Initial)
                 val change = event.changes.firstOrNull() ?: continue
                 if (change.changedToUp() && !change.isConsumed) {
                     val tapOffset = change.position
