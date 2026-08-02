@@ -54,6 +54,7 @@ import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
+import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RgbaColor
@@ -172,6 +173,20 @@ private fun DocumentFormattingToolbar(
             onClick = { state.toggleFormat(StrikethroughKey) },
             modifier = unfocusableModifier,
         )
+        FormatToggleButton(
+            iconRes = Res.drawable.format_underlined,
+            contentDescription = "Hyperlink",
+            isActive = state.currentAttributes.containsKey(LinkKey),
+            onClick = {
+                if (state.currentAttributes.containsKey(LinkKey)) {
+                    state.removeFormat(LinkKey)
+                } else {
+                    state.applyFormat(LinkKey, "https://example.com")
+                }
+            },
+            modifier = unfocusableModifier,
+        )
+
         FormatToggleButton(
             iconRes = Res.drawable.format_color_text,
             contentDescription = "Text Color Red",

@@ -105,4 +105,28 @@ class DocumentEditorSampleTest {
         // Button should be OFF because at index 0, there is no inherited attribute and no typing attribute
         onNodeWithContentDescription("Bold").assertIsOff()
     }
+
+    @Test
+    fun `toolbar hyperlink button toggles on selection`() = runComposeUiTest {
+        setContent {
+            ArrangerTheme {
+                DocumentEditorSample()
+            }
+        }
+
+        val textInputNode = onNodeWithTag("DocumentEditor")
+        textInputNode.performTextInput("Hello World")
+
+        // Select "Hello"
+        textInputNode.performTextInputSelection(TextRange(0, 5))
+
+        // Toggle Hyperlink on
+        onNodeWithContentDescription("Hyperlink").performClick()
+        onNodeWithContentDescription("Hyperlink").assertIsOn()
+
+        // Toggle Hyperlink off
+        onNodeWithContentDescription("Hyperlink").performClick()
+        onNodeWithContentDescription("Hyperlink").assertIsOff()
+    }
 }
+
