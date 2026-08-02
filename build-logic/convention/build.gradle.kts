@@ -16,6 +16,7 @@ dependencies {
     compileOnly(libs.spotless.gradlePlugin)
     implementation(libs.vanniktech.maven.publish.gradlePlugin)
     implementation(libs.roborazzi.gradlePlugin)
+    testImplementation(kotlin("test"))
 }
 
 gradlePlugin {

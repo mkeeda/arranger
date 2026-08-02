@@ -4,6 +4,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.withType
+
 
 class SpotlessConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -27,6 +29,33 @@ class SpotlessConventionPlugin : Plugin<Project> {
                 format("xml") {
                     target("**/*.xml")
                     targetExclude("**/build/**/*.xml")
+                }
+            }
+
+            // Wire the custom rule as a separate task to avoid Spotless Configuration Cache serialization bug
+            val checkFullyQualifiedNames = tasks.register("checkFullyQualifiedNames") {
+                val kotlinFiles = fileTree("src") {
+                    include("**/*.kt")
+                    exclude("**/build/**")
+                }
+                inputs.files(kotlinFiles)
+                val outputFile = layout.buildDirectory.file("reports/checkFullyQualifiedNames/success.txt")
+                outputs.file(outputFile)
+                
+                doLast {
+                    kotlinFiles.forEach { file ->
+                        dev.mkeeda.arranger.buildlogic.SpotlessCustomRules.noFullyQualifiedNames(file.readText())
+                    }
+                    outputFile.get().asFile.apply {
+                        parentFile.mkdirs()
+                        writeText("Success")
+                    }
+                }
+            }
+
+            tasks.configureEach {
+                if (name == "spotlessCheck") {
+                    dependsOn(checkFullyQualifiedNames)
                 }
             }
         }
