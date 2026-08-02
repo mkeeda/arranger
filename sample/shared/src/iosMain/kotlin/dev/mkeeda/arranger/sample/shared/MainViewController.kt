@@ -37,6 +37,7 @@ private enum class SampleDestination(val title: String) {
     ListFormatting("List Formatting"),
     UndoRedo("Undo / Redo"),
     DocumentEditor("Document Editor"),
+    Hyperlink("Hyperlink"),
 }
 
 // Disable PlistSanityCheck to prevent crashes related to implicit Info.plist checks
@@ -144,6 +145,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.ListFormatting -> ListFormattingSample()
                 SampleDestination.UndoRedo -> UndoRedoSample()
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
+                SampleDestination.Hyperlink -> HyperlinkSample()
             }
         }
     }
