@@ -65,18 +65,8 @@ public fun HyperlinkSample(modifier: Modifier = Modifier) {
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = {
-                    val updated = state.richString.detectAndApplyLinks()
                     state.clearFormats()
-                    for (span in updated.spans) {
-                        val linkUrl = span.attributes[LinkKey]
-                        if (!linkUrl.isNullOrEmpty()) {
-                            state.edit {
-                                editAttributes(span.range) {
-                                    setSpanAttribute(LinkKey, linkUrl)
-                                }
-                            }
-                        }
-                    }
+                    state.detectAndApplyLinks()
                 }) {
                     Text("Auto Detect")
                 }

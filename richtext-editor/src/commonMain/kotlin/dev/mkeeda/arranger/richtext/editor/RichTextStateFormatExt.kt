@@ -8,6 +8,7 @@ import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
+import dev.mkeeda.arranger.richtext.UrlParser
 
 /**
  * Toggles a [SpanAttributeKey] that does not require a value (i.e. its value is [Unit]).
@@ -170,3 +171,18 @@ public fun RichTextState.toAnnotatedString(
             }
         }
     }
+
+/**
+ * Scans the current text for URLs and applies [LinkKey] attributes to them.
+ */
+public fun RichTextState.detectAndApplyLinks() {
+    val urls = UrlParser.findUrls(richString.text)
+    if (urls.isEmpty()) return
+    edit {
+        for (discovered in urls) {
+            editAttributes(discovered.range) {
+                setSpanAttribute(LinkKey, discovered.url)
+            }
+        }
+    }
+}
