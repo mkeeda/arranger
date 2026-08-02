@@ -16,10 +16,14 @@ Antigravityエージェント（あなた）が Arranger プロジェクトの�
 
 ---
 
-## 2. 人間承認ゲートの必須化 (Human Approval Gate)
+## 2. 人間承認ゲートの必須化 (Human Approval Gate) & 手動Compactionプロトコル
 
 - **自動進行の厳禁**: `implementation_plan.md` の作成完了後、あなたは**即座にツール呼び出しを停止してターンを終了し、ユーザーからの明示的な承認（Proceedボタン押下・承認メッセージ）を待たなければならない**。
 - **フライングの禁止**: ユーザーから承認を得る前に、コードの実装・変更を開始することを厳格に禁止する。
+- **手動Compaction（セッション切替）プロトコル**:
+  `implementation_plan.md` の作成と承認完了後は、長丁場タスクにおけるコンテキスト肥大化（Context Saturation）を防止するため、ユーザーに新セッションへの切り替えを推奨すること。
+  承認獲得時、エージェントは以下のメッセージを提示して指示を待つか新セッションでの開始を促す：
+  > `implementation_plan.md` が確定しました。コンテキストをクリーンに保つため、新しいセッションを開いて `implementation_plan.md` から実装を開始することを推奨します。
 
 ---
 
@@ -51,6 +55,7 @@ Antigravity アプリケーション上で変更差分（Review タブ）を一�
 
 1. **単体テスト**: `./gradlew test` がエラーなく全件パスすること。
 2. **ビジュアル検証**: Roborazzi によるスナップショットテスト (`./gradlew verifyRoborazziDebug`) がパスすること。
+   - **[Roborazziベースライン無断更新の絶対禁止]**: `./gradlew recordRoborazziDebug` やそれと同等のベースライン（正解画像）を上書き更新するコマンドは、**ユーザーからの明示的な指示がない限り絶対実行禁止**とする。テスト失敗時はコード修正で解決を図り、仕様変更で更新が必要な場合はコマンドを勝手に実行せず理由を添えてユーザーに判定を仰ぐこと。
 3. **コード整形**: `./gradlew spotlessCheck` がエラーなしでパスすること。
 
 ---
@@ -64,10 +69,11 @@ Antigravity アプリケーション上で変更差分（Review タブ）を一�
 - **Public API-First**: 機能要件(What)や検証観点に加え、ライブラリ利用者が記述する直感的な Public API シグネチャ（DSLや拡張関数等）を明示的に計画に含める。
 - 必要に応じて Architect (`planner`) と壁打ちしつつ、機能要件や検証観点を整理した `implementation_plan.md` を作成する。
 - **作成後、ツール呼び出しを停止してユーザーへ提示し、承認（Proceed）を必ず待つ。**
+- **承認獲得時**: コンテキスト肥大化を防ぐため、「`implementation_plan.md` が確定しました。コンテキストをクリーンに保つため、新しいセッションを開いて `implementation_plan.md` から実装を開始することを推奨します」とユーザーに提示する。
 
 ### Step 2. TDD実装と品質保証（あなたが担当）
-- **ユーザーの承認を得てから**、あなた自身が主体的に設計し、`commonTest` の追加と `commonMain` への実装を実行する。
-- エッジケース追加等を行い、`./gradlew test` / Roborazzi / `spotlessCheck` を実行させて結果を検証する。
+- **ユーザーの承認を得てから**（新セッションまたは継続セッションにて）、あなた自身が主体的に設計し、`commonTest` の追加と `commonMain` への実装を実行する。
+- エッジケース追加等を行い、`./gradlew test` / Roborazzi (`./gradlew verifyRoborazziDebug`) / `spotlessCheck` を実行させて結果を検証する。
 - （以前のコミット分割ルールは一時的に緩和し、一連の機能追加をまとめて実装してもよい。最終合格後に適切にコミットを作成する。）
 
 ### Step 3. コード査定の委任 (`invoke_subagent`)
