@@ -35,7 +35,8 @@ https://android.googlesource.com/platform/frameworks/support/+/androidx-main/com
 
 ## importルール
 - single importのみを使うこと。*を使って複数のクラスをまとめてimportしない。
-- ファイル内でオブジェクト名の被りがない限り、必ずimport文を書いてクラス名等を短く書く。androidx.compose.ui...などのようにフルパッケージ指定は極力避ける。
+- フルパッケージ指定（例: `androidx.compose.ui.Modifier` や `dev.mkeeda.arranger.LinkKey`）をコード本文中で直接使用することは**絶対に禁止**します。必ずimport文を使用してください。
+- クラス名等がスコープ内で衝突する場合でもフルパッケージ指定は行わず、代わりに**Import Alias**（例: `import dev.mkeeda.arranger.LinkKey as ArrangerLinkKey`）を使用してください。
 
 ## テストケース名の表現
 - テスト関数名は英語で記載する
