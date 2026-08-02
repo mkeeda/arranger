@@ -30,6 +30,7 @@ import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.bulletList
 import dev.mkeeda.arranger.richtext.headingLevel
 import dev.mkeeda.arranger.richtext.italic
+import dev.mkeeda.arranger.richtext.link
 import dev.mkeeda.arranger.richtext.orderedList
 import dev.mkeeda.arranger.richtext.rangeOf
 import dev.mkeeda.arranger.richtext.strikethrough
@@ -53,6 +54,28 @@ class RichTextEditorScreenshotTest {
                 "Pack my box with five dozen liquor jugs.\n" +
                 "How vexingly quick daft zebras jump."
         val state = RichTextState(initialText = RichString(text))
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White),
+            )
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun `render hyperlink text`() {
+        val text = "Visit Google for searching and Kotlin for programming."
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Google")) { link("https://google.com") }
+                        editAttributes(text.rangeOf("Kotlin")) { link("https://kotlinlang.org") }
+                    },
+            )
 
         composeTestRule.setContent {
             RichTextEditor(

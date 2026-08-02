@@ -5,9 +5,11 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.AlignmentAttributeKey
 import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
@@ -115,5 +117,14 @@ class AttributeStyleResolverTest {
 
         resolved.spanStyle.shouldBeNull()
         resolved.paragraphStyle.shouldBeNull()
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves LinkKey to blue underline`() {
+        val container = attributeContainerOf(LinkKey to "https://example.com")
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.spanStyle?.color shouldBe Color(0xFF1E88E5)
+        resolved.spanStyle?.textDecoration shouldBe TextDecoration.Underline
     }
 }

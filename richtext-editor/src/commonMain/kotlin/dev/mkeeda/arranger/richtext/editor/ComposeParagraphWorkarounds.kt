@@ -22,6 +22,21 @@ internal class ComposeParagraphWorkarounds {
         return originalOffset + emptyParagraphIndices.count { it < originalOffset }
     }
 
+    /**
+     * Maps a transformed character index back to its original index.
+     */
+    fun unmapCharacterIndex(transformedIndex: Int): Int {
+        var original = transformedIndex
+        for (idx in emptyParagraphIndices.sorted()) {
+            if (idx <= original) {
+                original--
+            } else {
+                break
+            }
+        }
+        return original.coerceAtLeast(0)
+    }
+
     fun apply(
         buffer: TextFieldBuffer,
         getParagraphStyleAt: (Int) -> ParagraphStyle?,

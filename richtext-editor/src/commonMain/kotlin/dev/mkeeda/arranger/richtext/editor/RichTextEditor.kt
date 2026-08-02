@@ -22,12 +22,18 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
+import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.extractListItems
@@ -81,9 +87,16 @@ public fun RichTextEditor(
 
     val listItems = remember(state.richString) { state.richString.extractListItems() }
 
+    val uriHandler = LocalUriHandler.current
+    val linkTapModifier =
+        remember(state, textLayoutResult, uriHandler, workarounds) {
+            Modifier.linkTapHandler(state, textLayoutResult, uriHandler, workarounds)
+        }
+
     val drawModifier =
         Modifier
             .clipToBounds()
+            .then(linkTapModifier)
             .drawBehind {
                 val layoutResult = textLayoutResult ?: return@drawBehind
 
@@ -149,3 +162,33 @@ private fun DrawScope.drawListItems(
         canvas.restore()
     }
 }
+
+private fun Modifier.linkTapHandler(
+    state: RichTextState,
+    textLayoutResult: TextLayoutResult?,
+    uriHandler: UriHandler,
+    workarounds: ComposeParagraphWorkarounds,
+): Modifier =
+    pointerInput(state, textLayoutResult, uriHandler) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
+                val change = event.changes.firstOrNull() ?: continue
+                if (change.changedToUp() && !change.isConsumed) {
+                    val tapOffset = change.position
+                    val layoutResult = textLayoutResult ?: continue
+                    val rawOffset = layoutResult.getOffsetForPosition(tapOffset)
+                    val unmappedOffset = workarounds.unmapCharacterIndex(rawOffset)
+                    val targetSpan =
+                        state.richString.spans.find { span ->
+                            unmappedOffset in span.range && span.attributes.containsKey(LinkKey)
+                        }
+                    val url = targetSpan?.attributes?.get(LinkKey)
+                    if (!url.isNullOrEmpty()) {
+                        change.consume()
+                        uriHandler.openUri(url)
+                    }
+                }
+            }
+        }
+    }
