@@ -167,3 +167,11 @@ public object OrderedListKey : BlockTypeAttributeKey<ListIndentLevel> {
     override val defaultValue: ListIndentLevel = ListIndentLevel.Unspecified
     override val enterKeyStrategy: EnterKeyStrategy = ListEnterStrategy
 }
+
+/**
+ * The standard [AttributeKey] to denote a hyperlink URL.
+ */
+public object LinkKey : SpanAttributeKey<String> {
+    override val name: String = "link"
+    override val defaultValue: String = ""
+}
