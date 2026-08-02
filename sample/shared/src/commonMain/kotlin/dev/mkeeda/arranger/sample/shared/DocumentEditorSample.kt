@@ -1,25 +1,5 @@
 package dev.mkeeda.arranger.sample.shared
 
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
-import arranger.sample.shared.generated.resources.Res
-import arranger.sample.shared.generated.resources.format_align_center
-import arranger.sample.shared.generated.resources.format_bold
-import arranger.sample.shared.generated.resources.format_clear
-import arranger.sample.shared.generated.resources.format_color_fill
-import arranger.sample.shared.generated.resources.format_color_text
-import arranger.sample.shared.generated.resources.format_h1
-import arranger.sample.shared.generated.resources.format_indent_decrease
-import arranger.sample.shared.generated.resources.format_indent_increase
-import arranger.sample.shared.generated.resources.format_italic
-import arranger.sample.shared.generated.resources.format_list_bulleted
-import arranger.sample.shared.generated.resources.format_list_numbered
-import arranger.sample.shared.generated.resources.format_quote
-import arranger.sample.shared.generated.resources.format_size
-import arranger.sample.shared.generated.resources.format_strikethrough
-import arranger.sample.shared.generated.resources.format_underlined
-import arranger.sample.shared.generated.resources.redo
-import arranger.sample.shared.generated.resources.undo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -46,6 +26,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import arranger.sample.shared.generated.resources.Res
+import arranger.sample.shared.generated.resources.format_align_center
+import arranger.sample.shared.generated.resources.format_bold
+import arranger.sample.shared.generated.resources.format_clear
+import arranger.sample.shared.generated.resources.format_color_fill
+import arranger.sample.shared.generated.resources.format_color_text
+import arranger.sample.shared.generated.resources.format_h1
+import arranger.sample.shared.generated.resources.format_indent_decrease
+import arranger.sample.shared.generated.resources.format_indent_increase
+import arranger.sample.shared.generated.resources.format_italic
+import arranger.sample.shared.generated.resources.format_list_bulleted
+import arranger.sample.shared.generated.resources.format_list_numbered
+import arranger.sample.shared.generated.resources.format_quote
+import arranger.sample.shared.generated.resources.format_size
+import arranger.sample.shared.generated.resources.format_strikethrough
+import arranger.sample.shared.generated.resources.format_underlined
+import arranger.sample.shared.generated.resources.redo
+import arranger.sample.shared.generated.resources.undo
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
@@ -71,7 +69,8 @@ import dev.mkeeda.arranger.richtext.editor.clearFormats
 import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.removeFormat
 import dev.mkeeda.arranger.richtext.editor.toggleFormat
-import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun DocumentEditorSample(modifier: Modifier = Modifier) {
@@ -421,4 +420,3 @@ private fun IndentButton(
         )
     }
 }
-

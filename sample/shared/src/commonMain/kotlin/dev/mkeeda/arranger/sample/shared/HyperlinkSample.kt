@@ -37,10 +37,11 @@ public fun HyperlinkSample(modifier: Modifier = Modifier) {
 
     Scaffold(modifier = modifier) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
         ) {
             Text("Hyperlink Support Sample")
             Spacer(modifier = Modifier.height(12.dp))
@@ -49,7 +50,7 @@ public fun HyperlinkSample(modifier: Modifier = Modifier) {
                 value = inputUrl,
                 onValueChange = { inputUrl = it },
                 label = { Text("Link URL") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -79,17 +80,16 @@ public fun HyperlinkSample(modifier: Modifier = Modifier) {
                 }) {
                     Text("Auto Detect")
                 }
-
-
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             RichTextEditor(
                 state = state,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
             )
         }
     }

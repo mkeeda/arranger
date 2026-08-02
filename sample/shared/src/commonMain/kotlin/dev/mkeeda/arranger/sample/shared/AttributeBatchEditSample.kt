@@ -18,7 +18,6 @@ import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.textColor
 import dev.mkeeda.arranger.richtext.rangeOf
-import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 @Composable
 fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
@@ -67,4 +66,3 @@ fun AttributeBatchEditSample(modifier: Modifier = Modifier) {
         )
     }
 }
-

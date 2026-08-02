@@ -164,6 +164,3 @@ fun CustomListMarkerSample(modifier: Modifier = Modifier) {
         listMarkerResolver = customMarkerResolver,
     )
 }
-
-
-

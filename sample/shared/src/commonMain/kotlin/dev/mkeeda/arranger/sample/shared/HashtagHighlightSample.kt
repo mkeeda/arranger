@@ -13,7 +13,6 @@ import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.textColor
 import dev.mkeeda.arranger.richtext.rangesOf
-import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 @Composable
 fun HashtagHighlightSample(modifier: Modifier = Modifier) {
@@ -48,4 +47,3 @@ fun HashtagHighlightSample(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
     )
 }
-

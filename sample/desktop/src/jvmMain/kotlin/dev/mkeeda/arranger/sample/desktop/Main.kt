@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -50,21 +49,22 @@ private enum class SampleDestination(val title: String) {
     DocumentEditor("Document Editor"),
 }
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "Arranger Sample"
-    ) {
-        ArrangerTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                SampleApp()
+fun main() =
+    application {
+        Window(
+            onCloseRequest = ::exitApplication,
+            title = "Arranger Sample",
+        ) {
+            ArrangerTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    SampleApp()
+                }
             }
         }
     }
-}
 
 @Composable
 private fun SampleApp() {
@@ -74,12 +74,12 @@ private fun SampleApp() {
         SampleListPane(
             modifier = Modifier.weight(1f),
             currentDestination = currentDestination,
-            onSampleSelected = { currentDestination = it }
+            onSampleSelected = { currentDestination = it },
         )
         VerticalDivider()
         SampleDetailPane(
             modifier = Modifier.weight(2f),
-            currentDestination = currentDestination
+            currentDestination = currentDestination,
         )
     }
 }
@@ -89,32 +89,36 @@ private fun SampleApp() {
 private fun SampleListPane(
     modifier: Modifier = Modifier,
     currentDestination: SampleDestination?,
-    onSampleSelected: (SampleDestination) -> Unit
+    onSampleSelected: (SampleDestination) -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text("Samples") }) }
+        topBar = { TopAppBar(title = { Text("Samples") }) },
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
         ) {
             item { Spacer(modifier = Modifier.height(8.dp)) }
             items(SampleDestination.entries) { destination ->
                 val isSelected = currentDestination == destination
                 OutlinedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .clickable { onSampleSelected(destination) },
-                    colors = CardDefaults.outlinedCardColors(
-                        containerColor = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface,
-                    ),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .clickable { onSampleSelected(destination) },
+                    colors =
+                        CardDefaults.outlinedCardColors(
+                            containerColor =
+                                if (isSelected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface,
+                        ),
                 ) {
                     Text(
                         text = destination.title,
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
+                        color =
+                            if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -127,7 +131,7 @@ private fun SampleListPane(
 @Composable
 private fun SampleDetailPane(
     modifier: Modifier = Modifier,
-    currentDestination: SampleDestination
+    currentDestination: SampleDestination,
 ) {
     Scaffold(
         modifier = modifier,
@@ -135,10 +139,10 @@ private fun SampleDetailPane(
             TopAppBar(
                 title = { Text(currentDestination.title) },
             )
-        }
+        },
     ) { innerPadding ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(16.dp)
+            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(16.dp),
         ) {
             when (currentDestination) {
                 SampleDestination.DynamicEditing -> DynamicEditingSample()

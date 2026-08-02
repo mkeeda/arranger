@@ -12,6 +12,7 @@ class WasmJsApplicationConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
+                apply("arranger.spotless")
             }
 
             extensions.configure<KotlinMultiplatformExtension> {

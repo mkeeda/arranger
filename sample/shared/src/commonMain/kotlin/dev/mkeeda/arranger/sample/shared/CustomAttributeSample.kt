@@ -14,7 +14,6 @@ import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.rangeOf
-import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 // 1. Define Custom Attribute Key
 public object HighlightKey : SpanAttributeKey<Unit> {
@@ -57,4 +56,3 @@ fun CustomAttributeSample(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
     )
 }
-

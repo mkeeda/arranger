@@ -17,7 +17,6 @@ import dev.mkeeda.arranger.richtext.headingLevel
 import dev.mkeeda.arranger.richtext.rangeOf
 import dev.mkeeda.arranger.richtext.textAlignment
 import dev.mkeeda.arranger.richtext.underline
-import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 @Composable
 fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
@@ -63,4 +62,3 @@ fun AdvancedFormattingSample(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
     )
 }
-

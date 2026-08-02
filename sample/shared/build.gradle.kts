@@ -7,6 +7,7 @@ plugins {
     id("arranger.ios.target")
     id("arranger.wasmjs.target")
     id("arranger.kmp.compose")
+    id("arranger.spotless")
 }
 
 kotlin {
@@ -48,4 +49,3 @@ kotlin {
         }
     }
 }
-
