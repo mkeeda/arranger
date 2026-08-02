@@ -32,7 +32,7 @@ class HyperlinkAttributeTest {
     }
 
     @Test
-    fun `UrlParser finds http, https, and www urls`() {
+    fun `UrlParser finds http https and www urls`() {
         val text = "Visit https://kotlinlang.org or http://example.com/test?a=1 and www.github.com for details."
         val discovered = UrlParser.findUrls(text)
 
@@ -59,14 +59,5 @@ class HyperlinkAttributeTest {
         discovered.size shouldBe 2
         discovered[0].rawUrl shouldBe "https://example.com"
         discovered[1].rawUrl shouldBe "https://example.org/path"
-    }
-
-    @Test
-    fun `detectAndApplyLinks applies LinkKey spans`() {
-        val richString = RichString("Here is www.google.com link.")
-
-        val updated = richString.detectAndApplyLinks()
-        val googleRun = updated.runs(LinkKey).firstOrNull { it.text == "www.google.com" }
-        googleRun?.value shouldBe "https://www.google.com"
     }
 }

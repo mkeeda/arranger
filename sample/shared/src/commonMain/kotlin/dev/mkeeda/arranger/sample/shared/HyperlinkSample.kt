@@ -21,11 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.detectAndApplyLinks
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.applyFormat
 import dev.mkeeda.arranger.richtext.editor.clearFormats
+import dev.mkeeda.arranger.richtext.editor.detectAndApplyLinks
 import dev.mkeeda.arranger.richtext.editor.removeFormat
 
 @Composable

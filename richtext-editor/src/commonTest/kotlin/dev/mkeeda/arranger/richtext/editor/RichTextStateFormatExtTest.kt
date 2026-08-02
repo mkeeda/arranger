@@ -249,4 +249,40 @@ class RichTextStateFormatExtTest {
         linkAnnotations.size shouldBe 1
         (linkAnnotations.first().item as LinkAnnotation.Url).url shouldBe linkUrl
     }
+
+    @Test
+    fun `detectAndApplyLinks applies LinkKey to discovered URLs in RichTextState`() {
+        val state = RichTextState(initialText = RichString("Check out https://example.com and www.test.org for info."))
+
+        state.detectAndApplyLinks()
+
+        val spans = state.richString.spans
+        spans.size shouldBe 2
+
+        val firstSpan = spans.first { it.attributes[LinkKey] == "https://example.com" }
+        firstSpan.range shouldBe state.richString.text.rangeOf("https://example.com")
+
+        val secondSpan = spans.first { it.attributes[LinkKey] == "https://www.test.org" }
+        secondSpan.range shouldBe state.richString.text.rangeOf("www.test.org")
+    }
+
+    @Test
+    fun `detectAndApplyLinks does not overwrite manually set links`() {
+        val text = "Check out https://example.com"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        setSpanAttribute(LinkKey, "https://custom-tracking.com", range = text.rangeOf("https://example.com"))
+                    },
+            )
+
+        state.detectAndApplyLinks()
+
+        val spans = state.richString.spans
+        spans.size shouldBe 1
+
+        val linkSpan = spans.first()
+        linkSpan.attributes[LinkKey] shouldBe "https://custom-tracking.com"
+    }
 }

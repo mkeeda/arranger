@@ -178,10 +178,20 @@ public fun RichTextState.toAnnotatedString(
 public fun RichTextState.detectAndApplyLinks() {
     val urls = UrlParser.findUrls(richString.text)
     if (urls.isEmpty()) return
+
+    val existingLinkSpans = richString.spans.filter { it.attributes[LinkKey] != null }
+
     edit {
         for (discovered in urls) {
-            editAttributes(discovered.range) {
-                setSpanAttribute(LinkKey, discovered.url)
+            val hasExistingLink =
+                existingLinkSpans.any { span ->
+                    span.range.first <= discovered.range.last &&
+                        span.range.last >= discovered.range.first
+                }
+            if (!hasExistingLink) {
+                editAttributes(discovered.range) {
+                    setSpanAttribute(LinkKey, discovered.url)
+                }
             }
         }
     }

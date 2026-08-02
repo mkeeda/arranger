@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
@@ -125,6 +126,11 @@ class DocumentEditorSampleTest {
 
             // Toggle Hyperlink on
             onNodeWithContentDescription("Hyperlink").performClick()
+
+            // Wait for dialog and enter URL
+            onNodeWithText("URL").performTextInput("https://example.com")
+            onNodeWithText("Apply").performClick()
+
             onNodeWithContentDescription("Hyperlink").assertIsOn()
 
             // Toggle Hyperlink off

@@ -59,18 +59,3 @@ public object UrlParser {
         return results
     }
 }
-
-/**
- * Convenience extension function to scan [RichString] text for URLs and apply [LinkKey] attributes.
- */
-public fun RichString.detectAndApplyLinks(): RichString {
-    val urls = UrlParser.findUrls(text)
-    if (urls.isEmpty()) return this
-    return edit {
-        for (discovered in urls) {
-            editAttributes(discovered.range) {
-                link(discovered.url)
-            }
-        }
-    }
-}
