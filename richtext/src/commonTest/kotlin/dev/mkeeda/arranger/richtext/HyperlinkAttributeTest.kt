@@ -1,24 +1,23 @@
 package dev.mkeeda.arranger.richtext
 
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 class HyperlinkAttributeTest {
     @Test
-    fun apply_and_remove_link_key_on_rich_string() {
+    fun `apply and remove LinkKey on RichString`() {
         val richString =
-            buildRichString {
-                append("Check out Google for search.")
+            RichString("Check out Google for search.").edit {
                 editAttributes(10..15) {
                     link("https://google.com")
                 }
             }
 
         // Check runs/attributes
-        val runs = richString.runs().toList()
+        val runs = richString.runs(LinkKey).toList()
         val googleRun = runs.firstOrNull { it.text == "Google" }
-        assertEquals("https://google.com", googleRun?.attributes?.get(LinkKey))
+        googleRun?.value shouldBe "https://google.com"
 
         // Check removal
         val modifiedString =
@@ -27,50 +26,47 @@ class HyperlinkAttributeTest {
                     clearLink()
                 }
             }
-        val modifiedRuns = modifiedString.runs().toList()
+        val modifiedRuns = modifiedString.runs(LinkKey).toList()
         val modifiedGoogleRun = modifiedRuns.firstOrNull { it.text == "Google" }
-        assertNull(modifiedGoogleRun?.attributes?.get(LinkKey))
+        modifiedGoogleRun.shouldBeNull()
     }
 
     @Test
-    fun url_parser_finds_http_https_and_www_urls() {
+    fun `UrlParser finds http, https, and www urls`() {
         val text = "Visit https://kotlinlang.org or http://example.com/test?a=1 and www.github.com for details."
         val discovered = UrlParser.findUrls(text)
 
-        assertEquals(3, discovered.size)
+        discovered.size shouldBe 3
 
-        assertEquals(6..27, discovered[0].range)
-        assertEquals("https://kotlinlang.org", discovered[0].rawUrl)
-        assertEquals("https://kotlinlang.org", discovered[0].url)
+        discovered[0].range shouldBe 6..27
+        discovered[0].rawUrl shouldBe "https://kotlinlang.org"
+        discovered[0].url shouldBe "https://kotlinlang.org"
 
-        assertEquals(32..58, discovered[1].range)
-        assertEquals("http://example.com/test?a=1", discovered[1].rawUrl)
-        assertEquals("http://example.com/test?a=1", discovered[1].url)
+        discovered[1].range shouldBe 32..58
+        discovered[1].rawUrl shouldBe "http://example.com/test?a=1"
+        discovered[1].url shouldBe "http://example.com/test?a=1"
 
-        assertEquals(63..76, discovered[2].range)
-        assertEquals("www.github.com", discovered[2].rawUrl)
-        assertEquals("https://www.github.com", discovered[2].url)
+        discovered[2].range shouldBe 64..77
+        discovered[2].rawUrl shouldBe "www.github.com"
+        discovered[2].url shouldBe "https://www.github.com"
     }
 
     @Test
-    fun url_parser_trims_trailing_punctuation() {
+    fun `UrlParser trims trailing punctuation`() {
         val text = "Go to https://example.com., or (https://example.org/path)!"
         val discovered = UrlParser.findUrls(text)
 
-        assertEquals(2, discovered.size)
-        assertEquals("https://example.com", discovered[0].rawUrl)
-        assertEquals("https://example.org/path", discovered[1].rawUrl)
+        discovered.size shouldBe 2
+        discovered[0].rawUrl shouldBe "https://example.com"
+        discovered[1].rawUrl shouldBe "https://example.org/path"
     }
 
     @Test
-    fun detect_and_apply_links_applies_link_spans() {
-        val richString =
-            buildRichString {
-                append("Here is www.google.com link.")
-            }
+    fun `detectAndApplyLinks applies LinkKey spans`() {
+        val richString = RichString("Here is www.google.com link.")
 
         val updated = richString.detectAndApplyLinks()
-        val googleRun = updated.runs().firstOrNull { it.text == "www.google.com" }
-        assertEquals("https://www.google.com", googleRun?.attributes?.get(LinkKey))
+        val googleRun = updated.runs(LinkKey).firstOrNull { it.text == "www.google.com" }
+        googleRun?.value shouldBe "https://www.google.com"
     }
 }
