@@ -19,7 +19,7 @@ The goal of `v1.0.0` is to deliver a robust, multiplatform-ready, rich text edit
 - [ ] **Markdown & HTML Support:** Import / Export converters for Markdown and HTML representations.
 - [ ] **Visual Block Decorations:** Visual container rendering for blockquotes, code blocks, callouts, and background styling.
 - [ ] **WYSIWYG Auto-formatting:** Live markdown syntax replacement while typing (e.g., typing `# ` converts to H1 automatically).
-- [ ] **Hyperlink Support:** `LinkKey` attribute, URL parsing, and interactive tap/click handling across platforms.
+- [x] **Hyperlink Support:** `LinkKey` attribute, URL parsing (`UrlParser`), interactive tap/click navigation via `LocalUriHandler`, and `detectAndApplyLinks()` API.
 
 ### 🔒 v1.0.0-alpha / v1.0.0-rc (Release Preparation)
 - [ ] **Public API Audit & Freeze:** Finalize and freeze public API signatures across `arranger-richtext`, `arranger-richtext-editor`, and platform-specific modules.

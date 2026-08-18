@@ -352,6 +352,58 @@ The library includes three built-in strategies:
 
 You can combine these strategies (or create your own custom strategies) to build a seamless editing experience.
 
+## Hyperlinks & URL Detection
+
+Arranger provides native support for rich hyperlinks with `LinkKey`. You can apply links to text ranges, automatically detect URLs in plain text, and provide seamless tap/click navigation across all platforms.
+
+### Applying Hyperlinks
+You can apply a URL link to a selected range using the standard `applyFormat(LinkKey, url)` extension on `RichTextState`, or `link(url)` within a `RichString` builder:
+
+<details>
+<summary><b>Show Code</b></summary>
+
+```kotlin
+@Composable
+fun HyperlinkSample(modifier: Modifier = Modifier) {
+    val initialText = "Visit Kotlin website or Google for search."
+
+    val state =
+        remember {
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        editAttributes(range = initialText.rangeOf("Kotlin website")) {
+                            link("https://kotlinlang.org")
+                        }
+                        editAttributes(range = initialText.rangeOf("Google")) {
+                            link("https://google.com")
+                        }
+                    },
+            )
+        }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+```
+
+</details>
+
+### Interactive Tap / Click Handling
+`RichTextEditor` automatically styles links (blue text with underline by default) and handles tap/click gestures:
+* **Native Navigation:** Clicking or tapping a hyperlink automatically invokes Compose's standard `LocalUriHandler.current.openUri(url)`.
+* **Custom URI Handlers:** To customize link navigation behavior (e.g., in-app web views or custom routing), provide a custom handler using standard Compose `CompositionLocalProvider(LocalUriHandler provides customUriHandler)`.
+
+### URL Parsing & Auto-Linking
+Arranger includes a pure Kotlin `UrlParser` utility that detects URLs in plain text and normalizes them (e.g., prepending `https://` to `www.` domains).
+To automatically scan the document and apply `LinkKey` spans to all detected URLs in one atomic transaction, use `state.detectAndApplyLinks()`:
+
+```kotlin
+// Automatically detects URLs and applies LinkKey spans (preserving existing custom links)
+state.detectAndApplyLinks()
+```
 
 ## Custom Attribute Mapping
 
@@ -650,7 +702,7 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 
 | Sample | Screenshot |
 | --- | --- |
-| **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as an Android, iOS, Desktop (macOS, Windows, Linux), and Web (Wasm) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
+| **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, insert hyperlinks via dialogs, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as an Android, iOS, Desktop (macOS, Windows, Linux), and Web (Wasm) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
 
 ### Running the Sample Applications
 
