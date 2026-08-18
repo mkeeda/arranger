@@ -1,6 +1,7 @@
 package dev.mkeeda.arranger.richtext.editor
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.TextSize
@@ -26,6 +27,6 @@ class AttributeConversionsTest {
 
     @Test
     fun `TextSize toTextUnit returns Unspecified when size is Unspecified`() {
-        TextSize.Unspecified.toTextUnit() shouldBe androidx.compose.ui.unit.TextUnit.Unspecified
+        TextSize.Unspecified.toTextUnit() shouldBe TextUnit.Unspecified
     }
 }

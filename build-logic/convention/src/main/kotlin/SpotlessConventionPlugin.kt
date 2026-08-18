@@ -17,7 +17,9 @@ class SpotlessConventionPlugin : Plugin<Project> {
                 kotlin {
                     target("**/*.kt")
                     targetExclude("**/build/**/*.kt")
-                    ktlint(ktlintVersion).setEditorConfigPath(target.rootProject.file(".editorconfig"))
+                    ktlint(ktlintVersion)
+                        .setEditorConfigPath(target.rootProject.file(".editorconfig"))
+                        .customRuleSets(listOf(":ktlint-rules:"))
                 }
                 kotlinGradle {
                     target("**/*.kts")
