@@ -32,7 +32,7 @@ class NoFullyQualifiedNamesRule : Rule(
             }
 
             val text = node.text
-            if (BANNED_PREFIXES.any { text.startsWith(it) }) {
+            if (isFullyQualified(node.elementType, text)) {
                 emit(
                     node.startOffset,
                     "Fully qualified name '$text' is not allowed in code body. Use imports or import aliases (e.g. `import package.ClassName as AliasName`) instead.",
@@ -40,6 +40,13 @@ class NoFullyQualifiedNamesRule : Rule(
                 )
             }
         }
+    }
+
+    private fun isFullyQualified(elementType: org.jetbrains.kotlin.com.intellij.psi.tree.IElementType, text: String): Boolean {
+        if (elementType == ElementType.USER_TYPE) {
+            return USER_TYPE_QUALIFIED_PATTERN.containsMatchIn(text)
+        }
+        return PACKAGE_PREFIX_PATTERN.containsMatchIn(text) || MULTI_PACKAGE_CLASS_PATTERN.containsMatchIn(text)
     }
 
     private fun ASTNode.isInsideImportOrPackage(): Boolean {
@@ -56,9 +63,14 @@ class NoFullyQualifiedNamesRule : Rule(
     }
 
     companion object {
-        private val BANNED_PREFIXES = listOf(
-            "androidx.compose.",
-            "dev.mkeeda.",
+        private val USER_TYPE_QUALIFIED_PATTERN = Regex("""^[a-z][a-zA-Z0-9_]*\..*""")
+
+        private val PACKAGE_PREFIX_PATTERN = Regex(
+            """^(androidx|dev|com|org|io|java|javax|kotlin|kotlinx|android|net)\.[a-zA-Z0-9_]+"""
+        )
+
+        private val MULTI_PACKAGE_CLASS_PATTERN = Regex(
+            """^[a-z][a-zA-Z0-9_]*(\.[a-z][a-zA-Z0-9_]*)+\.[A-Z]"""
         )
     }
 }
