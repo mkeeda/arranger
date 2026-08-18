@@ -33,10 +33,6 @@ Text("ui text")
 APIの命名規則は公式のCompose API Guidelinesに従うこと。
 https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-api-guidelines.md
 
-## importルール
-- single importのみを使うこと。*を使って複数のクラスをまとめてimportしない。
-- フルパッケージ指定（例: `androidx.compose.ui.Modifier` や `dev.mkeeda.arranger.LinkKey`）をコード本文中で直接使用することは**絶対に禁止**します。必ずimport文を使用してください。
-- クラス名等がスコープ内で衝突する場合でもフルパッケージ指定は行わず、代わりに**Import Alias**（例: `import dev.mkeeda.arranger.LinkKey as ArrangerLinkKey`）を使用してください。
 
 ## テストケース名の表現
 - テスト関数名は英語で記載する
