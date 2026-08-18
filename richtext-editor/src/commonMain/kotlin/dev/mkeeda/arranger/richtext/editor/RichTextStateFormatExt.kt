@@ -1,9 +1,5 @@
 package dev.mkeeda.arranger.richtext.editor
 
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.buildAnnotatedString
 import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
@@ -135,42 +131,6 @@ public fun RichTextState.clearFormats() {
         }
     }
 }
-
-/**
- * Converts this [RichTextState] into an Compose [AnnotatedString],
- * applying resolved styles and [LinkAnnotation.Url] annotations.
- */
-public fun RichTextState.toAnnotatedString(
-    styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
-): AnnotatedString =
-    buildAnnotatedString {
-        val fullText = this@toAnnotatedString.richString.text
-        append(fullText)
-        val totalLength = fullText.length
-
-        for (span in richString.spans) {
-            val start = span.range.first.coerceIn(0, totalLength)
-            val end = (span.range.last + 1).coerceIn(0, totalLength)
-            if (start >= end) continue
-
-            val resolved = styleResolver.resolve(span.attributes)
-            resolved.spanStyle?.let { addStyle(it, start, end) }
-            resolved.paragraphStyle?.let { addStyle(it, start, end) }
-
-            val linkUrl = span.attributes[LinkKey]
-            if (!linkUrl.isNullOrEmpty()) {
-                addLink(
-                    url =
-                        LinkAnnotation.Url(
-                            url = linkUrl,
-                            styles = resolved.spanStyle?.let { TextLinkStyles(style = it) },
-                        ),
-                    start = start,
-                    end = end,
-                )
-            }
-        }
-    }
 
 /**
  * Scans the current text for URLs and applies [LinkKey] attributes to them.

@@ -27,12 +27,14 @@ import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
+import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
@@ -43,8 +45,8 @@ import dev.mkeeda.arranger.richtext.extractListItems
  *
  * @param state The [RichTextState] holding the text and its attributes.
  * @param modifier The modifier to be applied to the text field.
- * @param styleResolver A resolver that specifies how [dev.mkeeda.arranger.richtext.AttributeContainer]s
- * should be translated into visually rendered Compose [androidx.compose.ui.text.SpanStyle]s.
+ * @param styleResolver A resolver that specifies how [AttributeContainer]s
+ * should be translated into visually rendered Compose [SpanStyle]s.
  */
 @Composable
 public fun RichTextEditor(
@@ -181,7 +183,7 @@ private fun Modifier.linkTapHandler(
                     val unmappedOffset = workarounds.unmapCharacterIndex(rawOffset)
                     val targetSpan =
                         state.richString.spans.find { span ->
-                            unmappedOffset in span.range && span.attributes.containsKey(LinkKey)
+                            span.attributes.containsKey(LinkKey) && unmappedOffset in span.range
                         }
                     val url = targetSpan?.attributes?.get(LinkKey)
                     if (!url.isNullOrEmpty()) {

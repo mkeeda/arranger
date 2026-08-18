@@ -1,6 +1,5 @@
 package dev.mkeeda.arranger.richtext.editor
 
-import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
@@ -230,24 +229,6 @@ class RichTextStateFormatExtTest {
         state.clearFormats()
 
         state.richString.spans.isEmpty() shouldBe true
-    }
-
-    @Test
-    fun `toAnnotatedString creates LinkAnnotation for LinkKey`() {
-        val text = "Click here for docs"
-        val linkUrl = "https://example.com/docs"
-        val state =
-            RichTextState(
-                initialText =
-                    RichString(text = text).edit {
-                        setSpanAttribute(LinkKey, linkUrl, range = text.rangeOf("here"))
-                    },
-            )
-
-        val annotated = state.toAnnotatedString()
-        val linkAnnotations = annotated.getLinkAnnotations(text.indexOf("here"), text.indexOf("here") + 4)
-        linkAnnotations.size shouldBe 1
-        (linkAnnotations.first().item as LinkAnnotation.Url).url shouldBe linkUrl
     }
 
     @Test
