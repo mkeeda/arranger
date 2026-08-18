@@ -17,7 +17,6 @@ dependencies {
     implementation(libs.vanniktech.maven.publish.gradlePlugin)
     implementation(libs.roborazzi.gradlePlugin)
     runtimeOnly(project(":ktlint-rules"))
-    testImplementation(kotlin("test"))
 }
 
 gradlePlugin {

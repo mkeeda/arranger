@@ -2,7 +2,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "dev.mkeeda.arranger.buildlogic"
+group = "dev.mkeeda.arranger.ktlint"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -16,5 +16,6 @@ dependencies {
     testImplementation(libs.ktlint.rule.engine.core)
     testImplementation(libs.ktlint.cli.ruleset.core)
     testImplementation(libs.ktlint.test)
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotest.assertions.core)
 }
