@@ -1,19 +1,29 @@
 package dev.mkeeda.arranger.richtext.editor
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.attributeContainerOf
@@ -489,4 +499,55 @@ class RichTextEditorTest {
 
         state.richString.text shouldBe "Hello World"
     }
+
+    @Test
+    fun `tapping on a hyperlink triggers LocalUriHandler`() {
+        val initialText = "Click here"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setSpanAttribute(LinkKey, "https://example.com", 6..10)
+                    },
+            )
+
+        var openedUri: String? = null
+        val testUriHandler =
+            object : UriHandler {
+                override fun openUri(uri: String) {
+                    openedUri = uri
+                }
+            }
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalUriHandler provides testUriHandler,
+            ) {
+                RichTextEditor(state = state)
+            }
+        }
+
+        // Tap on the plain text "Click" (index 0).
+        // This verifies that non-hyperlink areas are NOT intercepted and
+        // the underlying BasicTextField correctly processes it (e.g. moves the cursor).
+        composeTestRule.onNodeWithText(initialText).clickOnCharacter(0)
+        openedUri shouldBe null // UriHandler not triggered
+        state.selection.collapsed shouldBe true
+
+        // Tap on the hyperlink "here" (index 6).
+        // We use raw TouchInput instead of Semantics actions to verify that our
+        // PointerEventPass.Initial interception correctly catches the touch event
+        // before the underlying BasicTextField consumes it for cursor placement.
+        composeTestRule.onNodeWithText(initialText).clickOnCharacter(6)
+
+        openedUri shouldBe "https://example.com"
+    }
+}
+
+private fun SemanticsNodeInteraction.clickOnCharacter(index: Int) {
+    val textLayoutResults = mutableListOf<TextLayoutResult>()
+    fetchSemanticsNode().config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(textLayoutResults)
+    val layoutResult = textLayoutResults.first()
+    val boundingBox = layoutResult.getBoundingBox(index)
+    performTouchInput { click(boundingBox.center) }
 }

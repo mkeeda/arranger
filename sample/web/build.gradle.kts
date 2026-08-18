@@ -13,9 +13,10 @@ kotlin {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "sample-web.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static(projectDirPath)
-                }
+                devServer =
+                    (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                        static(projectDirPath)
+                    }
             }
         }
         binaries.executable()

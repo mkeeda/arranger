@@ -17,30 +17,30 @@ import org.junit.Test
 
 @OptIn(ExperimentalTestApi::class)
 class DocumentEditorDesktopTest {
-
     @Test
-    fun `toolbar buttons apply format to selected text on desktop`() = runComposeUiTest {
-        setContent {
-            ArrangerTheme {
-                DocumentEditorSample()
+    fun `toolbar buttons apply format to selected text on desktop`() =
+        runComposeUiTest {
+            setContent {
+                ArrangerTheme {
+                    DocumentEditorSample()
+                }
             }
+
+            val textInputNode = onNodeWithTag("DocumentEditor")
+            textInputNode.performTextInput("Desktop Test")
+
+            // Select "Desktop Test"
+            textInputNode.performTextInputSelection(TextRange(0, 12))
+            textInputNode.assertIsFocused()
+
+            // Assert initial state (Bold is OFF)
+            onNodeWithContentDescription("Bold").assertIsOff()
+
+            // Toggle Bold on
+            onNodeWithContentDescription("Bold").performClick()
+
+            // Assert Bold is applied (button remains toggled ON)
+            onNodeWithContentDescription("Bold").assertIsOn()
+            textInputNode.assertIsFocused()
         }
-
-        val textInputNode = onNodeWithTag("DocumentEditor")
-        textInputNode.performTextInput("Desktop Test")
-
-        // Select "Desktop Test"
-        textInputNode.performTextInputSelection(TextRange(0, 12))
-        textInputNode.assertIsFocused()
-
-        // Assert initial state (Bold is OFF)
-        onNodeWithContentDescription("Bold").assertIsOff()
-
-        // Toggle Bold on
-        onNodeWithContentDescription("Bold").performClick()
-
-        // Assert Bold is applied (button remains toggled ON)
-        onNodeWithContentDescription("Bold").assertIsOn()
-        textInputNode.assertIsFocused()
-    }
 }

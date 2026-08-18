@@ -238,3 +238,21 @@ public fun AttributeEditScope.orderedList(level: ListIndentLevel) {
 public fun AttributeEditScope.clearOrderedList() {
     setParagraphAttribute(OrderedListKey, null)
 }
+
+/**
+ * Convenience function to set the link attribute within this builder.
+ */
+public fun AttributeEditScope.link(url: String) {
+    if (url.isEmpty()) {
+        clearLink()
+    } else {
+        setSpanAttribute(LinkKey, url)
+    }
+}
+
+/**
+ * Convenience function to remove the link attribute in the range.
+ */
+public fun AttributeEditScope.clearLink() {
+    setSpanAttribute(LinkKey, null)
+}

@@ -1,25 +1,5 @@
 package dev.mkeeda.arranger.sample.shared
 
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
-import arranger.sample.shared.generated.resources.Res
-import arranger.sample.shared.generated.resources.format_align_center
-import arranger.sample.shared.generated.resources.format_bold
-import arranger.sample.shared.generated.resources.format_clear
-import arranger.sample.shared.generated.resources.format_color_fill
-import arranger.sample.shared.generated.resources.format_color_text
-import arranger.sample.shared.generated.resources.format_h1
-import arranger.sample.shared.generated.resources.format_indent_decrease
-import arranger.sample.shared.generated.resources.format_indent_increase
-import arranger.sample.shared.generated.resources.format_italic
-import arranger.sample.shared.generated.resources.format_list_bulleted
-import arranger.sample.shared.generated.resources.format_list_numbered
-import arranger.sample.shared.generated.resources.format_quote
-import arranger.sample.shared.generated.resources.format_size
-import arranger.sample.shared.generated.resources.format_strikethrough
-import arranger.sample.shared.generated.resources.format_underlined
-import arranger.sample.shared.generated.resources.redo
-import arranger.sample.shared.generated.resources.undo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -32,20 +12,45 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import arranger.sample.shared.generated.resources.Res
+import arranger.sample.shared.generated.resources.format_align_center
+import arranger.sample.shared.generated.resources.format_bold
+import arranger.sample.shared.generated.resources.format_clear
+import arranger.sample.shared.generated.resources.format_color_fill
+import arranger.sample.shared.generated.resources.format_color_text
+import arranger.sample.shared.generated.resources.format_h1
+import arranger.sample.shared.generated.resources.format_indent_decrease
+import arranger.sample.shared.generated.resources.format_indent_increase
+import arranger.sample.shared.generated.resources.format_italic
+import arranger.sample.shared.generated.resources.format_link
+import arranger.sample.shared.generated.resources.format_list_bulleted
+import arranger.sample.shared.generated.resources.format_list_numbered
+import arranger.sample.shared.generated.resources.format_quote
+import arranger.sample.shared.generated.resources.format_size
+import arranger.sample.shared.generated.resources.format_strikethrough
+import arranger.sample.shared.generated.resources.format_underlined
+import arranger.sample.shared.generated.resources.redo
+import arranger.sample.shared.generated.resources.undo
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
@@ -54,6 +59,7 @@ import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
+import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RgbaColor
@@ -70,7 +76,8 @@ import dev.mkeeda.arranger.richtext.editor.clearFormats
 import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.removeFormat
 import dev.mkeeda.arranger.richtext.editor.toggleFormat
-import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun DocumentEditorSample(modifier: Modifier = Modifier) {
@@ -114,6 +121,9 @@ private fun DocumentFormattingToolbar(
     state: RichTextState,
     modifier: Modifier = Modifier,
 ) {
+    var showLinkDialog by remember { mutableStateOf(false) }
+    var linkUrl by remember { mutableStateOf("") }
+
     val unfocusableModifier = Modifier.focusProperties { canFocus = false }
     FlowRow(
         modifier =
@@ -172,6 +182,20 @@ private fun DocumentFormattingToolbar(
             onClick = { state.toggleFormat(StrikethroughKey) },
             modifier = unfocusableModifier,
         )
+        FormatToggleButton(
+            iconRes = Res.drawable.format_link,
+            contentDescription = "Hyperlink",
+            isActive = state.currentAttributes.containsKey(LinkKey),
+            onClick = {
+                if (state.currentAttributes.containsKey(LinkKey)) {
+                    state.removeFormat(LinkKey)
+                } else {
+                    showLinkDialog = true
+                }
+            },
+            modifier = unfocusableModifier,
+        )
+
         FormatToggleButton(
             iconRes = Res.drawable.format_color_text,
             contentDescription = "Text Color Red",
@@ -286,6 +310,44 @@ private fun DocumentFormattingToolbar(
                 contentDescription = "Clear Formatting",
             )
         }
+    }
+
+    if (showLinkDialog) {
+        AlertDialog(
+            onDismissRequest = { showLinkDialog = false },
+            title = { Text("Insert Link") },
+            text = {
+                OutlinedTextField(
+                    value = linkUrl,
+                    onValueChange = { linkUrl = it },
+                    label = { Text("URL") },
+                    singleLine = true,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (linkUrl.isNotBlank()) {
+                            state.applyFormat(LinkKey, linkUrl)
+                        }
+                        showLinkDialog = false
+                        linkUrl = ""
+                    },
+                ) {
+                    Text("Apply")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showLinkDialog = false
+                        linkUrl = ""
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 }
 
@@ -406,4 +468,3 @@ private fun IndentButton(
         )
     }
 }
-

@@ -22,12 +22,20 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
+import dev.mkeeda.arranger.richtext.AttributeContainer
+import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.extractListItems
@@ -37,8 +45,8 @@ import dev.mkeeda.arranger.richtext.extractListItems
  *
  * @param state The [RichTextState] holding the text and its attributes.
  * @param modifier The modifier to be applied to the text field.
- * @param styleResolver A resolver that specifies how [dev.mkeeda.arranger.richtext.AttributeContainer]s
- * should be translated into visually rendered Compose [androidx.compose.ui.text.SpanStyle]s.
+ * @param styleResolver A resolver that specifies how [AttributeContainer]s
+ * should be translated into visually rendered Compose [SpanStyle]s.
  */
 @Composable
 public fun RichTextEditor(
@@ -81,9 +89,16 @@ public fun RichTextEditor(
 
     val listItems = remember(state.richString) { state.richString.extractListItems() }
 
+    val uriHandler = LocalUriHandler.current
+    val linkTapModifier =
+        remember(state, textLayoutResult, uriHandler, workarounds) {
+            Modifier.linkTapHandler(state, textLayoutResult, uriHandler, workarounds)
+        }
+
     val drawModifier =
         Modifier
             .clipToBounds()
+            .then(linkTapModifier)
             .drawBehind {
                 val layoutResult = textLayoutResult ?: return@drawBehind
 
@@ -149,3 +164,33 @@ private fun DrawScope.drawListItems(
         canvas.restore()
     }
 }
+
+private fun Modifier.linkTapHandler(
+    state: RichTextState,
+    textLayoutResult: TextLayoutResult?,
+    uriHandler: UriHandler,
+    workarounds: ComposeParagraphWorkarounds,
+): Modifier =
+    pointerInput(state, textLayoutResult, uriHandler) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val change = event.changes.firstOrNull() ?: continue
+                if (change.changedToUp() && !change.isConsumed) {
+                    val tapOffset = change.position
+                    val layoutResult = textLayoutResult ?: continue
+                    val rawOffset = layoutResult.getOffsetForPosition(tapOffset)
+                    val unmappedOffset = workarounds.unmapCharacterIndex(rawOffset)
+                    val targetSpan =
+                        state.richString.spans.find { span ->
+                            span.attributes.containsKey(LinkKey) && unmappedOffset in span.range
+                        }
+                    val url = targetSpan?.attributes?.get(LinkKey)
+                    if (!url.isNullOrEmpty()) {
+                        change.consume()
+                        uriHandler.openUri(url)
+                    }
+                }
+            }
+        }
+    }

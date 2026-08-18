@@ -20,6 +20,7 @@ import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
+import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
@@ -68,6 +69,13 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
         spanStyle(UnderlineKey) {
             SpanStyle(textDecoration = TextDecoration.Underline)
         }
+        spanStyle(LinkKey) {
+            SpanStyle(
+                color = Color(0xFF1E88E5),
+                textDecoration = TextDecoration.Underline,
+            )
+        }
+
         spanStyle(HeadingKey) { level ->
             when (level) {
                 HeadingLevel.H1 -> SpanStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold)

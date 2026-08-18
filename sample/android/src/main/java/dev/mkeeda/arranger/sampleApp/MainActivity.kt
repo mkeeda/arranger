@@ -43,6 +43,7 @@ import dev.mkeeda.arranger.sample.shared.CustomAttributeSample
 import dev.mkeeda.arranger.sample.shared.DocumentEditorSample
 import dev.mkeeda.arranger.sample.shared.DynamicEditingSample
 import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
+import dev.mkeeda.arranger.sample.shared.HyperlinkSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
@@ -61,6 +62,7 @@ internal enum class SampleDestination(val title: String) : NavKey {
     ListFormatting("List Formatting"),
     UndoRedo("Undo / Redo"),
     DocumentEditor("Document Editor"),
+    Hyperlink("Hyperlink"),
 }
 
 class MainActivity : ComponentActivity() {
@@ -206,6 +208,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.ListFormatting -> ListFormattingSample()
                 SampleDestination.UndoRedo -> UndoRedoSample()
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
+                SampleDestination.Hyperlink -> HyperlinkSample()
             }
         }
     }

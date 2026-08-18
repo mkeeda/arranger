@@ -2,7 +2,6 @@ package dev.mkeeda.arranger.sample.shared
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -39,22 +37,25 @@ private enum class SampleDestination(val title: String) {
     ListFormatting("List Formatting"),
     UndoRedo("Undo / Redo"),
     DocumentEditor("Document Editor"),
+    Hyperlink("Hyperlink"),
 }
 
-// Disable PlistSanityCheck to prevent crashes related to implicit Info.plist checks 
+// Disable PlistSanityCheck to prevent crashes related to implicit Info.plist checks
 // for 120Hz displays on ProMotion devices when using SwiftPM.
-fun MainViewController() = ComposeUIViewController(
-    configure = { enforceStrictPlistSanityCheck = false }
-) {
-    ArrangerTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            IosArrangerSampleApp()
+@Suppress("FunctionName")
+fun MainViewController() =
+    ComposeUIViewController(
+        configure = { enforceStrictPlistSanityCheck = false },
+    ) {
+        ArrangerTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+            ) {
+                IosArrangerSampleApp()
+            }
         }
     }
-}
 
 @Composable
 private fun IosArrangerSampleApp() {
@@ -63,12 +64,12 @@ private fun IosArrangerSampleApp() {
 
     if (destination == null) {
         SampleListScreen(
-            onSampleSelected = { currentDestination = it }
+            onSampleSelected = { currentDestination = it },
         )
     } else {
         SampleDetailScreen(
             destination = destination,
-            onBack = { currentDestination = null }
+            onBack = { currentDestination = null },
         )
     }
 }
@@ -82,21 +83,24 @@ private fun SampleListScreen(onSampleSelected: (SampleDestination) -> Unit) {
         },
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp),
         ) {
             item { Spacer(modifier = Modifier.height(8.dp)) }
             items(SampleDestination.entries) { destination ->
                 OutlinedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .clickable { onSampleSelected(destination) },
-                    colors = CardDefaults.outlinedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .clickable { onSampleSelected(destination) },
+                    colors =
+                        CardDefaults.outlinedCardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ),
                 ) {
                     Text(
                         text = destination.title,
@@ -126,10 +130,11 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
         },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp),
         ) {
             when (destination) {
                 SampleDestination.DynamicEditing -> DynamicEditingSample()
@@ -140,6 +145,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.ListFormatting -> ListFormattingSample()
                 SampleDestination.UndoRedo -> UndoRedoSample()
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
+                SampleDestination.Hyperlink -> HyperlinkSample()
             }
         }
     }
