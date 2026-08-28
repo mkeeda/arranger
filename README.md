@@ -4,8 +4,8 @@
 [![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-richtext-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-richtext-editor%22)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Arranger is a declarative, type-safe rich text editor engine and UI components for Compose Multiplatform.
-While standard `buildAnnotatedString` is perfect for static text decoration, it quickly breaks down when building real-time editors where users insert and delete text. Arranger is built specifically for **dynamic text operations**, automatically managing and shifting attribute spans (like bold, colors, or links) as the underlying text mutates.
+Arranger is a declarative, type-safe rich text editor engine and UI ecosystem for Compose Multiplatform.
+Think of Arranger as the foundational framework (similar to ProseMirror or Lexical) for building full-featured, modern text editing experiences on Compose—providing out-of-the-box paragraph formatting, dynamic enter-key strategies, semantic attribute querying, atomic undo/redo, and upcoming Markdown/WYSIWYG interoperability.
 
 <div align="center">
   <img src="./docs/images/rich-text-editor-demo.gif" width="300" alt="Arranger Rich Text Editor Demo"/>
@@ -28,48 +28,41 @@ While standard `buildAnnotatedString` is perfect for static text decoration, it 
 
 ## Core Features
 
-* 🛡️ **Type-Safe Custom Attributes:** Define and apply UI-specific styles (like `SpanStyle`) and domain-specific attributes (e.g., `@Mention`, `#Hashtag`) with full compile-time safety.
-* 🔄 **Atomic Mutations:** Safely insert, delete, and replace text. Arranger automatically tracks and shifts span indices, eliminating manual calculation errors.
-* 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes). This allows for semantic iteration, searching, and batch editing.
-* 🎨 **Declarative Constraints (Planned):** Provide a way to declaratively define constraints (e.g., "This text field only allows bold text and links") to automatically strip unwanted styles.
-* 🧩 **Native Compose Multiplatform Integration:** Elegantly separate state management and UI rendering by leveraging the latest `TextFieldState` and `OutputTransformation`.
+* 🛡️ **Type-Safe Custom Attributes:** Define and apply UI-specific styles (like `SpanStyle`) and domain-specific attributes (e.g., `@Mention`, `#Hashtag`, `LinkKey`) with full compile-time safety.
+* ⚡ **High-Level Editor Behaviors:** Built-in paragraph formatting (Headings, Blockquotes, Alignments, Bullet & Ordered Lists), dynamic enter-key strategies, and robust Undo/Redo history tracking.
+* 🔄 **Declarative & Type-Safe Mutation DSL:** Atomically mutate text and apply rich attributes within a type-safe builder DSL, eliminating manual index calculations and ensuring synchronized state.
+* 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
+* 🌐 **Markdown & HTML Interoperability (Planned):** Bi-directional import/export converters and live WYSIWYG auto-formatting while typing.
+* 🧩 **Native Compose Multiplatform Integration:** Elegantly separate headless core state management (`RichTextState`) and UI rendering (`RichTextEditor`) across Android, iOS, Desktop, and Web.
 
 ## Why Arranger?
 
-Arranger solves the biggest pain points of traditional rich text handling in Compose Multiplatform.
+While Compose 1.12+ provides fundamental primitives (`TextField`, `addStyle`), building a production-grade rich text editor (such as Notion, Bear, or Slack) requires a higher-level engine to orchestrate complex editing interactions. Arranger delivers that complete editor framework.
 
-### 1. No More Manual Index Math (Auto-Shifting Spans)
-While standard `buildAnnotatedString` is excellent for decorating static text, it is not designed for dynamic input. If a user inserts or deletes text in the middle of an `AnnotatedString`, all subsequent span indices become misaligned, and you are forced to manually recalculate them. This manual index math is tedious and highly error-prone when building a real-time text editor.
+### 1. Declarative & Type-Safe Mutation DSL
+Standard text components require manual index math and string concatenation. Arranger provides a declarative, type-safe builder DSL to atomically mutate text and apply formatting attributes in a single synchronized operation:
 
-**The Pain (`AnnotatedString`)**
 ```kotlin
-// The Pain: If a user inserts text, you must manually recalculate all span indices!
-val oldText = "Hello Bold Text"
-val oldSpans = listOf(AnnotatedString.Range(SpanStyle(fontWeight = FontWeight.Bold), 6, 10))
-
-// Inserting "!" at the beginning
-val newText = "!" + oldText
-val newSpans = oldSpans.map { 
-    // Manual index shifting - tedious and highly error-prone
-    AnnotatedString.Range(it.item, it.start + 1, it.end + 1) 
-}
-```
-
-**The Arranger Way**
-Arranger automatically tracks and shifts spans during text mutations.
-```kotlin
-// Arranger Way 1: Automatically tracks and shifts spans during text mutations.
+// Arranger: Declarative and type-safe text mutation DSL
 state.edit {
-    insert(index = 0, text = "!")
-    // The "Bold" span is automatically shifted. No manual index math required!
+    insert(index = textLength, text = "New Section") {
+        bold()
+        headingLevel(HeadingLevel.H2)
+    }
 }
 ```
 
-### 2. Semantic Attribute Search via "Runs"
+### 2. Out-of-the-Box Editor Behaviors
+Building an intuitive editing experience requires orchestrating multi-step formatting rules. Arranger comes with batteries included:
+* **Smart Enter Key Handling:** `EnterKeyStrategy` automatically manages list continuations, outdenting, and heading resets on newlines.
+* **Dynamic List Marker Resolution:** Automated nested bullet markers and sequence numbering (`ListMarkerResolver`).
+* **Atomic Undo / Redo:** Full undo/redo stack tracking both text mutations and formatting changes seamlessly.
+
+### 3. Semantic Attribute Search via "Runs"
 Inspired by SwiftUI's `AttributedString.Runs`, Arranger treats text as semantic chunks. You can easily find and batch-edit specific attributes without complex regex or index tracking.
 
 ```kotlin
-// Arranger Way 2: Semantic iteration over attributes via "Runs"
+// Arranger: Semantic iteration over attributes via "Runs"
 state.edit {
     // Find all chunks of text that are Bold, and turn them Red at once
     val boldRuns = state.richString.runs(BoldKey)
@@ -131,7 +124,7 @@ fun DynamicEditingSample(modifier: Modifier = Modifier) {
         )
     }
 
-    // 2. Render natively via Compose 1.7
+    // 2. Render natively via Compose Multiplatform
     // Try typing in the middle of "styled text"! 
     // Arranger automatically tracks and shifts the span indices in the background.
     RichTextEditor(
@@ -730,11 +723,14 @@ To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (K
 
 ## Development Roadmap
 
-Arranger is actively evolving towards a stable **v1.0.0 (Production-Ready Release)**.
+Arranger is evolving towards a stable **v1.0.0 (Production-Ready Release)**.
 
-With **Phase 3 (KMP Architecture Migration)** successfully completed, we are currently transitioning into **v0.4.0 (Phase 4: Interoperability & Rich Features)**, focusing on Markdown/HTML import/export, WYSIWYG auto-formatting, visual block decorations, and hyperlink support.
+With the release of **Compose 1.12**, we have pivoted our focus toward delivering a comprehensive **High-Level Rich Text Editor Engine**:
+* **v0.3.x (Strategic Pivot & Baseline):** Compose 1.12 compatibility verification and positioning pivot.
+* **v0.4.0 – v0.5.0 (High Priority Focus):** Markdown/HTML interop, WYSIWYG auto-formatting, interactive links/mentions, and visual block decorations.
+* **v1.0.0 (Production Readiness):** Internal adoption of Compose 1.12 native `TrackedRange` primitives across all multiplatform targets, API freeze, and LTS stability.
 
-For the complete version release plan, detailed milestones, and post-1.0.0 roadmap, please see [ROADMAP.md](ROADMAP.md).
+For the complete version release plan, detailed milestone breakdown, and post-1.0.0 roadmap, please see [ROADMAP.md](ROADMAP.md).
 
 ## Contributing
 Contributions are welcome! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
