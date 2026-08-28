@@ -24,7 +24,7 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 | **Web** | ✅ Supported | WasmJs |
 
 ## Requirements
-* **Kotlin 2.3.20+**
+* **Kotlin 2.4.10+**
 
 ## Core Features
 
@@ -85,10 +85,10 @@ kotlin {
         commonMain.dependencies {
             // For Compose UI integration (RichTextEditor).
             // This automatically includes the core 'arranger-richtext' module.
-            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.3.0-alpha03")
+            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha01")
 
             // Optional: If you only need the core data structures without Compose UI:
-            // implementation("dev.mkeeda.arranger:arranger-richtext:0.3.0-alpha03")
+            // implementation("dev.mkeeda.arranger:arranger-richtext:0.4.0-alpha01")
         }
     }
 }
@@ -99,7 +99,7 @@ Add the dependencies to your top-level `dependencies` block in `build.gradle.kts
 
 ```kotlin
 dependencies {
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.3.0-alpha03")
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha01")
 }
 ```
 
@@ -408,7 +408,7 @@ You can define custom attribute keys and map them to Compose styles. Below shows
 > To use it, add the following dependency to your module's `build.gradle.kts`:
 > ```kotlin
 > dependencies {
->     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.3.0-alpha03")
+>     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha01")
 > }
 > ```
 
