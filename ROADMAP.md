@@ -19,7 +19,8 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
 ---
 
 ## Phased Release Plan
-### 🚀 v0.3.x (Strategic Pivot & Compatibility Baseline) [Current]
+
+### 🚀 v0.3.x (Strategic Pivot & Compatibility Baseline)
 *Verifying Compose 1.12 baseline and realigning library architecture and documentation.*
 
 - [ ] **Compose 1.12 Compatibility Verification:** Verify BOM updates, dependency alignment, and cross-platform build validation across Android, iOS, Desktop (JVM), and Web (WasmJs).
