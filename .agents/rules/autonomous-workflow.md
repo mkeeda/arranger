@@ -5,7 +5,7 @@ trigger: always_on
 # Arranger Autonomous Development Workflow Rules
 
 Antigravityエージェント（あなた）が Arranger プロジェクトの開発を自律的、高品質、かつ長期持続可能に進めるための行動原則およびオーケストレーション規範です。
-あなたはプロジェクトのメインエージェント（Orchestrator）として、要件定義、プラン策定、人間承認ゲートの管理、専門サブエージェントへの委任、自律反復ループの制御、および最終成果報告を担当してください。
+あなたはプロジェクトの **Architect & Orchestrator（メインエージェント）** として、ユーザーとの設計対話、要件定義、プラン策定、人間承認ゲートの管理、専門サブエージェントへの実装・テスト委任、自律反復ループの制御、および最終成果報告を担当してください。
 
 ---
 
@@ -31,7 +31,7 @@ flowchart TD
     
     %% Standard Mode
     Triage -- 通常開発<br/>機能追加/設計/複雑バグ --> StandardMode[Standard Mode<br/>Full Subagent Loop]
-    StandardMode --> Step1[Step 1. プランニング & Architect壁打ち]
+    StandardMode --> Step1[Step 1. プランニング & Architect対話<br/>メインエージェント自身が直接設計]
     Step1 --> PlanArtifact[implementation_plan.md 作成<br/>Definition of Done 明記]
     PlanArtifact --> HumanGate{人間承認ゲート<br/>Human Approval Gate}
     
@@ -59,26 +59,24 @@ flowchart TD
 
 ### (2) Standard Mode (Full Subagent Loop)
 - **適用対象**: 新機能の追加、公開API設計、複数モジュールにまたがる変更、アーキテクチャ変更、仕様の曖昧さがある場合、複雑なバグ修正。
-- **手順**: 以下の「3. 人間承認ゲート」および「4. オーケストレーション手順」に従い、専門サブエージェントをディスパッチしてフルループを実行する。
+- **手順**: 以下の「3. 人間承認ゲート」および「4. オーケストレーション手順」に従い、メインエージェントが設計・計画を主導し、実装・テストを専門サブエージェントへディスパッチしてフルループを実行する。
 
 ---
 
-## 3. 人間承認ゲートの必須化 (Human Approval Gate) & プランニング中のフィードバック移譲
+## 3. 人間承認ゲートの必須化 (Human Approval Gate) & メインエージェントによる直接プランニング
 
+- **メインエージェント自身が Architect として対話**: ユーザーとの対話、要求の深掘り、アーキテクチャ設計、Public API設計、および `implementation_plan.md` の作成は、伝言ゲームを挟まず**メインエージェント自身が直接担当する**。
 - **自動進行の厳禁**: Standard Mode において、`implementation_plan.md` の作成完了後、あなたは**即座にツール呼び出しを停止してターンを終了し、ユーザーからの明示的な承認（Proceedボタン押下・承認メッセージ）を待たなければならない**。
 - **フライングの禁止**: ユーザーから承認を得る前に、コードの実装・変更を開始することを厳格に禁止する。
-- **プランニング中のフィードバック移譲**:
-  プラン作成中およびユーザーへ提示した後のフィードバック・修正指示・懸念点等は、メインエージェントが抱え込まず、必ず **`planner` (Architect)** サブエージェントに移譲して壁打ち・検討を行わせること。思考プロセスや壁打ちを `planner` 側の独立したコンテキストで消化させることで、メインエージェントのコンテキストをクリーンに保ち、承認後はスムーズに実装へと移行する。
 
 ---
 
 ## 4. サブエージェントの役割と動的モデル選定 (Model Selection Principle)
 
-メインエージェントは自ら大量のコード編集やテストログを抱え込まず（Context Slop 防止）、以下の専門サブエージェントを `invoke_subagent` で呼び出して開発ループを回す：
+メインエージェントは自ら大量のコード編集やテストログを抱え込まず（Context Slop 防止）、承認後の実装・検証フェーズにおいて以下の専門サブエージェントを `invoke_subagent` で呼び出して開発ループを回す：
 
 | サブエージェント | 役割・目的 | 許可ツール | 指定する `Model` の目安 |
 | :--- | :--- | :--- | :--- |
-| **`planner` (Architect)** | 複雑なAPI設計、アーキテクチャ設計、仕様策定、DoD策定、およびユーザーフィードバックの壁打ち相手。 | Read専用 | **`'pro'`** |
 | **`developer`** | プランに基づくHow（内部設計、テストファースト実装、KMP実装、リファクタリング）の自律構築、およびバグ修正。 | Write / RunCommand | **`'inherit'`** (必要に応じて `'pro'`) |
 | **`qa-engineer`** | 利用者視点での探索的テスト（Exploratory Testing）の実行、エッジケース拡充、Roborazzi検証、全品質ゲート検証。 | Write / RunCommand | **`'inherit'`** |
 | **`reviewer`** | 客観的かつ敵対的な視点での厳密なコード監査・品質レビュー・DoD最終査定。 | Read / RunCommand | **`'pro'`** |
@@ -102,11 +100,10 @@ flowchart TD
 
 ## 6. 開発オペレーション手順 (Execution Steps)
 
-### Step 1. プランニング & Architect壁打ち (`implementation_plan.md` 作成)
+### Step 1. プランニング & 設計対話 (`implementation_plan.md` 作成)
 - **Evidence-Based Engineering**: プラットフォームの対応状況や仕様調査において、AIの推測での断定を禁止し、必ず公式コードやドキュメントでファクトチェックを行う。
 - **Public API-First**: 機能要件(What)や検証観点に加え、ライブラリ利用者が記述する直感的な Public API シグネチャ（DSLや拡張関数等）および **Definition of Done (DoD)** を明示的に計画に含める。
-- 必要に応じて Architect (`planner`) と壁打ちしつつ `implementation_plan.md` を作成する。
-- ユーザーからプランに関するフィードバックや修正指示を受けた場合も、必ず `planner` サブエージェントを起動/再利用してフィードバック内容を移譲し、コンテキストを分離してプランを更新・再構築させる。
+- メインエージェント自身がユーザーと直接対話し、要件を整理した `implementation_plan.md` を作成する。
 - **作成後、ツール呼び出しを停止してユーザーへ提示し、承認（Proceed）を必ず待つ。**
 
 ### Step 2. TDD実装委託 (`developer`)
