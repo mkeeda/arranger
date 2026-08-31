@@ -22,13 +22,20 @@ import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.gfm.GFMElementTypes
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.flavours.gfm.GFMTokenTypes
+import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
+
+private val nonCancellableToken = CancellationToken { }
 
 internal class MarkdownImporter : RichTextImporter<String> {
     override fun import(input: String): RichString {
         if (input.isEmpty()) return RichString("")
 
-        val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(input)
+        val parsedTree =
+            MarkdownParser(
+                flavour = flavour,
+                cancellationToken = nonCancellableToken,
+            ).buildMarkdownTreeFromString(input as CharSequence)
 
         val builder = StringBuilder()
         val spans = mutableListOf<RichSpan>()
