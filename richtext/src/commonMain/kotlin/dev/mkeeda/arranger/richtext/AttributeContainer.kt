@@ -207,3 +207,18 @@ public fun <T1, T2, T3, T4> attributeContainerOf(
     p3: Pair<AttributeKey<T3>, T3>,
     p4: Pair<AttributeKey<T4>, T4>,
 ): AttributeContainer = AttributeContainer.empty() + p1 + p2 + p3 + p4
+
+/**
+ * Returns a new [AttributeContainer] containing the specified key-value pairs.
+ */
+public fun attributeContainerOf(
+    vararg pairs: Pair<AttributeKey<*>, Any?>,
+): AttributeContainer {
+    if (pairs.isEmpty()) return AttributeContainer.empty()
+    var result = AttributeContainer.empty()
+    for (pair in pairs) {
+        @Suppress("UNCHECKED_CAST")
+        result = result.plus(pair.first as AttributeKey<Any?>, pair.second)
+    }
+    return result
+}

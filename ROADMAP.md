@@ -31,8 +31,8 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
 ### ⭐ v0.4.0 – v0.5.0 (High-Value Editor Engine & Interoperability) [Highest Priority Focus]
 *Building high-value editor capabilities that standard Compose does not provide.*
 
-- [ ] **Markdown & HTML Bi-directional Conversion:**
-  - Import / Export converters between `RichString` and CommonMark Markdown / HTML representations.
+- [x] **Markdown & HTML Bi-directional Conversion:**
+  - Import / Export converters between `RichString` and CommonMark Markdown / HTML representations (`:richtext-markdown` and `:richtext-html`).
   - Lossless parsing and serialization of inline and block formatting.
 - [ ] **WYSIWYG Auto-formatting:**
   - Live typing auto-conversions (e.g., `# ` triggers H1 heading, `- ` / `* ` triggers bullet lists, `1. ` triggers ordered lists).

@@ -818,6 +818,59 @@ class RichTextStateTest {
         spans.first().range shouldBe (1..1)
         spans.first().attributes shouldBe attributeContainerOf(BoldKey to Unit)
     }
+
+    @Test
+    fun `setRichString replaces entire text and spans`() {
+        val initialText = "Initial"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, 0..6)
+                    },
+            )
+
+        val newRichString =
+            RichString("New Text Content").edit {
+                setSpanAttribute(ItalicKey, Unit, 0..7)
+            }
+
+        state.setRichString(newRichString)
+
+        state.richString.text shouldBe "New Text Content"
+        state.richString.spans.size shouldBe 1
+        state.richString.spans.first().range shouldBe 0..7
+        state.richString.spans.first().attributes shouldBe attributeContainerOf(ItalicKey to Unit)
+    }
+
+    @Test
+    fun `setRichString clamps cursor selection to new text length`() {
+        val initialText = "Very Long Initial Text"
+        val state = RichTextState(initialText = RichString(initialText))
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        val shortRichString = RichString("Short")
+        state.setRichString(shortRichString)
+
+        state.selection shouldBe TextRange(5)
+    }
+
+    @Test
+    fun `setRichString clears typing attributes and undo history`() {
+        val state = RichTextState(initialText = RichString("Hello"))
+        state.setTypingAttribute(BoldKey, Unit)
+        state.simulateTypingAtEnd("!")
+
+        state.undoState.canUndo shouldBe true
+
+        state.setRichString(RichString("Reset"))
+
+        state.typingAttributes shouldBe null
+        state.undoState.canUndo shouldBe false
+        state.richString.text shouldBe "Reset"
+    }
 }
 
 private fun RichTextState.simulateTypingAtEnd(text: String) {
