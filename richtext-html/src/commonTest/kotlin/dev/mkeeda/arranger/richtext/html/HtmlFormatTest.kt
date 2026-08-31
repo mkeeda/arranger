@@ -23,6 +23,7 @@ import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
@@ -58,11 +59,10 @@ class HtmlFormatTest {
         val html = "<p><strong>Hello</strong> <b>World</b></p>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Hello World"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
-                RichSpan(range = 6..10, attributes = attributeContainerOf(BoldKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
+            RichSpan(range = 6..10, attributes = attributeContainerOf(BoldKey to Unit)),
+        )
     }
 
     @Test
@@ -80,11 +80,10 @@ class HtmlFormatTest {
         val html = "<p><em>Hello</em> <i>World</i></p>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Hello World"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..4, attributes = attributeContainerOf(ItalicKey to Unit)),
-                RichSpan(range = 6..10, attributes = attributeContainerOf(ItalicKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..4, attributes = attributeContainerOf(ItalicKey to Unit)),
+            RichSpan(range = 6..10, attributes = attributeContainerOf(ItalicKey to Unit)),
+        )
     }
 
     @Test
@@ -102,12 +101,11 @@ class HtmlFormatTest {
         val html = "<p><s>One</s> <del>Two</del> <strike>Three</strike></p>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "One Two Three"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..2, attributes = attributeContainerOf(StrikethroughKey to Unit)),
-                RichSpan(range = 4..6, attributes = attributeContainerOf(StrikethroughKey to Unit)),
-                RichSpan(range = 8..12, attributes = attributeContainerOf(StrikethroughKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..2, attributes = attributeContainerOf(StrikethroughKey to Unit)),
+            RichSpan(range = 4..6, attributes = attributeContainerOf(StrikethroughKey to Unit)),
+            RichSpan(range = 8..12, attributes = attributeContainerOf(StrikethroughKey to Unit)),
+        )
     }
 
     @Test
@@ -125,10 +123,9 @@ class HtmlFormatTest {
         val html = "<p>Hello <u>World</u></p>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Hello World"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 6..10, attributes = attributeContainerOf(UnderlineKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 6..10, attributes = attributeContainerOf(UnderlineKey to Unit)),
+        )
     }
 
     @Test
@@ -146,10 +143,9 @@ class HtmlFormatTest {
         val html = "<p>Visit <a href=\"https://google.com\">Google</a></p>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Visit Google"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 6..11, attributes = attributeContainerOf(LinkKey to "https://google.com")),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 6..11, attributes = attributeContainerOf(LinkKey to "https://google.com")),
+        )
     }
 
     @Test
@@ -170,18 +166,17 @@ class HtmlFormatTest {
         val html = "<p><span style=\"color: #ff0000; background-color: #ffff00; font-size: 18.0sp;\">Styled</span></p>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Styled"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..5,
-                    attributes =
-                        attributeContainerOf(
-                            TextColorKey to RgbaColor(0xFFFF0000),
-                            BackgroundColorKey to RgbaColor(0xFFFFFF00),
-                            FontSizeKey to TextSize(18f),
-                        ),
-                ),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..5,
+                attributes =
+                    attributeContainerOf(
+                        TextColorKey to RgbaColor(0xFFFF0000),
+                        BackgroundColorKey to RgbaColor(0xFFFFFF00),
+                        FontSizeKey to TextSize(18f),
+                    ),
+            ),
+        )
     }
 
     @Test
@@ -190,13 +185,12 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Red Text"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..7,
-                    attributes = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000)),
-                ),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..7,
+                attributes = attributeContainerOf(TextColorKey to RgbaColor(0xFFFF0000)),
+            ),
+        )
     }
 
     @Test
@@ -205,13 +199,12 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Semi-transparent Red"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..19,
-                    attributes = attributeContainerOf(TextColorKey to RgbaColor(0x80FF0000)),
-                ),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..19,
+                attributes = attributeContainerOf(TextColorKey to RgbaColor(0x80FF0000)),
+            ),
+        )
     }
 
     @Test
@@ -220,17 +213,16 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Green on Blue"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..12,
-                    attributes =
-                        attributeContainerOf(
-                            TextColorKey to RgbaColor(0xFF00FF00),
-                            BackgroundColorKey to RgbaColor(0x7F0000FF),
-                        ),
-                ),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..12,
+                attributes =
+                    attributeContainerOf(
+                        TextColorKey to RgbaColor(0xFF00FF00),
+                        BackgroundColorKey to RgbaColor(0x7F0000FF),
+                    ),
+            ),
+        )
     }
 
     @Test
@@ -239,17 +231,16 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "24px Text 12pt Text"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..8,
-                    attributes = attributeContainerOf(FontSizeKey to TextSize(24f)),
-                ),
-                RichSpan(
-                    range = 10..18,
-                    attributes = attributeContainerOf(FontSizeKey to TextSize(12f)),
-                ),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..8,
+                attributes = attributeContainerOf(FontSizeKey to TextSize(24f)),
+            ),
+            RichSpan(
+                range = 10..18,
+                attributes = attributeContainerOf(FontSizeKey to TextSize(12f)),
+            ),
+        )
     }
 
     @Test
@@ -276,23 +267,22 @@ class HtmlFormatTest {
         val reimported = RichString.fromHtml(html)
 
         reimported.text shouldBe text
-        reimported.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..11,
-                    attributes =
-                        attributeContainerOf(
-                            LinkKey to url,
-                            TextColorKey to color,
-                            BackgroundColorKey to bgColor,
-                            FontSizeKey to fontSize,
-                            BoldKey to Unit,
-                            ItalicKey to Unit,
-                            UnderlineKey to Unit,
-                            StrikethroughKey to Unit,
-                        ),
-                ),
-            )
+        reimported.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..11,
+                attributes =
+                    attributeContainerOf(
+                        LinkKey to url,
+                        TextColorKey to color,
+                        BackgroundColorKey to bgColor,
+                        FontSizeKey to fontSize,
+                        BoldKey to Unit,
+                        ItalicKey to Unit,
+                        UnderlineKey to Unit,
+                        StrikethroughKey to Unit,
+                    ),
+            ),
+        )
     }
 
     @Test
@@ -322,12 +312,11 @@ class HtmlFormatTest {
         val html = "<h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Heading 1\nHeading 2\nHeading 3"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..8, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
-                RichSpan(range = 10..18, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H2)),
-                RichSpan(range = 20..28, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H3)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..8, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
+            RichSpan(range = 10..18, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H2)),
+            RichSpan(range = 20..28, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H3)),
+        )
     }
 
     @Test
@@ -345,10 +334,9 @@ class HtmlFormatTest {
         val html = "<blockquote><p>This is a quote</p></blockquote>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "This is a quote"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..14, attributes = attributeContainerOf(BlockquoteKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..14, attributes = attributeContainerOf(BlockquoteKey to Unit)),
+        )
     }
 
     @Test
@@ -357,10 +345,9 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Quote 1\nQuote 2"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..14, attributes = attributeContainerOf(BlockquoteKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..14, attributes = attributeContainerOf(BlockquoteKey to Unit)),
+        )
     }
 
     @Test
@@ -369,11 +356,10 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Heading in Quote"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..15, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
-                RichSpan(range = 0..15, attributes = attributeContainerOf(BlockquoteKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..15, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
+            RichSpan(range = 0..15, attributes = attributeContainerOf(BlockquoteKey to Unit)),
+        )
     }
 
     @Test
@@ -391,11 +377,10 @@ class HtmlFormatTest {
         val html = "<p style=\"text-align: center;\">Centered</p><p style=\"text-align: right;\">Right</p>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Centered\nRight"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..7, attributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Center)),
-                RichSpan(range = 9..13, attributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Right)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..7, attributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Center)),
+            RichSpan(range = 9..13, attributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Right)),
+        )
     }
 
     @Test
@@ -404,10 +389,9 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Justified text"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..13, attributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Justify)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..13, attributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Justify)),
+        )
     }
 
     @Test
@@ -424,17 +408,16 @@ class HtmlFormatTest {
 
         val reimported = RichString.fromHtml(html)
         reimported.text shouldBe text
-        reimported.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..14,
-                    attributes =
-                        attributeContainerOf(
-                            HeadingKey to HeadingLevel.H2,
-                            TextAlignmentKey to TextAlignment.Center,
-                        ),
-                ),
-            )
+        reimported.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..14,
+                attributes =
+                    attributeContainerOf(
+                        HeadingKey to HeadingLevel.H2,
+                        TextAlignmentKey to TextAlignment.Center,
+                    ),
+            ),
+        )
     }
 
     @Test
@@ -455,12 +438,11 @@ class HtmlFormatTest {
         val html = "<ul><li>Item 1</li><li>Item 2<ul><li>Item 2.1</li></ul></li></ul>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "Item 1\nItem 2\nItem 2.1"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..5, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
-                RichSpan(range = 7..12, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
-                RichSpan(range = 14..21, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level2)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..5, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 7..12, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 14..21, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level2)),
+        )
     }
 
     @Test
@@ -469,13 +451,12 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Level 1\nLevel 2\nLevel 3\nLevel 4"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..6, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
-                RichSpan(range = 8..14, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
-                RichSpan(range = 16..22, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level3)),
-                RichSpan(range = 24..30, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level4)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..6, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 8..14, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
+            RichSpan(range = 16..22, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level3)),
+            RichSpan(range = 24..30, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level4)),
+        )
     }
 
     @Test
@@ -493,12 +474,11 @@ class HtmlFormatTest {
 
         val reimported = RichString.fromHtml(html)
         reimported.text shouldBe text
-        reimported.spans shouldBe
-            listOf(
-                RichSpan(range = 0..5, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
-                RichSpan(range = 7..14, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
-                RichSpan(range = 16..25, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level3)),
-            )
+        reimported.spans.shouldContainExactly(
+            RichSpan(range = 0..5, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 7..14, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
+            RichSpan(range = 16..25, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level3)),
+        )
     }
 
     @Test
@@ -514,11 +494,10 @@ class HtmlFormatTest {
         val reimported = RichString.fromHtml(html)
 
         reimported.text shouldBe text
-        reimported.spans shouldBe
-            listOf(
-                RichSpan(range = 0..10, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
-                RichSpan(range = 12..23, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
-            )
+        reimported.spans.shouldContainExactly(
+            RichSpan(range = 0..10, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 12..23, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+        )
     }
 
     @Test
@@ -539,12 +518,11 @@ class HtmlFormatTest {
         val html = "<ol><li>First</li><li>Second<ol><li>Nested</li></ol></li></ol>"
         val richString = RichString.fromHtml(html)
         richString.text shouldBe "First\nSecond\nNested"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..4, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
-                RichSpan(range = 6..11, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
-                RichSpan(range = 13..18, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..4, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 6..11, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 13..18, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
+        )
     }
 
     @Test
@@ -568,10 +546,9 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Unclosed bold text"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(range = 0..17, attributes = attributeContainerOf(BoldKey to Unit)),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..17, attributes = attributeContainerOf(BoldKey to Unit)),
+        )
     }
 
     @Test
@@ -580,17 +557,16 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Mismatched"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..9,
-                    attributes =
-                        attributeContainerOf(
-                            BoldKey to Unit,
-                            ItalicKey to Unit,
-                        ),
-                ),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..9,
+                attributes =
+                    attributeContainerOf(
+                        BoldKey to Unit,
+                        ItalicKey to Unit,
+                    ),
+            ),
+        )
     }
 
     @Test
@@ -599,13 +575,12 @@ class HtmlFormatTest {
         val richString = RichString.fromHtml(html)
 
         richString.text shouldBe "Test"
-        richString.spans shouldBe
-            listOf(
-                RichSpan(
-                    range = 0..3,
-                    attributes = attributeContainerOf(BackgroundColorKey to RgbaColor(0xFF00FF00)),
-                ),
-            )
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..3,
+                attributes = attributeContainerOf(BackgroundColorKey to RgbaColor(0xFF00FF00)),
+            ),
+        )
     }
 
     @Test
@@ -648,11 +623,10 @@ class HtmlFormatTest {
         val reimported = RichString.fromHtml(html)
 
         reimported.text shouldBe text
-        reimported.spans shouldBe
-            listOf(
-                RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
-                RichSpan(range = 8..10, attributes = attributeContainerOf(ItalicKey to Unit)),
-            )
+        reimported.spans.shouldContainExactly(
+            RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
+            RichSpan(range = 8..10, attributes = attributeContainerOf(ItalicKey to Unit)),
+        )
     }
 
     @Test
@@ -667,7 +641,7 @@ class HtmlFormatTest {
         val exported = richString.toHtml()
         val reimported = RichString.fromHtml(exported)
         reimported.text shouldBe richString.text
-        reimported.spans shouldBe richString.spans
+        reimported.spans shouldContainExactly richString.spans
     }
 
     @Test
@@ -682,12 +656,11 @@ class HtmlFormatTest {
         val reimported = RichString.fromHtml(html)
 
         reimported.text shouldBe "Hello World\nSecond Paragraph"
-        reimported.spans shouldBe
-            listOf(
-                RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
-                RichSpan(range = 0..10, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
-                RichSpan(range = 12..17, attributes = attributeContainerOf(ItalicKey to Unit)),
-            )
+        reimported.spans.shouldContainExactly(
+            RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
+            RichSpan(range = 0..10, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
+            RichSpan(range = 12..17, attributes = attributeContainerOf(ItalicKey to Unit)),
+        )
     }
 
     @Test
