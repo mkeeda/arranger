@@ -750,26 +750,6 @@ You can run the sample application on any of the supported platforms:
 - **Android:** Open the project in Android Studio and run the `:sample:android` configuration.
 - **iOS:** Open `sample/ios/ArrangerSample.xcodeproj` in Xcode and press **Run (Cmd + R)**.
 
-## Core Architecture Overview
-To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
-
-### Pure Kotlin Core (Data Structures)
-* **`RichString` & `RichRun`**: Immutable representations of text and its semantic chunks.
-* **`AttributeKey<T>`**: Defines the data type of an attribute.
-* **`AttributeContainer`**: A core structure holding a type-safe map of attributes, which is associated with specific text ranges to form `RichSpan`s.
-* **`RichStringScope`**: A builder scope used to safely mutate the attributes of a string within an `edit` block. Designed to accumulate attribute mutations and produce a completely new, immutable `RichString`.
-* **`RichTextFormat<T>` / `RichTextExporter<T>` / `RichTextImporter<T>`**: Extensible abstractions for bi-directional data conversions.
-
-### Format Conversion Modules
-* **`:arranger-richtext-markdown`**: JetBrains CommonMark-based bi-directional Markdown parser & serializer (`MarkdownFormat`).
-* **`:arranger-richtext-html`**: Pure KMP DOM-based bi-directional HTML parser & serializer (`HtmlFormat`).
-
-### Compose UI Layer
-* **`RichTextState`**: Wraps `TextFieldState` and manages the Spans. It acts as the single source of truth and exposes the complete `RichString`.
-* **`RichTextBuffer`**: A state-backed buffer provided inside `RichTextState.edit { }` that allows atomic, programmatic text and attribute mutations while automatically keeping spans synchronized.
-* **`RichTextOutputTransformation`**: Converts the plain text and spans into Compose's `AnnotatedString` purely at render time.
-* **`RichTextEditor`**: A simple, declarative Composable wrapping `BasicTextField` with our state and transformation.
-
 ## Development Roadmap
 
 Arranger is evolving towards a stable **v1.0.0 (Production-Ready Release)**.
