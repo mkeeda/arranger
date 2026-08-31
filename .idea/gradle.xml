@@ -11,6 +11,7 @@
                 <projects>
                   <project path="$PROJECT_DIR$/build-logic" />
                   <project path="$PROJECT_DIR$/build-logic/convention" />
+                  <project path="$PROJECT_DIR$/build-logic/ktlint-rules" />
                 </projects>
               </build>
             </builds>
@@ -23,6 +24,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/build-logic" />
             <option value="$PROJECT_DIR$/build-logic/convention" />
+            <option value="$PROJECT_DIR$/build-logic/ktlint-rules" />
             <option value="$PROJECT_DIR$/richtext" />
             <option value="$PROJECT_DIR$/richtext-editor" />
             <option value="$PROJECT_DIR$/richtext-editor-material3" />
