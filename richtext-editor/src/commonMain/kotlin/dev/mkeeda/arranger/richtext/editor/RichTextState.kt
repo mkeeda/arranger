@@ -225,6 +225,26 @@ public class RichTextState(initialText: RichString = RichString("")) {
         }
     }
 
+    /**
+     * Replaces the entire text and formatting attributes of this state with the given [richString].
+     *
+     * This resets the editor content, clears any active typing attributes, resets the undo history,
+     * and clamps the cursor selection if it exceeds the new text length.
+     */
+    public fun setRichString(richString: RichString) {
+        textFieldState.edit {
+            replace(0, length, richString.text)
+            selection =
+                TextRange(
+                    minOf(selection.start, richString.text.length),
+                    minOf(selection.end, richString.text.length),
+                )
+        }
+        spans = richString.spans.resnapParagraphSpans(richString.text)
+        clearTypingAttributes()
+        undoState.clearHistory()
+    }
+
     @OptIn(ExperimentalFoundationApi::class)
     internal fun updateRichString(buffer: TextFieldBuffer) {
         if (buffer.changes.changeCount == 0) {
