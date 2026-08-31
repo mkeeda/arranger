@@ -9,6 +9,7 @@ import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
+import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
@@ -32,7 +33,7 @@ class MarkdownFormatTest {
         val markdown = "Hello World"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Hello World"
-        richString.spans shouldBe emptyList()
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
@@ -50,9 +51,10 @@ class MarkdownFormatTest {
         val markdown = "**Hello** World"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Hello World"
-        richString.spans shouldHaveSize 1
-        richString.spans[0].range shouldBe 0..4
-        richString.spans[0].attributes shouldBe attributeContainerOf(BoldKey to Unit)
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
+            )
     }
 
     @Test
@@ -70,9 +72,10 @@ class MarkdownFormatTest {
         val markdown = "Hello *World*"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Hello World"
-        richString.spans shouldHaveSize 1
-        richString.spans[0].range shouldBe 6..10
-        richString.spans[0].attributes shouldBe attributeContainerOf(ItalicKey to Unit)
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 6..10, attributes = attributeContainerOf(ItalicKey to Unit)),
+            )
     }
 
     @Test
@@ -80,9 +83,10 @@ class MarkdownFormatTest {
         val markdown = "Hello _World_"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Hello World"
-        richString.spans shouldHaveSize 1
-        richString.spans[0].range shouldBe 6..10
-        richString.spans[0].attributes shouldBe attributeContainerOf(ItalicKey to Unit)
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 6..10, attributes = attributeContainerOf(ItalicKey to Unit)),
+            )
     }
 
     @Test
@@ -100,9 +104,10 @@ class MarkdownFormatTest {
         val markdown = "~~Hello~~ World"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Hello World"
-        richString.spans shouldHaveSize 1
-        richString.spans[0].range shouldBe 0..4
-        richString.spans[0].attributes shouldBe attributeContainerOf(StrikethroughKey to Unit)
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..4, attributes = attributeContainerOf(StrikethroughKey to Unit)),
+            )
     }
 
     @Test
@@ -120,9 +125,10 @@ class MarkdownFormatTest {
         val markdown = "Hello <u>World</u>"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Hello World"
-        richString.spans shouldHaveSize 1
-        richString.spans[0].range shouldBe 6..10
-        richString.spans[0].attributes shouldBe attributeContainerOf(UnderlineKey to Unit)
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 6..10, attributes = attributeContainerOf(UnderlineKey to Unit)),
+            )
     }
 
     @Test
@@ -140,9 +146,10 @@ class MarkdownFormatTest {
         val markdown = "Visit [Google](https://google.com)"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Visit Google"
-        richString.spans shouldHaveSize 1
-        richString.spans[0].range shouldBe 6..11
-        richString.spans[0].attributes shouldBe attributeContainerOf(LinkKey to "https://google.com")
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 6..11, attributes = attributeContainerOf(LinkKey to "https://google.com")),
+            )
     }
 
     @Test
@@ -161,8 +168,11 @@ class MarkdownFormatTest {
         val markdown = "**Hello *World***"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Hello World"
-        richString.spans.any { it.attributes.containsKey(BoldKey) && 0 in it.range } shouldBe true
-        richString.spans.any { it.attributes.containsKey(ItalicKey) && 6 in it.range } shouldBe true
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 6..10, attributes = attributeContainerOf(ItalicKey to Unit)),
+                RichSpan(range = 0..10, attributes = attributeContainerOf(BoldKey to Unit)),
+            )
     }
 
     @Test
@@ -171,9 +181,12 @@ class MarkdownFormatTest {
         val richString = RichString.fromMarkdown(markdown)
 
         richString.text shouldBe "Bold and Italic Link"
-        richString.spans.any { it.attributes[LinkKey] == "https://example.com" } shouldBe true
-        richString.spans.any { it.attributes.containsKey(BoldKey) } shouldBe true
-        richString.spans.any { it.attributes.containsKey(ItalicKey) } shouldBe true
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..19, attributes = attributeContainerOf(BoldKey to Unit)),
+                RichSpan(range = 0..19, attributes = attributeContainerOf(ItalicKey to Unit)),
+                RichSpan(range = 0..19, attributes = attributeContainerOf(LinkKey to "https://example.com")),
+            )
     }
 
     @Test
@@ -191,9 +204,12 @@ class MarkdownFormatTest {
 
         val reimported = RichString.fromMarkdown(exported)
         reimported.text shouldBe text
-        reimported.spans.any { it.attributes[LinkKey] == "https://example.com" } shouldBe true
-        reimported.spans.any { it.attributes.containsKey(BoldKey) } shouldBe true
-        reimported.spans.any { it.attributes.containsKey(ItalicKey) } shouldBe true
+        reimported.spans shouldBe
+            listOf(
+                RichSpan(range = 0..15, attributes = attributeContainerOf(BoldKey to Unit)),
+                RichSpan(range = 0..15, attributes = attributeContainerOf(ItalicKey to Unit)),
+                RichSpan(range = 0..15, attributes = attributeContainerOf(LinkKey to "https://example.com")),
+            )
     }
 
     @Test
@@ -213,11 +229,14 @@ class MarkdownFormatTest {
 
         val reimported = RichString.fromMarkdown(exported)
         reimported.text shouldBe text
-        reimported.spans.any { it.attributes[LinkKey] == "https://example.com" } shouldBe true
-        reimported.spans.any { it.attributes.containsKey(UnderlineKey) } shouldBe true
-        reimported.spans.any { it.attributes.containsKey(StrikethroughKey) } shouldBe true
-        reimported.spans.any { it.attributes.containsKey(BoldKey) } shouldBe true
-        reimported.spans.any { it.attributes.containsKey(ItalicKey) } shouldBe true
+        reimported.spans shouldBe
+            listOf(
+                RichSpan(range = 0..18, attributes = attributeContainerOf(BoldKey to Unit)),
+                RichSpan(range = 0..18, attributes = attributeContainerOf(ItalicKey to Unit)),
+                RichSpan(range = 0..18, attributes = attributeContainerOf(StrikethroughKey to Unit)),
+                RichSpan(range = 0..18, attributes = attributeContainerOf(UnderlineKey to Unit)),
+                RichSpan(range = 0..18, attributes = attributeContainerOf(LinkKey to "https://example.com")),
+            )
     }
 
     @Test
@@ -260,13 +279,12 @@ class MarkdownFormatTest {
         val markdown = "# Heading 1\n## Heading 2\n### Heading 3"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Heading 1\nHeading 2\nHeading 3"
-
-        val spans = richString.spans
-        spans.any { it.attributes[HeadingKey] == HeadingLevel.H1 && 0 in it.range } shouldBe true
-        val h2Index = richString.text.indexOf("Heading 2")
-        spans.any { it.attributes[HeadingKey] == HeadingLevel.H2 && h2Index in it.range } shouldBe true
-        val h3Index = richString.text.indexOf("Heading 3")
-        spans.any { it.attributes[HeadingKey] == HeadingLevel.H3 && h3Index in it.range } shouldBe true
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..8, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
+                RichSpan(range = 10..18, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H2)),
+                RichSpan(range = 20..28, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H3)),
+            )
     }
 
     @Test
@@ -281,11 +299,12 @@ class MarkdownFormatTest {
             """.trimIndent()
 
         val richString = RichString.fromMarkdown(markdown)
-        val h1Idx = richString.text.indexOf("Setext Heading 1")
-        val h2Idx = richString.text.indexOf("Setext Heading 2")
-
-        richString.spans.any { it.attributes[HeadingKey] == HeadingLevel.H1 && h1Idx in it.range } shouldBe true
-        richString.spans.any { it.attributes[HeadingKey] == HeadingLevel.H2 && h2Idx in it.range } shouldBe true
+        richString.text shouldBe "Setext Heading 1\n\nSetext Heading 2"
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..15, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)),
+                RichSpan(range = 18..33, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H2)),
+            )
     }
 
     @Test
@@ -303,8 +322,10 @@ class MarkdownFormatTest {
         val markdown = "> This is a quote"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "This is a quote"
-        richString.spans shouldHaveSize 1
-        richString.spans[0].attributes.containsKey(BlockquoteKey) shouldBe true
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..14, attributes = attributeContainerOf(BlockquoteKey to Unit)),
+            )
     }
 
     @Test
@@ -317,13 +338,13 @@ class MarkdownFormatTest {
             """.trimIndent()
 
         val richString = RichString.fromMarkdown(markdown)
-        val p1Idx = richString.text.indexOf("Quote paragraph 1")
-        val p2Idx = richString.text.indexOf("Quote paragraph 2")
-
-        richString.spans.any { it.attributes.containsKey(BlockquoteKey) && p1Idx in it.range } shouldBe true
-        richString.spans.any { it.attributes.containsKey(BlockquoteKey) && p2Idx in it.range } shouldBe true
-        richString.spans.any { it.attributes.containsKey(BoldKey) } shouldBe true
-        richString.spans.any { it.attributes.containsKey(ItalicKey) } shouldBe true
+        richString.text shouldBe "Quote paragraph 1 with bold.\n>\n> Quote paragraph 2 with italic."
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 23..26, attributes = attributeContainerOf(BoldKey to Unit)),
+                RichSpan(range = 56..61, attributes = attributeContainerOf(ItalicKey to Unit)),
+                RichSpan(range = 0..62, attributes = attributeContainerOf(BlockquoteKey to Unit)),
+            )
     }
 
     @Test
@@ -356,14 +377,12 @@ class MarkdownFormatTest {
         val markdown = "* Item 1\n* Item 2\n  * Item 2.1"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "Item 1\nItem 2\nItem 2.1"
-
-        val item1Index = richString.text.indexOf("Item 1")
-        val item2Index = richString.text.indexOf("Item 2")
-        val item21Index = richString.text.indexOf("Item 2.1")
-
-        richString.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level1 && item1Index in it.range } shouldBe true
-        richString.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level1 && item2Index in it.range } shouldBe true
-        richString.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level2 && item21Index in it.range } shouldBe true
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..5, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 7..13, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 14..21, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level2)),
+            )
     }
 
     @Test
@@ -377,18 +396,14 @@ class MarkdownFormatTest {
             """.trimIndent()
 
         val richString = RichString.fromMarkdown(markdown)
-        val lines = richString.text.split('\n')
-        lines shouldHaveSize 4
-
-        val l1Idx = richString.text.indexOf("Level 1 Bullet")
-        val l2Idx = richString.text.indexOf("Level 2 Ordered")
-        val l3Idx = richString.text.indexOf("Level 3 Bullet")
-        val l4Idx = richString.text.indexOf("Level 4 Ordered")
-
-        richString.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level1 && l1Idx in it.range } shouldBe true
-        richString.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level2 && l2Idx in it.range } shouldBe true
-        richString.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level3 && l3Idx in it.range } shouldBe true
-        richString.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level4 && l4Idx in it.range } shouldBe true
+        richString.text shouldBe "Level 1 Bullet\nLevel 2 Ordered\nLevel 3 Bullet\nLevel 4 Ordered"
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..14, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 15..30, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
+                RichSpan(range = 31..45, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level3)),
+                RichSpan(range = 46..60, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level4)),
+            )
     }
 
     @Test
@@ -406,15 +421,14 @@ class MarkdownFormatTest {
         exported shouldBe "* Level 1\n  * Level 2\n    * Level 3\n      * Level 4"
 
         val reimported = RichString.fromMarkdown(exported)
-        val l1Idx = reimported.text.indexOf("Level 1")
-        val l2Idx = reimported.text.indexOf("Level 2")
-        val l3Idx = reimported.text.indexOf("Level 3")
-        val l4Idx = reimported.text.indexOf("Level 4")
-
-        reimported.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level1 && l1Idx in it.range } shouldBe true
-        reimported.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level2 && l2Idx in it.range } shouldBe true
-        reimported.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level3 && l3Idx in it.range } shouldBe true
-        reimported.spans.any { it.attributes[BulletListKey] == ListIndentLevel.Level4 && l4Idx in it.range } shouldBe true
+        reimported.text shouldBe text
+        reimported.spans shouldBe
+            listOf(
+                RichSpan(range = 0..7, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 8..15, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level2)),
+                RichSpan(range = 16..23, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level3)),
+                RichSpan(range = 24..30, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level4)),
+            )
     }
 
     @Test
@@ -435,14 +449,12 @@ class MarkdownFormatTest {
         val markdown = "1. First\n2. Second\n   1. Nested"
         val richString = RichString.fromMarkdown(markdown)
         richString.text shouldBe "First\nSecond\nNested"
-
-        val firstIndex = richString.text.indexOf("First")
-        val secondIndex = richString.text.indexOf("Second")
-        val nestedIndex = richString.text.indexOf("Nested")
-
-        richString.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level1 && firstIndex in it.range } shouldBe true
-        richString.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level1 && secondIndex in it.range } shouldBe true
-        richString.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level2 && nestedIndex in it.range } shouldBe true
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..4, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 6..12, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 13..18, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
+            )
     }
 
     @Test
@@ -460,15 +472,14 @@ class MarkdownFormatTest {
         exported shouldBe "1. Level 1\n   1. Level 2\n      1. Level 3\n         1. Level 4"
 
         val reimported = RichString.fromMarkdown(exported)
-        val l1Idx = reimported.text.indexOf("Level 1")
-        val l2Idx = reimported.text.indexOf("Level 2")
-        val l3Idx = reimported.text.indexOf("Level 3")
-        val l4Idx = reimported.text.indexOf("Level 4")
-
-        reimported.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level1 && l1Idx in it.range } shouldBe true
-        reimported.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level2 && l2Idx in it.range } shouldBe true
-        reimported.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level3 && l3Idx in it.range } shouldBe true
-        reimported.spans.any { it.attributes[OrderedListKey] == ListIndentLevel.Level4 && l4Idx in it.range } shouldBe true
+        reimported.text shouldBe text
+        reimported.spans shouldBe
+            listOf(
+                RichSpan(range = 0..7, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 8..15, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level2)),
+                RichSpan(range = 16..23, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level3)),
+                RichSpan(range = 24..30, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level4)),
+            )
     }
 
     @Test
@@ -480,17 +491,17 @@ class MarkdownFormatTest {
             """.trimIndent()
 
         val richString = RichString.fromMarkdown(markdown)
-        val boldIdx = richString.text.indexOf("Bold Item")
-        val linkIdx = richString.text.indexOf("Link")
-        val italicIdx = richString.text.indexOf("Italic Item")
-        val underlineIdx = richString.text.indexOf("Underline")
-        val strikeIdx = richString.text.indexOf("Strike")
-
-        richString.spans.any { it.attributes.containsKey(BoldKey) && boldIdx in it.range } shouldBe true
-        richString.spans.any { it.attributes[LinkKey] == "https://example.com" && linkIdx in it.range } shouldBe true
-        richString.spans.any { it.attributes.containsKey(ItalicKey) && italicIdx in it.range } shouldBe true
-        richString.spans.any { it.attributes.containsKey(UnderlineKey) && underlineIdx in it.range } shouldBe true
-        richString.spans.any { it.attributes.containsKey(StrikethroughKey) && strikeIdx in it.range } shouldBe true
+        richString.text shouldBe "Bold Item with Link\nItalic Item with Underline and Strike"
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 0..8, attributes = attributeContainerOf(BoldKey to Unit)),
+                RichSpan(range = 15..18, attributes = attributeContainerOf(LinkKey to "https://example.com")),
+                RichSpan(range = 0..18, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+                RichSpan(range = 20..30, attributes = attributeContainerOf(ItalicKey to Unit)),
+                RichSpan(range = 37..45, attributes = attributeContainerOf(UnderlineKey to Unit)),
+                RichSpan(range = 51..56, attributes = attributeContainerOf(StrikethroughKey to Unit)),
+                RichSpan(range = 20..56, attributes = attributeContainerOf(BulletListKey to ListIndentLevel.Level1)),
+            )
     }
 
     @Test
@@ -499,7 +510,7 @@ class MarkdownFormatTest {
         val richString = RichString.fromMarkdown(markdown)
 
         richString.text shouldBe "Calculation: 2 * 3 = 6 and 4 * 5 = 20."
-        richString.spans.any { it.attributes.containsKey(ItalicKey) } shouldBe false
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
@@ -508,7 +519,7 @@ class MarkdownFormatTest {
         val richString = RichString.fromMarkdown(markdown)
 
         richString.text shouldBe "The variable_name_here should not be italicized."
-        richString.spans.any { it.attributes.containsKey(ItalicKey) } shouldBe false
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
@@ -517,7 +528,7 @@ class MarkdownFormatTest {
         val richString = RichString.fromMarkdown(markdown)
 
         richString.text shouldBe "I love programming in C# and #kotlin is great."
-        richString.spans.any { it.attributes.containsKey(HeadingKey) } shouldBe false
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
@@ -526,7 +537,7 @@ class MarkdownFormatTest {
         val richString = RichString.fromMarkdown(markdown)
 
         richString.text shouldBe "Condition: x > 5 and y < 10."
-        richString.spans.any { it.attributes.containsKey(BlockquoteKey) } shouldBe false
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
@@ -535,7 +546,7 @@ class MarkdownFormatTest {
         val richString = RichString.fromMarkdown(markdown)
 
         richString.text shouldBe "Access element array[0] or [index]."
-        richString.spans.any { it.attributes.containsKey(LinkKey) } shouldBe false
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
@@ -546,7 +557,7 @@ class MarkdownFormatTest {
         val reimported = RichString.fromMarkdown(exportedMarkdown)
 
         reimported.text shouldBe richString.text
-        reimported.spans.size shouldBe richString.spans.size
+        reimported.spans shouldBe richString.spans
     }
 
     @Test
@@ -556,12 +567,12 @@ class MarkdownFormatTest {
 
         val richString = RichString.fromMarkdown(markdown)
         richString.text.length shouldBe ("Hello World with Link and Italic. ".length * 150)
-        richString.spans.size shouldBe (3 * 150) // Bold, Link, Italic per chunk
+        richString.spans shouldHaveSize (3 * 150) // Bold, Link, Italic per chunk
 
         val exported = richString.toMarkdown()
         val reimported = RichString.fromMarkdown(exported)
         reimported.text shouldBe richString.text
-        reimported.spans.size shouldBe richString.spans.size
+        reimported.spans shouldBe richString.spans
     }
 
     @Test
@@ -569,7 +580,8 @@ class MarkdownFormatTest {
         val markdown = "\n\n\n   \n\nHello\n\n\n"
         val richString = RichString.fromMarkdown(markdown)
 
-        richString.text.contains("Hello") shouldBe true
+        richString.text shouldBe "\n\n\n   \n\nHello\n\n\n"
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
@@ -592,8 +604,10 @@ class MarkdownFormatTest {
 
         val reimported = RichString.fromMarkdown(exported)
         reimported.text shouldBe "X"
-        reimported.spans shouldHaveSize 1
-        reimported.spans.first().attributes.containsKey(BoldKey) shouldBe true
+        reimported.spans shouldBe
+            listOf(
+                RichSpan(range = 0..0, attributes = attributeContainerOf(BoldKey to Unit)),
+            )
     }
 
     @Test
@@ -629,8 +643,10 @@ class MarkdownFormatTest {
         val richString = RichString.fromMarkdown(markdown)
 
         richString.text shouldBe "Some unclosed underline text"
-        val span = richString.spans.firstOrNull { it.attributes.containsKey(UnderlineKey) }
-        span?.range shouldBe (5 until richString.text.length)
+        richString.spans shouldBe
+            listOf(
+                RichSpan(range = 5..27, attributes = attributeContainerOf(UnderlineKey to Unit)),
+            )
     }
 
     @Test
@@ -638,15 +654,15 @@ class MarkdownFormatTest {
         val markdown = "# \n> \n* "
         val richString = RichString.fromMarkdown(markdown)
 
-        // Must not throw any exception
-        (richString.text.isNotEmpty() || richString.text.isEmpty()) shouldBe true
+        richString.text shouldBe "\n\n"
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
     fun `importing empty markdown returns empty rich string`() {
         val richString = RichString.fromMarkdown("")
         richString.text shouldBe ""
-        richString.spans shouldBe emptyList()
+        richString.spans.shouldBeEmpty()
     }
 
     @Test
