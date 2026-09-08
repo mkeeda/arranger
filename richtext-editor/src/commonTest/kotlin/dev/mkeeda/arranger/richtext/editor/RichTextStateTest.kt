@@ -357,6 +357,25 @@ class RichTextStateTest {
     }
 
     @Test
+    fun `currentAttributes returns paragraph attributes when cursor is at end of text`() {
+        val initialText = "Heading"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(HeadingKey, HeadingLevel.H1, range = initialText.indices)
+                    },
+            )
+
+        // Move cursor to the end of the text (cursor position == text.length)
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        state.currentAttributes shouldBe attributeContainerOf(HeadingKey to HeadingLevel.H1)
+    }
+
+    @Test
     fun `currentAttributes returns empty when cursor is at position 0`() {
         val initialText = "Hello World"
         val state =
