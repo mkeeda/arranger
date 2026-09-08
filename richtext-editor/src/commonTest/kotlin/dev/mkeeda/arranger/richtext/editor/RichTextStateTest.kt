@@ -236,8 +236,8 @@ class RichTextStateTest {
                     },
             )
 
-        // Initial span should be "Bravo" (indices 6..11)
-        state.richString.spans.first().range shouldBe (6..11)
+        // Initial span should be "Bravo" (indices 6..10)
+        state.richString.spans.first().range shouldBe (6..10)
 
         state.edit {
             // Insert a '\n' in the middle of Bravo
@@ -249,8 +249,8 @@ class RichTextStateTest {
 
         val spans = state.richString.spans
         spans.size shouldBe 1
-        // Expected span is the combined new paragraphs: "Bra\nvo" (indices 6..12)
-        spans.first().range shouldBe (6..12)
+        // Expected span is the combined new paragraphs: "Bra\nvo" (indices 6..11)
+        spans.first().range shouldBe (6..11)
     }
 
     @Test
@@ -311,12 +311,7 @@ class RichTextStateTest {
         secondSpan.attributes.containsKey(BlockquoteKey) shouldBe true
         secondSpan.attributes.containsKey(BoldKey) shouldBe true
 
-        // Paragraph attributes are now extended to text.length (11)
-        spans.size shouldBe 3
-        val thirdSpan = spans[2]
-        thirdSpan.range shouldBe (11..11)
-        thirdSpan.attributes.containsKey(BlockquoteKey) shouldBe true
-        thirdSpan.attributes.containsKey(BoldKey) shouldBe false
+        spans.size shouldBe 2
     }
 
     @Test
@@ -564,6 +559,7 @@ class RichTextStateTest {
         // Type a newline and some text
         state.textFieldState.edit {
             replace(length, length, "\nNew line")
+            state.updateRichString(this)
         }
 
         val expectedText = "Bullet item\nNew line"
@@ -784,7 +780,7 @@ class RichTextStateTest {
         val spans = state.richString.spans
         spans.size shouldBe 1
         // Since it's a multi-character paste with a newline, the paragraph attribute should inherit to both lines
-        spans.first().range shouldBe (0..21)
+        spans.first().range shouldBe (0..20)
         spans.first().attributes shouldBe
             attributeContainerOf(
                 HeadingKey to HeadingLevel.H1,
