@@ -15,11 +15,26 @@ class ParagraphSnappingTest {
         // Index 0 is 'L' in "Line1". Should snap to "Line1\n" (0..5)
         (0..0).snapToParagraphs(text) shouldBe (0..5)
 
-        // Last index is in "Line3". Should snap to "Line3" (12..17)
-        (text.lastIndex..text.lastIndex).snapToParagraphs(text) shouldBe (12..17)
+        // Last index is in "Line3". Should snap to "Line3" (12..16)
+        (text.lastIndex..text.lastIndex).snapToParagraphs(text) shouldBe (12..16)
 
         // Spanning across paragraphs (from 'n' in Line1 to 'L' in Line3)
-        (2..12).snapToParagraphs(text) shouldBe (0..17)
+        (2..12).snapToParagraphs(text) shouldBe (0..16)
+    }
+
+    @Test
+    fun `snapToParagraphs handles single paragraph without trailing newline`() {
+        val text = "Hello"
+        (0..4).snapToParagraphs(text) shouldBe (0..4)
+        (0..0).snapToParagraphs(text) shouldBe (0..4)
+        (2..3).snapToParagraphs(text) shouldBe (0..4)
+    }
+
+    @Test
+    fun `snapToParagraphs preserves empty paragraph at the end of text`() {
+        val text = "Line1\n"
+        // Index 6 is the empty paragraph at the end
+        (6..6).snapToParagraphs(text) shouldBe (6..6)
     }
 
     @Test
@@ -79,7 +94,7 @@ class ParagraphSnappingTest {
 
         resnappedSpans shouldHaveSize 1
         // Range should be clamped to valid text length
-        resnappedSpans.first().range shouldBe (0..5)
+        resnappedSpans.first().range shouldBe (0..4)
     }
 
     @Test
