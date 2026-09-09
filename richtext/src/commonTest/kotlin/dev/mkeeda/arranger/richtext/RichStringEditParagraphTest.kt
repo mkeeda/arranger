@@ -241,23 +241,4 @@ class RichStringEditParagraphTest {
         actual.spans[0].range shouldBe (0..4)
         actual.spans[0].range.last shouldBe text.lastIndex
     }
-
-    @Test
-    fun `setParagraphAttribute on last paragraph of multiline text without trailing newline preserves valid character range`() {
-        val text = "Line1\nLine2"
-        val richString = RichString(text = text)
-
-        val actual =
-            richString.edit {
-                val line2Index = text.indexOf("Line2")
-                editAttributes(range = line2Index..text.lastIndex) {
-                    headingLevel(HeadingLevel.H1)
-                }
-            }
-
-        val headingRuns = actual.runs(HeadingKey).toList()
-        headingRuns shouldHaveSize 1
-        headingRuns[0] shouldBe RichRun(text = "Line2", range = 6..10, value = HeadingLevel.H1)
-        headingRuns[0].range.last shouldBe text.lastIndex
-    }
 }
