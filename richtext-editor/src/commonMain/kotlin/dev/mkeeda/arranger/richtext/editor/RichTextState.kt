@@ -135,7 +135,7 @@ public class RichTextState(initialText: RichString = RichString("")) {
         val removedAttr = removedTypingAttributes
 
         val isAfterNewline = cursorPosition > 0 && textFieldState.text[cursorPosition - 1] == '\n'
-        val paragraphInheritIndex = if (isAfterNewline) cursorPosition else cursorPosition - 1
+        val paragraphInheritIndex = if (cursorPosition == 0 || isAfterNewline) cursorPosition else cursorPosition - 1
 
         val inheritedAttributes =
             collectInheritedAttributes(

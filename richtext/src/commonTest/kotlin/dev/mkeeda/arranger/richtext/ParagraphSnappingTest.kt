@@ -24,7 +24,10 @@ class ParagraphSnappingTest {
 
     @Test
     fun `snapToParagraphs handles single paragraph without trailing newline`() {
+        // Arrange
         val text = "Hello"
+
+        // Act & Assert
         (0..4).snapToParagraphs(text) shouldBe (0..4)
         (0..0).snapToParagraphs(text) shouldBe (0..4)
         (2..3).snapToParagraphs(text) shouldBe (0..4)
@@ -32,9 +35,15 @@ class ParagraphSnappingTest {
 
     @Test
     fun `snapToParagraphs preserves empty paragraph at the end of text`() {
+        // Arrange
         val text = "Line1\n"
-        // Index 6 is the empty paragraph at the end
-        (6..6).snapToParagraphs(text) shouldBe (6..6)
+        val trailingEmptyParagraphRange = 6..6
+
+        // Act
+        val actual = trailingEmptyParagraphRange.snapToParagraphs(text)
+
+        // Assert
+        actual shouldBe (6..6)
     }
 
     @Test

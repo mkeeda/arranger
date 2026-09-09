@@ -376,6 +376,27 @@ class RichTextStateTest {
     }
 
     @Test
+    fun `currentAttributes returns paragraph attributes when cursor is at position 0`() {
+        // Arrange
+        val initialText = "Heading"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(HeadingKey, HeadingLevel.H1, range = initialText.indices)
+                    },
+            )
+
+        // Act
+        state.textFieldState.edit {
+            selection = TextRange(0)
+        }
+
+        // Assert
+        state.currentAttributes shouldBe attributeContainerOf(HeadingKey to HeadingLevel.H1)
+    }
+
+    @Test
     fun `currentAttributes returns empty when cursor is at position 0`() {
         val initialText = "Hello World"
         val state =
