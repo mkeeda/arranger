@@ -1,5 +1,6 @@
 package dev.mkeeda.arranger.richtext
 
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -204,6 +205,43 @@ class AttributeEditScopeTest {
     }
 
     @Test
+    fun `code sets and clears properly`() {
+        var str =
+            RichString("Test").edit {
+                editAttributes { code() }
+            }
+        str.spans[0].attributes[CodeKey] shouldBe Unit
+
+        str =
+            str.edit {
+                editAttributes { clearCode() }
+            }
+        str.spans.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `code can coexist with bold attribute in the same range`() {
+        val str =
+            RichString("Test").edit {
+                editAttributes {
+                    bold()
+                    code()
+                }
+            }
+        str.spans.size shouldBe 1
+        str.spans[0].attributes[BoldKey] shouldBe Unit
+        str.spans[0].attributes[CodeKey] shouldBe Unit
+
+        val afterClear =
+            str.edit {
+                editAttributes { clearCode() }
+            }
+        afterClear.spans.size shouldBe 1
+        afterClear.spans[0].attributes[BoldKey] shouldBe Unit
+        afterClear.spans[0].attributes[CodeKey].shouldBeNull()
+    }
+
+    @Test
     fun `clearAll removes all known attributes properly`() {
         var str =
             RichString("Test").edit {
@@ -213,6 +251,7 @@ class AttributeEditScopeTest {
                     italic()
                     strikethrough()
                     underline()
+                    code()
                     headingLevel(HeadingLevel.H1)
                     bulletList(ListIndentLevel.Level1)
                 }

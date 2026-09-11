@@ -157,6 +157,20 @@ public fun AttributeEditScope.clearStrikethrough() {
 }
 
 /**
+ * Convenience function to apply the inline code text attribute within this builder.
+ */
+public fun AttributeEditScope.code() {
+    setSpanAttribute(CodeKey, Unit)
+}
+
+/**
+ * Convenience function to remove the inline code attribute in the range.
+ */
+public fun AttributeEditScope.clearCode() {
+    setSpanAttribute(CodeKey, null)
+}
+
+/**
  * Convenience function to set the heading level of the paragraph within this builder.
  * The applied range will automatically snap to paragraph boundaries.
  */
