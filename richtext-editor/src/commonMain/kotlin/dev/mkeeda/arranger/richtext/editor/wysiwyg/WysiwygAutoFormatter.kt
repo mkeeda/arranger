@@ -90,20 +90,38 @@ internal object WysiwygAutoFormatter {
         state.undoState.undoManager.pushSnapshot(stateBSnapshot, UndoMergePolicy.Separate)
 
         // --- State C への変換 ---
+        val deletedText = prefix
         buffer.delete(lineStart, lineStart + triggerLength)
         buffer.selection = TextRange(lineStart)
+        state.shiftSpansDirectly(
+            editStart = lineStart,
+            editEnd = lineStart + triggerLength,
+            newLength = 0,
+            offsetDiff = -triggerLength,
+            deletedText = deletedText,
+        )
 
         val updatedText = buffer.toString()
-        val lineEnd =
-            updatedText.indexOf('\n', startIndex = lineStart).let {
-                if (it == -1) updatedText.length else it
+        val rawLineEnd = updatedText.indexOf('\n', startIndex = lineStart)
+        val lineEnd = if (rawLineEnd == -1) updatedText.length else rawLineEnd
+        val isLineEmpty = lineStart == lineEnd
+        val paragraphRange =
+            if (rawLineEnd == -1) {
+                lineStart..(lineEnd - 1).coerceAtLeast(lineStart)
+            } else {
+                lineStart..rawLineEnd
             }
-        val paragraphRange = lineStart..lineEnd
 
         applyAction(paragraphRange, updatedText)
 
+        // Block-level 属性の衝突防止: タイピング属性から既存のブロック属性を削除
+        state.removeTypingAttribute(HeadingKey)
+        state.removeTypingAttribute(BulletListKey)
+        state.removeTypingAttribute(OrderedListKey)
+        state.removeTypingAttribute(BlockquoteKey)
+
         // 空行の場合はタイピング属性も同期
-        if (lineStart == lineEnd) {
+        if (isLineEmpty) {
             when (type) {
                 AutoFormatType.Heading -> {
                     state.setTypingAttribute(
@@ -255,6 +273,20 @@ internal object WysiwygAutoFormatter {
 
                 buffer.delete(closingStart, closingEnd)
                 buffer.delete(openingStart, openingEnd)
+                state.shiftSpansDirectly(
+                    editStart = closingStart,
+                    editEnd = closingEnd,
+                    newLength = 0,
+                    offsetDiff = -(closingEnd - closingStart),
+                    deletedText = delim,
+                )
+                state.shiftSpansDirectly(
+                    editStart = openingStart,
+                    editEnd = openingEnd,
+                    newLength = 0,
+                    offsetDiff = -(openingEnd - openingStart),
+                    deletedText = delim,
+                )
 
                 state.setSpanAttributeDirectly(targetKey, Unit, transformedRange, buffer.toString())
 

@@ -332,4 +332,40 @@ class WysiwygAutoFormatterTest {
         boldSpan shouldNotBe null
         boldSpan?.range shouldBe 0..3
     }
+
+    @Test
+    fun `block transformation on existing line without trailing newline sets correct closed paragraph range`() {
+        val (state, _, transformation) = createEngine()
+        typeText(state, transformation, "Item")
+
+        // Move cursor to start of line and type "# "
+        state.textFieldState.edit {
+            selection = TextRange(0)
+        }
+        typeText(state, transformation, "# ")
+
+        state.textFieldState.text.toString() shouldBe "Item"
+        val headingRuns = state.richString.runs(HeadingKey).toList()
+        headingRuns.size shouldBe 1
+        headingRuns[0].value shouldBe HeadingLevel.H1
+        headingRuns[0].range.first shouldBe 0
+        (headingRuns[0].range.last <= 4) shouldBe true
+    }
+
+    @Test
+    fun `block transformation clears conflicting block attributes on paragraph`() {
+        val (state, _, transformation) = createEngine()
+        // Line 1: Bullet list
+        typeText(state, transformation, "- Item 1\n")
+        // Line 2: Inherits bullet list, then converts to ordered list
+        typeText(state, transformation, "1. ")
+        typeText(state, transformation, "Item 2")
+
+        val bulletRuns = state.richString.runs(BulletListKey).toList()
+        val orderedRuns = state.richString.runs(OrderedListKey).toList()
+
+        bulletRuns.size shouldBe 1
+        orderedRuns.size shouldBe 1
+        orderedRuns[0].value shouldBe ListIndentLevel.Level1
+    }
 }

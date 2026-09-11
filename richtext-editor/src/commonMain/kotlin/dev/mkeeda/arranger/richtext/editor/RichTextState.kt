@@ -11,8 +11,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.EnterKeyContext
+import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.InheritParagraphStrategy
+import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
@@ -233,6 +238,12 @@ public class RichTextState(initialText: RichString = RichString("")) {
         currentText: String,
     ) {
         val scope = RichStringScope(spans, currentText)
+        if (key is BlockTypeAttributeKey<*>) {
+            scope.removeParagraphAttribute(HeadingKey, range)
+            scope.removeParagraphAttribute(BulletListKey, range)
+            scope.removeParagraphAttribute(OrderedListKey, range)
+            scope.removeParagraphAttribute(BlockquoteKey, range)
+        }
         scope.setParagraphAttribute(key, value, range)
         spans = scope.spans.resnapParagraphSpans(currentText)
     }
@@ -246,6 +257,16 @@ public class RichTextState(initialText: RichString = RichString("")) {
         val scope = RichStringScope(spans, currentText)
         scope.setSpanAttribute(key, value, range)
         spans = scope.spans.resnapParagraphSpans(currentText)
+    }
+
+    internal fun shiftSpansDirectly(
+        editStart: Int,
+        editEnd: Int,
+        newLength: Int,
+        offsetDiff: Int,
+        deletedText: String = "",
+    ) {
+        spans = spans.shiftSpans(editStart, editEnd, newLength, offsetDiff, deletedText)
     }
 
     internal fun updateSpans(newSpans: List<RichSpan>) {
