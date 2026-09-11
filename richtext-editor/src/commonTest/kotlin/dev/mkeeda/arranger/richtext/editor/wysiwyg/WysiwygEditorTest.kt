@@ -263,6 +263,171 @@ class WysiwygEditorTest {
     }
 
     @Test
+    fun `handleWysiwygKey repeated backspace consumes only first event and allows subsequent standard backspace`() {
+        val (state, wysiwygState, transformation) = setupEditor()
+        typeText(state, wysiwygState, transformation, "# ")
+
+        // First Backspace consumes and reverts
+        val firstConsumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        firstConsumed shouldBe true
+        state.richString.text shouldBe "# "
+        wysiwygState.canRevert(state) shouldBe false
+
+        // Second Backspace does NOT consume, allowing normal deletion
+        val secondConsumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        secondConsumed shouldBe false
+
+        // Third Backspace does NOT consume
+        val thirdConsumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        thirdConsumed shouldBe false
+    }
+
+    @Test
+    fun `handleWysiwygKey repeated backspace for inline formatting consumes only first event`() {
+        val (state, wysiwygState, transformation) = setupEditor()
+        typeText(state, wysiwygState, transformation, "**bold**")
+
+        val firstConsumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        firstConsumed shouldBe true
+        state.richString.text shouldBe "**bold**"
+        wysiwygState.canRevert(state) shouldBe false
+
+        val secondConsumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        secondConsumed shouldBe false
+    }
+
+    @Test
+    fun `handleWysiwygKey does not consume backspace after typing additional text following auto-format`() {
+        val (state, wysiwygState, transformation) = setupEditor()
+        typeText(state, wysiwygState, transformation, "# ")
+        typeText(state, wysiwygState, transformation, "Title")
+
+        val consumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        consumed shouldBe false
+        state.richString.text shouldBe "Title"
+    }
+
+    @Test
+    fun `handleWysiwygKey does not consume backspace when cursor moves away after auto-format`() {
+        val (state, wysiwygState, transformation) = setupEditor()
+        typeText(state, wysiwygState, transformation, "**bold**")
+        state.richString.text shouldBe "bold"
+
+        // Move cursor away from post-format position
+        state.textFieldState.edit {
+            selection = TextRange(2)
+        }
+
+        val consumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        consumed shouldBe false
+        state.richString.text shouldBe "bold"
+    }
+
+    @Test
+    fun `handleWysiwygKey does not consume backspace when text is selected`() {
+        val (state, wysiwygState, transformation) = setupEditor()
+        typeText(state, wysiwygState, transformation, "**bold**")
+        state.richString.text shouldBe "bold"
+
+        // Non-collapsed selection
+        state.textFieldState.edit {
+            selection = TextRange(0, 4)
+        }
+
+        val consumed =
+            handleWysiwygKey(
+                isKeyDown = true,
+                key = Key.Backspace,
+                state = state,
+                wysiwygState = wysiwygState,
+            )
+        consumed shouldBe false
+        state.richString.text shouldBe "bold"
+    }
+
+    @Test
+    fun `handleWysiwygKey rejects diverse non-backspace keys even after auto-format`() {
+        val (state, wysiwygState, transformation) = setupEditor()
+        typeText(state, wysiwygState, transformation, "# ")
+
+        val nonBackspaceKeys =
+            listOf(
+                Key.Delete,
+                Key.Spacebar,
+                Key.A,
+                Key.Escape,
+                Key.Tab,
+                Key.DirectionLeft,
+                Key.DirectionRight,
+            )
+
+        for (testKey in nonBackspaceKeys) {
+            val consumed =
+                handleWysiwygKey(
+                    isKeyDown = true,
+                    key = testKey,
+                    state = state,
+                    wysiwygState = wysiwygState,
+                )
+            consumed shouldBe false
+        }
+
+        // Key-up for all those keys must also not be consumed
+        for (testKey in nonBackspaceKeys + Key.Backspace) {
+            val consumed =
+                handleWysiwygKey(
+                    isKeyDown = false,
+                    key = testKey,
+                    state = state,
+                    wysiwygState = wysiwygState,
+                )
+            consumed shouldBe false
+        }
+    }
+
+    @Test
     fun `side by side comparison WysiwygEditor auto-formats while RichTextEditor does not`() {
         val wysiwygHarness = createWysiwygHarness(isWysiwygEnabled = true)
         val richTextHarness = createWysiwygHarness(isWysiwygEnabled = false)
