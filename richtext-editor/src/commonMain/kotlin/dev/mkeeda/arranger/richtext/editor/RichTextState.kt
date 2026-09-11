@@ -16,6 +16,7 @@ import dev.mkeeda.arranger.richtext.InheritParagraphStrategy
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.RichStringScope
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.mergeSpan
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
@@ -223,6 +224,32 @@ public class RichTextState(initialText: RichString = RichString("")) {
             richTextBuffer.block()
             spans = richTextBuffer.spans.resnapParagraphSpans(this.toString())
         }
+    }
+
+    internal fun <T> setParagraphAttributeDirectly(
+        key: ParagraphAttributeKey<T>,
+        value: T,
+        range: IntRange,
+        currentText: String,
+    ) {
+        val scope = RichStringScope(spans, currentText)
+        scope.setParagraphAttribute(key, value, range)
+        spans = scope.spans.resnapParagraphSpans(currentText)
+    }
+
+    internal fun <T> setSpanAttributeDirectly(
+        key: SpanAttributeKey<T>,
+        value: T,
+        range: IntRange,
+        currentText: String,
+    ) {
+        val scope = RichStringScope(spans, currentText)
+        scope.setSpanAttribute(key, value, range)
+        spans = scope.spans.resnapParagraphSpans(currentText)
+    }
+
+    internal fun updateSpans(newSpans: List<RichSpan>) {
+        spans = newSpans
     }
 
     @OptIn(ExperimentalFoundationApi::class)
