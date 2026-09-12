@@ -7,9 +7,9 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
@@ -80,7 +80,7 @@ internal object WysiwygAutoFormatter {
                 }
             }
 
-        // --- 3状態モデル: State B Snapshot を UndoManager にプッシュ ---
+        // --- 3-state model: push State B snapshot to UndoManager ---
         val stateBSnapshot =
             EditorSnapshot(
                 text = buffer.toString(),
@@ -89,7 +89,7 @@ internal object WysiwygAutoFormatter {
             )
         state.undoState.undoManager.pushSnapshot(stateBSnapshot, UndoMergePolicy.Separate)
 
-        // --- State C への変換 ---
+        // --- Transform to State C ---
         val deletedText = prefix
         buffer.delete(lineStart, lineStart + triggerLength)
         buffer.selection = TextRange(lineStart)
@@ -114,13 +114,13 @@ internal object WysiwygAutoFormatter {
 
         applyAction(paragraphRange, updatedText)
 
-        // Block-level 属性の衝突防止: タイピング属性から既存のブロック属性を削除
+        // Prevent block-level attribute collision: remove existing block attributes from typing attributes
         state.removeTypingAttribute(HeadingKey)
         state.removeTypingAttribute(BulletListKey)
         state.removeTypingAttribute(OrderedListKey)
         state.removeTypingAttribute(BlockquoteKey)
 
-        // 空行の場合はタイピング属性も同期
+        // Synchronize typing attributes if line is empty
         if (isLineEmpty) {
             when (type) {
                 AutoFormatType.Heading -> {
@@ -192,7 +192,7 @@ internal object WysiwygAutoFormatter {
                 if (closingEnd < text.length && text[closingEnd] == '_') continue
             }
 
-            // 右側空白判定 (Closing delimiter cannot be preceded by whitespace)
+            // Closing delimiter cannot be preceded by whitespace
             if (closingStart > 0 && text[closingStart - 1].isWhitespace()) continue
 
             val lineStart =
@@ -249,7 +249,7 @@ internal object WysiwygAutoFormatter {
                     if (beforeOpening.isLetterOrDigit() || afterClosing.isLetterOrDigit()) continue
                 }
 
-                // --- 3状態モデル: State B Snapshot を UndoManager にプッシュ ---
+                // --- 3-state model: push State B snapshot to UndoManager ---
                 val stateBSnapshot =
                     EditorSnapshot(
                         text = buffer.toString(),
@@ -258,13 +258,13 @@ internal object WysiwygAutoFormatter {
                     )
                 state.undoState.undoManager.pushSnapshot(stateBSnapshot, UndoMergePolicy.Separate)
 
-                // --- State C への変換 ---
+                // --- Transform to State C ---
                 val (type, targetKey: SpanAttributeKey<Unit>) =
                     when (delim) {
                         "**" -> AutoFormatType.Bold to BoldKey
                         "*" -> AutoFormatType.Italic to ItalicKey
                         "_" -> AutoFormatType.Italic to ItalicKey
-                        "`" -> AutoFormatType.Code to CodeKey
+                        "`" -> AutoFormatType.InlineCode to InlineCodeKey
                         "~" -> AutoFormatType.Strikethrough to StrikethroughKey
                         else -> continue
                     }
@@ -293,7 +293,7 @@ internal object WysiwygAutoFormatter {
                 val postCursor = transformedRange.last + 1
                 buffer.selection = TextRange(postCursor)
 
-                // F14: 後続文字への装飾漏洩を防止
+                // F14: Prevent attribute leakage to subsequent typed characters
                 state.clearTypingAttributes()
                 state.removeTypingAttribute(targetKey)
 

@@ -19,20 +19,20 @@ internal class WysiwygInputTransformation(
 
         val lastChar = extractLastChar(this)
 
-        // 新たな入力が発生したため、以前の変換イベントを一旦無効化
+        // New input occurred; clear any prior auto-format event
         wysiwygState.clearLastAutoFormat()
 
-        // 1. 通常の RichTextState 更新（State A -> State B スパンシフト、タイピング属性適用）
+        // 1. Regular RichTextState update (State A -> State B span shift, typing attribute application)
         state.updateRichString(this)
 
-        // 2. ブロックレベル自動変換の判定
+        // 2. Evaluate block-level auto-formatting
         val blockEvent = WysiwygAutoFormatter.formatBlockIfMatched(this, state, lastChar)
         if (blockEvent != null) {
             wysiwygState.recordAutoFormat(blockEvent)
             return
         }
 
-        // 3. インラインレベル自動変換の判定
+        // 3. Evaluate inline-level auto-formatting
         val inlineEvent = WysiwygAutoFormatter.formatInlineIfMatched(this, state, lastChar)
         if (inlineEvent != null) {
             wysiwygState.recordAutoFormat(inlineEvent)

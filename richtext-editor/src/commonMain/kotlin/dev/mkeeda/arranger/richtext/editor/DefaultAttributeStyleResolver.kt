@@ -17,10 +17,10 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
@@ -71,7 +71,7 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
         spanStyle(UnderlineKey) {
             SpanStyle(textDecoration = TextDecoration.Underline)
         }
-        spanStyle(CodeKey) {
+        spanStyle(InlineCodeKey) {
             SpanStyle(
                 fontFamily = FontFamily.Monospace,
                 background = Color(0x14000000),

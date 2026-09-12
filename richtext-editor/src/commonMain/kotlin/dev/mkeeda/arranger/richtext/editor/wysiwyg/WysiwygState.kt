@@ -8,18 +8,20 @@ import dev.mkeeda.arranger.richtext.editor.EditorSnapshot
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 
 /**
- * WYSIWYG エディタの自動フォーマット直後の一時状態（Backspace復元用）を管理する。
+ * Manages the transient state immediately following an auto-formatting event in the WYSIWYG editor
+ * (used for Backspace restoration).
  */
 @Stable
 public class WysiwygState {
     internal var lastAutoFormatEvent: AutoFormatEvent? by mutableStateOf(null)
 
     /**
-     * 直前の自動変換が Backspace または Revert によって巻き戻し（State B 復元）可能かを判定する。
-     * - 直前に自動変換が発生していること
-     * - カーソル位置が自動変換直後の期待位置（postFormatCursor）と完全に一致していること
-     * - 選択範囲が折りたたまれていること（collapsed）
-     * - Undo が可能であること
+     * Determines whether the most recent auto-formatting event can be reverted (restoring State B)
+     * via Backspace or explicit revert action.
+     * - An auto-formatting event must have occurred immediately prior
+     * - The cursor must be exactly at the expected post-format position
+     * - The selection must be collapsed
+     * - Undo must be available
      */
     public fun canRevert(state: RichTextState): Boolean {
         val event = lastAutoFormatEvent ?: return false
@@ -28,7 +30,7 @@ public class WysiwygState {
     }
 
     /**
-     * 直前の自動変換を巻き戻し、State B（生記号テキスト）へ復元する。
+     * Reverts the most recent auto-formatting event, restoring State B (raw symbol text).
      */
     public fun revert(state: RichTextState): Boolean {
         if (!canRevert(state)) return false
@@ -59,6 +61,6 @@ internal enum class AutoFormatType {
     Blockquote,
     Bold,
     Italic,
-    Code,
+    InlineCode,
     Strikethrough,
 }

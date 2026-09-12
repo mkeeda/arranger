@@ -47,10 +47,8 @@ import dev.mkeeda.arranger.richtext.editor.RichTextState
  * @param cursorBrush The brush used to draw the cursor.
  * @param decorator Allows adding decorations around the text field.
  * @param styleResolver A resolver that specifies how [AttributeContainer]s should be translated into visually rendered Compose styles.
- * @param attributeStyleResolver Alias for [styleResolver].
  * @param listMarkerResolver A resolver that specifies how list markers should be rendered.
  * @param onLinkClick Optional custom callback when a hyperlink is tapped.
- * @param wysiwygState The [WysiwygState] instance for tracking and reverting auto-formatting events.
  */
 @Composable
 public fun WysiwygEditor(
@@ -68,17 +66,10 @@ public fun WysiwygEditor(
     cursorBrush: Brush = SolidColor(Color.Black),
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
-    attributeStyleResolver: AttributeStyleResolver = styleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
     onLinkClick: ((String) -> Unit)? = null,
-    wysiwygState: WysiwygState = remember(state) { WysiwygState() },
 ) {
-    val effectiveStyleResolver =
-        if (attributeStyleResolver !== DefaultAttributeStyleResolver) {
-            attributeStyleResolver
-        } else {
-            styleResolver
-        }
+    val wysiwygState = remember(state) { WysiwygState() }
 
     val transformation =
         remember(state, wysiwygState) {
@@ -105,7 +96,7 @@ public fun WysiwygEditor(
         interactionSource = interactionSource,
         cursorBrush = cursorBrush,
         decorator = decorator,
-        styleResolver = effectiveStyleResolver,
+        styleResolver = styleResolver,
         listMarkerResolver = listMarkerResolver,
         onLinkClick = onLinkClick,
     )
