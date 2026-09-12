@@ -6,61 +6,61 @@ import kotlin.test.Test
 
 class AttributesTest {
     @Test
-    fun `CodeKey has correct metadata and default value`() {
-        CodeKey.name shouldBe "code"
-        CodeKey.defaultValue shouldBe Unit
+    fun `InlineCodeKey has correct metadata and default value`() {
+        InlineCodeKey.name shouldBe "inlineCode"
+        InlineCodeKey.defaultValue shouldBe Unit
     }
 
     @Test
-    fun `CodeKey implements SpanAttributeKey and not ParagraphAttributeKey`() {
-        val key: AttributeKey<*> = CodeKey
+    fun `InlineCodeKey implements SpanAttributeKey and not ParagraphAttributeKey`() {
+        val key: AttributeKey<*> = InlineCodeKey
         (key is SpanAttributeKey<*>) shouldBe true
         (key is ParagraphAttributeKey<*>) shouldBe false
     }
 
     @Test
-    fun `CodeKey can be stored in and retrieved from AttributeContainer`() {
-        val container = attributeContainerOf(CodeKey to Unit)
-        container[CodeKey] shouldBe Unit
-        container.getOrDefault(CodeKey) shouldBe Unit
-        container.containsKey(CodeKey) shouldBe true
+    fun `InlineCodeKey can be stored in and retrieved from AttributeContainer`() {
+        val container = attributeContainerOf(InlineCodeKey to Unit)
+        container[InlineCodeKey] shouldBe Unit
+        container.getOrDefault(InlineCodeKey) shouldBe Unit
+        container.containsKey(InlineCodeKey) shouldBe true
     }
 
     @Test
-    fun `CodeKey returns defaultValue or null from AttributeContainer when unset`() {
+    fun `InlineCodeKey returns defaultValue or null from AttributeContainer when unset`() {
         val container = attributeContainerOf()
-        container[CodeKey].shouldBeNull()
-        container.getOrDefault(CodeKey) shouldBe Unit
-        container.containsKey(CodeKey) shouldBe false
+        container[InlineCodeKey].shouldBeNull()
+        container.getOrDefault(InlineCodeKey) shouldBe Unit
+        container.containsKey(InlineCodeKey) shouldBe false
     }
 
     @Test
-    fun `CodeKey can be removed from AttributeContainer using minus operator`() {
-        val container = attributeContainerOf(CodeKey to Unit)
-        val removed = container - CodeKey
-        removed[CodeKey].shouldBeNull()
-        removed.containsKey(CodeKey) shouldBe false
+    fun `InlineCodeKey can be removed from AttributeContainer using minus operator`() {
+        val container = attributeContainerOf(InlineCodeKey to Unit)
+        val removed = container - InlineCodeKey
+        removed[InlineCodeKey].shouldBeNull()
+        removed.containsKey(InlineCodeKey) shouldBe false
     }
 
     @Test
-    fun `CodeKey is preserved by filterSpanAttributes and filtered out by filterParagraphAttributes`() {
+    fun `InlineCodeKey is preserved by filterSpanAttributes and filtered out by filterParagraphAttributes`() {
         val container =
             attributeContainerOf(
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
                 HeadingKey to HeadingLevel.H1,
             )
         val spanOnly = container.filterSpanAttributes()
-        spanOnly.containsKey(CodeKey) shouldBe true
+        spanOnly.containsKey(InlineCodeKey) shouldBe true
         spanOnly.containsKey(HeadingKey) shouldBe false
 
         val paragraphOnly = container.filterParagraphAttributes()
-        paragraphOnly.containsKey(CodeKey) shouldBe false
+        paragraphOnly.containsKey(InlineCodeKey) shouldBe false
         paragraphOnly.containsKey(HeadingKey) shouldBe true
     }
 
     @Test
-    fun `CodeKey data object provides meaningful string representation and equality`() {
-        CodeKey.toString() shouldBe "CodeKey"
-        (CodeKey == CodeKey) shouldBe true
+    fun `InlineCodeKey data object provides meaningful string representation and equality`() {
+        InlineCodeKey.toString() shouldBe "InlineCodeKey"
+        (InlineCodeKey == InlineCodeKey) shouldBe true
     }
 }

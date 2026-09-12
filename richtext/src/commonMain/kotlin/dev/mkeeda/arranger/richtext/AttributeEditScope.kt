@@ -159,15 +159,15 @@ public fun AttributeEditScope.clearStrikethrough() {
 /**
  * Convenience function to apply the inline code text attribute within this builder.
  */
-public fun AttributeEditScope.code() {
-    setSpanAttribute(CodeKey, Unit)
+public fun AttributeEditScope.inlineCode() {
+    setSpanAttribute(InlineCodeKey, Unit)
 }
 
 /**
  * Convenience function to remove the inline code attribute in the range.
  */
-public fun AttributeEditScope.clearCode() {
-    setSpanAttribute(CodeKey, null)
+public fun AttributeEditScope.clearInlineCode() {
+    setSpanAttribute(InlineCodeKey, null)
 }
 
 /**

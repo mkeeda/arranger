@@ -32,7 +32,7 @@ class SpanMergerAdversarialStressTest {
                 setSpanAttribute(StrikethroughKey, Unit, 2..35)
                 setSpanAttribute(BoldKey, Unit, 5..15)
                 setSpanAttribute(ItalicKey, Unit, 10..20)
-                setSpanAttribute(CodeKey, Unit, 21..28)
+                setSpanAttribute(InlineCodeKey, Unit, 21..28)
                 setSpanAttribute(TextColorKey, RgbaColor(0xFF00FF00), 36..45)
             }
 
@@ -54,7 +54,7 @@ class SpanMergerAdversarialStressTest {
         italicRuns shouldHaveSize 1
         italicRuns[0].range shouldBe 10..20
 
-        val codeRuns = richString.runs(CodeKey).toList()
+        val codeRuns = richString.runs(InlineCodeKey).toList()
         codeRuns shouldHaveSize 1
         codeRuns[0].range shouldBe 21..28
 
@@ -92,7 +92,7 @@ class SpanMergerAdversarialStressTest {
         spans[4].attributes.keys shouldBe setOf(BulletListKey, StrikethroughKey, ItalicKey)
 
         spans[5].range shouldBe 21..28
-        spans[5].attributes.keys shouldBe setOf(BulletListKey, StrikethroughKey, CodeKey)
+        spans[5].attributes.keys shouldBe setOf(BulletListKey, StrikethroughKey, InlineCodeKey)
 
         spans[6].range shouldBe 29..35
         spans[6].attributes.keys shouldBe setOf(BulletListKey, StrikethroughKey)
@@ -176,7 +176,7 @@ class SpanMergerAdversarialStressTest {
                 setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, 0..16)
                 setParagraphAttribute(OrderedListKey, ListIndentLevel.Level1, 17..33)
                 setSpanAttribute(BoldKey, Unit, 12..15) // "bold"
-                setSpanAttribute(CodeKey, Unit, 29..32) // "code"
+                setSpanAttribute(InlineCodeKey, Unit, 29..32) // "code"
             }
 
         // Test resnapParagraphSpans preserves all inline and paragraph spans
@@ -195,7 +195,7 @@ class SpanMergerAdversarialStressTest {
         boldRuns shouldHaveSize 1
         boldRuns[0].range shouldBe 12..15
 
-        val codeRuns = resnappedRichString.runs(CodeKey).toList()
+        val codeRuns = resnappedRichString.runs(InlineCodeKey).toList()
         codeRuns shouldHaveSize 1
         codeRuns[0].range shouldBe 29..32
     }
@@ -222,7 +222,7 @@ class SpanMergerAdversarialStressTest {
                 RichSpan(5..9, attributeContainerOf(ItalicKey to Unit)),
             )
 
-        val merged = spans.mergeSpan(RichSpan(10..14, attributeContainerOf(CodeKey to Unit)))
+        val merged = spans.mergeSpan(RichSpan(10..14, attributeContainerOf(InlineCodeKey to Unit)))
         merged shouldHaveSize 3
         merged[0].range shouldBe 0..4
         merged[1].range shouldBe 5..9
@@ -250,7 +250,7 @@ class SpanMergerAdversarialStressTest {
         val numOperations = 200
 
         data class Op(val key: SpanAttributeKey<Unit>, val range: IntRange)
-        val keys = listOf<SpanAttributeKey<Unit>>(BoldKey, ItalicKey, CodeKey, StrikethroughKey)
+        val keys = listOf<SpanAttributeKey<Unit>>(BoldKey, ItalicKey, InlineCodeKey, StrikethroughKey)
         val ops = mutableListOf<Op>()
 
         repeat(numOperations) {

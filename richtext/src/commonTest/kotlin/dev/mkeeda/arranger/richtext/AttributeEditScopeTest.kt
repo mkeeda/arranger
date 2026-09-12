@@ -205,40 +205,40 @@ class AttributeEditScopeTest {
     }
 
     @Test
-    fun `code sets and clears properly`() {
+    fun `inlineCode sets and clears properly`() {
         var str =
             RichString("Test").edit {
-                editAttributes { code() }
+                editAttributes { inlineCode() }
             }
-        str.spans[0].attributes[CodeKey] shouldBe Unit
+        str.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         str =
             str.edit {
-                editAttributes { clearCode() }
+                editAttributes { clearInlineCode() }
             }
         str.spans.isEmpty() shouldBe true
     }
 
     @Test
-    fun `code can coexist with bold attribute in the same range`() {
+    fun `inlineCode can coexist with bold attribute in the same range`() {
         val str =
             RichString("Test").edit {
                 editAttributes {
                     bold()
-                    code()
+                    inlineCode()
                 }
             }
         str.spans.size shouldBe 1
         str.spans[0].attributes[BoldKey] shouldBe Unit
-        str.spans[0].attributes[CodeKey] shouldBe Unit
+        str.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         val afterClear =
             str.edit {
-                editAttributes { clearCode() }
+                editAttributes { clearInlineCode() }
             }
         afterClear.spans.size shouldBe 1
         afterClear.spans[0].attributes[BoldKey] shouldBe Unit
-        afterClear.spans[0].attributes[CodeKey].shouldBeNull()
+        afterClear.spans[0].attributes[InlineCodeKey].shouldBeNull()
     }
 
     @Test
@@ -251,7 +251,7 @@ class AttributeEditScopeTest {
                     italic()
                     strikethrough()
                     underline()
-                    code()
+                    inlineCode()
                     headingLevel(HeadingLevel.H1)
                     bulletList(ListIndentLevel.Level1)
                 }
