@@ -40,11 +40,11 @@ import kotlin.random.Random
 import kotlin.test.Test
 
 /**
- * Adversarial stress and boundary condition test suite for Milestone 1 (Core Inline Code Attribute).
+ * Adversarial stress and boundary condition test suite for Core Inline Code Attribute (InlineCodeKey).
  *
- * Authored by: Challenger 1 (m1_challenger_1)
+ * Verifies attribute combinations, resolution orthogonality, RichString operations, and styling boundaries.
  */
-class Milestone1Challenger1StressTest {
+class InlineCodeStressTest {
     // =========================================================================
     // 1. Extreme Combinations: InlineCodeKey with All Inline & Paragraph Attributes
     // =========================================================================

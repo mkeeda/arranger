@@ -21,7 +21,7 @@ import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
 /**
- * Tier 5: Adversarial Coverage Hardening Test Suite (Milestone 4 Phase 2).
+ * Tier 5: Adversarial Coverage Hardening Test Suite.
  *
  * Exercises the production auto-formatting engine (WysiwygAutoFormatter, WysiwygInputTransformation,
  * WysiwygState, RichTextState) under hostile and boundary conditions:

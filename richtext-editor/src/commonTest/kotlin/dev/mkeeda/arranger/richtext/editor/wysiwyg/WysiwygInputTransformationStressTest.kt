@@ -19,11 +19,11 @@ import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
 /**
- * Empirical challenger stress test suite for Milestone 2.
+ * Stress test suite for WYSIWYG input transformations.
  * Thoroughly exercises block triggers, block transitions, inline triggers,
  * false-positive mining, and ergonomic undo/redo behaviors.
  */
-class Milestone2Challenger3StressTest {
+class WysiwygInputTransformationStressTest {
     private fun createEngine(): Triple<RichTextState, WysiwygState, WysiwygInputTransformation> {
         val state = RichTextState(initialText = RichString(""))
         val wysiwygState = WysiwygState()

@@ -17,7 +17,10 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
-class WysiwygChallenger4ErgonomicsTest {
+/**
+ * Stress test suite for WYSIWYG editing ergonomics, Undo/Redo cycles, and Backspace reversal contracts.
+ */
+class WysiwygErgonomicsStressTest {
     private fun createEngine(): Triple<RichTextState, WysiwygState, WysiwygInputTransformation> {
         val state = RichTextState(initialText = RichString(""))
         val wysiwygState = WysiwygState()

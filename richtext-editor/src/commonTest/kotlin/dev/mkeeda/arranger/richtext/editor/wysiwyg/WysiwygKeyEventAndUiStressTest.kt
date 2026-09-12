@@ -46,11 +46,11 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Tier 5 Adversarial Coverage Hardening Suite for Milestone 4:
- * Focus: Compose UI, Component Separation, Key Event Interception,
+ * Stress test suite for WYSIWYG Key Event Handling and Compose UI:
+ * Focus: Key Event Interception, Component Separation,
  * Recomposition Stability, Parameter Permutations, and Backspace Reversal Edge Cases.
  */
-class Milestone4Challenger2UiAndKeyStressTest {
+class WysiwygKeyEventAndUiStressTest {
     // =========================================================================
     // Group 1: Key Event Interception & Modifiers & Diverse Selection States
     // =========================================================================

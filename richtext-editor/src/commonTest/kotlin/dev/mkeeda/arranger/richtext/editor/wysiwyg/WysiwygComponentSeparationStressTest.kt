@@ -31,14 +31,14 @@ import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
 /**
- * Empirical challenger stress test suite for Milestone 3 (Component Separation: F15 vs F16).
+ * Stress test suite for Component Separation (RichTextEditor vs WysiwygEditor).
  *
  * Verifies that:
  * 1. RichTextEditor NEVER triggers Markdown auto-formatting under any conditions (F16).
  * 2. WysiwygEditor triggers all Markdown auto-formatting correctly (F15).
  * 3. Component signatures and parameter bindings maintain 100% backward compatibility and parity.
  */
-class Milestone3Challenger1StressTest {
+class WysiwygComponentSeparationStressTest {
     @Test
     fun `RichTextEditor composable contract compiles and binds properly across all overloads`() {
         val composableRef: @Composable () -> Unit = {

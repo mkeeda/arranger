@@ -19,7 +19,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlin.test.Test
 
-class WysiwygChallengerStressTest {
+/**
+ * Stress test suite for rapid typing, multi-paragraph input, and stack consistency under auto-formatting.
+ */
+class WysiwygRapidTypingStressTest {
     private fun createEngine(): Triple<RichTextState, WysiwygState, WysiwygInputTransformation> {
         val state = RichTextState(initialText = RichString(""))
         val wysiwygState = WysiwygState()

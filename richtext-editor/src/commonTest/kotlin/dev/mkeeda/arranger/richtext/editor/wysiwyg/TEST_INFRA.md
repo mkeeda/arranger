@@ -28,10 +28,13 @@ richtext-editor/src/commonTest/kotlin/dev/mkeeda/arranger/richtext/editor/wysiwy
 ├── Tier3CrossFeatureCombinationTest.kt    # Tier 3: Cross-feature combinations (pairwise, nested, block × inline)
 ├── Tier4RealWorldScenarioTest.kt          # Tier 4: Real-world document editing and authoring workflows
 ├── Tier5AdversarialCoverageHardeningTest.kt # Tier 5: Adversarial stress and rapid typing boundary verification
-├── WysiwygEditorTest.kt                   # WysiwygEditor Composable bindings and integration tests
-├── WysiwygAutoFormatterTest.kt            # Engine-level unit tests for block and inline formatters
-├── WysiwygChallenger4ErgonomicsTest.kt    # Ergonomics, Undo/Redo, and Backspace reversal contract verification
-└── WysiwygChallengerStressTest.kt         # Stress tests for rapid typing, multi-paragraph, and stack consistency
+├── WysiwygEditorTest.kt                        # WysiwygEditor Composable bindings and integration tests
+├── WysiwygAutoFormatterTest.kt                 # Engine-level unit tests for block and inline formatters
+├── WysiwygErgonomicsStressTest.kt              # Ergonomics, Undo/Redo, and Backspace reversal contract verification
+├── WysiwygRapidTypingStressTest.kt             # Stress tests for rapid typing, multi-paragraph, and stack consistency
+├── WysiwygInputTransformationStressTest.kt     # Stress tests for input transformation pipeline and false positives
+├── WysiwygComponentSeparationStressTest.kt     # Component separation verification (RichTextEditor vs WysiwygEditor)
+└── WysiwygKeyEventAndUiStressTest.kt           # Key event handling and Compose UI stress tests
 ```
 
 ### 2.2 Test Driver Contract (`WysiwygTestDriver`)
