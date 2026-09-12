@@ -46,6 +46,7 @@ import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
 import dev.mkeeda.arranger.sample.shared.HyperlinkSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
+import dev.mkeeda.arranger.sample.shared.WysiwygEditorSample
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 import kotlinx.serialization.Serializable
 
@@ -63,6 +64,7 @@ internal enum class SampleDestination(val title: String) : NavKey {
     UndoRedo("Undo / Redo"),
     DocumentEditor("Document Editor"),
     Hyperlink("Hyperlink"),
+    WysiwygEditor("WYSIWYG Editor"),
 }
 
 class MainActivity : ComponentActivity() {
@@ -209,6 +211,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.UndoRedo -> UndoRedoSample()
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
                 SampleDestination.Hyperlink -> HyperlinkSample()
+                SampleDestination.WysiwygEditor -> WysiwygEditorSample()
             }
         }
     }
