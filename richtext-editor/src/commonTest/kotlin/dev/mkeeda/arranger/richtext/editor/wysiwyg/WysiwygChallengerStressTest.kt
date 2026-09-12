@@ -6,9 +6,9 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
@@ -71,122 +71,122 @@ class WysiwygChallengerStressTest {
     }
 
     // =========================================================================
-    // 1. 同一行での連続フォーマット適用（見出し + 太字 + インラインコード）
+    // 1. Consecutive format application on same line (heading + bold + inline code)
     // =========================================================================
 
     @Test
-    fun test_same_line_heading_and_bold_and_code() {
+    fun `same line heading and bold and code`() {
         val (state, _, transformation) = createEngine()
 
-        // 1. 行頭で # を入力 -> 見出し1
+        // 1. Type # at line start -> Heading 1
         typeText(state, transformation, "# ")
         state.textFieldState.text.toString() shouldBe ""
 
-        // 2. テキスト "Hello " を入力
+        // 2. Type text "Hello "
         typeText(state, transformation, "Hello ")
         state.textFieldState.text.toString() shouldBe "Hello "
 
-        // 3. 太字 "**bold**" を入力
+        // 3. Type bold "**bold**"
         typeText(state, transformation, "**bold**")
         state.textFieldState.text.toString() shouldBe "Hello bold"
 
-        // 4. " and " を入力
+        // 4. Type " and "
         typeText(state, transformation, " and ")
         state.textFieldState.text.toString() shouldBe "Hello bold and "
 
-        // 5. インラインコード "`code`" を入力
+        // 5. Type inline code "`code`"
         typeText(state, transformation, "`code`")
         state.textFieldState.text.toString() shouldBe "Hello bold and code"
 
-        // 検証:
-        // - 全体が Heading 1 であること
+        // Assertions:
+        // - Entire text is Heading 1
         val headingRuns = state.richString.runs(HeadingKey).toList()
         headingRuns.size shouldBe 1
         headingRuns[0].value shouldBe HeadingLevel.H1
         headingRuns[0].range.first shouldBe 0
         (headingRuns[0].range.last >= 18) shouldBe true
 
-        // - "bold" (range 6..9) が Bold であること
+        // - "bold" (range 6..9) is Bold
         val boldRuns = state.richString.runs(BoldKey).toList()
         boldRuns.size shouldBe 1
         boldRuns[0].range shouldBe 6..9
 
-        // - "code" (range 15..18) が Code であること
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        // - "code" (range 15..18) is InlineCode
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns.size shouldBe 1
         codeRuns[0].range shouldBe 15..18
     }
 
     @Test
-    fun test_empty_heading_then_immediate_bold() {
+    fun `empty heading then immediate bold`() {
         val (state, _, transformation) = createEngine()
 
-        // 行頭で # を入力 -> 空行見出し1
+        // Type # at line start -> empty Heading 1
         typeText(state, transformation, "# ")
         state.textFieldState.text.toString() shouldBe ""
 
-        // 空行の直後に **bold** を入力
+        // Immediately type **bold** on empty line
         typeText(state, transformation, "**bold**")
         state.textFieldState.text.toString() shouldBe "bold"
 
-        // 後続テキスト " text" を入力
+        // Type subsequent text " text"
         typeText(state, transformation, " text")
         state.textFieldState.text.toString() shouldBe "bold text"
 
-        // 検証: 段落全体が Heading 1 を維持しているか？
+        // Assertions: 段落全体が Heading 1 を維持しているか？
         val headingRuns = state.richString.runs(HeadingKey).toList()
         headingRuns.size shouldBe 1
         headingRuns[0].value shouldBe HeadingLevel.H1
         headingRuns[0].range.first shouldBe 0
         (headingRuns[0].range.last >= 8) shouldBe true
 
-        // "bold" (0..3) のみ Bold であること
+        // Only "bold" (0..3) is Bold
         val boldRuns = state.richString.runs(BoldKey).toList()
         boldRuns.size shouldBe 1
         boldRuns[0].range shouldBe 0..3
     }
 
     @Test
-    fun test_existing_text_turned_into_heading_then_inline_formatting() {
+    fun `existing text turned into heading then inline formatting`() {
         val (state, _, transformation) = createEngine()
 
-        // 既存テキスト "Title with **star**" をまず普通に入力（先頭にスペースなし）
+        // Type initial text "Title with star" without initial space
         typeText(state, transformation, "Title with star")
 
-        // カーソルを行頭に移動
+        // Move cursor to start of line
         state.textFieldState.edit {
             selection = TextRange(0)
         }
 
-        // 行頭に "# " を入力
+        // Type "# " at start of line
         typeText(state, transformation, "# ")
 
-        // 見出し1になり、プレフィックス "# " が消去されていること
+        // Transformed to Heading 1 and prefix "# " is removed
         state.textFieldState.text.toString() shouldBe "Title with star"
         val headingRuns = state.richString.runs(HeadingKey).toList()
         headingRuns.size shouldBe 1
         headingRuns[0].value shouldBe HeadingLevel.H1
 
-        // カーソルを末尾へ移動
+        // Move cursor to end of text
         state.textFieldState.edit {
             selection = TextRange(state.textFieldState.text.length)
         }
 
-        // 末尾に " and `code`" を入力
+        // Type " and `code`" at end of line
         typeText(state, transformation, " and `code`")
         state.textFieldState.text.toString() shouldBe "Title with star and code"
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns.size shouldBe 1
         codeRuns[0].range shouldBe 20..23
     }
 
     // =========================================================================
-    // 2. 複数行にわたる高速タイピングシミュレーション
+    // 2. Rapid typing simulation across multiple lines
     // =========================================================================
 
     @Test
-    fun test_multiline_rapid_typing_simulation() {
+    fun `multiline rapid typing simulation`() {
         val (state, _, transformation) = createEngine()
 
         // Line 1: Heading 1 + Bold
@@ -211,7 +211,7 @@ class WysiwygChallengerStressTest {
         println("ORDERED RUNS: ${state.richString.runs(OrderedListKey).toList()}")
         println("QUOTE RUNS: ${state.richString.runs(BlockquoteKey).toList()}")
         println("BOLD RUNS: ${state.richString.runs(BoldKey).toList()}")
-        println("CODE RUNS: ${state.richString.runs(CodeKey).toList()}")
+        println("CODE RUNS: ${state.richString.runs(InlineCodeKey).toList()}")
         println("ITALIC RUNS: ${state.richString.runs(ItalicKey).toList()}")
         println("STRIKE RUNS: ${state.richString.runs(StrikethroughKey).toList()}")
 
@@ -223,7 +223,7 @@ class WysiwygChallengerStressTest {
 
         state.textFieldState.text.toString() shouldBe expectedText
 
-        // 各行の段落属性を検証
+        // Verify paragraph attributes for each line
         val headingRuns = state.richString.runs(HeadingKey).toList()
         headingRuns.size shouldBe 1
         headingRuns[0].value shouldBe HeadingLevel.H1
@@ -239,11 +239,11 @@ class WysiwygChallengerStressTest {
         val quoteRuns = state.richString.runs(BlockquoteKey).toList()
         quoteRuns.size shouldBe 1
 
-        // 各行のインライン属性を検証
+        // Verify inline attributes for each line
         val boldRuns = state.richString.runs(BoldKey).toList()
         boldRuns.size shouldBe 1
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         println("CODE RUNS: " + codeRuns)
         codeRuns.size shouldBe 1
 
@@ -252,7 +252,7 @@ class WysiwygChallengerStressTest {
     }
 
     @Test
-    fun test_list_to_ordered_list_transition_bug() {
+    fun `list to ordered list transition bug`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "- Item 1\n")
@@ -284,7 +284,7 @@ class WysiwygChallengerStressTest {
     }
 
     @Test
-    fun test_heading_to_bullet_list_transition() {
+    fun `heading to bullet list transition`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "# Heading 1\n")
@@ -306,7 +306,7 @@ class WysiwygChallengerStressTest {
     }
 
     @Test
-    fun test_bullet_list_to_heading_transition() {
+    fun `bullet list to heading transition`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "- List 1\n")
@@ -328,14 +328,14 @@ class WysiwygChallengerStressTest {
     }
 
     // =========================================================================
-    // 3. Undo/Redo を繰り返した際のスタック整合性とカーソル復元
+    // 3. Stack consistency and cursor restoration during repeated Undo/Redo
     // =========================================================================
 
     @Test
-    fun test_undo_redo_stack_consistency_and_cursor_restoration() {
+    fun `undo redo stack consistency and cursor restoration`() {
         val (state, _, transformation) = createEngine()
 
-        // 1. タイピング: "**hello**"
+        // 1. Type: "**hello**"
         typeText(state, transformation, "**hello**")
         state.textFieldState.text.toString() shouldBe "hello"
         state.selection shouldBe TextRange(5)
@@ -343,7 +343,7 @@ class WysiwygChallengerStressTest {
 
         println("Undo stack size before undo: canUndo=${state.undoState.canUndo}")
 
-        // 2. 1回目の Undo -> State B ("**hello**", selection: 9)
+        // 2. 1st Undo -> State B ("**hello**", selection: 9)
         state.undoState.undo()
         println(
             "After 1st undo: text='${state.textFieldState.text}', canUndo=${state.undoState.canUndo}, canRedo=${state.undoState.canRedo}",
@@ -357,7 +357,7 @@ class WysiwygChallengerStressTest {
         state.textFieldState.text.toString() shouldBe "hello"
         state.richString.spans.firstOrNull { it.attributes.containsKey(BoldKey) } shouldNotBe null
 
-        // 4. Undo を実行 (State C -> State B)
+        // 4. Execute Undo (State C -> State B)
         state.undoState.undo()
         println(
             "After undo to State B: text='${state.textFieldState.text}', canUndo=${state.undoState.canUndo}, canRedo=${state.undoState.canRedo}",
@@ -366,128 +366,128 @@ class WysiwygChallengerStressTest {
     }
 
     // =========================================================================
-    // 4. Backspace 巻き戻しと通常削除の境界動作
+    // 4. Boundary behavior between Backspace reversal and normal deletion
     // =========================================================================
 
     @Test
-    fun test_backspace_reversal_then_normal_backspace() {
+    fun `backspace reversal then normal backspace`() {
         val (state, wysiwygState, transformation) = createEngine()
 
-        // 1. "# " を入力して見出し変換発動
+        // 1. Type "# " to trigger heading conversion
         typeText(state, transformation, "# ")
         state.textFieldState.text.toString() shouldBe ""
         wysiwygState.canRevert(state) shouldBe true
 
-        // 2. 直後に Backspace を押下 -> State B ("# ") へ復元
+        // 2. Immediately press Backspace -> restore State B ("# ")
         pressBackspace(state, wysiwygState)
         state.textFieldState.text.toString() shouldBe "# "
         state.selection shouldBe TextRange(2)
         wysiwygState.canRevert(state) shouldBe false
 
-        // 3. もう一度 Backspace を押下 -> 通常削除で末尾スペースが消える ("#")
+        // 3. Press Backspace again -> normal deletion removes trailing space ("#")
         pressBackspace(state, wysiwygState)
         state.textFieldState.text.toString() shouldBe "#"
         state.selection shouldBe TextRange(1)
 
-        // 4. もう一度 Backspace を押下 -> "#" が消える ("")
+        // 4. Press Backspace again -> removes "#" ("")
         pressBackspace(state, wysiwygState)
         state.textFieldState.text.toString() shouldBe ""
         state.selection shouldBe TextRange(0)
     }
 
     @Test
-    fun test_backspace_inline_reversal_then_normal_backspace() {
+    fun `backspace inline reversal then normal backspace`() {
         val (state, wysiwygState, transformation) = createEngine()
 
-        // 1. "**bold**" を入力
+        // 1. Type "**bold**"
         typeText(state, transformation, "**bold**")
         state.textFieldState.text.toString() shouldBe "bold"
         state.selection shouldBe TextRange(4)
         wysiwygState.canRevert(state) shouldBe true
 
-        // 2. Backspace -> 生記号テキスト "**bold**" に復元
+        // 2. Backspace -> restore raw symbol text "**bold**"
         pressBackspace(state, wysiwygState)
         state.textFieldState.text.toString() shouldBe "**bold**"
         state.selection shouldBe TextRange(8)
         wysiwygState.canRevert(state) shouldBe false
 
-        // 3. 2回目の Backspace -> 通常削除で末尾の "*" が削除される ("**bold*")
+        // 3. 2nd Backspace -> normal deletion deletes trailing "*" ("**bold*")
         pressBackspace(state, wysiwygState)
         state.textFieldState.text.toString() shouldBe "**bold*"
         state.selection shouldBe TextRange(7)
     }
 
     @Test
-    fun test_backspace_after_cursor_move_does_not_revert_autoformat() {
+    fun `backspace after cursor move does not revert autoformat`() {
         val (state, wysiwygState, transformation) = createEngine()
 
-        // 1. "**bold**" を入力
+        // 1. Type "**bold**"
         typeText(state, transformation, "**bold**")
         state.textFieldState.text.toString() shouldBe "bold"
         wysiwygState.canRevert(state) shouldBe true
 
-        // 2. カーソルを途中に移動 (offset 2)
+        // 2. Move cursor inside text (offset 2)
         state.textFieldState.edit {
             selection = TextRange(2)
         }
 
-        // 3. カーソル移動後は canRevert が false になること
+        // 3. After cursor moves, canRevert must be false
         wysiwygState.canRevert(state) shouldBe false
 
-        // 4. Backspace を押すと通常削除が行われる ("bld")
+        // 4. Pressing Backspace performs normal deletion ("bld")
         pressBackspace(state, wysiwygState)
         state.textFieldState.text.toString() shouldBe "bld"
         state.selection shouldBe TextRange(1)
     }
 
     @Test
-    fun test_backspace_after_additional_typing_does_not_revert_autoformat() {
+    fun `backspace after additional typing does not revert autoformat`() {
         val (state, wysiwygState, transformation) = createEngine()
 
-        // 1. "**bold**" を入力
+        // 1. Type "**bold**"
         typeText(state, transformation, "**bold**")
         state.textFieldState.text.toString() shouldBe "bold"
         wysiwygState.canRevert(state) shouldBe true
 
-        // 2. 続けて文字 "!" を入力
+        // 2. Continuously type character "!"
         typeText(state, transformation, "!")
         state.textFieldState.text.toString() shouldBe "bold!"
         wysiwygState.canRevert(state) shouldBe false
 
-        // 3. Backspace を押すと "!" が通常削除される
+        // 3. Pressing Backspace normally deletes "!"
         pressBackspace(state, wysiwygState)
         state.textFieldState.text.toString() shouldBe "bold"
         state.selection shouldBe TextRange(4)
     }
 
     // =========================================================================
-    // 5. 敵対的極限ケース (Japanese, Single Char, Escapes, Asterisk Nesting)
+    // 5. Adversarial edge cases (Multibyte, Single Char, Escapes, Asterisk Nesting)
     // =========================================================================
 
     @Test
-    fun test_japanese_multibyte_inline_formatting() {
+    fun `japanese multibyte inline formatting`() {
         val (state, _, transformation) = createEngine()
 
-        // 日本語テキストの太字 "**日本語**"
+        // Multibyte bold text "**日本語**"
         typeText(state, transformation, "**日本語**")
         state.textFieldState.text.toString() shouldBe "日本語"
         val boldRuns = state.richString.runs(BoldKey).toList()
         boldRuns.size shouldBe 1
         boldRuns[0].range shouldBe 0..2
 
-        // 日本語テキストのインラインコード "`コード`"
+        // Multibyte inline code "`コード`"
         typeText(state, transformation, "と`コード`")
         state.textFieldState.text.toString() shouldBe "日本語とコード"
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns.size shouldBe 1
         codeRuns[0].range shouldBe 4..6
     }
 
     @Test
-    fun test_single_character_inline_formatting() {
+    fun `single character inline formatting`() {
         val (state, _, transformation) = createEngine()
 
-        // 1文字だけの装飾: "*a*"
+        // Single-character formatting: "*a*"
         typeText(state, transformation, "*a*")
         state.textFieldState.text.toString() shouldBe "a"
         state.selection shouldBe TextRange(1)

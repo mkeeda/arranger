@@ -17,7 +17,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F1_B01 multiline inline code prevented`() {
+    fun `F1-B01 multiline inline code prevented`() {
         val harness = createWysiwygHarness()
         harness.typeText("`line1\nline2`")
         harness.assertText("`line1\nline2`")
@@ -25,7 +25,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F1_B02 consecutive backticks do not crash or erroneously format`() {
+    fun `F1-B02 consecutive backticks do not crash or erroneously format`() {
         val harness = createWysiwygHarness()
         harness.typeText("````")
         harness.assertText("````")
@@ -33,7 +33,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F1_B03 empty backticks prevented`() {
+    fun `F1-B03 empty backticks prevented`() {
         val harness = createWysiwygHarness()
         harness.typeText("``")
         harness.assertText("``")
@@ -41,7 +41,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F1_B04 special characters html tags and emojis in code`() {
+    fun `F1-B04 special characters html tags and emojis in code`() {
         val harness = createWysiwygHarness()
         harness.typeText("`<div>🚀</div>`")
         harness.assertText("<div>🚀</div>")
@@ -49,7 +49,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F1_B05 whitespace enclosed backticks prevented`() {
+    fun `F1-B05 whitespace enclosed backticks prevented`() {
         val harness = createWysiwygHarness()
         harness.typeText("` code `")
         harness.assertText("` code `")
@@ -61,7 +61,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F2_B01 heading level 4 not converted`() {
+    fun `F2-B01 heading level 4 not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("#### Level4")
         harness.assertText("#### Level4")
@@ -69,7 +69,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F2_B02 no space after hash not converted`() {
+    fun `F2-B02 no space after hash not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("#HeaderWithoutSpace")
         harness.assertText("#HeaderWithoutSpace")
@@ -77,7 +77,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F2_B03 mid line hash space not converted`() {
+    fun `F2-B03 mid line hash space not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("Text # NotHeader")
         harness.assertText("Text # NotHeader")
@@ -85,7 +85,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F2_B04 empty line heading backspace reverts immediately`() {
+    fun `F2-B04 empty line heading backspace reverts immediately`() {
         val harness = createWysiwygHarness()
         harness.typeText("# ")
         harness.assertHeading(HeadingLevel.H1, range = 0..0)
@@ -95,7 +95,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F2_B05 consecutive hashes without space not converted`() {
+    fun `F2-B05 consecutive hashes without space not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("####### SevenHashes")
         harness.assertText("####### SevenHashes")
@@ -107,7 +107,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F3_B01 no space after dash not converted`() {
+    fun `F3-B01 no space after dash not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("-DashItem")
         harness.assertText("-DashItem")
@@ -115,7 +115,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F3_B02 mid line dash not converted`() {
+    fun `F3-B02 mid line dash not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("left - right")
         harness.assertText("left - right")
@@ -123,7 +123,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F3_B03 horizontal rule dashes not converted`() {
+    fun `F3-B03 horizontal rule dashes not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("--- HorizontalRule")
         harness.assertText("--- HorizontalRule")
@@ -131,7 +131,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F3_B04 empty bullet backspace reverts immediately`() {
+    fun `F3-B04 empty bullet backspace reverts immediately`() {
         val harness = createWysiwygHarness()
         harness.typeText("- ")
         harness.assertBulletList(range = 0..0)
@@ -141,7 +141,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F3_B05 no space after asterisk not converted to list`() {
+    fun `F3-B05 no space after asterisk not converted to list`() {
         val harness = createWysiwygHarness()
         harness.typeText("*AsteriskWord")
         harness.assertText("*AsteriskWord")
@@ -153,7 +153,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F4_B01 digit other than 1 does not trigger initial ordered list`() {
+    fun `F4-B01 digit other than 1 does not trigger initial ordered list`() {
         val harness = createWysiwygHarness()
         harness.typeText("2. SecondItem")
         harness.assertText("2. SecondItem")
@@ -161,7 +161,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F4_B02 no space after digit and dot not converted`() {
+    fun `F4-B02 no space after digit and dot not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("1.Item")
         harness.assertText("1.Item")
@@ -169,7 +169,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F4_B03 mid line ordered marker not converted`() {
+    fun `F4-B03 mid line ordered marker not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("Version 1. Released")
         harness.assertText("Version 1. Released")
@@ -177,7 +177,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F4_B04 alternative closing bracket not converted`() {
+    fun `F4-B04 alternative closing bracket not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("1) Parenthesis")
         harness.assertText("1) Parenthesis")
@@ -185,7 +185,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F4_B05 empty ordered list backspace reverts immediately`() {
+    fun `F4-B05 empty ordered list backspace reverts immediately`() {
         val harness = createWysiwygHarness()
         harness.typeText("1. ")
         harness.assertOrderedList(range = 0..0)
@@ -199,7 +199,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F5_B01 no space after greater than not converted`() {
+    fun `F5-B01 no space after greater than not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText(">QuotedWord")
         harness.assertText(">QuotedWord")
@@ -207,7 +207,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F5_B02 mid line greater than not converted`() {
+    fun `F5-B02 mid line greater than not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("A > B condition")
         harness.assertText("A > B condition")
@@ -215,7 +215,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F5_B03 full width greater than symbol not converted`() {
+    fun `F5-B03 full width greater than symbol not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("＞ 全角引用")
         harness.assertText("＞ 全角引用")
@@ -223,7 +223,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F5_B04 empty blockquote backspace reverts immediately`() {
+    fun `F5-B04 empty blockquote backspace reverts immediately`() {
         val harness = createWysiwygHarness()
         harness.typeText("> ")
         harness.assertBlockquote(range = 0..0)
@@ -233,7 +233,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F5_B05 multiple greater than symbols without spaces`() {
+    fun `F5-B05 multiple greater than symbols without spaces`() {
         val harness = createWysiwygHarness()
         harness.typeText(">>> TripleGreater")
         harness.assertText(">>> TripleGreater")
@@ -245,7 +245,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F6_B01 escaped bold markers not converted`() {
+    fun `F6-B01 escaped bold markers not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("\\*\\*escaped\\*\\*")
         harness.assertText("\\*\\*escaped\\*\\*")
@@ -253,7 +253,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F6_B02 whitespace left not converted`() {
+    fun `F6-B02 whitespace left not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("** bold**")
         harness.assertText("** bold**")
@@ -261,7 +261,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F6_B03 whitespace right not converted`() {
+    fun `F6-B03 whitespace right not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold **")
         harness.assertText("**bold **")
@@ -269,7 +269,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F6_B04 multiline bold not converted`() {
+    fun `F6-B04 multiline bold not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("**line1\nline2**")
         harness.assertText("**line1\nline2**")
@@ -277,7 +277,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F6_B05 empty bold markers not converted`() {
+    fun `F6-B05 empty bold markers not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("****")
         harness.assertText("****")
@@ -289,7 +289,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F7_B01 math multiplication not converted`() {
+    fun `F7-B01 math multiplication not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("2 * 3 * 4")
         harness.assertText("2 * 3 * 4")
@@ -297,7 +297,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F7_B02 escaped asterisk not converted`() {
+    fun `F7-B02 escaped asterisk not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("\\*escaped\\*")
         harness.assertText("\\*escaped\\*")
@@ -305,7 +305,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F7_B03 whitespace left not converted`() {
+    fun `F7-B03 whitespace left not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("Prefix * italic*")
         harness.assertText("Prefix * italic*")
@@ -313,7 +313,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F7_B04 whitespace right not converted`() {
+    fun `F7-B04 whitespace right not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("Prefix *italic *")
         harness.assertText("Prefix *italic *")
@@ -321,7 +321,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F7_B05 multiline asterisk not converted`() {
+    fun `F7-B05 multiline asterisk not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("Prefix *line1\nline2*")
         harness.assertText("Prefix *line1\nline2*")
@@ -333,7 +333,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F8_B01 constant naming not converted`() {
+    fun `F8-B01 constant naming not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("val MAX_BUFFER_SIZE = 1024")
         harness.assertText("val MAX_BUFFER_SIZE = 1024")
@@ -341,7 +341,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F8_B02 dunder names not converted`() {
+    fun `F8-B02 dunder names not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("def __init__(self):")
         harness.assertText("def __init__(self):")
@@ -349,7 +349,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F8_B03 url underscores not converted`() {
+    fun `F8-B03 url underscores not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("https://example.com/api_v1_endpoint")
         harness.assertText("https://example.com/api_v1_endpoint")
@@ -357,7 +357,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F8_B04 escaped underscore not converted`() {
+    fun `F8-B04 escaped underscore not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("\\_escaped\\_")
         harness.assertText("\\_escaped\\_")
@@ -365,7 +365,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F8_B05 whitespace padded underscore not converted`() {
+    fun `F8-B05 whitespace padded underscore not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("Word _ spaced _ text")
         harness.assertText("Word _ spaced _ text")
@@ -377,7 +377,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F9_B01 escaped backtick not converted`() {
+    fun `F9-B01 escaped backtick not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("\\`escaped\\`")
         harness.assertText("\\`escaped\\`")
@@ -385,7 +385,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F9_B02 single backtick does not trigger`() {
+    fun `F9-B02 single backtick does not trigger`() {
         val harness = createWysiwygHarness()
         harness.typeText("A single ` backtick")
         harness.assertText("A single ` backtick")
@@ -393,7 +393,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F9_B03 directory path expressions not converted`() {
+    fun `F9-B03 directory path expressions not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("/usr/local/bin")
         harness.assertText("/usr/local/bin")
@@ -401,7 +401,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F9_B04 whitespace left in code not converted`() {
+    fun `F9-B04 whitespace left in code not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("` code`")
         harness.assertText("` code`")
@@ -409,7 +409,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F9_B05 whitespace right in code not converted`() {
+    fun `F9-B05 whitespace right in code not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("`code `")
         harness.assertText("`code `")
@@ -421,7 +421,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F10_B01 home directory path not converted`() {
+    fun `F10-B01 home directory path not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("~/documents/file.txt")
         harness.assertText("~/documents/file.txt")
@@ -429,7 +429,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F10_B02 approximation tilde not converted`() {
+    fun `F10-B02 approximation tilde not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("Discount is approx ~ 50%")
         harness.assertText("Discount is approx ~ 50%")
@@ -437,7 +437,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F10_B03 escaped tilde not converted`() {
+    fun `F10-B03 escaped tilde not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("\\~escaped\\~")
         harness.assertText("\\~escaped\\~")
@@ -445,7 +445,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F10_B04 whitespace padded tilde not converted`() {
+    fun `F10-B04 whitespace padded tilde not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("~ spaced ~")
         harness.assertText("~ spaced ~")
@@ -453,7 +453,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F10_B05 empty tilde not converted`() {
+    fun `F10-B05 empty tilde not converted`() {
         val harness = createWysiwygHarness()
         harness.typeText("~~")
         harness.assertText("~~")
@@ -465,14 +465,14 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F11_B01 only special characters does not crash`() {
+    fun `F11-B01 only special characters does not crash`() {
         val harness = createWysiwygHarness()
         harness.typeText("***___~~~```")
         harness.assertText("***___~~~```")
     }
 
     @Test
-    fun `F11_B02 japanese punctuation and symbols handled cleanly`() {
+    fun `F11-B02 japanese punctuation and symbols handled cleanly`() {
         val harness = createWysiwygHarness()
         harness.typeText("これは、**太字**です。そして*斜体*です！")
         harness.assertText("これは、太字です。そして斜体です！")
@@ -481,7 +481,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F11_B03 surrogate pairs and emojis maintain index stability`() {
+    fun `F11-B03 surrogate pairs and emojis maintain index stability`() {
         val harness = createWysiwygHarness()
         harness.typeText("Hello 🌍 **World** 🚀")
         harness.assertText("Hello 🌍 World 🚀")
@@ -489,7 +489,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F11_B04 rapid successive triggers handled cleanly`() {
+    fun `F11-B04 rapid successive triggers handled cleanly`() {
         val harness = createWysiwygHarness()
         harness.typeText("**A****B****C**")
         harness.assertText("ABC")
@@ -499,7 +499,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F11_B05 unbalanced nested delimiters prevented from corrupted formatting`() {
+    fun `F11-B05 unbalanced nested delimiters prevented from corrupted formatting`() {
         val harness = createWysiwygHarness()
         harness.typeText("**_unbalanced*")
         harness.assertText("**_unbalanced*")
@@ -510,7 +510,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F12_B01 undo after typing further reverts typing first`() {
+    fun `F12-B01 undo after typing further reverts typing first`() {
         val harness = createWysiwygHarness()
         harness.typeText("# ")
         harness.typeText("Text")
@@ -525,7 +525,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F12_B02 multiple sequential undos rewind document history`() {
+    fun `F12-B02 multiple sequential undos rewind document history`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.typeText(" ")
@@ -545,21 +545,21 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F12_B03 undo when stack empty is safe no-op`() {
+    fun `F12-B03 undo when stack empty is safe no-op`() {
         val harness = createWysiwygHarness()
         harness.undo()
         harness.assertText("")
     }
 
     @Test
-    fun `F12_B04 redo when stack empty is safe no-op`() {
+    fun `F12-B04 redo when stack empty is safe no-op`() {
         val harness = createWysiwygHarness()
         harness.redo()
         harness.assertText("")
     }
 
     @Test
-    fun `F12_B05 retyping after undo triggers auto-formatting again`() {
+    fun `F12-B05 retyping after undo triggers auto-formatting again`() {
         val harness = createWysiwygHarness()
         harness.typeText("# ")
         harness.undo()
@@ -576,7 +576,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F13_B01 backspace after cursor relocation deletes character normally`() {
+    fun `F13-B01 backspace after cursor relocation deletes character normally`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.setCursor(2) // Move cursor inside "bold"
@@ -585,7 +585,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F13_B02 backspace on selection deletes selection normally`() {
+    fun `F13-B02 backspace on selection deletes selection normally`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.setSelection(1, 3) // Select "ol"
@@ -594,7 +594,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F13_B03 retype space after backspace reversal triggers again`() {
+    fun `F13-B03 retype space after backspace reversal triggers again`() {
         val harness = createWysiwygHarness()
         harness.typeText("> ")
         harness.pressBackspace() // Revert to "> "
@@ -607,7 +607,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F13_B04 continuous backspaces delete raw markers character by character`() {
+    fun `F13-B04 continuous backspaces delete raw markers character by character`() {
         val harness = createWysiwygHarness()
         harness.typeText("### ")
         harness.pressBackspace() // revert to "### "
@@ -627,7 +627,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F13_B05 backspace at start of empty document is safe no-op`() {
+    fun `F13-B05 backspace at start of empty document is safe no-op`() {
         val harness = createWysiwygHarness()
         harness.pressBackspace()
         harness.assertText("")
@@ -638,14 +638,14 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F14_B01 bold at start of line cursor positioned after word`() {
+    fun `F14-B01 bold at start of line cursor positioned after word`() {
         val harness = createWysiwygHarness()
         harness.typeText("**abc**")
         harness.assertCursorAt(3)
     }
 
     @Test
-    fun `F14_B02 bold at end of long text cursor positioned accurately`() {
+    fun `F14-B02 bold at end of long text cursor positioned accurately`() {
         val harness = createWysiwygHarness()
         val longPrefix = "A".repeat(100)
         harness.typeText(longPrefix)
@@ -654,7 +654,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F14_B03 cursor relocation clears removed typing attribute lock`() {
+    fun `F14-B03 cursor relocation clears removed typing attribute lock`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.setCursor(0)
@@ -664,7 +664,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F14_B04 newline immediately after bold does not carry bold across newline`() {
+    fun `F14-B04 newline immediately after bold does not carry bold across newline`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**\nplain")
         harness.assertText("bold\nplain")
@@ -673,7 +673,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F14_B05 continuous inline formats on same line retain proper spans`() {
+    fun `F14-B05 continuous inline formats on same line retain proper spans`() {
         val harness = createWysiwygHarness()
         harness.typeText("**first** and *second*")
         harness.assertText("first and second")
@@ -687,7 +687,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F15_B01 disabled editor suppresses all auto formatting`() {
+    fun `F15-B01 disabled editor suppresses all auto formatting`() {
         val harness = createWysiwygHarness(readOnly = true)
         harness.typeText("# Header")
         harness.assertText("")
@@ -695,7 +695,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F15_B02 large text typing stability`() {
+    fun `F15-B02 large text typing stability`() {
         val harness = createWysiwygHarness()
         val baseText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(10)
         harness.typeText(baseText)
@@ -704,7 +704,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F15_B03 empty string initialization handled gracefully`() {
+    fun `F15-B03 empty string initialization handled gracefully`() {
         val harness = createWysiwygHarness(initialText = "")
         harness.assertText("")
         harness.typeText("1. ")
@@ -712,7 +712,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F15_B04 multiple initial spans preserved`() {
+    fun `F15-B04 multiple initial spans preserved`() {
         val initialSpans =
             listOf(
                 RichSpan(range = 0..3, attributes = attributeContainerOf(BoldKey to Unit)),
@@ -724,7 +724,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F15_B05 external edit retains wysiwyg reactivity`() {
+    fun `F15-B05 external edit retains wysiwyg reactivity`() {
         val harness = createWysiwygHarness()
         harness.driver.rawState.edit {
             insert(0, "External ")
@@ -739,7 +739,7 @@ class Tier2BoundaryCornerCaseTest {
     // =========================================================================
 
     @Test
-    fun `F16_B01 rich text editor preserves complex markdown document raw`() {
+    fun `F16-B01 rich text editor preserves complex markdown document raw`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         val markdownDoc = "# Title\n- Bullet\n1. Number\n> Quote\n**bold** `code`"
         harness.typeText(markdownDoc)
@@ -753,7 +753,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F16_B02 rich text editor backspace behaves as standard text deletion`() {
+    fun `F16-B02 rich text editor backspace behaves as standard text deletion`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("# ")
         harness.pressBackspace()
@@ -761,7 +761,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F16_B03 rich text editor undo operates on standard typing granularity`() {
+    fun `F16-B03 rich text editor undo operates on standard typing granularity`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("abc")
         harness.typeText(" ")
@@ -771,7 +771,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F16_B04 rich text editor selection deletion works normally`() {
+    fun `F16-B04 rich text editor selection deletion works normally`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("Hello World")
         harness.setSelection(5, 11)
@@ -780,7 +780,7 @@ class Tier2BoundaryCornerCaseTest {
     }
 
     @Test
-    fun `F16_B05 rich text editor read only suppresses text modification`() {
+    fun `F16-B05 rich text editor read only suppresses text modification`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false, readOnly = true)
         harness.typeText("Attempt")
         harness.assertText("")

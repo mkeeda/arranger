@@ -1,8 +1,8 @@
 package dev.mkeeda.arranger.richtext.editor.wysiwyg
 
 import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
@@ -21,52 +21,52 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F1_01 code key attribute name and specification contract`() {
-        CodeKey.name shouldBe "code"
-        CodeKey.defaultValue shouldBe Unit
+    fun `F1-01 code key attribute name and specification contract`() {
+        InlineCodeKey.name shouldBe "inlineCode"
+        InlineCodeKey.defaultValue shouldBe Unit
     }
 
     @Test
-    fun `F1_02 code key container equality and retrieval`() {
-        val container = attributeContainerOf(CodeKey to Unit)
-        container.containsKey(CodeKey) shouldBe true
-        container[CodeKey] shouldBe Unit
+    fun `F1-02 code key container equality and retrieval`() {
+        val container = attributeContainerOf(InlineCodeKey to Unit)
+        container.containsKey(InlineCodeKey) shouldBe true
+        container[InlineCodeKey] shouldBe Unit
     }
 
     @Test
-    fun `F1_03 code key coexistence with bold and italic in attribute container`() {
+    fun `F1-03 code key coexistence with bold and italic in attribute container`() {
         val container =
             attributeContainerOf(
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
                 BoldKey to Unit,
                 ItalicKey to Unit,
             )
-        container.containsKey(CodeKey) shouldBe true
+        container.containsKey(InlineCodeKey) shouldBe true
         container.containsKey(BoldKey) shouldBe true
         container.containsKey(ItalicKey) shouldBe true
     }
 
     @Test
-    fun `F1_04 style resolver mapping contract for monospace family`() {
+    fun `F1-04 style resolver mapping contract for monospace family`() {
         // Contract test for code attribute resolution
         val spans =
             listOf(
                 RichSpan(
                     range = 0..4,
-                    attributes = attributeContainerOf(CodeKey to Unit),
+                    attributes = attributeContainerOf(InlineCodeKey to Unit),
                 ),
             )
         val state = RichTextState(initialText = RichString("code", spans))
-        state.richString.spans.first().attributes.containsKey(CodeKey) shouldBe true
+        state.richString.spans.first().attributes.containsKey(InlineCodeKey) shouldBe true
     }
 
     @Test
-    fun `F1_05 code key in rich string spans preserves boundary`() {
+    fun `F1-05 code key in rich string spans preserves boundary`() {
         val initialText = "val x = 42"
         val richString =
             RichString(
                 text = initialText,
-                spans = listOf(RichSpan(range = 0..9, attributes = attributeContainerOf(CodeKey to Unit))),
+                spans = listOf(RichSpan(range = 0..9, attributes = attributeContainerOf(InlineCodeKey to Unit))),
             )
         richString.spans.size shouldBe 1
         richString.spans.first().range shouldBe (0..9)
@@ -77,7 +77,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F2_01 heading 1 converts at line start and removes prefix`() {
+    fun `F2-01 heading 1 converts at line start and removes prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("# Header1")
         harness.assertText("Header1")
@@ -85,7 +85,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F2_02 heading 2 converts at line start and removes prefix`() {
+    fun `F2-02 heading 2 converts at line start and removes prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("## Header2")
         harness.assertText("Header2")
@@ -93,7 +93,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F2_03 heading 3 converts at line start and removes prefix`() {
+    fun `F2-03 heading 3 converts at line start and removes prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("### Header3")
         harness.assertText("Header3")
@@ -101,7 +101,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F2_04 heading on multiline document converts only current paragraph`() {
+    fun `F2-04 heading on multiline document converts only current paragraph`() {
         val harness = createWysiwygHarness()
         harness.typeText("First paragraph\n# Second paragraph")
         harness.assertText("First paragraph\nSecond paragraph")
@@ -109,10 +109,10 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F2_05 heading with japanese text converts properly`() {
+    fun `F2-05 heading with japanese text converts properly`() {
         val harness = createWysiwygHarness()
-        harness.typeText("# 見出しタイトル")
-        harness.assertText("見出しタイトル")
+        harness.typeText("# Heading Title")
+        harness.assertText("Heading Title")
         harness.assertHeading(HeadingLevel.H1, range = 0..6)
     }
 
@@ -121,7 +121,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F3_01 bullet list converts with dash prefix`() {
+    fun `F3-01 bullet list converts with dash prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("- List item")
         harness.assertText("List item")
@@ -129,7 +129,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F3_02 bullet list converts with asterisk prefix`() {
+    fun `F3-02 bullet list converts with asterisk prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("* Asterisk list")
         harness.assertText("Asterisk list")
@@ -137,7 +137,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F3_03 bullet list on subsequent line converts accurately`() {
+    fun `F3-03 bullet list on subsequent line converts accurately`() {
         val harness = createWysiwygHarness()
         harness.typeText("Plain line\n- Bullet line")
         harness.assertText("Plain line\nBullet line")
@@ -145,7 +145,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F3_04 bullet list typing cursor placement immediately after prefix removal`() {
+    fun `F3-04 bullet list typing cursor placement immediately after prefix removal`() {
         val harness = createWysiwygHarness()
         harness.typeText("- ")
         harness.assertText("")
@@ -154,7 +154,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F3_05 bullet list continuous typing retains bullet attribute`() {
+    fun `F3-05 bullet list continuous typing retains bullet attribute`() {
         val harness = createWysiwygHarness()
         harness.typeText("- Alpha")
         harness.typeText(" Bravo")
@@ -167,7 +167,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F4_01 ordered list converts with 1 dot space prefix`() {
+    fun `F4-01 ordered list converts with 1 dot space prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("1. First item")
         harness.assertText("First item")
@@ -175,7 +175,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F4_02 ordered list on subsequent line converts accurately`() {
+    fun `F4-02 ordered list on subsequent line converts accurately`() {
         val harness = createWysiwygHarness()
         harness.typeText("Intro\n1. Numbered item")
         harness.assertText("Intro\nNumbered item")
@@ -183,7 +183,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F4_03 ordered list typing cursor position immediately after trigger`() {
+    fun `F4-03 ordered list typing cursor position immediately after trigger`() {
         val harness = createWysiwygHarness()
         harness.typeText("1. ")
         harness.assertText("")
@@ -192,15 +192,15 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F4_04 ordered list with japanese text converts properly`() {
+    fun `F4-04 ordered list with japanese text converts properly`() {
         val harness = createWysiwygHarness()
-        harness.typeText("1. 最初の項目")
-        harness.assertText("最初の項目")
+        harness.typeText("1. First item")
+        harness.assertText("First item")
         harness.assertOrderedList(range = 0..4)
     }
 
     @Test
-    fun `F4_05 ordered list continuous typing extends text in ordered list`() {
+    fun `F4-05 ordered list continuous typing extends text in ordered list`() {
         val harness = createWysiwygHarness()
         harness.typeText("1. Step 1")
         harness.typeText(" details")
@@ -213,7 +213,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F5_01 blockquote converts with greater-than space prefix`() {
+    fun `F5-01 blockquote converts with greater-than space prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("> Quote text")
         harness.assertText("Quote text")
@@ -221,7 +221,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F5_02 blockquote on subsequent line converts independently`() {
+    fun `F5-02 blockquote on subsequent line converts independently`() {
         val harness = createWysiwygHarness()
         harness.typeText("Normal text\n> Quoted paragraph")
         harness.assertText("Normal text\nQuoted paragraph")
@@ -229,7 +229,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F5_03 blockquote cursor positioned at line start after conversion`() {
+    fun `F5-03 blockquote cursor positioned at line start after conversion`() {
         val harness = createWysiwygHarness()
         harness.typeText("> ")
         harness.assertText("")
@@ -238,15 +238,15 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F5_04 blockquote with japanese text converts properly`() {
+    fun `F5-04 blockquote with japanese text converts properly`() {
         val harness = createWysiwygHarness()
-        harness.typeText("> 重要な引用")
-        harness.assertText("重要な引用")
+        harness.typeText("> Important quote")
+        harness.assertText("Important quote")
         harness.assertBlockquote(range = 0..4)
     }
 
     @Test
-    fun `F5_05 blockquote continuous typing maintains blockquote format`() {
+    fun `F5-05 blockquote continuous typing maintains blockquote format`() {
         val harness = createWysiwygHarness()
         harness.typeText("> Initial quote")
         harness.typeText(" appended")
@@ -259,7 +259,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F6_01 bold standard word conversion`() {
+    fun `F6-01 bold standard word conversion`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.assertText("bold")
@@ -267,7 +267,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F6_02 bold conversion in middle of sentence`() {
+    fun `F6-02 bold conversion in middle of sentence`() {
         val harness = createWysiwygHarness()
         harness.typeText("This is **important** text")
         harness.assertText("This is important text")
@@ -277,7 +277,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F6_03 bold conversion across multiple words`() {
+    fun `F6-03 bold conversion across multiple words`() {
         val harness = createWysiwygHarness()
         harness.typeText("**multiple bold words**")
         harness.assertText("multiple bold words")
@@ -285,15 +285,15 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F6_04 bold conversion with japanese text`() {
+    fun `F6-04 bold conversion with japanese text`() {
         val harness = createWysiwygHarness()
-        harness.typeText("**太字テスト**")
-        harness.assertText("太字テスト")
+        harness.typeText("**Bold test**")
+        harness.assertText("Bold test")
         harness.assertBold(range = 0..4)
     }
 
     @Test
-    fun `F6_05 bold cursor positioned immediately after styled text`() {
+    fun `F6-05 bold cursor positioned immediately after styled text`() {
         val harness = createWysiwygHarness()
         harness.typeText("**word**")
         harness.assertCursorAt(4)
@@ -304,7 +304,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F7_01 italic asterisk standard conversion`() {
+    fun `F7-01 italic asterisk standard conversion`() {
         val harness = createWysiwygHarness()
         harness.typeText("*italic*")
         harness.assertText("italic")
@@ -312,7 +312,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F7_02 italic asterisk in middle of sentence`() {
+    fun `F7-02 italic asterisk in middle of sentence`() {
         val harness = createWysiwygHarness()
         harness.typeText("A *quick* brown fox")
         harness.assertText("A quick brown fox")
@@ -322,7 +322,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F7_03 italic asterisk multiple words`() {
+    fun `F7-03 italic asterisk multiple words`() {
         val harness = createWysiwygHarness()
         harness.typeText("*two italic words*")
         harness.assertText("two italic words")
@@ -330,15 +330,15 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F7_04 italic asterisk with japanese text`() {
+    fun `F7-04 italic asterisk with japanese text`() {
         val harness = createWysiwygHarness()
-        harness.typeText("*斜体テスト*")
-        harness.assertText("斜体テスト")
+        harness.typeText("*Italic test*")
+        harness.assertText("Italic test")
         harness.assertItalic(range = 0..4)
     }
 
     @Test
-    fun `F7_05 italic asterisk cursor placed immediately after styled text`() {
+    fun `F7-05 italic asterisk cursor placed immediately after styled text`() {
         val harness = createWysiwygHarness()
         harness.typeText("*italic*")
         harness.assertCursorAt(6)
@@ -349,7 +349,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F8_01 italic underscore standard conversion`() {
+    fun `F8-01 italic underscore standard conversion`() {
         val harness = createWysiwygHarness()
         harness.typeText("_italic_")
         harness.assertText("italic")
@@ -357,7 +357,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F8_02 italic underscore in middle of sentence`() {
+    fun `F8-02 italic underscore in middle of sentence`() {
         val harness = createWysiwygHarness()
         harness.typeText("Some _emphasized_ word")
         harness.assertText("Some emphasized word")
@@ -366,7 +366,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F8_03 italic underscore multiple words`() {
+    fun `F8-03 italic underscore multiple words`() {
         val harness = createWysiwygHarness()
         harness.typeText("_three separate words_")
         harness.assertText("three separate words")
@@ -374,15 +374,15 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F8_04 italic underscore with japanese text`() {
+    fun `F8-04 italic underscore with japanese text`() {
         val harness = createWysiwygHarness()
-        harness.typeText("_日本語の強調_")
-        harness.assertText("日本語の強調")
+        harness.typeText("_Emphasis text_")
+        harness.assertText("Emphasis text")
         harness.assertItalic(range = 0..5)
     }
 
     @Test
-    fun `F8_05 italic underscore cursor placed immediately after styled text`() {
+    fun `F8-05 italic underscore cursor placed immediately after styled text`() {
         val harness = createWysiwygHarness()
         harness.typeText("_word_")
         harness.assertCursorAt(4)
@@ -393,7 +393,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F9_01 inline code standard conversion`() {
+    fun `F9-01 inline code standard conversion`() {
         val harness = createWysiwygHarness()
         harness.typeText("`val x = 1`")
         harness.assertText("val x = 1")
@@ -401,7 +401,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F9_02 inline code in sentence`() {
+    fun `F9-02 inline code in sentence`() {
         val harness = createWysiwygHarness()
         harness.typeText("Run the `main` method")
         harness.assertText("Run the main method")
@@ -410,7 +410,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F9_03 inline code with symbols`() {
+    fun `F9-03 inline code with symbols`() {
         val harness = createWysiwygHarness()
         harness.typeText("`x && y || z`")
         harness.assertText("x && y || z")
@@ -418,15 +418,15 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F9_04 inline code with japanese text`() {
+    fun `F9-04 inline code with japanese text`() {
         val harness = createWysiwygHarness()
-        harness.typeText("`設定ファイル.kt`")
-        harness.assertText("設定ファイル.kt")
+        harness.typeText("`ConfigFile.kt`")
+        harness.assertText("ConfigFile.kt")
         harness.assertInlineCode(range = 0..9)
     }
 
     @Test
-    fun `F9_05 inline code cursor placed immediately after code span`() {
+    fun `F9-05 inline code cursor placed immediately after code span`() {
         val harness = createWysiwygHarness()
         harness.typeText("`code`")
         harness.assertCursorAt(4)
@@ -437,7 +437,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F10_01 strikethrough standard conversion`() {
+    fun `F10-01 strikethrough standard conversion`() {
         val harness = createWysiwygHarness()
         harness.typeText("~strikethrough~")
         harness.assertText("strikethrough")
@@ -445,7 +445,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F10_02 strikethrough in sentence`() {
+    fun `F10-02 strikethrough in sentence`() {
         val harness = createWysiwygHarness()
         harness.typeText("The ~old~ new way")
         harness.assertText("The old new way")
@@ -454,7 +454,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F10_03 strikethrough multiple words`() {
+    fun `F10-03 strikethrough multiple words`() {
         val harness = createWysiwygHarness()
         harness.typeText("~cancelled meeting today~")
         harness.assertText("cancelled meeting today")
@@ -462,15 +462,15 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F10_04 strikethrough with japanese text`() {
+    fun `F10-04 strikethrough with japanese text`() {
         val harness = createWysiwygHarness()
-        harness.typeText("~削除済みタスク~")
-        harness.assertText("削除済みタスク")
+        harness.typeText("~Deleted task~")
+        harness.assertText("Deleted task")
         harness.assertStrikethrough(range = 0..6)
     }
 
     @Test
-    fun `F10_05 strikethrough cursor placed immediately after styled text`() {
+    fun `F10-05 strikethrough cursor placed immediately after styled text`() {
         val harness = createWysiwygHarness()
         harness.typeText("~strike~")
         harness.assertCursorAt(6)
@@ -481,7 +481,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F11_01 snake_case identifiers do not trigger italic`() {
+    fun `F11-01 snake case identifiers do not trigger italic`() {
         val harness = createWysiwygHarness()
         harness.typeText("val user_first_name = 1")
         harness.assertText("val user_first_name = 1")
@@ -489,7 +489,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F11_02 unclosed markers remain plain text`() {
+    fun `F11-02 unclosed markers remain plain text`() {
         val harness = createWysiwygHarness()
         harness.typeText("**unclosed bold text")
         harness.assertText("**unclosed bold text")
@@ -497,7 +497,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F11_03 empty markers do not format`() {
+    fun `F11-03 empty markers do not format`() {
         val harness = createWysiwygHarness()
         harness.typeText("****")
         harness.assertText("****")
@@ -505,7 +505,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F11_04 mid-sentence block markers do not convert to blocks`() {
+    fun `F11-04 mid-sentence block markers do not convert to blocks`() {
         val harness = createWysiwygHarness()
         harness.typeText("Word # not heading")
         harness.assertText("Word # not heading")
@@ -513,7 +513,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F11_05 whitespace padded markers do not convert`() {
+    fun `F11-05 whitespace padded markers do not convert`() {
         val harness = createWysiwygHarness()
         harness.typeText("Text * spaced *")
         harness.assertText("Text * spaced *")
@@ -525,7 +525,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F12_01 undo heading restores prefix`() {
+    fun `F12-01 undo heading restores prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("# ")
         harness.assertHeading(HeadingLevel.H1, range = 0..0)
@@ -536,7 +536,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F12_02 undo bullet list restores dash prefix`() {
+    fun `F12-02 undo bullet list restores dash prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("- ")
         harness.assertBulletList(range = 0..0)
@@ -547,7 +547,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F12_03 undo inline bold restores raw asterisks`() {
+    fun `F12-03 undo inline bold restores raw asterisks`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.assertText("bold")
@@ -559,7 +559,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F12_04 redo after undo restores formatted state`() {
+    fun `F12-04 redo after undo restores formatted state`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.undo()
@@ -571,7 +571,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F12_05 undo restores selection cursor position`() {
+    fun `F12-05 undo restores selection cursor position`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.assertCursorAt(4)
@@ -585,7 +585,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F13_01 backspace immediately after heading reverts to prefix`() {
+    fun `F13-01 backspace immediately after heading reverts to prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("# ")
         harness.assertHeading(HeadingLevel.H1, range = 0..0)
@@ -596,7 +596,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F13_02 backspace immediately after bullet list reverts to prefix`() {
+    fun `F13-02 backspace immediately after bullet list reverts to prefix`() {
         val harness = createWysiwygHarness()
         harness.typeText("- ")
         harness.assertBulletList(range = 0..0)
@@ -607,7 +607,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F13_03 backspace immediately after bold reverts to markers`() {
+    fun `F13-03 backspace immediately after bold reverts to markers`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.assertBold(range = 0..3)
@@ -618,7 +618,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F13_04 backspace immediately after inline code reverts to backticks`() {
+    fun `F13-04 backspace immediately after inline code reverts to backticks`() {
         val harness = createWysiwygHarness()
         harness.typeText("`code`")
         harness.assertInlineCode(range = 0..3)
@@ -629,7 +629,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F13_05 subsequent backspace after reversal deletes normally`() {
+    fun `F13-05 subsequent backspace after reversal deletes normally`() {
         val harness = createWysiwygHarness()
         harness.typeText("# ")
         harness.pressBackspace() // Revert to "# "
@@ -647,7 +647,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F14_01 typing plain text after bold does not leak bold attribute`() {
+    fun `F14-01 typing plain text after bold does not leak bold attribute`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold**")
         harness.typeText(" plain")
@@ -657,7 +657,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F14_02 typing plain text after inline code does not leak code attribute`() {
+    fun `F14-02 typing plain text after inline code does not leak code attribute`() {
         val harness = createWysiwygHarness()
         harness.typeText("`val`")
         harness.typeText(" next")
@@ -667,7 +667,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F14_03 typing plain text after italic does not leak italic attribute`() {
+    fun `F14-03 typing plain text after italic does not leak italic attribute`() {
         val harness = createWysiwygHarness()
         harness.typeText("*italic*")
         harness.typeText(" plain")
@@ -677,7 +677,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F14_04 typing plain text after strikethrough does not leak attribute`() {
+    fun `F14-04 typing plain text after strikethrough does not leak attribute`() {
         val harness = createWysiwygHarness()
         harness.typeText("~strike~")
         harness.typeText(" plain")
@@ -687,7 +687,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F14_05 cursor placed precisely after transformed span boundary`() {
+    fun `F14-05 cursor placed precisely after transformed span boundary`() {
         val harness = createWysiwygHarness()
         harness.typeText("Prefix **formatted**")
         harness.assertCursorAt(16) // "Prefix formatted".length == 16
@@ -698,14 +698,14 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F15_01 wysiwyg harness initializes in enabled state by default`() {
+    fun `F15-01 wysiwyg harness initializes in enabled state by default`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = true)
         harness.typeText("# Heading")
         harness.assertHeading(HeadingLevel.H1, range = 0..6)
     }
 
     @Test
-    fun `F15_02 wysiwyg harness accepts initial rich string with spans`() {
+    fun `F15-02 wysiwyg harness accepts initial rich string with spans`() {
         val initialSpan = RichSpan(range = 0..3, attributes = attributeContainerOf(BoldKey to Unit))
         val harness = createWysiwygHarness(initialText = "test", initialSpans = listOf(initialSpan))
         harness.assertText("test")
@@ -713,14 +713,14 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F15_03 wysiwyg harness supports readOnly mode preventing transforms`() {
+    fun `F15-03 wysiwyg harness supports readOnly mode preventing transforms`() {
         val harness = createWysiwygHarness(readOnly = true)
         harness.typeText("# Heading")
         harness.assertText("")
     }
 
     @Test
-    fun `F15_04 wysiwyg harness supports cursor relocation and typing`() {
+    fun `F15-04 wysiwyg harness supports cursor relocation and typing`() {
         val harness = createWysiwygHarness()
         harness.typeText("Hello World")
         harness.setCursor(5)
@@ -729,7 +729,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F15_05 wysiwyg state exposes rich string single source of truth`() {
+    fun `F15-05 wysiwyg state exposes rich string single source of truth`() {
         val harness = createWysiwygHarness()
         harness.typeText("**bold text**")
         val state = harness.driver.rawState
@@ -742,7 +742,7 @@ class Tier1FeatureCoverageTest {
     // =========================================================================
 
     @Test
-    fun `F16_01 rich text editor preserves raw heading symbols without formatting`() {
+    fun `F16-01 rich text editor preserves raw heading symbols without formatting`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("# Header")
         harness.assertText("# Header")
@@ -750,7 +750,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F16_02 rich text editor preserves raw bullet list dash without formatting`() {
+    fun `F16-02 rich text editor preserves raw bullet list dash without formatting`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("- Bullet")
         harness.assertText("- Bullet")
@@ -758,7 +758,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F16_03 rich text editor preserves raw bold asterisks without formatting`() {
+    fun `F16-03 rich text editor preserves raw bold asterisks without formatting`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("**bold**")
         harness.assertText("**bold**")
@@ -766,7 +766,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F16_04 rich text editor preserves raw backticks without formatting`() {
+    fun `F16-04 rich text editor preserves raw backticks without formatting`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("`code`")
         harness.assertText("`code`")
@@ -774,7 +774,7 @@ class Tier1FeatureCoverageTest {
     }
 
     @Test
-    fun `F16_05 rich text editor preserves raw blockquote symbol without formatting`() {
+    fun `F16-05 rich text editor preserves raw blockquote symbol without formatting`() {
         val harness = createWysiwygHarness(isWysiwygEnabled = false)
         harness.typeText("> Quote")
         harness.assertText("> Quote")

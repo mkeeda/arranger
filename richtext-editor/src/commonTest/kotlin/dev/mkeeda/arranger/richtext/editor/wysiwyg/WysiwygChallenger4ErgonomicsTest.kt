@@ -6,8 +6,8 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -73,7 +73,7 @@ class WysiwygChallenger4ErgonomicsTest {
     // =========================================================================
 
     @Test
-    fun test_undo_heading1_restores_raw_prefix_and_cursor() {
+    fun `undo heading1 restores raw prefix and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "# ")
         state.textFieldState.text.toString() shouldBe ""
@@ -87,7 +87,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_heading2_restores_raw_prefix_and_cursor() {
+    fun `undo heading2 restores raw prefix and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "## ")
         state.textFieldState.text.toString() shouldBe ""
@@ -100,7 +100,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_heading3_restores_raw_prefix_and_cursor() {
+    fun `undo heading3 restores raw prefix and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "### ")
         state.textFieldState.text.toString() shouldBe ""
@@ -113,7 +113,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_bullet_list_dash_restores_raw_prefix_and_cursor() {
+    fun `undo bullet list dash restores raw prefix and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "- ")
         state.textFieldState.text.toString() shouldBe ""
@@ -126,7 +126,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_bullet_list_asterisk_restores_raw_prefix_and_cursor() {
+    fun `undo bullet list asterisk restores raw prefix and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "* ")
         state.textFieldState.text.toString() shouldBe ""
@@ -139,7 +139,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_ordered_list_restores_raw_prefix_and_cursor() {
+    fun `undo ordered list restores raw prefix and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "1. ")
         state.textFieldState.text.toString() shouldBe ""
@@ -152,7 +152,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_blockquote_restores_raw_prefix_and_cursor() {
+    fun `undo blockquote restores raw prefix and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "> ")
         state.textFieldState.text.toString() shouldBe ""
@@ -165,7 +165,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_bold_restores_raw_markers_and_cursor() {
+    fun `undo bold restores raw markers and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**bold**")
         state.textFieldState.text.toString() shouldBe "bold"
@@ -178,7 +178,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_italic_asterisk_restores_raw_markers_and_cursor() {
+    fun `undo italic asterisk restores raw markers and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "*italic*")
         state.textFieldState.text.toString() shouldBe "italic"
@@ -191,7 +191,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_italic_underscore_restores_raw_markers_and_cursor() {
+    fun `undo italic underscore restores raw markers and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "_italic_")
         state.textFieldState.text.toString() shouldBe "italic"
@@ -204,7 +204,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_inline_code_restores_raw_markers_and_cursor() {
+    fun `undo inline code restores raw markers and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "`code`")
         state.textFieldState.text.toString() shouldBe "code"
@@ -213,11 +213,11 @@ class WysiwygChallenger4ErgonomicsTest {
         state.undoState.undo()
         state.textFieldState.text.toString() shouldBe "`code`"
         state.selection shouldBe TextRange(6)
-        state.richString.spans.none { it.attributes.containsKey(CodeKey) } shouldBe true
+        state.richString.spans.none { it.attributes.containsKey(InlineCodeKey) } shouldBe true
     }
 
     @Test
-    fun test_undo_strikethrough_restores_raw_markers_and_cursor() {
+    fun `undo strikethrough restores raw markers and cursor`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "~strike~")
         state.textFieldState.text.toString() shouldBe "strike"
@@ -230,7 +230,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_inline_with_preceding_text() {
+    fun `undo inline with preceding text`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "Prefix **bold**")
         state.textFieldState.text.toString() shouldBe "Prefix bold"
@@ -243,7 +243,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_undo_and_redo_cycles_consistency() {
+    fun `undo and redo cycles consistency`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**test**")
         state.textFieldState.text.toString() shouldBe "test"
@@ -278,7 +278,7 @@ class WysiwygChallenger4ErgonomicsTest {
     // =========================================================================
 
     @Test
-    fun test_backspace_heading1_reversal() {
+    fun `backspace heading1 reversal`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "# ")
         wysiwygState.canRevert(state) shouldBe true
@@ -299,7 +299,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_backspace_bullet_list_reversal() {
+    fun `backspace bullet list reversal`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "- ")
         wysiwygState.canRevert(state) shouldBe true
@@ -311,7 +311,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_backspace_ordered_list_reversal() {
+    fun `backspace ordered list reversal`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "1. ")
         wysiwygState.canRevert(state) shouldBe true
@@ -323,7 +323,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_backspace_blockquote_reversal() {
+    fun `backspace blockquote reversal`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "> ")
         wysiwygState.canRevert(state) shouldBe true
@@ -335,7 +335,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_backspace_bold_reversal() {
+    fun `backspace bold reversal`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "**bold**")
         wysiwygState.canRevert(state) shouldBe true
@@ -352,7 +352,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_backspace_code_reversal() {
+    fun `backspace code reversal`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "`code`")
         wysiwygState.canRevert(state) shouldBe true
@@ -364,7 +364,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_backspace_reversal_invalidated_by_cursor_movement() {
+    fun `backspace reversal invalidated by cursor movement`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "**bold**")
         wysiwygState.canRevert(state) shouldBe true
@@ -382,7 +382,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_backspace_reversal_invalidated_by_further_typing() {
+    fun `backspace reversal invalidated by further typing`() {
         val (state, wysiwygState, transformation) = createEngine()
         typeText(state, transformation, "**bold**")
         wysiwygState.canRevert(state) shouldBe true
@@ -402,7 +402,7 @@ class WysiwygChallenger4ErgonomicsTest {
     // =========================================================================
 
     @Test
-    fun test_f14_typing_characters_immediately_after_bold_does_not_leak() {
+    fun `f14 typing characters immediately after bold does not leak`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**bold**")
         state.textFieldState.text.toString() shouldBe "bold"
@@ -417,7 +417,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_typing_with_space_after_bold_does_not_leak() {
+    fun `f14 typing with space after bold does not leak`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**bold** and plain")
         state.textFieldState.text.toString() shouldBe "bold and plain"
@@ -428,7 +428,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_typing_characters_immediately_after_italic_asterisk_does_not_leak() {
+    fun `f14 typing characters immediately after italic asterisk does not leak`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "*italic*more")
         state.textFieldState.text.toString() shouldBe "italicmore"
@@ -439,7 +439,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_typing_characters_immediately_after_italic_underscore_does_not_leak() {
+    fun `f14 typing characters immediately after italic underscore does not leak`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "_italic_more")
         state.textFieldState.text.toString() shouldBe "italicmore"
@@ -450,18 +450,18 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_typing_characters_immediately_after_code_does_not_leak() {
+    fun `f14 typing characters immediately after code does not leak`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "`code`more")
         state.textFieldState.text.toString() shouldBe "codemore"
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns shouldHaveSize 1
         codeRuns[0].range shouldBe 0..3
     }
 
     @Test
-    fun test_f14_typing_characters_immediately_after_strikethrough_does_not_leak() {
+    fun `f14 typing characters immediately after strikethrough does not leak`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "~strike~more")
         state.textFieldState.text.toString() shouldBe "strikemore"
@@ -472,7 +472,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_inline_formatting_with_surrounding_plain_text() {
+    fun `f14 inline formatting with surrounding plain text`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "Prefix **bold** suffix")
         state.textFieldState.text.toString() shouldBe "Prefix bold suffix"
@@ -483,7 +483,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_consecutive_inline_formats_do_not_contaminate_each_other() {
+    fun `f14 consecutive inline formats do not contaminate each other`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**bold** `code` *italic*")
         state.textFieldState.text.toString() shouldBe "bold code italic"
@@ -492,7 +492,7 @@ class WysiwygChallenger4ErgonomicsTest {
         boldRuns shouldHaveSize 1
         boldRuns[0].range shouldBe 0..3
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns shouldHaveSize 1
         codeRuns[0].range shouldBe 5..8
 
@@ -502,7 +502,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_punctuation_immediately_after_inline_formatting() {
+    fun `f14 punctuation immediately after inline formatting`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**bold**, `code`: *italic*!")
         state.textFieldState.text.toString() shouldBe "bold, code: italic!"
@@ -511,7 +511,7 @@ class WysiwygChallenger4ErgonomicsTest {
         boldRuns shouldHaveSize 1
         boldRuns[0].range shouldBe 0..3
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns shouldHaveSize 1
         codeRuns[0].range shouldBe 6..9
 
@@ -521,7 +521,7 @@ class WysiwygChallenger4ErgonomicsTest {
     }
 
     @Test
-    fun test_f14_typing_after_backspacing_a_typed_character() {
+    fun `f14 typing after backspacing a typed character`() {
         val (state, wysiwygState, transformation) = createEngine()
         // 1. Type **bold**
         typeText(state, transformation, "**bold**")

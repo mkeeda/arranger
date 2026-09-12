@@ -11,9 +11,9 @@ import androidx.compose.ui.text.TextStyle
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -30,23 +30,21 @@ class WysiwygEditorTest {
     fun `WysiwygEditor composable contract compiles and binds properly with all parameter overloads`() {
         val composableRef: @Composable () -> Unit = {
             val state = RichTextState(initialText = RichString(text = "Sample"))
-            val wysiwygState = WysiwygState()
             val interactionSource = MutableInteractionSource()
 
             // Call with default parameters
             WysiwygEditor(state = state)
 
-            // Call with attributeStyleResolver and onLinkClick
+            // Call with styleResolver and onLinkClick
             WysiwygEditor(
                 state = state,
                 modifier = Modifier,
                 readOnly = false,
                 textStyle = TextStyle.Default,
-                attributeStyleResolver = DefaultAttributeStyleResolver,
+                styleResolver = DefaultAttributeStyleResolver,
                 interactionSource = interactionSource,
                 cursorBrush = SolidColor(Color.Black),
                 onLinkClick = { _ -> },
-                wysiwygState = wysiwygState,
             )
         }
         composableRef shouldBe composableRef
@@ -152,7 +150,7 @@ class WysiwygEditorTest {
         typeText(state, wysiwygState, transformation, "`code`")
 
         state.richString.text shouldBe "code"
-        state.richString.spans.any { it.attributes.containsKey(CodeKey) } shouldBe true
+        state.richString.spans.any { it.attributes.containsKey(InlineCodeKey) } shouldBe true
     }
 
     @Test

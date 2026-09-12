@@ -15,10 +15,10 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
@@ -37,18 +37,18 @@ import kotlin.test.Test
 
 /**
  * Empirical stress tests for [DefaultAttributeStyleResolver] focusing on:
- * 1. Property completeness and orthogonality of CodeKey
+ * 1. Property completeness and orthogonality of InlineCodeKey
  * 2. Style inheritance and non-destruction with HeadingKey and paragraph styles
  * 3. Multi-span overlap and style synthesis verification
  */
 class DefaultAttributeStyleResolverStressTest {
     // =========================================================================
-    // 1. Property Completeness and Orthogonality of CodeKey
+    // 1. Property Completeness and Orthogonality of InlineCodeKey
     // =========================================================================
 
     @Test
-    fun `CodeKey resolves isolated Monospace font and subtle background without polluting other properties`() {
-        val container = attributeContainerOf(CodeKey to Unit)
+    fun `InlineCodeKey resolves isolated Monospace font and subtle background without polluting other properties`() {
+        val container = attributeContainerOf(InlineCodeKey to Unit)
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
         val spanStyle = resolved.spanStyle.shouldNotBeNull()
@@ -68,17 +68,17 @@ class DefaultAttributeStyleResolverStressTest {
         spanStyle.shadow.shouldBeNull()
         spanStyle.drawStyle.shouldBeNull()
 
-        // CodeKey is an inline span attribute, so paragraphStyle MUST be null
+        // InlineCodeKey is an inline span attribute, so paragraphStyle MUST be null
         resolved.paragraphStyle.shouldBeNull()
     }
 
     @Test
-    fun `CodeKey merges orthogonally with TextColorKey and FontSizeKey`() {
+    fun `InlineCodeKey merges orthogonally with TextColorKey and FontSizeKey`() {
         val customColor = RgbaColor(0xFFFF5722)
         val customSize = TextSize(22f)
         val container =
             attributeContainerOf(
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
                 TextColorKey to customColor,
                 FontSizeKey to customSize,
             )
@@ -93,10 +93,10 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `CodeKey merges orthogonally with LinkKey`() {
+    fun `InlineCodeKey merges orthogonally with LinkKey`() {
         val container =
             attributeContainerOf(
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
                 LinkKey to "https://arranger.dev",
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
@@ -109,19 +109,19 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `Adversarial Check - BackgroundColorKey and CodeKey coexistence behavior in same container`() {
+    fun `Adversarial Check - BackgroundColorKey and InlineCodeKey coexistence behavior in same container`() {
         val customBg = RgbaColor(0xFF00FF00) // Green
         val container =
             attributeContainerOf(
                 BackgroundColorKey to customBg,
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
         val span = resolved.spanStyle.shouldNotBeNull()
 
         span.fontFamily shouldBe FontFamily.Monospace
-        // Verify which background wins: CodeKey is registered after BackgroundColorKey in DefaultAttributeStyleResolver
-        // so SpanStyle.merge causes CodeKey's subtle background to override the custom BackgroundColorKey.
+        // Verify which background wins: InlineCodeKey is registered after BackgroundColorKey in DefaultAttributeStyleResolver
+        // so SpanStyle.merge causes InlineCodeKey's subtle background to override the custom BackgroundColorKey.
         span.background shouldBe Color(0x14000000)
     }
 
@@ -130,7 +130,7 @@ class DefaultAttributeStyleResolverStressTest {
     // =========================================================================
 
     @Test
-    fun `CodeKey merged with all Heading levels H1 through H6 preserves font sizes bold weight and line heights`() {
+    fun `InlineCodeKey merged with all Heading levels H1 through H6 preserves font sizes bold weight and line heights`() {
         data class HeadingSpec(
             val level: HeadingLevel,
             val expectedFontSize: TextUnit,
@@ -151,7 +151,7 @@ class DefaultAttributeStyleResolverStressTest {
             val container =
                 attributeContainerOf(
                     HeadingKey to spec.level,
-                    CodeKey to Unit,
+                    InlineCodeKey to Unit,
                 )
             val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -168,11 +168,11 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `CodeKey merged with BlockquoteKey preserves blockquote indent line height italic and alpha`() {
+    fun `InlineCodeKey merged with BlockquoteKey preserves blockquote indent line height italic and alpha`() {
         val container =
             attributeContainerOf(
                 BlockquoteKey to Unit,
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -189,11 +189,11 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `CodeKey merged with BulletListKey preserves list indent and line height`() {
+    fun `InlineCodeKey merged with BulletListKey preserves list indent and line height`() {
         val container =
             attributeContainerOf(
                 BulletListKey to ListIndentLevel.Level1,
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -208,11 +208,11 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `CodeKey merged with OrderedListKey preserves list indent and line height`() {
+    fun `InlineCodeKey merged with OrderedListKey preserves list indent and line height`() {
         val container =
             attributeContainerOf(
                 OrderedListKey to ListIndentLevel.Level2,
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -226,12 +226,12 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `CodeKey merged with TextAlignmentKey preserves alignment`() {
+    fun `InlineCodeKey merged with TextAlignmentKey preserves alignment`() {
         for (align in listOf(TextAlignment.Left, TextAlignment.Center, TextAlignment.Right, TextAlignment.Justify)) {
             val container =
                 attributeContainerOf(
                     TextAlignmentKey to align,
-                    CodeKey to Unit,
+                    InlineCodeKey to Unit,
                 )
             val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -261,7 +261,7 @@ class DefaultAttributeStyleResolverStressTest {
         // In Arranger's RichString model, a heading is often a span over the whole paragraph (e.g. 0..19),
         // and inline code is a sub-span (e.g. 5..10).
         val headingAttributes = attributeContainerOf(HeadingKey to HeadingLevel.H1)
-        val codeAttributes = attributeContainerOf(CodeKey to Unit)
+        val codeAttributes = attributeContainerOf(InlineCodeKey to Unit)
 
         val headingResolved = DefaultAttributeStyleResolver.resolve(headingAttributes)
         val codeResolved = DefaultAttributeStyleResolver.resolve(codeAttributes)
@@ -274,8 +274,8 @@ class DefaultAttributeStyleResolverStressTest {
 
         synthesized.fontSize shouldBe 32.sp // Preserved from H1!
         synthesized.fontWeight shouldBe FontWeight.Bold // Preserved from H1!
-        synthesized.fontFamily shouldBe FontFamily.Monospace // Applied from CodeKey!
-        synthesized.background shouldBe Color(0x14000000) // Applied from CodeKey!
+        synthesized.fontFamily shouldBe FontFamily.Monospace // Applied from InlineCodeKey!
+        synthesized.background shouldBe Color(0x14000000) // Applied from InlineCodeKey!
 
         // Paragraph style remains intact from heading
         val paragraph = headingResolved.paragraphStyle.shouldNotBeNull()
@@ -298,7 +298,7 @@ class DefaultAttributeStyleResolverStressTest {
         // [16..19]: Italic only
 
         val boldResolved = DefaultAttributeStyleResolver.resolve(attributeContainerOf(BoldKey to Unit)).spanStyle.shouldNotBeNull()
-        val codeResolved = DefaultAttributeStyleResolver.resolve(attributeContainerOf(CodeKey to Unit)).spanStyle.shouldNotBeNull()
+        val codeResolved = DefaultAttributeStyleResolver.resolve(attributeContainerOf(InlineCodeKey to Unit)).spanStyle.shouldNotBeNull()
         val italicResolved = DefaultAttributeStyleResolver.resolve(attributeContainerOf(ItalicKey to Unit)).spanStyle.shouldNotBeNull()
 
         // Segment [0..4]: Bold only
@@ -334,17 +334,17 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `RichString with Heading and embedded CodeKey splits into 3 non-overlapping chunks and resolves styles consistently`() {
+    fun `RichString with Heading and embedded InlineCodeKey splits into 3 non-overlapping chunks and resolves styles consistently`() {
         val richString =
             RichString("Hello World of Code")
                 .edit {
                     setParagraphAttribute(HeadingKey, HeadingLevel.H2, range = 0..18)
-                    setSpanAttribute(CodeKey, Unit, range = 6..10) // "World"
+                    setSpanAttribute(InlineCodeKey, Unit, range = 6..10) // "World"
                 }
 
         // SpanMerger splits overlapping ranges into distinct non-overlapping chunks:
         // Chunk 0: 0..5 ("Hello ") -> Heading H2
-        // Chunk 1: 6..10 ("World") -> Heading H2 + CodeKey
+        // Chunk 1: 6..10 ("World") -> Heading H2 + InlineCodeKey
         // Chunk 2: 11..18 (" of Code") -> Heading H2
         richString.spans.size shouldBe 3
 
@@ -375,7 +375,7 @@ class DefaultAttributeStyleResolverStressTest {
     }
 
     @Test
-    fun `RichTextState toggleFormat with CodeKey applies Monospace style and toggle off clears it`() {
+    fun `RichTextState toggleFormat with InlineCodeKey applies Monospace style and toggle off clears it`() {
         val text = "Inline Code Test"
         val state = RichTextState(initialText = RichString(text))
 
@@ -384,8 +384,8 @@ class DefaultAttributeStyleResolverStressTest {
             selection = TextRange(7, 11)
         }
 
-        // Toggle on CodeKey
-        state.toggleFormat(CodeKey)
+        // Toggle on InlineCodeKey
+        state.toggleFormat(InlineCodeKey)
 
         state.richString.spans.size shouldBe 1
         val span = state.richString.spans.first()
@@ -394,13 +394,13 @@ class DefaultAttributeStyleResolverStressTest {
         resolvedOn.spanStyle?.fontFamily shouldBe FontFamily.Monospace
         resolvedOn.spanStyle?.background shouldBe Color(0x14000000)
 
-        // Toggle off CodeKey
-        state.toggleFormat(CodeKey)
+        // Toggle off InlineCodeKey
+        state.toggleFormat(InlineCodeKey)
         state.richString.spans.isEmpty() shouldBe true
     }
 
     @Test
-    fun `RichTextState with Heading H1 and embedded CodeKey preserves heading font size and line height across entire paragraph`() {
+    fun `RichTextState with Heading H1 and embedded InlineCodeKey preserves heading font size and line height across entire paragraph`() {
         val text = "Heading with code inside"
         val state = RichTextState(initialText = RichString(text))
 
@@ -411,11 +411,11 @@ class DefaultAttributeStyleResolverStressTest {
         state.textFieldState.edit {
             selection = TextRange(13, 17)
         }
-        state.toggleFormat(CodeKey)
+        state.toggleFormat(InlineCodeKey)
 
         // Should split into 3 segments:
         // [0..12]: "Heading with " (H1 only)
-        // [13..16]: "code" (H1 + CodeKey)
+        // [13..16]: "code" (H1 + InlineCodeKey)
         // [17..24]: " inside" (H1 only)
         state.richString.spans.size shouldBe 3
 
@@ -453,7 +453,7 @@ class DefaultAttributeStyleResolverStressTest {
 
         // 2. Code first word "Overlapping" (0..11)
         state.textFieldState.edit { selection = TextRange(0, 11) }
-        state.toggleFormat(CodeKey)
+        state.toggleFormat(InlineCodeKey)
 
         // 3. Italic "Formats" (12..19)
         state.textFieldState.edit { selection = TextRange(12, 19) }

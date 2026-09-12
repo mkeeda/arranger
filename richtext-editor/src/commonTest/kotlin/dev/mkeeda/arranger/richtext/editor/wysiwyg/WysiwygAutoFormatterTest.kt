@@ -5,9 +5,9 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
@@ -213,7 +213,7 @@ class WysiwygAutoFormatterTest {
 
         state.textFieldState.text.toString() shouldBe "Hello"
         state.selection shouldBe TextRange(5)
-        val codeSpan = state.richString.spans.firstOrNull { it.attributes.containsKey(CodeKey) }
+        val codeSpan = state.richString.spans.firstOrNull { it.attributes.containsKey(InlineCodeKey) }
         codeSpan shouldNotBe null
         codeSpan?.range shouldBe 0..4
     }

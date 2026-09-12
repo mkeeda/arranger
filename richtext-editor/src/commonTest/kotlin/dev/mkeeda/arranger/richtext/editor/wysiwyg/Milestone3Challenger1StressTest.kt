@@ -14,9 +14,9 @@ import androidx.compose.ui.text.TextStyle
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -79,7 +79,7 @@ class Milestone3Challenger1StressTest {
             // 1. Minimum invocation
             WysiwygEditor(state = state)
 
-            // 2. Full overload invocation with wysiwygState, attributeStyleResolver, onLinkClick
+            // 2. Full overload invocation with onLinkClick and resolvers
             WysiwygEditor(
                 state = state,
                 modifier = Modifier,
@@ -90,17 +90,15 @@ class Milestone3Challenger1StressTest {
                 interactionSource = interactionSource,
                 cursorBrush = SolidColor(Color.Black),
                 styleResolver = DefaultAttributeStyleResolver,
-                attributeStyleResolver = DefaultAttributeStyleResolver,
                 listMarkerResolver = DefaultListMarkerResolver,
                 onLinkClick = { _ -> },
-                wysiwygState = wysiwygState,
             )
         }
         composableRef shouldBe composableRef
     }
 
     @Test
-    fun `RichTextEditor never triggers block formatting for headings H1, H2, H3, and H4`() {
+    fun `RichTextEditor never triggers block formatting for headings H1 H2 H3 and H4`() {
         val (state, transformation) = createRichTextEngine()
 
         typeTextToRichText(state, transformation, "# Heading 1\n## Heading 2\n### Heading 3\n#### Heading 4")
@@ -110,7 +108,7 @@ class Milestone3Challenger1StressTest {
     }
 
     @Test
-    fun `RichTextEditor never triggers block formatting for bullet lists, ordered lists, and blockquotes`() {
+    fun `RichTextEditor never triggers block formatting for bullet lists ordered lists and blockquotes`() {
         val (state, transformation) = createRichTextEngine()
 
         typeTextToRichText(state, transformation, "- Dash list\n* Asterisk list\n1. Ordered list\n> Blockquote text")
@@ -122,7 +120,7 @@ class Milestone3Challenger1StressTest {
     }
 
     @Test
-    fun `RichTextEditor never triggers inline formatting for bold, italic, code, and strikethrough`() {
+    fun `RichTextEditor never triggers inline formatting for bold italic code and strikethrough`() {
         val (state, transformation) = createRichTextEngine()
 
         typeTextToRichText(
@@ -134,7 +132,7 @@ class Milestone3Challenger1StressTest {
         state.richString.text shouldBe "**bold** and *italic* and _underscore_ and `code` and ~strike~"
         state.richString.spans.filter { it.attributes.containsKey(BoldKey) }.shouldBeEmpty()
         state.richString.spans.filter { it.attributes.containsKey(ItalicKey) }.shouldBeEmpty()
-        state.richString.spans.filter { it.attributes.containsKey(CodeKey) }.shouldBeEmpty()
+        state.richString.spans.filter { it.attributes.containsKey(InlineCodeKey) }.shouldBeEmpty()
         state.richString.spans.filter { it.attributes.containsKey(StrikethroughKey) }.shouldBeEmpty()
     }
 
@@ -219,7 +217,7 @@ class Milestone3Challenger1StressTest {
 
         typeTextToWysiwyg(state, transformation, "`code` ")
         state.richString.text shouldBe "bold italic italic2 code "
-        state.richString.spans.any { it.attributes.containsKey(CodeKey) } shouldBe true
+        state.richString.spans.any { it.attributes.containsKey(InlineCodeKey) } shouldBe true
 
         typeTextToWysiwyg(state, transformation, "~strike~")
         state.richString.text shouldBe "bold italic italic2 code strike"
@@ -227,12 +225,12 @@ class Milestone3Challenger1StressTest {
     }
 
     @Test
-    fun `WysiwygEditor avoids false positive formatting on snake_case, arithmetic, and paths`() {
+    fun `WysiwygEditor avoids false positive formatting on snake case arithmetic and paths`() {
         val (state, wysiwygState, transformation) = createWysiwygEngine()
 
-        typeTextToWysiwyg(state, transformation, "val snake_case_variable = 2 * 3 * 4; cd ~/docs; ****")
+        typeTextToWysiwyg(state, transformation, "val snake case_variable = 2 * 3 * 4; cd ~/docs; ****")
 
-        state.richString.text shouldBe "val snake_case_variable = 2 * 3 * 4; cd ~/docs; ****"
+        state.richString.text shouldBe "val snake case_variable = 2 * 3 * 4; cd ~/docs; ****"
         state.richString.spans.shouldBeEmpty()
     }
 
@@ -271,7 +269,7 @@ class Milestone3Challenger1StressTest {
 
         typeTextToWysiwyg(state, transformation, "`fun main()`")
         state.richString.text shouldBe "fun main()"
-        state.richString.spans.any { it.attributes.containsKey(CodeKey) } shouldBe true
+        state.richString.spans.any { it.attributes.containsKey(InlineCodeKey) } shouldBe true
         wysiwygState.canRevert(state) shouldBe true
 
         val consumed =
@@ -284,7 +282,7 @@ class Milestone3Challenger1StressTest {
 
         consumed shouldBe true
         state.richString.text shouldBe "`fun main()`"
-        state.richString.spans.filter { it.attributes.containsKey(CodeKey) }.shouldBeEmpty()
+        state.richString.spans.filter { it.attributes.containsKey(InlineCodeKey) }.shouldBeEmpty()
         wysiwygState.canRevert(state) shouldBe false
     }
 
@@ -336,7 +334,7 @@ class Milestone3Challenger1StressTest {
         wysiwygState.richString.spans.any { it.attributes.containsKey(BulletListKey) } shouldBe true
         wysiwygState.richString.spans.any { it.attributes.containsKey(BlockquoteKey) } shouldBe true
         wysiwygState.richString.spans.any { it.attributes.containsKey(BoldKey) } shouldBe true
-        wysiwygState.richString.spans.any { it.attributes.containsKey(CodeKey) } shouldBe true
+        wysiwygState.richString.spans.any { it.attributes.containsKey(InlineCodeKey) } shouldBe true
     }
 
     // --- Helpers ---

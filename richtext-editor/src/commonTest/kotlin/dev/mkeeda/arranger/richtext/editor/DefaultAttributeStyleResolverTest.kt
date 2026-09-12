@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.CodeKey
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
@@ -17,8 +17,8 @@ import kotlin.test.Test
 
 class DefaultAttributeStyleResolverTest {
     @Test
-    fun `resolves CodeKey to Monospace font and subtle background color`() {
-        val container = attributeContainerOf(CodeKey to Unit)
+    fun `resolves InlineCodeKey to Monospace font and subtle background color`() {
+        val container = attributeContainerOf(InlineCodeKey to Unit)
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
         resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
@@ -27,11 +27,11 @@ class DefaultAttributeStyleResolverTest {
     }
 
     @Test
-    fun `merges BoldKey and CodeKey orthogonal styles without interference`() {
+    fun `merges BoldKey and InlineCodeKey orthogonal styles without interference`() {
         val container =
             attributeContainerOf(
                 BoldKey to Unit,
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -41,11 +41,11 @@ class DefaultAttributeStyleResolverTest {
     }
 
     @Test
-    fun `merges ItalicKey and CodeKey orthogonal styles without interference`() {
+    fun `merges ItalicKey and InlineCodeKey orthogonal styles without interference`() {
         val container =
             attributeContainerOf(
                 ItalicKey to Unit,
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -55,11 +55,11 @@ class DefaultAttributeStyleResolverTest {
     }
 
     @Test
-    fun `merges StrikethroughKey and CodeKey orthogonal styles without interference`() {
+    fun `merges StrikethroughKey and InlineCodeKey orthogonal styles without interference`() {
         val container =
             attributeContainerOf(
                 StrikethroughKey to Unit,
-                CodeKey to Unit,
+                InlineCodeKey to Unit,
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
@@ -69,13 +69,13 @@ class DefaultAttributeStyleResolverTest {
     }
 
     @Test
-    fun `merges multiple inline styles including CodeKey simultaneously`() {
+    fun `merges multiple inline styles including InlineCodeKey simultaneously`() {
         val container =
             attributeContainerOf(
                 BoldKey to Unit,
                 ItalicKey to Unit,
                 StrikethroughKey to Unit,
-            ) + (CodeKey to Unit)
+            ) + (InlineCodeKey to Unit)
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
         resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold

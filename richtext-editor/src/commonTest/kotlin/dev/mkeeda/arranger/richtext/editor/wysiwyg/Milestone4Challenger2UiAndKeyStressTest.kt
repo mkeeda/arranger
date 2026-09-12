@@ -16,7 +16,6 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,15 +24,14 @@ import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.ComposeParagraphWorkarounds
-import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.DefaultListMarkerResolver
 import dev.mkeeda.arranger.richtext.editor.ResolvedRichStyle
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
@@ -89,7 +87,7 @@ class Milestone4Challenger2UiAndKeyStressTest {
     }
 
     @Test
-    fun `handleWysiwygKey rejects Delete key (forward delete) even after auto-format`() {
+    fun `handleWysiwygKey rejects Delete key forward delete even after auto-format`() {
         val (state, wysiwygState, transformation) = createWysiwygEngine()
         typeTextToWysiwyg(state, transformation, "**bold**")
 
@@ -390,7 +388,7 @@ class Milestone4Challenger2UiAndKeyStressTest {
     }
 
     @Test
-    fun `rapid repeated backspace (10 consecutive calls) after block autoformat only reverts once and never crashes`() {
+    fun `rapid repeated backspace 10 consecutive calls after block autoformat only reverts once and never crashes`() {
         val (state, wysiwygState, transformation) = createWysiwygEngine()
         typeTextToWysiwyg(state, transformation, "- ")
 
@@ -422,7 +420,7 @@ class Milestone4Challenger2UiAndKeyStressTest {
     }
 
     @Test
-    fun `rapid repeated backspace (10 consecutive calls) after inline autoformat only reverts once and deletes characters normally`() {
+    fun `rapid repeated backspace 10 consecutive calls after inline autoformat only reverts once and deletes characters normally`() {
         val (state, wysiwygState, transformation) = createWysiwygEngine()
         typeTextToWysiwyg(state, transformation, "**a**")
 
@@ -555,7 +553,7 @@ class Milestone4Challenger2UiAndKeyStressTest {
         state.richString.text shouldBe "code"
         assertTrue(handleWysiwygKey(true, Key.Backspace, state, wysiwygState))
         state.richString.text shouldBe "`code`"
-        state.richString.spans.filter { it.attributes.containsKey(CodeKey) }.shouldBeEmpty()
+        state.richString.spans.filter { it.attributes.containsKey(InlineCodeKey) }.shouldBeEmpty()
 
         // Clear
         state.textFieldState.edit {
@@ -682,61 +680,11 @@ class Milestone4Challenger2UiAndKeyStressTest {
                 cursorBrush = SolidColor(Color.Red),
                 decorator = customDecorator,
                 styleResolver = customStyleResolver,
-                attributeStyleResolver = customStyleResolver,
                 listMarkerResolver = DefaultListMarkerResolver,
                 onLinkClick = { _ -> },
-                wysiwygState = wysiwygState,
             )
         }
         composableRef shouldBe composableRef
-    }
-
-    @Test
-    fun `effectiveStyleResolver resolution logic verifies styleResolver vs attributeStyleResolver precedence`() {
-        val resolverA =
-            object : AttributeStyleResolver {
-                override fun resolve(attributes: AttributeContainer) =
-                    ResolvedRichStyle(
-                        spanStyle = SpanStyle(fontWeight = FontWeight.Bold),
-                    )
-            }
-        val resolverB =
-            object : AttributeStyleResolver {
-                override fun resolve(attributes: AttributeContainer) =
-                    ResolvedRichStyle(
-                        spanStyle = SpanStyle(fontStyle = FontStyle.Italic),
-                    )
-            }
-
-        // 1. Both default -> DefaultAttributeStyleResolver
-        resolveEffectiveResolver(
-            styleResolver = DefaultAttributeStyleResolver,
-            attributeStyleResolver = DefaultAttributeStyleResolver,
-        ) shouldBe DefaultAttributeStyleResolver
-
-        // 2. Only styleResolver specified as custom -> resolverA
-        resolveEffectiveResolver(
-            styleResolver = resolverA,
-            attributeStyleResolver = resolverA, // as defaulted by `attributeStyleResolver = styleResolver`
-        ) shouldBe resolverA
-
-        // 3. Only attributeStyleResolver specified as custom -> resolverB
-        resolveEffectiveResolver(
-            styleResolver = DefaultAttributeStyleResolver,
-            attributeStyleResolver = resolverB,
-        ) shouldBe resolverB
-
-        // 4. Both specified as distinct custom resolvers -> attributeStyleResolver (resolverB) takes precedence
-        resolveEffectiveResolver(
-            styleResolver = resolverA,
-            attributeStyleResolver = resolverB,
-        ) shouldBe resolverB
-
-        // 5. attributeStyleResolver explicitly set to DefaultAttributeStyleResolver -> falls back to styleResolver
-        resolveEffectiveResolver(
-            styleResolver = resolverA,
-            attributeStyleResolver = DefaultAttributeStyleResolver,
-        ) shouldBe resolverA
     }
 
     @Test
@@ -750,7 +698,7 @@ class Milestone4Challenger2UiAndKeyStressTest {
         state.richString.text shouldBe "# H1\n- Bullet\n`code`\n**bold**\n> quote"
         state.richString.spans.filter { it.attributes.containsKey(HeadingKey) }.shouldBeEmpty()
         state.richString.spans.filter { it.attributes.containsKey(BulletListKey) }.shouldBeEmpty()
-        state.richString.spans.filter { it.attributes.containsKey(CodeKey) }.shouldBeEmpty()
+        state.richString.spans.filter { it.attributes.containsKey(InlineCodeKey) }.shouldBeEmpty()
         state.richString.spans.filter { it.attributes.containsKey(BoldKey) }.shouldBeEmpty()
         state.richString.spans.filter { it.attributes.containsKey(BlockquoteKey) }.shouldBeEmpty()
     }
@@ -1016,17 +964,6 @@ class Milestone4Challenger2UiAndKeyStressTest {
     // =========================================================================
     // Test Helpers
     // =========================================================================
-
-    private fun resolveEffectiveResolver(
-        styleResolver: AttributeStyleResolver,
-        attributeStyleResolver: AttributeStyleResolver,
-    ): AttributeStyleResolver {
-        return if (attributeStyleResolver !== DefaultAttributeStyleResolver) {
-            attributeStyleResolver
-        } else {
-            styleResolver
-        }
-    }
 
     private fun createWysiwygEngine(): Triple<RichTextState, WysiwygState, WysiwygInputTransformation> {
         val state = RichTextState()

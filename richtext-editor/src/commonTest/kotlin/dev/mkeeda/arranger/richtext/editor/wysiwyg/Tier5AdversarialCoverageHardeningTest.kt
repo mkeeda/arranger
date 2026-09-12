@@ -6,9 +6,9 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
@@ -93,7 +93,7 @@ class Tier5AdversarialCoverageHardeningTest {
     // =========================================================================
 
     @Test
-    fun test_rapid_heading1_with_immediate_multiple_inline_decorations() {
+    fun `rapid heading1 with immediate multiple inline decorations`() {
         val (state, _, transformation) = createEngine()
 
         // 1. Heading 1 trigger
@@ -118,7 +118,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_rapid_block_switching_via_backspace_on_empty_line() {
+    fun `rapid block switching via backspace on empty line`() {
         val (state, wysiwygState, transformation) = createEngine()
 
         // Start with H1
@@ -162,7 +162,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_rapid_ordered_list_with_all_inline_types_in_single_line() {
+    fun `rapid ordered list with all inline types in single line`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "1. ")
@@ -182,7 +182,7 @@ class Tier5AdversarialCoverageHardeningTest {
         italicRuns.size shouldBe 1
         italicRuns[0].range shouldBe 6..6
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns.size shouldBe 1
         codeRuns[0].range shouldBe 12..12
 
@@ -196,7 +196,7 @@ class Tier5AdversarialCoverageHardeningTest {
     // =========================================================================
 
     @Test
-    fun test_cjk_kanji_and_hiragana_adjacent_to_bold_and_code() {
+    fun `cjk kanji and hiragana adjacent to bold and code`() {
         val (state, _, transformation) = createEngine()
 
         // CJK before and after bold: "私の**最愛の**本" -> "私の最愛の本"
@@ -211,13 +211,13 @@ class Tier5AdversarialCoverageHardeningTest {
         typeText(state, transformation, "、`設定`画面")
         state.textFieldState.text.toString() shouldBe "私の最愛の本、設定画面"
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns.size shouldBe 1
         codeRuns[0].range shouldBe 7..8
     }
 
     @Test
-    fun test_cjk_with_underscore_italic_word_boundary_protection() {
+    fun `cjk with underscore italic word boundary protection`() {
         val (state, _, transformation) = createEngine()
 
         // In Japanese, kanji/kana are letters, so intra-word underscore like "私の_秘密_です"
@@ -236,7 +236,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_emoji_surrogate_pairs_inside_and_around_inline_formatting() {
+    fun `emoji surrogate pairs inside and around inline formatting`() {
         val (state, _, transformation) = createEngine()
 
         // Surrogate pair emoji inside bold: "**🎉**"
@@ -251,13 +251,13 @@ class Tier5AdversarialCoverageHardeningTest {
         typeText(state, transformation, " 🚀`build`✨")
         state.textFieldState.text.toString() shouldBe "🎉 🚀build✨"
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns.size shouldBe 1
         codeRuns[0].range shouldBe 5..9
     }
 
     @Test
-    fun test_emoji_inside_strikethrough_and_italic() {
+    fun `emoji inside strikethrough and italic`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "~🔥~ and *🌟*")
@@ -273,7 +273,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_zenkaku_fullwidth_space_does_not_trigger_block_formatting() {
+    fun `zenkaku fullwidth space does not trigger block formatting`() {
         val (state, _, transformation) = createEngine()
 
         // Zenkaku Japanese space '\u3000' must NOT trigger markdown block
@@ -291,7 +291,7 @@ class Tier5AdversarialCoverageHardeningTest {
     // =========================================================================
 
     @Test
-    fun test_consecutive_newlines_before_block_triggers() {
+    fun `consecutive newlines before block triggers`() {
         val (state, _, transformation) = createEngine()
 
         // Multiple empty lines before heading
@@ -304,7 +304,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_leading_whitespace_and_tabs_prevent_block_triggers() {
+    fun `leading whitespace and tabs prevent block triggers`() {
         val (state, _, transformation) = createEngine()
 
         // Leading single space before '#'
@@ -323,7 +323,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_inner_whitespace_and_tabs_prevent_inline_formatting() {
+    fun `inner whitespace and tabs prevent inline formatting`() {
         val (state, _, transformation) = createEngine()
 
         // Space after opening or before closing
@@ -336,7 +336,7 @@ class Tier5AdversarialCoverageHardeningTest {
         state.richString.runs(ItalicKey).toList().shouldBeEmpty()
 
         typeText(state, transformation, "` code ` ")
-        state.richString.runs(CodeKey).toList().shouldBeEmpty()
+        state.richString.runs(InlineCodeKey).toList().shouldBeEmpty()
 
         typeText(state, transformation, "~ strike ~ ")
         state.richString.runs(StrikethroughKey).toList().shouldBeEmpty()
@@ -351,7 +351,7 @@ class Tier5AdversarialCoverageHardeningTest {
     // =========================================================================
 
     @Test
-    fun test_undo_redo_cycles_with_intermediate_navigation() {
+    fun `undo redo cycles with intermediate navigation`() {
         val (state, wysiwygState, transformation) = createEngine()
 
         typeText(state, transformation, "**word**")
@@ -385,7 +385,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_backspace_reversal_followed_by_immediate_retype_and_trigger() {
+    fun `backspace reversal followed by immediate retype and trigger`() {
         val (state, wysiwygState, transformation) = createEngine()
 
         // 1. Trigger bold
@@ -407,7 +407,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_block_reversal_followed_by_immediate_retype_and_trigger() {
+    fun `block reversal followed by immediate retype and trigger`() {
         val (state, wysiwygState, transformation) = createEngine()
 
         // 1. Trigger H2
@@ -439,7 +439,7 @@ class Tier5AdversarialCoverageHardeningTest {
     // =========================================================================
 
     @Test
-    fun test_url_with_query_params_and_path_underscores_not_formatted() {
+    fun `url with query params and path underscores not formatted`() {
         val (state, _, transformation) = createEngine()
 
         val testUrl = "https://example.com/api_v2_users/get_profile?user_id=123"
@@ -451,7 +451,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_math_expressions_with_multiplication_not_formatted() {
+    fun `math expressions with multiplication not formatted`() {
         val (state, _, transformation) = createEngine()
 
         val expr = "total = (a * b) + (c * d * e)"
@@ -462,7 +462,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_math_comparison_operators_do_not_trigger_blockquote() {
+    fun `math comparison operators do not trigger blockquote`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "if (x > y && z > 0)")
@@ -471,7 +471,7 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_programming_identifiers_and_constants_not_formatted() {
+    fun `programming identifiers and constants not formatted`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "val DEFAULT_HTTP_TIMEOUT_MS = 5000")
@@ -483,26 +483,26 @@ class Tier5AdversarialCoverageHardeningTest {
     }
 
     @Test
-    fun test_unclosed_and_empty_markers_not_formatted() {
+    fun `unclosed and empty markers not formatted`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "*unclosed `code ~tilde **bold")
         state.textFieldState.text.toString() shouldBe "*unclosed `code ~tilde **bold"
         state.richString.runs(ItalicKey).toList().shouldBeEmpty()
-        state.richString.runs(CodeKey).toList().shouldBeEmpty()
+        state.richString.runs(InlineCodeKey).toList().shouldBeEmpty()
         state.richString.runs(StrikethroughKey).toList().shouldBeEmpty()
         state.richString.runs(BoldKey).toList().shouldBeEmpty()
 
         // Empty markers
         typeText(state, transformation, "\n`` and **** and ~~~~")
         state.textFieldState.text.toString() shouldBe "*unclosed `code ~tilde **bold\n`` and **** and ~~~~"
-        state.richString.runs(CodeKey).toList().shouldBeEmpty()
+        state.richString.runs(InlineCodeKey).toList().shouldBeEmpty()
         state.richString.runs(BoldKey).toList().shouldBeEmpty()
         state.richString.runs(StrikethroughKey).toList().shouldBeEmpty()
     }
 
     @Test
-    fun test_tilde_file_path_and_approximate_symbol_not_formatted() {
+    fun `tilde file path and approximate symbol not formatted`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "~/config/settings.json")

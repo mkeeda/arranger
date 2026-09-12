@@ -6,9 +6,9 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
@@ -79,7 +79,7 @@ class Milestone2Challenger3StressTest {
     // =========================================================================
 
     @Test
-    fun test_all_block_triggers_clean_application_and_typing_attributes() {
+    fun `all block triggers clean application and typing attributes`() {
         val triggers =
             listOf(
                 "# " to (HeadingKey to HeadingLevel.H1),
@@ -115,7 +115,7 @@ class Milestone2Challenger3StressTest {
     // =========================================================================
 
     @Test
-    fun test_transition_from_quote_to_heading() {
+    fun `transition from quote to heading`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "> Quote text\n")
         typeText(state, transformation, "# Heading text")
@@ -125,7 +125,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_quote_to_bullet() {
+    fun `transition from quote to bullet`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "> Quote text\n")
         typeText(state, transformation, "- Bullet item")
@@ -135,7 +135,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_quote_to_ordered() {
+    fun `transition from quote to ordered`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "> Quote text\n")
         typeText(state, transformation, "1. Ordered item")
@@ -145,7 +145,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_ordered_to_bullet() {
+    fun `transition from ordered to bullet`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "1. First\n")
         typeText(state, transformation, "- Second")
@@ -155,7 +155,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_ordered_to_heading() {
+    fun `transition from ordered to heading`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "1. First\n")
         typeText(state, transformation, "## Second")
@@ -167,7 +167,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_ordered_to_quote() {
+    fun `transition from ordered to quote`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "1. First\n")
         typeText(state, transformation, "> Second")
@@ -177,7 +177,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_heading_to_quote() {
+    fun `transition from heading to quote`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "# Header\n")
         typeText(state, transformation, "> Blockquote")
@@ -187,7 +187,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_heading_to_ordered() {
+    fun `transition from heading to ordered`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "# Header\n")
         typeText(state, transformation, "1. First Item")
@@ -197,7 +197,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_transition_from_bullet_to_quote() {
+    fun `transition from bullet to quote`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "- Bullet\n")
         typeText(state, transformation, "> Quote")
@@ -207,7 +207,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_heading_levels_transition() {
+    fun `heading levels transition`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "# Heading 1\n")
         typeText(state, transformation, "## Heading 2\n")
@@ -221,7 +221,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_same_line_in_place_revert_and_switch_block_type() {
+    fun `same line in place revert and switch block type`() {
         val (state, wysiwygState, transformation) = createEngine()
 
         // 1. Type "- " -> Bullet List
@@ -253,7 +253,7 @@ class Milestone2Challenger3StressTest {
     // =========================================================================
 
     @Test
-    fun test_all_inline_triggers() {
+    fun `all inline triggers`() {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "**bold** ")
@@ -274,7 +274,7 @@ class Milestone2Challenger3StressTest {
         italicRuns[0].range shouldBe 5..10
         italicRuns[1].range shouldBe 12..19
 
-        val codeRuns = state.richString.runs(CodeKey).toList()
+        val codeRuns = state.richString.runs(InlineCodeKey).toList()
         codeRuns.size shouldBe 1
         codeRuns[0].range shouldBe 21..24
 
@@ -288,7 +288,7 @@ class Milestone2Challenger3StressTest {
     // =========================================================================
 
     @Test
-    fun test_snake_case_and_internal_underscores_no_format() {
+    fun `snake case and internal underscores no format`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "foo_bar_baz AND my_variable_name")
 
@@ -297,7 +297,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_unclosed_markers_do_not_format() {
+    fun `unclosed markers do not format`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**unclosed bold\n")
         typeText(state, transformation, "*unclosed italic\n")
@@ -309,7 +309,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_empty_markers_do_not_format() {
+    fun `empty markers do not format`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "empty: **** and ** and __ and `` and ~~")
 
@@ -318,7 +318,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_whitespace_inside_markers_no_format() {
+    fun `whitespace inside markers no format`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "** leading space** ")
         typeText(state, transformation, "**trailing space ** ")
@@ -329,7 +329,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_escaped_markers_do_not_format() {
+    fun `escaped markers do not format`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, """\*not italic\* and \*\*not bold\*\* and \`not code\`""")
 
@@ -338,7 +338,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_double_backslash_escaped_allows_formatting() {
+    fun `double backslash escaped allows formatting`() {
         val (state, _, transformation) = createEngine()
         // Double backslash means escaped backslash, so marker is active: \\*italic*
         typeText(state, transformation, """\\*italic*""")
@@ -354,7 +354,7 @@ class Milestone2Challenger3StressTest {
     // =========================================================================
 
     @Test
-    fun test_triple_asterisk_bold_and_italic() {
+    fun `triple asterisk bold and italic`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "***bold and italic***")
 
@@ -369,7 +369,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_nested_bold_and_underscore_italic() {
+    fun `nested bold and underscore italic`() {
         val (state, _, transformation) = createEngine()
         typeText(state, transformation, "**bold and _italic_ text**")
 
@@ -384,7 +384,7 @@ class Milestone2Challenger3StressTest {
     }
 
     @Test
-    fun test_ten_paragraphs_alternating_blocks_stress() {
+    fun `ten paragraphs alternating blocks stress`() {
         val (state, _, transformation) = createEngine()
 
         for (i in 1..10) {
@@ -404,7 +404,7 @@ class Milestone2Challenger3StressTest {
         state.richString.runs(BlockquoteKey).toList().size shouldBe 2 // 4, 9
 
         state.richString.runs(BoldKey).toList().size shouldBe 2
-        state.richString.runs(CodeKey).toList().size shouldBe 2
+        state.richString.runs(InlineCodeKey).toList().size shouldBe 2
         state.richString.runs(ItalicKey).toList().size shouldBe 4 // 2 asterisk + 2 underscore
         state.richString.runs(StrikethroughKey).toList().size shouldBe 2
     }

@@ -6,8 +6,8 @@ import androidx.compose.ui.text.TextStyle
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -157,7 +157,7 @@ class RichTextEditorNonRegressionTest {
         typeTextSimulated(state, transformation, "`code text`")
 
         state.richString.text shouldBe "`code text`"
-        state.richString.spans.filter { it.attributes.containsKey(CodeKey) }.shouldBeEmpty()
+        state.richString.spans.filter { it.attributes.containsKey(InlineCodeKey) }.shouldBeEmpty()
     }
 
     @Test

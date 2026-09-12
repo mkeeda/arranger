@@ -8,9 +8,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.CodeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -19,13 +19,13 @@ import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.clearBold
-import dev.mkeeda.arranger.richtext.clearCode
+import dev.mkeeda.arranger.richtext.clearInlineCode
 import dev.mkeeda.arranger.richtext.clearItalic
 import dev.mkeeda.arranger.richtext.clearLink
 import dev.mkeeda.arranger.richtext.clearStrikethrough
 import dev.mkeeda.arranger.richtext.clearUnderline
-import dev.mkeeda.arranger.richtext.code
 import dev.mkeeda.arranger.richtext.headingLevel
+import dev.mkeeda.arranger.richtext.inlineCode
 import dev.mkeeda.arranger.richtext.italic
 import dev.mkeeda.arranger.richtext.link
 import dev.mkeeda.arranger.richtext.rangeOf
@@ -46,15 +46,15 @@ import kotlin.test.Test
  */
 class Milestone1Challenger1StressTest {
     // =========================================================================
-    // 1. Extreme Combinations: CodeKey with All Inline & Paragraph Attributes
+    // 1. Extreme Combinations: InlineCodeKey with All Inline & Paragraph Attributes
     // =========================================================================
 
     @Test
-    fun `CodeKey resolves orthogonally when combined with all standard inline attributes`() {
+    fun `InlineCodeKey resolves orthogonally when combined with all standard inline attributes`() {
         val testUrl = "https://arranger.dev"
         val container =
             AttributeContainer.empty() +
-                (CodeKey to Unit) +
+                (InlineCodeKey to Unit) +
                 (BoldKey to Unit) +
                 (ItalicKey to Unit) +
                 (StrikethroughKey to Unit) +
@@ -63,7 +63,7 @@ class Milestone1Challenger1StressTest {
 
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
-        // Monospace and background from CodeKey
+        // Monospace and background from InlineCodeKey
         resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
         resolved.spanStyle?.background shouldBe Color(0x14000000)
 
@@ -84,7 +84,7 @@ class Milestone1Challenger1StressTest {
     }
 
     @Test
-    fun `RichString applies all 6 inline attributes and clearCode isolates CodeKey removal`() {
+    fun `RichString applies all 6 inline attributes and clearCode isolates InlineCodeKey removal`() {
         val original = RichString("All inline styles test")
         val styled =
             original.edit {
@@ -94,30 +94,30 @@ class Milestone1Challenger1StressTest {
                     strikethrough()
                     underline()
                     link("https://arranger.dev")
-                    code()
+                    inlineCode()
                 }
             }
 
         styled.spans shouldHaveSize 1
         val attrs = styled.spans[0].attributes
-        attrs[CodeKey] shouldBe Unit
+        attrs[InlineCodeKey] shouldBe Unit
         attrs[BoldKey] shouldBe Unit
         attrs[ItalicKey] shouldBe Unit
         attrs[StrikethroughKey] shouldBe Unit
         attrs[UnderlineKey] shouldBe Unit
         attrs[LinkKey] shouldBe "https://arranger.dev"
 
-        // Remove only code()
+        // Remove only inlineCode()
         val afterClearCode =
             styled.edit {
                 editAttributes {
-                    clearCode()
+                    clearInlineCode()
                 }
             }
 
         afterClearCode.spans shouldHaveSize 1
         val clearedAttrs = afterClearCode.spans[0].attributes
-        clearedAttrs[CodeKey].shouldBeNull()
+        clearedAttrs[InlineCodeKey].shouldBeNull()
         clearedAttrs[BoldKey] shouldBe Unit
         clearedAttrs[ItalicKey] shouldBe Unit
         clearedAttrs[StrikethroughKey] shouldBe Unit
@@ -127,32 +127,32 @@ class Milestone1Challenger1StressTest {
         // Clear other attributes one by one, ensuring code remains intact when re-added
         val reAddedCode =
             afterClearCode.edit {
-                editAttributes { code() }
+                editAttributes { inlineCode() }
             }
-        reAddedCode.spans[0].attributes[CodeKey] shouldBe Unit
+        reAddedCode.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         val clearedBold = reAddedCode.edit { editAttributes { clearBold() } }
-        clearedBold.spans[0].attributes[CodeKey] shouldBe Unit
+        clearedBold.spans[0].attributes[InlineCodeKey] shouldBe Unit
         clearedBold.spans[0].attributes[BoldKey].shouldBeNull()
 
         val clearedItalic = clearedBold.edit { editAttributes { clearItalic() } }
-        clearedItalic.spans[0].attributes[CodeKey] shouldBe Unit
+        clearedItalic.spans[0].attributes[InlineCodeKey] shouldBe Unit
         clearedItalic.spans[0].attributes[ItalicKey].shouldBeNull()
 
         val clearedStrikethrough = clearedItalic.edit { editAttributes { clearStrikethrough() } }
-        clearedStrikethrough.spans[0].attributes[CodeKey] shouldBe Unit
+        clearedStrikethrough.spans[0].attributes[InlineCodeKey] shouldBe Unit
         clearedStrikethrough.spans[0].attributes[StrikethroughKey].shouldBeNull()
 
         val clearedUnderline = clearedStrikethrough.edit { editAttributes { clearUnderline() } }
-        clearedUnderline.spans[0].attributes[CodeKey] shouldBe Unit
+        clearedUnderline.spans[0].attributes[InlineCodeKey] shouldBe Unit
         clearedUnderline.spans[0].attributes[UnderlineKey].shouldBeNull()
 
         val clearedLink = clearedUnderline.edit { editAttributes { clearLink() } }
-        clearedLink.spans[0].attributes[CodeKey] shouldBe Unit
+        clearedLink.spans[0].attributes[InlineCodeKey] shouldBe Unit
         clearedLink.spans[0].attributes[LinkKey].shouldBeNull()
 
         // At this point only code remains
-        clearedLink.spans[0].attributes shouldBe attributeContainerOf(CodeKey to Unit)
+        clearedLink.spans[0].attributes shouldBe attributeContainerOf(InlineCodeKey to Unit)
     }
 
     // =========================================================================
@@ -160,12 +160,12 @@ class Milestone1Challenger1StressTest {
     // =========================================================================
 
     @Test
-    fun `CodeKey on empty string does not crash and yields empty spans`() {
+    fun `InlineCodeKey on empty string does not crash and yields empty spans`() {
         val emptyRichString = RichString("")
         val edited =
             emptyRichString.edit {
                 editAttributes(0 until 0) {
-                    code()
+                    inlineCode()
                 }
             }
         edited.text shouldBe ""
@@ -175,29 +175,29 @@ class Milestone1Challenger1StressTest {
         val state = RichTextState(initialText = RichString(""))
         state.edit {
             editAttributes(0 until 0) {
-                code()
+                inlineCode()
             }
         }
         state.richString.spans.shouldBeEmpty()
     }
 
     @Test
-    fun `CodeKey on single character behaves correctly across lifecycle`() {
+    fun `InlineCodeKey on single character behaves correctly across lifecycle`() {
         val oneChar =
             RichString("x").edit {
                 editAttributes(0..0) {
-                    code()
+                    inlineCode()
                 }
             }
         oneChar.spans shouldHaveSize 1
         oneChar.spans[0].range shouldBe 0..0
-        oneChar.spans[0].attributes[CodeKey] shouldBe Unit
+        oneChar.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // Clear code on 1-char
         val cleared =
             oneChar.edit {
                 editAttributes(0..0) {
-                    clearCode()
+                    clearInlineCode()
                 }
             }
         cleared.spans.shouldBeEmpty()
@@ -212,7 +212,7 @@ class Milestone1Challenger1StressTest {
     }
 
     @Test
-    fun `CodeKey handles huge strings 50000 characters efficiently without overflow`() {
+    fun `InlineCodeKey handles huge strings 50000 characters efficiently without overflow`() {
         val size = 50_000
         val hugeText = "a".repeat(size)
         val initial = RichString(hugeText)
@@ -221,12 +221,12 @@ class Milestone1Challenger1StressTest {
         val styled =
             initial.edit {
                 editAttributes(10_000..40_000) {
-                    code()
+                    inlineCode()
                 }
             }
         styled.spans shouldHaveSize 1
         styled.spans[0].range shouldBe 10_000..40_000
-        styled.spans[0].attributes[CodeKey] shouldBe Unit
+        styled.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // Verify resolver on this container
         val resolved = DefaultAttributeStyleResolver.resolve(styled.spans[0].attributes)
@@ -242,7 +242,7 @@ class Milestone1Challenger1StressTest {
         state.richString.text.length shouldBe size + 100
         state.richString.spans shouldHaveSize 1
         state.richString.spans[0].range shouldBe 10_100..40_100
-        state.richString.spans[0].attributes[CodeKey] shouldBe Unit
+        state.richString.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // Delete 500 characters inside the code span
         state.edit {
@@ -251,11 +251,11 @@ class Milestone1Challenger1StressTest {
         state.richString.text.length shouldBe size + 100 - 500
         state.richString.spans shouldHaveSize 1
         state.richString.spans[0].range shouldBe 10_100..(40_100 - 500)
-        state.richString.spans[0].attributes[CodeKey] shouldBe Unit
+        state.richString.spans[0].attributes[InlineCodeKey] shouldBe Unit
     }
 
     // =========================================================================
-    // 3. Span Shifting, clearCode(), clearAll(), and Partial Deletions
+    // 3. Span Shifting, clearInlineCode(), clearAll(), and Partial Deletions
     // =========================================================================
 
     @Test
@@ -264,7 +264,7 @@ class Milestone1Challenger1StressTest {
         val styled =
             RichString(text).edit {
                 editAttributes(0..9) {
-                    code()
+                    inlineCode()
                 }
             }
         styled.spans shouldHaveSize 1
@@ -273,34 +273,34 @@ class Milestone1Challenger1StressTest {
         val split =
             styled.edit {
                 editAttributes(3..6) {
-                    clearCode()
+                    clearInlineCode()
                 }
             }
 
         split.spans shouldHaveSize 2
         split.spans[0].range shouldBe 0..2
-        split.spans[0].attributes[CodeKey] shouldBe Unit
+        split.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         split.spans[1].range shouldBe 7..9
-        split.spans[1].attributes[CodeKey] shouldBe Unit
+        split.spans[1].attributes[InlineCodeKey] shouldBe Unit
     }
 
     @Test
-    fun `clearAll removes CodeKey along with paragraph attributes`() {
+    fun `clearAll removes InlineCodeKey along with paragraph attributes`() {
         val text = "val x = 10\nval y = 20"
         // Paragraph 1 is 0..10 (inclusive of \n).
         // Let's apply code, bold, and heading to the entire paragraph 1 (0..10)
         val styled =
             RichString(text).edit {
                 editAttributes(0..10) {
-                    code()
+                    inlineCode()
                     bold()
                     headingLevel(HeadingLevel.H1)
                 }
             }
         styled.spans shouldHaveSize 1
         styled.spans[0].range shouldBe 0..10
-        styled.spans[0].attributes[CodeKey] shouldBe Unit
+        styled.spans[0].attributes[InlineCodeKey] shouldBe Unit
         styled.spans[0].attributes[BoldKey] shouldBe Unit
         styled.spans[0].attributes[HeadingKey] shouldBe HeadingLevel.H1
 
@@ -321,7 +321,7 @@ class Milestone1Challenger1StressTest {
         val richString =
             RichString(initialText).edit {
                 editAttributes(codeRange) {
-                    code()
+                    inlineCode()
                 }
             }
 
@@ -333,7 +333,7 @@ class Milestone1Challenger1StressTest {
         state1.richString.text shouldBe "[code] suffix"
         state1.richString.spans shouldHaveSize 1
         state1.richString.spans[0].range shouldBe 0..5
-        state1.richString.spans[0].attributes[CodeKey] shouldBe Unit
+        state1.richString.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // 2. Partial delete overlapping start of span
         val state2 = RichTextState(richString)
@@ -346,7 +346,7 @@ class Milestone1Challenger1StressTest {
         // Overlap: 7..9 deleted. Remaining span is original 10..12 shifted left by 5 -> 5..7 ("de]")
         state2.richString.spans[0].range shouldBe 5..7
         state2.richString.text.substring(5..7) shouldBe "de]"
-        state2.richString.spans[0].attributes[CodeKey] shouldBe Unit
+        state2.richString.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // 3. Partial delete inside span
         val state3 = RichTextState(richString)
@@ -360,7 +360,7 @@ class Milestone1Challenger1StressTest {
         state3.richString.spans shouldHaveSize 1
         state3.richString.spans[0].range shouldBe 7..9 // "[c]"
         state3.richString.text.substring(7..9) shouldBe "[c]"
-        state3.richString.spans[0].attributes[CodeKey] shouldBe Unit
+        state3.richString.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // 4. Complete deletion of span
         val state4 = RichTextState(richString)
@@ -376,13 +376,13 @@ class Milestone1Challenger1StressTest {
     // =========================================================================
 
     @Test
-    fun `overlapping CodeKey and BoldKey properly tessellate and clearCode preserves BoldKey`() {
+    fun `overlapping InlineCodeKey and BoldKey properly tessellate and clearCode preserves BoldKey`() {
         // Text: 01234567890123456789 (20 chars)
         val text = "ABCDEFGHIJKLMNOPQRST"
         val styled =
             RichString(text).edit {
                 editAttributes(0..14) { bold() }
-                editAttributes(5..19) { code() }
+                editAttributes(5..19) { inlineCode() }
             }
 
         // Expected chunks:
@@ -393,21 +393,21 @@ class Milestone1Challenger1StressTest {
 
         styled.spans[0].range shouldBe 0..4
         styled.spans[0].attributes[BoldKey] shouldBe Unit
-        styled.spans[0].attributes[CodeKey].shouldBeNull()
+        styled.spans[0].attributes[InlineCodeKey].shouldBeNull()
 
         styled.spans[1].range shouldBe 5..14
         styled.spans[1].attributes[BoldKey] shouldBe Unit
-        styled.spans[1].attributes[CodeKey] shouldBe Unit
+        styled.spans[1].attributes[InlineCodeKey] shouldBe Unit
 
         styled.spans[2].range shouldBe 15..19
         styled.spans[2].attributes[BoldKey].shouldBeNull()
-        styled.spans[2].attributes[CodeKey] shouldBe Unit
+        styled.spans[2].attributes[InlineCodeKey] shouldBe Unit
 
         // Clear code across 10..17
         val cleared =
             styled.edit {
                 editAttributes(10..17) {
-                    clearCode()
+                    clearInlineCode()
                 }
             }
 
@@ -423,42 +423,42 @@ class Milestone1Challenger1StressTest {
         cleared.spans[0].attributes shouldBe attributeContainerOf(BoldKey to Unit)
 
         cleared.spans[1].range shouldBe 5..9
-        cleared.spans[1].attributes shouldBe (attributeContainerOf(BoldKey to Unit) + (CodeKey to Unit))
+        cleared.spans[1].attributes shouldBe (attributeContainerOf(BoldKey to Unit) + (InlineCodeKey to Unit))
 
         cleared.spans[2].range shouldBe 10..14
         cleared.spans[2].attributes shouldBe attributeContainerOf(BoldKey to Unit)
 
         cleared.spans[3].range shouldBe 18..19
-        cleared.spans[3].attributes shouldBe attributeContainerOf(CodeKey to Unit)
+        cleared.spans[3].attributes shouldBe attributeContainerOf(InlineCodeKey to Unit)
     }
 
     // =========================================================================
-    // 5. RichTextState Typing Attribute Workflow with CodeKey
+    // 5. RichTextState Typing Attribute Workflow with InlineCodeKey
     // =========================================================================
 
     @Test
-    fun `toggleFormat and typingAttributes apply CodeKey to typed characters`() {
+    fun `toggleFormat and typingAttributes apply InlineCodeKey to typed characters`() {
         val state = RichTextState(RichString("Hello "))
 
         // Place cursor at end (collapsed)
         state.textFieldState.edit { selection = TextRange(6) }
 
         // Toggle code on
-        state.toggleFormat(CodeKey)
+        state.toggleFormat(InlineCodeKey)
         state.typingAttributes.shouldNotBeNull()
-        state.typingAttributes?.get(CodeKey) shouldBe Unit
+        state.typingAttributes?.get(InlineCodeKey) shouldBe Unit
 
         // Type characters via edit or insert
         state.edit {
             insert(6, "code") {
-                code()
+                inlineCode()
             }
         }
 
         state.richString.text shouldBe "Hello code"
         state.richString.spans shouldHaveSize 1
         state.richString.spans[0].range shouldBe 6..9
-        state.richString.spans[0].attributes[CodeKey] shouldBe Unit
+        state.richString.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // Clear formats
         state.textFieldState.edit { selection = TextRange(10) }
@@ -467,16 +467,16 @@ class Milestone1Challenger1StressTest {
     }
 
     // =========================================================================
-    // 6. Subrange clearAll with CodeKey Slicing
+    // 6. Subrange clearAll with InlineCodeKey Slicing
     // =========================================================================
 
     @Test
-    fun `clearAll on subrange slices CodeKey cleanly into two separate spans`() {
+    fun `clearAll on subrange slices InlineCodeKey cleanly into two separate spans`() {
         val text = "0123456789ABCDEF"
         val styled =
             RichString(text).edit {
                 editAttributes(0..15) {
-                    code()
+                    inlineCode()
                 }
             }
         styled.spans shouldHaveSize 1
@@ -491,14 +491,14 @@ class Milestone1Challenger1StressTest {
 
         sliced.spans shouldHaveSize 2
         sliced.spans[0].range shouldBe 0..4
-        sliced.spans[0].attributes shouldBe attributeContainerOf(CodeKey to Unit)
+        sliced.spans[0].attributes shouldBe attributeContainerOf(InlineCodeKey to Unit)
 
         sliced.spans[1].range shouldBe 11..15
-        sliced.spans[1].attributes shouldBe attributeContainerOf(CodeKey to Unit)
+        sliced.spans[1].attributes shouldBe attributeContainerOf(InlineCodeKey to Unit)
     }
 
     // =========================================================================
-    // 7. Contiguous & Redundant CodeKey Applications Merge Cleanly
+    // 7. Contiguous & Redundant InlineCodeKey Applications Merge Cleanly
     // =========================================================================
 
     @Test
@@ -506,36 +506,36 @@ class Milestone1Challenger1StressTest {
         val text = "0123456789"
         val styled =
             RichString(text).edit {
-                editAttributes(0..4) { code() }
-                editAttributes(5..9) { code() }
+                editAttributes(0..4) { inlineCode() }
+                editAttributes(5..9) { inlineCode() }
             }
 
         styled.spans shouldHaveSize 1
         styled.spans[0].range shouldBe 0..9
-        styled.spans[0].attributes shouldBe attributeContainerOf(CodeKey to Unit)
+        styled.spans[0].attributes shouldBe attributeContainerOf(InlineCodeKey to Unit)
 
         // Redundant application on middle subrange 2..7
         val reApplied =
             styled.edit {
-                editAttributes(2..7) { code() }
+                editAttributes(2..7) { inlineCode() }
             }
         reApplied.spans shouldHaveSize 1
         reApplied.spans[0].range shouldBe 0..9
-        reApplied.spans[0].attributes shouldBe attributeContainerOf(CodeKey to Unit)
+        reApplied.spans[0].attributes shouldBe attributeContainerOf(InlineCodeKey to Unit)
     }
 
     // =========================================================================
-    // 8. Paragraph Attributes Independence with CodeKey
+    // 8. Paragraph Attributes Independence with InlineCodeKey
     // =========================================================================
 
     @Test
-    fun `paragraph attributes do not expand CodeKey and snap independently`() {
+    fun `paragraph attributes do not expand InlineCodeKey and snap independently`() {
         val text = "First line with `code` here\nSecond line"
         val codeRange = text.rangeOf("`code`")
         val styled =
             RichString(text).edit {
                 editAttributes(codeRange) {
-                    code()
+                    inlineCode()
                 }
                 editAttributes(0..5) {
                     headingLevel(HeadingLevel.H1)
@@ -550,14 +550,14 @@ class Milestone1Challenger1StressTest {
         // (codeRange.last + 1)..27: Heading only
         styled.spans shouldHaveSize 3
 
-        val codeSpan = styled.spans.first { it.attributes.containsKey(CodeKey) }
+        val codeSpan = styled.spans.first { it.attributes.containsKey(InlineCodeKey) }
         codeSpan.range shouldBe codeRange
-        codeSpan.attributes[CodeKey] shouldBe Unit
+        codeSpan.attributes[InlineCodeKey] shouldBe Unit
         codeSpan.attributes[HeadingKey] shouldBe HeadingLevel.H1
 
-        // Other spans must NOT have CodeKey
-        styled.spans.filter { !it.attributes.containsKey(CodeKey) }.forEach { nonCodeSpan ->
-            nonCodeSpan.attributes[CodeKey].shouldBeNull()
+        // Other spans must NOT have InlineCodeKey
+        styled.spans.filter { !it.attributes.containsKey(InlineCodeKey) }.forEach { nonCodeSpan ->
+            nonCodeSpan.attributes[InlineCodeKey].shouldBeNull()
             nonCodeSpan.attributes[HeadingKey] shouldBe HeadingLevel.H1
         }
     }
@@ -572,8 +572,8 @@ class Milestone1Challenger1StressTest {
         val state =
             RichTextState(
                 RichString(text).edit {
-                    editAttributes(text.rangeOf("codeA")) { code() }
-                    editAttributes(text.rangeOf("codeB")) { code() }
+                    editAttributes(text.rangeOf("codeA")) { inlineCode() }
+                    editAttributes(text.rangeOf("codeB")) { inlineCode() }
                 },
             )
 
@@ -593,18 +593,18 @@ class Milestone1Challenger1StressTest {
         state.richString.spans shouldHaveSize 2
         // Span A before middle_text is unchanged
         state.richString.spans[0].range shouldBe origRangeA
-        state.richString.spans[0].attributes[CodeKey] shouldBe Unit
+        state.richString.spans[0].attributes[InlineCodeKey] shouldBe Unit
 
         // Span B shifted by diff in length
         val shiftDiff = replacement.length - "middle_text".length
         val expectedRangeB = (origRangeB.first + shiftDiff)..(origRangeB.last + shiftDiff)
         state.richString.spans[1].range shouldBe expectedRangeB
-        state.richString.spans[1].attributes[CodeKey] shouldBe Unit
+        state.richString.spans[1].attributes[InlineCodeKey] shouldBe Unit
         state.richString.text.substring(expectedRangeB) shouldBe "codeB"
     }
 
     // =========================================================================
-    // 10. Invariant Fuzz Test: 1,000 Edits on CodeKey and Attributes
+    // 10. Invariant Fuzz Test: 1,000 Edits on InlineCodeKey and Attributes
     // =========================================================================
 
     @Test
@@ -621,9 +621,9 @@ class Milestone1Challenger1StressTest {
             str =
                 str.edit {
                     when (iter % 4) {
-                        0 -> editAttributes(range) { code() }
+                        0 -> editAttributes(range) { inlineCode() }
                         1 -> editAttributes(range) { bold() }
-                        2 -> editAttributes(range) { clearCode() }
+                        2 -> editAttributes(range) { clearInlineCode() }
                         3 -> editAttributes(range) { clearAll() }
                     }
                 }
