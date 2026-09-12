@@ -211,6 +211,15 @@ public class RichTextState(initialText: RichString = RichString("")) {
         typingAttributesAnchor = null
     }
 
+    internal fun restoreTypingAttributes(
+        typing: AttributeContainer?,
+        removed: Set<AttributeKey<*>>?,
+    ) {
+        typingAttributes = typing
+        removedTypingAttributes = removed
+        typingAttributesAnchor = if (typing != null || removed != null) selection else null
+    }
+
     /**
      * The current selection range within the text field.
      * Returns [TextRange.Zero] when no selection is active (cursor at position 0).
@@ -379,6 +388,9 @@ public class RichTextState(initialText: RichString = RichString("")) {
             getSpans = { spans },
             setSpans = { spans = it },
             clearTypingAttributes = { clearTypingAttributes() },
+            getTypingAttributes = { typingAttributes },
+            getRemovedTypingAttributes = { removedTypingAttributes },
+            restoreTypingAttributes = { typing, removed -> restoreTypingAttributes(typing, removed) },
         )
 
     private fun handleNewlineInsertion(

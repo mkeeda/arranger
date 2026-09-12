@@ -4,6 +4,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Stable
+import dev.mkeeda.arranger.richtext.AttributeContainer
+import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 
 /**
@@ -24,6 +26,9 @@ public class RichTextUndoState internal constructor(
     private val getSpans: () -> List<RichSpan>,
     private val setSpans: (List<RichSpan>) -> Unit,
     private val clearTypingAttributes: () -> Unit,
+    private val getTypingAttributes: () -> AttributeContainer? = { null },
+    private val getRemovedTypingAttributes: () -> Set<AttributeKey<*>>? = { null },
+    private val restoreTypingAttributes: (AttributeContainer?, Set<AttributeKey<*>>?) -> Unit = { _, _ -> },
 ) {
     internal val undoManager = RichTextUndoManager()
 
@@ -85,6 +90,8 @@ public class RichTextUndoState internal constructor(
             text = textFieldState.text.toString(),
             spans = getSpans(),
             selection = textFieldState.selection,
+            typingAttributes = getTypingAttributes(),
+            removedTypingAttributes = getRemovedTypingAttributes(),
         )
     }
 
@@ -96,7 +103,7 @@ public class RichTextUndoState internal constructor(
         }
         textFieldState.undoState.clearHistory()
         setSpans(snapshot.spans)
-        clearTypingAttributes()
+        restoreTypingAttributes(snapshot.typingAttributes, snapshot.removedTypingAttributes)
     }
 }
 
