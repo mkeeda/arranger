@@ -13,8 +13,11 @@ import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
 import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
+import dev.mkeeda.arranger.richtext.StrikethroughKey
+import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -136,5 +139,82 @@ class AttributeStyleResolverTest {
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
         resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves both StrikethroughKey and UnderlineKey combined`() {
+        val container =
+            attributeContainerOf(
+                StrikethroughKey to Unit,
+                UnderlineKey to Unit,
+            )
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
+        (TextDecoration.LineThrough in decoration) shouldBe true
+        (TextDecoration.Underline in decoration) shouldBe true
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves both StrikethroughKey and LinkKey combined`() {
+        val container =
+            attributeContainerOf(
+                StrikethroughKey to Unit,
+                LinkKey to "https://example.com",
+            )
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.spanStyle?.color shouldBe Color(0xFF1E88E5)
+        val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
+        (TextDecoration.LineThrough in decoration) shouldBe true
+        (TextDecoration.Underline in decoration) shouldBe true
+    }
+
+    @Test
+    fun `AttributeStyleResolver combines TextDecoration across base and custom resolvers`() {
+        val baseResolver =
+            AttributeStyleResolver {
+                spanStyle(StrikethroughKey) {
+                    SpanStyle(textDecoration = TextDecoration.LineThrough)
+                }
+            }
+        val combinedResolver =
+            AttributeStyleResolver(base = baseResolver) {
+                spanStyle(UnderlineKey) {
+                    SpanStyle(textDecoration = TextDecoration.Underline)
+                }
+            }
+
+        val container =
+            attributeContainerOf(
+                StrikethroughKey to Unit,
+                UnderlineKey to Unit,
+            )
+        val resolved = combinedResolver.resolve(container)
+
+        val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
+        (TextDecoration.LineThrough in decoration) shouldBe true
+        (TextDecoration.Underline in decoration) shouldBe true
+    }
+
+    @Test
+    fun `AttributeStyleResolver respects TextDecoration None override`() {
+        val baseResolver =
+            AttributeStyleResolver {
+                spanStyle(UnderlineKey) {
+                    SpanStyle(textDecoration = TextDecoration.Underline)
+                }
+            }
+        val overridingResolver =
+            AttributeStyleResolver(base = baseResolver) {
+                spanStyle(UnderlineKey) {
+                    SpanStyle(textDecoration = TextDecoration.None)
+                }
+            }
+
+        val container = attributeContainerOf(UnderlineKey to Unit)
+        val resolved = overridingResolver.resolve(container)
+
+        resolved.spanStyle?.textDecoration shouldBe TextDecoration.None
     }
 }

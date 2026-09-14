@@ -43,4 +43,29 @@ class DocumentEditorDesktopTest {
             onNodeWithContentDescription("Bold").assertIsOn()
             textInputNode.assertIsFocused()
         }
+
+    @Test
+    fun `toolbar applies Strikethrough after Underline and other styles`() =
+        runComposeUiTest {
+            setContent {
+                ArrangerTheme {
+                    DocumentEditorSample()
+                }
+            }
+
+            val textInputNode = onNodeWithTag("DocumentEditor")
+            textInputNode.performTextInput("Desktop Test")
+
+            // Select "Desktop Test"
+            textInputNode.performTextInputSelection(TextRange(0, 12))
+
+            // Toggle Underline on
+            onNodeWithContentDescription("Underline").performClick()
+            onNodeWithContentDescription("Underline").assertIsOn()
+
+            // Toggle Strikethrough on
+            onNodeWithContentDescription("Strikethrough").performClick()
+            onNodeWithContentDescription("Strikethrough").assertIsOn()
+            onNodeWithContentDescription("Underline").assertIsOn()
+        }
 }

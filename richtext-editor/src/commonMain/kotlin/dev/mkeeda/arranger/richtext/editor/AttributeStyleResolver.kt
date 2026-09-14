@@ -2,6 +2,7 @@ package dev.mkeeda.arranger.richtext.editor
 
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
@@ -38,12 +39,7 @@ public fun AttributeStyleResolver(
         val baseStyle = base.resolve(attributes)
         val customStyle = customResolver.resolve(attributes)
 
-        val mergedSpan =
-            if (baseStyle.spanStyle != null) {
-                baseStyle.spanStyle.merge(customStyle.spanStyle)
-            } else {
-                customStyle.spanStyle
-            }
+        val mergedSpan = mergeSpanStyle(baseStyle.spanStyle, customStyle.spanStyle)
 
         val mergedParagraph =
             if (baseStyle.paragraphStyle != null) {
@@ -99,7 +95,7 @@ public class AttributeStyleBuilder internal constructor() {
             val mergedSpan =
                 spanResolvers.fold(null as SpanStyle?) { acc, resolver ->
                     val style = resolver(attributes)
-                    if (style != null) acc?.merge(style) ?: style else acc
+                    if (style != null) mergeSpanStyle(acc, style) else acc
                 }
 
             val mergedParagraph =
@@ -113,4 +109,31 @@ public class AttributeStyleBuilder internal constructor() {
                 paragraphStyle = mergedParagraph,
             )
         }
+}
+
+internal fun mergeTextDecoration(
+    base: TextDecoration?,
+    other: TextDecoration?,
+): TextDecoration? =
+    when {
+        base == null -> other
+        other == null -> base
+        other == TextDecoration.None -> TextDecoration.None
+        base == TextDecoration.None -> other
+        else -> base + other
+    }
+
+internal fun mergeSpanStyle(
+    base: SpanStyle?,
+    other: SpanStyle?,
+): SpanStyle? {
+    if (base == null) return other
+    if (other == null) return base
+    val merged = base.merge(other)
+    val textDecoration = mergeTextDecoration(base.textDecoration, other.textDecoration)
+    return if (textDecoration != merged.textDecoration) {
+        merged.copy(textDecoration = textDecoration)
+    } else {
+        merged
+    }
 }
