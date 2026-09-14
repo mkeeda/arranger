@@ -12,7 +12,7 @@ import dev.mkeeda.arranger.richtext.editor.RichTextState
  * (used for Backspace restoration).
  */
 @Stable
-public class WysiwygState {
+internal class WysiwygState {
     internal var lastAutoFormatEvent: AutoFormatEvent? by mutableStateOf(null)
 
     /**
@@ -23,7 +23,7 @@ public class WysiwygState {
      * - The selection must be collapsed
      * - Undo must be available
      */
-    public fun canRevert(state: RichTextState): Boolean {
+    internal fun canRevert(state: RichTextState): Boolean {
         val event = lastAutoFormatEvent ?: return false
         val sel = state.selection
         return sel.collapsed && sel.start == event.postFormatCursor && state.undoState.canUndo
@@ -32,14 +32,14 @@ public class WysiwygState {
     /**
      * Reverts the most recent auto-formatting event, restoring State B (raw symbol text).
      */
-    public fun revert(state: RichTextState): Boolean {
+    internal fun revert(state: RichTextState): Boolean {
         if (!canRevert(state)) return false
         state.undoState.undo()
         clearLastAutoFormat()
         return true
     }
 
-    public fun clearLastAutoFormat() {
+    internal fun clearLastAutoFormat() {
         lastAutoFormatEvent = null
     }
 
