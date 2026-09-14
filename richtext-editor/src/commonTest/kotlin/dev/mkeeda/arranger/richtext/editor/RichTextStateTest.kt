@@ -236,8 +236,8 @@ class RichTextStateTest {
                     },
             )
 
-        // Initial span should be "Bravo" (indices 6..11)
-        state.richString.spans.first().range shouldBe (6..11)
+        // Initial span should be "Bravo" (indices 6..10)
+        state.richString.spans.first().range shouldBe (6..10)
 
         state.edit {
             // Insert a '\n' in the middle of Bravo
@@ -249,8 +249,8 @@ class RichTextStateTest {
 
         val spans = state.richString.spans
         spans.size shouldBe 1
-        // Expected span is the combined new paragraphs: "Bra\nvo" (indices 6..12)
-        spans.first().range shouldBe (6..12)
+        // Expected span is the combined new paragraphs: "Bra\nvo" (indices 6..11)
+        spans.first().range shouldBe (6..11)
     }
 
     @Test
@@ -311,12 +311,7 @@ class RichTextStateTest {
         secondSpan.attributes.containsKey(BlockquoteKey) shouldBe true
         secondSpan.attributes.containsKey(BoldKey) shouldBe true
 
-        // Paragraph attributes are now extended to text.length (11)
-        spans.size shouldBe 3
-        val thirdSpan = spans[2]
-        thirdSpan.range shouldBe (11..11)
-        thirdSpan.attributes.containsKey(BlockquoteKey) shouldBe true
-        thirdSpan.attributes.containsKey(BoldKey) shouldBe false
+        spans.size shouldBe 2
     }
 
     @Test
@@ -359,6 +354,46 @@ class RichTextStateTest {
 
         val attrs = state.currentAttributes
         attrs shouldBe attributeContainerOf(BoldKey to Unit)
+    }
+
+    @Test
+    fun `currentAttributes returns paragraph attributes when cursor is at end of text`() {
+        val initialText = "Heading"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(HeadingKey, HeadingLevel.H1, range = initialText.indices)
+                    },
+            )
+
+        // Move cursor to the end of the text (cursor position == text.length)
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        state.currentAttributes shouldBe attributeContainerOf(HeadingKey to HeadingLevel.H1)
+    }
+
+    @Test
+    fun `currentAttributes returns paragraph attributes when cursor is at position 0`() {
+        // Arrange
+        val initialText = "Heading"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        setParagraphAttribute(HeadingKey, HeadingLevel.H1, range = initialText.indices)
+                    },
+            )
+
+        // Act
+        state.textFieldState.edit {
+            selection = TextRange(0)
+        }
+
+        // Assert
+        state.currentAttributes shouldBe attributeContainerOf(HeadingKey to HeadingLevel.H1)
     }
 
     @Test
@@ -564,6 +599,7 @@ class RichTextStateTest {
         // Type a newline and some text
         state.textFieldState.edit {
             replace(length, length, "\nNew line")
+            state.updateRichString(this)
         }
 
         val expectedText = "Bullet item\nNew line"
@@ -784,7 +820,7 @@ class RichTextStateTest {
         val spans = state.richString.spans
         spans.size shouldBe 1
         // Since it's a multi-character paste with a newline, the paragraph attribute should inherit to both lines
-        spans.first().range shouldBe (0..21)
+        spans.first().range shouldBe (0..20)
         spans.first().attributes shouldBe
             attributeContainerOf(
                 HeadingKey to HeadingLevel.H1,
@@ -817,6 +853,59 @@ class RichTextStateTest {
         spans.size shouldBe 1
         spans.first().range shouldBe (1..1)
         spans.first().attributes shouldBe attributeContainerOf(BoldKey to Unit)
+    }
+
+    @Test
+    fun `setRichString replaces entire text and spans`() {
+        val initialText = "Initial"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(initialText).edit {
+                        setSpanAttribute(BoldKey, Unit, 0..6)
+                    },
+            )
+
+        val newRichString =
+            RichString("New Text Content").edit {
+                setSpanAttribute(ItalicKey, Unit, 0..7)
+            }
+
+        state.setRichString(newRichString)
+
+        state.richString.text shouldBe "New Text Content"
+        state.richString.spans.size shouldBe 1
+        state.richString.spans.first().range shouldBe 0..7
+        state.richString.spans.first().attributes shouldBe attributeContainerOf(ItalicKey to Unit)
+    }
+
+    @Test
+    fun `setRichString clamps cursor selection to new text length`() {
+        val initialText = "Very Long Initial Text"
+        val state = RichTextState(initialText = RichString(initialText))
+        state.textFieldState.edit {
+            selection = TextRange(initialText.length)
+        }
+
+        val shortRichString = RichString("Short")
+        state.setRichString(shortRichString)
+
+        state.selection shouldBe TextRange(5)
+    }
+
+    @Test
+    fun `setRichString clears typing attributes and undo history`() {
+        val state = RichTextState(initialText = RichString("Hello"))
+        state.setTypingAttribute(BoldKey, Unit)
+        state.simulateTypingAtEnd("!")
+
+        state.undoState.canUndo shouldBe true
+
+        state.setRichString(RichString("Reset"))
+
+        state.typingAttributes shouldBe null
+        state.undoState.canUndo shouldBe false
+        state.richString.text shouldBe "Reset"
     }
 }
 

@@ -140,10 +140,13 @@ public class RichTextState(initialText: RichString = RichString("")) {
         val typingAttr = typingAttributes
         val removedAttr = removedTypingAttributes
 
+        val isAfterNewline = cursorPosition > 0 && textFieldState.text[cursorPosition - 1] == '\n'
+        val paragraphInheritIndex = if (cursorPosition == 0 || isAfterNewline) cursorPosition else cursorPosition - 1
+
         val inheritedAttributes =
             collectInheritedAttributes(
                 spanInheritIndex = cursorPosition - 1,
-                paragraphInheritIndex = cursorPosition,
+                paragraphInheritIndex = paragraphInheritIndex,
                 spans = spans,
             )
 
@@ -238,6 +241,26 @@ public class RichTextState(initialText: RichString = RichString("")) {
             richTextBuffer.block()
             spans = richTextBuffer.spans.resnapParagraphSpans(this.toString())
         }
+    }
+
+    /**
+     * Replaces the entire text and formatting attributes of this state with the given [richString].
+     *
+     * This resets the editor content, clears any active typing attributes, resets the undo history,
+     * and clamps the cursor selection if it exceeds the new text length.
+     */
+    public fun setRichString(richString: RichString) {
+        textFieldState.edit {
+            replace(0, length, richString.text)
+            selection =
+                TextRange(
+                    minOf(selection.start, richString.text.length),
+                    minOf(selection.end, richString.text.length),
+                )
+        }
+        spans = richString.spans.resnapParagraphSpans(richString.text)
+        clearTypingAttributes()
+        undoState.clearHistory()
     }
 
     internal fun <T> setParagraphAttributeDirectly(
@@ -346,8 +369,19 @@ public class RichTextState(initialText: RichString = RichString("")) {
                                 @Suppress("UNCHECKED_CAST")
                                 tempBuffer.removeSpanAttribute(key as SpanAttributeKey<Any>, insertStart..insertEnd)
                             } else if (key is ParagraphAttributeKey<*>) {
-                                @Suppress("UNCHECKED_CAST")
-                                tempBuffer.removeParagraphAttribute(key as ParagraphAttributeKey<Any>, insertStart..insertEnd)
+                                val effectiveParagraphStart =
+                                    if (buffer.asCharSequence()[insertStart] == '\n') {
+                                        insertStart + 1
+                                    } else {
+                                        insertStart
+                                    }
+                                if (effectiveParagraphStart <= insertEnd) {
+                                    @Suppress("UNCHECKED_CAST")
+                                    tempBuffer.removeParagraphAttribute(
+                                        key as ParagraphAttributeKey<Any>,
+                                        effectiveParagraphStart..insertEnd,
+                                    )
+                                }
                             }
                         }
                         updatedSpans = tempBuffer.spans
@@ -403,7 +437,8 @@ public class RichTextState(initialText: RichString = RichString("")) {
         removedAttr: Set<AttributeKey<*>>?,
     ): List<RichSpan> {
         val spanInheritIndex = if (originalRange.min > 0) originalRange.min - 1 else 0
-        val paragraphInheritIndex = originalRange.min
+        val isAfterNewline = originalRange.min > 0 && buffer.originalText[originalRange.min - 1] == '\n'
+        val paragraphInheritIndex = if (isAfterNewline) originalRange.min else spanInheritIndex
         val attrsBeforeCursor =
             collectInheritedAttributes(
                 spanInheritIndex = spanInheritIndex,

@@ -332,7 +332,7 @@ class RichTextEditorTest {
 
         val spans = state.richString.spans
         spans.size shouldBe 1
-        spans.first().range shouldBe (0..expectedText.length)
+        spans.first().range shouldBe expectedText.indices
         spans.first().attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
     }
 
@@ -449,7 +449,7 @@ class RichTextEditorTest {
         spans.size shouldBe 2
         spans[0].range shouldBe (0..6)
         spans[0].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level1)
-        spans[1].range shouldBe (7..13)
+        spans[1].range shouldBe (7..12)
         spans[1].attributes shouldBe attributeContainerOf(BulletListKey to ListIndentLevel.Level2)
     }
 

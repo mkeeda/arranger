@@ -92,4 +92,6 @@ public data class RichString(
         scope.block()
         return scope.build(text = text)
     }
+
+    public companion object
 }

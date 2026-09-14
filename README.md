@@ -31,8 +31,9 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 * 🛡️ **Type-Safe Custom Attributes:** Define and apply UI-specific styles (like `SpanStyle`) and domain-specific attributes (e.g., `@Mention`, `#Hashtag`, `LinkKey`) with full compile-time safety.
 * ⚡ **High-Level Editor Behaviors:** Built-in paragraph formatting (Headings, Blockquotes, Alignments, Bullet & Ordered Lists), dynamic enter-key strategies, and robust Undo/Redo history tracking.
 * 🔄 **Declarative & Type-Safe Mutation DSL:** Atomically mutate text and apply rich attributes within a type-safe builder DSL, eliminating manual index calculations and ensuring synchronized state.
+* 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
 * ✍️ **WYSIWYG Auto-Formatting Editor (`WysiwygEditor`):** Real-time Markdown shorthand conversions (headings, lists, blockquotes, bold, italic, inline code, strikethrough) as you type, complete with immediate backspace reversal and Undo/Redo integration.
-* 🌐 **Markdown & HTML Interoperability (Planned):** Bi-directional import/export converters.
+* 🌐 **Markdown & HTML Interoperability:** Bi-directional import/export converters between `RichString` and Markdown / HTML representations (`:richtext-markdown`, `:richtext-html`).
 * 🧩 **Native Compose Multiplatform Integration:** Elegantly separate headless core state management (`RichTextState`) and UI rendering (`RichTextEditor`, `WysiwygEditor`) across Android, iOS, Desktop, and Web.
 
 ## Why Arranger?
@@ -85,10 +86,16 @@ kotlin {
         commonMain.dependencies {
             // For Compose UI integration (RichTextEditor).
             // This automatically includes the core 'arranger-richtext' module.
-            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha02")
+
+            // Optional: Markdown bi-directional conversion support
+            implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha02")
+
+            // Optional: HTML bi-directional conversion support
+            implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha02")
 
             // Optional: If you only need the core data structures without Compose UI:
-            // implementation("dev.mkeeda.arranger:arranger-richtext:0.4.0-alpha01")
+            // implementation("dev.mkeeda.arranger:arranger-richtext:0.4.0-alpha02")
         }
     }
 }
@@ -99,7 +106,9 @@ Add the dependencies to your top-level `dependencies` block in `build.gradle.kts
 
 ```kotlin
 dependencies {
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha01")
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha02")
+    implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha02")
+    implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha02")
 }
 ```
 
@@ -408,7 +417,7 @@ You can define custom attribute keys and map them to Compose styles. Below shows
 > To use it, add the following dependency to your module's `build.gradle.kts`:
 > ```kotlin
 > dependencies {
->     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha01")
+>     implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha02")
 > }
 > ```
 
@@ -689,6 +698,42 @@ fun UndoRedoSample(modifier: Modifier = Modifier) {
 
 <img src="./docs/images/undo-redo.gif" width="500" alt="undo redo sample"/>
 
+## Markdown & HTML Bi-directional Conversion
+
+Arranger supports converting `RichString` to and from structured text formats (Markdown and HTML). This enables applications to persist formatted rich text to external databases or services, and restore the editor state dynamically.
+
+### Markdown Conversion (`:arranger-richtext-markdown`)
+Using the JetBrains CommonMark parser under the hood, Arranger supports full bi-directional conversion of inline formatting (Bold, Italic, Strikethrough, Underline, Links) and block formatting (Headings, Blockquotes, multi-level Bullet and Ordered lists):
+
+```kotlin
+// Exporting to Markdown
+val markdownText: String = state.richString.toMarkdown()
+
+// Importing from Markdown and setting to editor state
+val importedRichString = RichString.fromMarkdown("# Hello **World**\n* Item 1\n* Item 2")
+state.setRichString(importedRichString)
+```
+
+### HTML Conversion (`:arranger-richtext-html`)
+Using pure KMP HTML parsing, Arranger supports converting HTML tags, inline CSS styles (colors, background colors, font sizes), headings, blockquotes, alignments, and nested lists:
+
+```kotlin
+// Exporting to HTML
+val htmlText: String = state.richString.toHtml()
+
+// Importing from HTML and setting to editor state
+val importedHtmlString = RichString.fromHtml("<p>Hello <span style=\"color: #ff0000;\"><strong>Red Bold</strong></span></p>")
+state.setRichString(importedHtmlString)
+```
+
+### Generic Format Interface
+For custom serialization (e.g., custom JSON AST, BBCode), you can implement the generic `RichTextFormat<T>` or `RichTextExporter<T>` / `RichTextImporter<T>` interfaces:
+
+```kotlin
+val exported = state.richString.export(myCustomExporter)
+val imported = RichString.import(payload, myCustomImporter)
+```
+
 ## WYSIWYG Auto-Formatting (`WysiwygEditor`)
 
 For modern, keyboard-first writing workflows (similar to Notion, Slack, or Bear), Arranger provides `WysiwygEditor`. While `RichTextEditor` offers a clean canvas for toolbar-driven editing without unexpected conversions, `WysiwygEditor` actively parses Markdown shortcuts on the fly and converts them into rich text formatting in real time.
@@ -745,23 +790,6 @@ You can run the sample application on any of the supported platforms:
 - **Desktop:** `./gradlew :sample:desktop:run`
 - **Android:** Open the project in Android Studio and run the `:sample:android` configuration.
 - **iOS:** Open `sample/ios/ArrangerSample.xcodeproj` in Xcode and press **Run (Cmd + R)**.
-
-## Core Architecture Overview
-To ensure scalability up to PC-class text sizes and pure Kotlin compatibility (KMP), the architecture is layered:
-
-### Pure Kotlin Core (Data Structures)
-* **`RichString` & `RichRun`**: Immutable representations of text and its semantic chunks.
-* **`AttributeKey<T>`**: Defines the data type of an attribute.
-* **`AttributeContainer`**: A core structure holding a type-safe map of attributes, which is associated with specific text ranges to form `RichSpan`s.
-* **`RichStringScope`**: A builder scope used to safely mutate the attributes of a string within an `edit` block. Designed to accumulate attribute mutations and produce a completely new, immutable `RichString`.
-
-### Compose UI Layer
-* **`RichTextState`**: Wraps `TextFieldState` and manages the Spans. It acts as the single source of truth and exposes the complete `RichString`.
-* **`RichTextBuffer`**: A state-backed buffer provided inside `RichTextState.edit { }` that allows atomic, programmatic text and attribute mutations while automatically keeping spans synchronized.
-* **`RichTextOutputTransformation`**: Converts the plain text and spans into Compose's `AnnotatedString` purely at render time.
-* **`RichTextEditor`**: A simple, declarative Composable wrapping `BasicTextField` with our state and transformation.
-* **`WysiwygEditor`**: A high-level Composable providing real-time Markdown auto-formatting while typing, backspace reversal, and undo/redo integration.
-
 ## Development Roadmap
 
 Arranger is evolving towards a stable **v1.0.0 (Production-Ready Release)**.
