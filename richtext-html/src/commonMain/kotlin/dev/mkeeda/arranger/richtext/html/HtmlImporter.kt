@@ -35,41 +35,37 @@ internal class HtmlImporter : RichTextImporter<String> {
         val document = Ksoup.parseBodyFragment(input)
         val body = document.body()
 
-        val textBuilder = StringBuilder()
-        val spans = mutableListOf<RichSpan>()
+        val context = ParseContext()
 
         parseElementChildren(
             parent = body,
-            textBuilder = textBuilder,
-            spans = spans,
+            context = context,
             activeSpanAttributes = AttributeContainer.empty(),
             listDepth = 0,
             isOrderedList = false,
         )
 
         return RichString(
-            text = textBuilder.toString(),
-            spans = spans,
+            text = context.textBuilder.toString(),
+            spans = context.spans,
         )
     }
 
     private fun parseElementChildren(
         parent: Element,
-        textBuilder: StringBuilder,
-        spans: MutableList<RichSpan>,
+        context: ParseContext,
         activeSpanAttributes: AttributeContainer,
         listDepth: Int,
         isOrderedList: Boolean,
     ) {
         for (node in parent.childNodes()) {
-            parseNode(node, textBuilder, spans, activeSpanAttributes, listDepth, isOrderedList)
+            parseNode(node, context, activeSpanAttributes, listDepth, isOrderedList)
         }
     }
 
     private fun parseNode(
         node: Node,
-        textBuilder: StringBuilder,
-        spans: MutableList<RichSpan>,
+        context: ParseContext,
         activeSpanAttributes: AttributeContainer,
         listDepth: Int,
         isOrderedList: Boolean,
@@ -78,11 +74,15 @@ internal class HtmlImporter : RichTextImporter<String> {
             is TextNode -> {
                 val text = node.text()
                 if (text.isNotEmpty()) {
-                    val start = textBuilder.length
-                    textBuilder.append(text)
-                    val end = textBuilder.length
+                    if (!context.inParagraph) {
+                        if (node.isBlank()) return
+                        context.startParagraph()
+                    }
+                    val start = context.textBuilder.length
+                    context.textBuilder.append(text)
+                    val end = context.textBuilder.length
                     if (start < end && activeSpanAttributes.isNotEmpty()) {
-                        spans.add(RichSpan(start until end, activeSpanAttributes))
+                        context.spans.add(RichSpan(start until end, activeSpanAttributes))
                     }
                 }
             }
@@ -102,48 +102,56 @@ internal class HtmlImporter : RichTextImporter<String> {
                                 "h5" -> HeadingLevel.H5
                                 else -> HeadingLevel.H6
                             }
-                        if (textBuilder.isNotEmpty() && !textBuilder.endsWith('\n')) {
-                            textBuilder.append('\n')
-                        }
-                        val start = textBuilder.length
-                        parseElementChildren(node, textBuilder, spans, inlineAttrs, listDepth, isOrderedList)
-                        val end = textBuilder.length
+                        context.endParagraph()
+                        context.startParagraph()
+                        val start = context.textBuilder.length
+                        parseElementChildren(node, context, inlineAttrs, listDepth, isOrderedList)
+                        val end = context.textBuilder.length
                         if (start < end) {
                             var paraAttrs = attributeContainerOf(HeadingKey to level)
                             val align = parseAlignment(node)
                             if (align != null) paraAttrs += TextAlignmentKey to align
-                            spans.add(RichSpan(start until end, paraAttrs))
+                            context.spans.add(RichSpan(start until end, paraAttrs))
                         }
+                        context.endParagraph()
                     }
 
                     "blockquote" -> {
-                        if (textBuilder.isNotEmpty() && !textBuilder.endsWith('\n')) {
-                            textBuilder.append('\n')
+                        val hasBlock = containsBlockChild(node)
+                        if (!hasBlock) {
+                            context.endParagraph()
+                            context.startParagraph()
                         }
-                        val start = textBuilder.length
-                        parseElementChildren(node, textBuilder, spans, inlineAttrs, listDepth, isOrderedList)
-                        val end = textBuilder.length
+                        val start = context.textBuilder.length
+                        parseElementChildren(node, context, inlineAttrs, listDepth, isOrderedList)
+                        val end = context.textBuilder.length
                         if (start < end) {
                             var paraAttrs = attributeContainerOf(BlockquoteKey to Unit)
                             val align = parseAlignment(node)
                             if (align != null) paraAttrs += TextAlignmentKey to align
-                            spans.add(RichSpan(start until end, paraAttrs))
+                            context.spans.add(RichSpan(start until end, paraAttrs))
+                        }
+                        if (!hasBlock) {
+                            context.endParagraph()
                         }
                     }
 
                     "ul" -> {
-                        parseElementChildren(node, textBuilder, spans, inlineAttrs, listDepth + 1, isOrderedList = false)
+                        context.endParagraph()
+                        parseElementChildren(node, context, inlineAttrs, listDepth + 1, isOrderedList = false)
+                        context.endParagraph()
                     }
 
                     "ol" -> {
-                        parseElementChildren(node, textBuilder, spans, inlineAttrs, listDepth + 1, isOrderedList = true)
+                        context.endParagraph()
+                        parseElementChildren(node, context, inlineAttrs, listDepth + 1, isOrderedList = true)
+                        context.endParagraph()
                     }
 
                     "li" -> {
-                        if (textBuilder.isNotEmpty() && !textBuilder.endsWith('\n')) {
-                            textBuilder.append('\n')
-                        }
-                        val start = textBuilder.length
+                        context.endParagraph()
+                        context.startParagraph()
+                        val start = context.textBuilder.length
                         val indentLevel =
                             when (listDepth) {
                                 1 -> ListIndentLevel.Level1
@@ -171,10 +179,10 @@ internal class HtmlImporter : RichTextImporter<String> {
                         }
 
                         for (child in nonListNodes) {
-                            parseNode(child, textBuilder, spans, inlineAttrs, listDepth, isOrderedList)
+                            parseNode(child, context, inlineAttrs, listDepth, isOrderedList)
                         }
 
-                        val end = textBuilder.length
+                        val end = context.textBuilder.length
                         if (start < end) {
                             val key = if (isOrderedList) OrderedListKey else BulletListKey
 
@@ -182,37 +190,77 @@ internal class HtmlImporter : RichTextImporter<String> {
                             var paraAttrs = attributeContainerOf(key to indentLevel)
                             val align = parseAlignment(node)
                             if (align != null) paraAttrs += TextAlignmentKey to align
-                            spans.add(RichSpan(start until end, paraAttrs))
+                            context.spans.add(RichSpan(start until end, paraAttrs))
                         }
+                        context.endParagraph()
 
                         for (child in listNodes) {
-                            parseNode(child, textBuilder, spans, inlineAttrs, listDepth, isOrderedList)
+                            parseNode(child, context, inlineAttrs, listDepth, isOrderedList)
                         }
                     }
 
                     "p" -> {
-                        if (textBuilder.isNotEmpty() && !textBuilder.endsWith('\n')) {
-                            textBuilder.append('\n')
-                        }
-                        val start = textBuilder.length
-                        parseElementChildren(node, textBuilder, spans, inlineAttrs, listDepth, isOrderedList)
-                        val end = textBuilder.length
-                        val align = parseAlignment(node)
-                        if (start < end && align != null) {
-                            spans.add(RichSpan(start until end, attributeContainerOf(TextAlignmentKey to align)))
+                        context.endParagraph()
+                        if (isEmptyParagraph(node)) {
+                            context.startParagraph()
+                            context.endParagraph()
+                        } else {
+                            context.startParagraph()
+                            val start = context.textBuilder.length
+                            parseElementChildren(node, context, inlineAttrs, listDepth, isOrderedList)
+                            val end = context.textBuilder.length
+                            val align = parseAlignment(node)
+                            if (start < end && align != null) {
+                                context.spans.add(RichSpan(start until end, attributeContainerOf(TextAlignmentKey to align)))
+                            }
+                            context.endParagraph()
                         }
                     }
 
                     "br" -> {
-                        textBuilder.append('\n')
+                        context.textBuilder.append('\n')
                     }
 
                     else -> {
-                        parseElementChildren(node, textBuilder, spans, inlineAttrs, listDepth, isOrderedList)
+                        val isInline = tagName in inlineTags
+                        if (isInline && !context.inParagraph) {
+                            context.startParagraph()
+                        }
+                        parseElementChildren(node, context, inlineAttrs, listDepth, isOrderedList)
                     }
                 }
             }
         }
+    }
+
+    private fun isEmptyParagraph(element: Element): Boolean {
+        val children = element.childNodes()
+        if (children.isEmpty()) return true
+        val nonWhitespace =
+            children.filter { child ->
+                when (child) {
+                    is TextNode -> child.text().isNotBlank()
+                    is Element -> true
+                    else -> false
+                }
+            }
+        if (nonWhitespace.isEmpty()) return true
+        if (nonWhitespace.size == 1) {
+            val single = nonWhitespace[0]
+            if (single is Element && single.tagName().equals("br", ignoreCase = true)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun containsBlockChild(element: Element): Boolean {
+        val blockTags = setOf("p", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "ul", "ol", "li", "div")
+        return element.children().any { it.tagName().lowercase() in blockTags }
+    }
+
+    private companion object {
+        val inlineTags = setOf("strong", "b", "em", "i", "s", "del", "strike", "u", "a", "span")
     }
 
     private fun extractInlineAttributes(
@@ -350,5 +398,26 @@ internal class HtmlImporter : RichTextImporter<String> {
                 .removeSuffix("pt")
         val floatVal = cleaned.toFloatOrNull() ?: return null
         return TextSize(floatVal)
+    }
+}
+
+private class ParseContext(
+    val textBuilder: StringBuilder = StringBuilder(),
+    val spans: MutableList<RichSpan> = mutableListOf(),
+) {
+    var hasStartedParagraph: Boolean = false
+    var inParagraph: Boolean = false
+
+    fun startParagraph() {
+        if (!hasStartedParagraph) {
+            hasStartedParagraph = true
+        } else {
+            textBuilder.append('\n')
+        }
+        inParagraph = true
+    }
+
+    fun endParagraph() {
+        inParagraph = false
     }
 }
