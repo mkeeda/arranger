@@ -742,7 +742,7 @@ For modern, keyboard-first writing workflows (similar to Notion, Slack, or Bear)
 ```kotlin
 @Composable
 fun WysiwygEditorSample(modifier: Modifier = Modifier) {
-    val state = rememberRichTextState()
+    val state = remember { RichTextState() }
 
     WysiwygEditor(
         state = state,
