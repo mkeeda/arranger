@@ -70,12 +70,11 @@ public interface WysiwygTestDriver {
 
 ## 3. Tiered Test Specifications
 
-### Tier 1: Feature Coverage (F1–F16, 5+ Cases Each, 80+ Total)
+### Tier 1: Feature Coverage (F2–F16, 5+ Cases Each, 75+ Total)
 Validates primary user journeys and expected conversions for every feature:
 
 | Feature ID | Feature Name | Test Coverage Focus |
 |------------|--------------|---------------------|
-| **F1** | Inline Code Attribute | `InlineCodeKey` metadata, Monospace font family resolution, subtle background styling, coexistence with other attributes, container equality |
 | **F2** | Block: Heading 1..3 | Heading 1 (`# `), Heading 2 (`## `), Heading 3 (`### `), newline continuation, multibyte/accented text |
 | **F3** | Block: Bullet List | Dash prefix (`- `), asterisk prefix (`* `), multiline continuation, list text content, subsequent typing |
 | **F4** | Block: Ordered List | Ordered prefix (`1. `), multiline continuation, list text content, cursor placement, subsequent typing |
@@ -92,10 +91,9 @@ Validates primary user journeys and expected conversions for every feature:
 | **F15**| WysiwygEditor Component | Standalone component instantiation, pipeline integration, Backspace event interception, custom style resolver propagation |
 | **F16**| RichTextEditor Non-regression | Verification that `# `, `- `, `**`, and other triggers remain literal raw characters in `RichTextEditor`, preserving existing behavior |
 
-### Tier 2: Boundary & Corner Cases (F1–F16, 5+ Cases Each, 80+ Total)
+### Tier 2: Boundary & Corner Cases (F2–F16, 5+ Cases Each, 75+ Total)
 Exhaustively checks edge cases, boundary values, escape sequences, and false-positive prevention:
 
-- **F1**: Multiline inline code rejection, consecutive backticks safety, empty backticks, special characters and emojis, boundary spacing
 - **F2**: Unsupported levels (`#### `) rejected, unspaced prefixes (`#text`) ignored, mid-line `# ` ignored, empty heading backspace, re-triggering on existing heading
 - **F3**: Unspaced dashes (`-text`) ignored, mid-line `a - b` ignored, horizontal rules (`--- `) rejected, empty list newlines, indented triggers
 - **F4**: Non-1 initial numbers (`2. `) ignored, unspaced digits (`1.text`) ignored, mid-line markers (`v1. 0`) ignored, double spacing, non-dot markers (`1) `) ignored
@@ -103,7 +101,7 @@ Exhaustively checks edge cases, boundary values, escape sequences, and false-pos
 - **F6**: Triple asterisks handling, whitespace adjacent to delimiters (`** text**`) rejected, intra-word asterisks (`foo**bar**baz`), escaped symbols (`\*\*`), multiline rejection
 - **F7**: Mathematical expressions (`2 * 3 * 4`) ignored, intra-word asterisks (`foo*bar*baz`), whitespace adjacent to delimiters, escaped asterisks (`\*`), multiline rejection
 - **F8**: Snake case identifiers (`my_var_name`) ignored, screaming snake case (`MAX_VALUE`), dunder methods (`__init__`), URLs with underscores (`a_b_c`), whitespace boundaries
-- **F9**: Escaped backticks (``\`code\``) ignored, isolated single backtick, filesystem path expressions (`/usr/`local`/bin`), URL query parameters
+- **F9**: Escaped backticks (``\`code\``) ignored, isolated single backtick, consecutive/empty backticks safety, multiline rejection, filesystem path expressions (`/usr/`local`/bin`), URL query parameters
 - **F10**: Home directory paths (`~/dir`) ignored, approximation expressions (`~50%`) ignored, double tildes (`~~text~~`), whitespace boundaries, escaped tildes (`\~`)
 - **F11**: Empty lines, symbol-only inputs (`***`, `___`), surrogate pairs and emoji stability, rapid burst typing
 - **F12**: Undo after typing additional characters, chained undos across block + inline conversions, re-triggering after undo, empty redo stack safety

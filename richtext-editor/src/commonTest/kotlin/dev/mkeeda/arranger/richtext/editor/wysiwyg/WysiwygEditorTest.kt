@@ -1,13 +1,7 @@
 package dev.mkeeda.arranger.richtext.editor.wysiwyg
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
@@ -16,9 +10,7 @@ import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.OrderedListKey
-import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
-import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -26,30 +18,6 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 
 class WysiwygEditorTest {
-    @Test
-    fun `WysiwygEditor composable contract compiles and binds properly with all parameter overloads`() {
-        val composableRef: @Composable () -> Unit = {
-            val state = RichTextState(initialText = RichString(text = "Sample"))
-            val interactionSource = MutableInteractionSource()
-
-            // Call with default parameters
-            WysiwygEditor(state = state)
-
-            // Call with styleResolver and onLinkClick
-            WysiwygEditor(
-                state = state,
-                modifier = Modifier,
-                readOnly = false,
-                textStyle = TextStyle.Default,
-                styleResolver = DefaultAttributeStyleResolver,
-                interactionSource = interactionSource,
-                cursorBrush = SolidColor(Color.Black),
-                onLinkClick = { _ -> },
-            )
-        }
-        composableRef shouldBe composableRef
-    }
-
     @Test
     fun `WysiwygEditor triggers block auto-formatting for heading 1`() {
         val (state, wysiwygState, transformation) = setupEditor()

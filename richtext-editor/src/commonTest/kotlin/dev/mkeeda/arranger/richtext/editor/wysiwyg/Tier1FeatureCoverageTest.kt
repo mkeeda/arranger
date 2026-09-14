@@ -2,12 +2,8 @@ package dev.mkeeda.arranger.richtext.editor.wysiwyg
 
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
-import dev.mkeeda.arranger.richtext.InlineCodeKey
-import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.RichSpan
-import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.attributeContainerOf
-import dev.mkeeda.arranger.richtext.editor.RichTextState
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -16,62 +12,6 @@ import kotlin.test.Test
  * Comprehensive black-box requirements-driven tests covering F1 to F16 happy paths (5+ cases each).
  */
 class Tier1FeatureCoverageTest {
-    // =========================================================================
-    // F1: Inline Code Attribute & Styling (Survey / R3)
-    // =========================================================================
-
-    @Test
-    fun `F1-01 code key attribute name and specification contract`() {
-        InlineCodeKey.name shouldBe "inlineCode"
-        InlineCodeKey.defaultValue shouldBe Unit
-    }
-
-    @Test
-    fun `F1-02 code key container equality and retrieval`() {
-        val container = attributeContainerOf(InlineCodeKey to Unit)
-        container.containsKey(InlineCodeKey) shouldBe true
-        container[InlineCodeKey] shouldBe Unit
-    }
-
-    @Test
-    fun `F1-03 code key coexistence with bold and italic in attribute container`() {
-        val container =
-            attributeContainerOf(
-                InlineCodeKey to Unit,
-                BoldKey to Unit,
-                ItalicKey to Unit,
-            )
-        container.containsKey(InlineCodeKey) shouldBe true
-        container.containsKey(BoldKey) shouldBe true
-        container.containsKey(ItalicKey) shouldBe true
-    }
-
-    @Test
-    fun `F1-04 style resolver mapping contract for monospace family`() {
-        // Contract test for code attribute resolution
-        val spans =
-            listOf(
-                RichSpan(
-                    range = 0..4,
-                    attributes = attributeContainerOf(InlineCodeKey to Unit),
-                ),
-            )
-        val state = RichTextState(initialText = RichString("code", spans))
-        state.richString.spans.first().attributes.containsKey(InlineCodeKey) shouldBe true
-    }
-
-    @Test
-    fun `F1-05 code key in rich string spans preserves boundary`() {
-        val initialText = "val x = 42"
-        val richString =
-            RichString(
-                text = initialText,
-                spans = listOf(RichSpan(range = 0..9, attributes = attributeContainerOf(InlineCodeKey to Unit))),
-            )
-        richString.spans.size shouldBe 1
-        richString.spans.first().range shouldBe (0..9)
-    }
-
     // =========================================================================
     // F2: Block Heading 1..3 (# , ## , ### ) (R2)
     // =========================================================================

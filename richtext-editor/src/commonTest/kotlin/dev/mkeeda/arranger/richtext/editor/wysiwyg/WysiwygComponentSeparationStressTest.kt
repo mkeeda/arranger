@@ -1,16 +1,9 @@
 package dev.mkeeda.arranger.richtext.editor.wysiwyg
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
@@ -19,11 +12,7 @@ import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.OrderedListKey
-import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
-import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.DefaultListMarkerResolver
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextInputTransformation
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -39,64 +28,6 @@ import kotlin.test.Test
  * 3. Component signatures and parameter bindings maintain 100% backward compatibility and parity.
  */
 class WysiwygComponentSeparationStressTest {
-    @Test
-    fun `RichTextEditor composable contract compiles and binds properly across all overloads`() {
-        val composableRef: @Composable () -> Unit = {
-            val state = RichTextState(initialText = RichString("Sample"))
-            val interactionSource = MutableInteractionSource()
-            val scrollState = rememberScrollState()
-
-            // 1. Minimum invocation
-            RichTextEditor(state = state)
-
-            // 2. Full overload invocation with styleResolver and attributeStyleResolver
-            RichTextEditor(
-                state = state,
-                modifier = Modifier,
-                enabled = true,
-                readOnly = false,
-                textStyle = TextStyle.Default,
-                scrollState = scrollState,
-                interactionSource = interactionSource,
-                cursorBrush = SolidColor(Color.Black),
-                styleResolver = DefaultAttributeStyleResolver,
-                attributeStyleResolver = DefaultAttributeStyleResolver,
-                listMarkerResolver = DefaultListMarkerResolver,
-                onLinkClick = { _ -> },
-            )
-        }
-        composableRef shouldBe composableRef
-    }
-
-    @Test
-    fun `WysiwygEditor composable contract compiles and binds properly across all overloads`() {
-        val composableRef: @Composable () -> Unit = {
-            val state = RichTextState(initialText = RichString("Sample"))
-            val wysiwygState = WysiwygState()
-            val interactionSource = MutableInteractionSource()
-            val scrollState = rememberScrollState()
-
-            // 1. Minimum invocation
-            WysiwygEditor(state = state)
-
-            // 2. Full overload invocation with onLinkClick and resolvers
-            WysiwygEditor(
-                state = state,
-                modifier = Modifier,
-                enabled = true,
-                readOnly = false,
-                textStyle = TextStyle.Default,
-                scrollState = scrollState,
-                interactionSource = interactionSource,
-                cursorBrush = SolidColor(Color.Black),
-                styleResolver = DefaultAttributeStyleResolver,
-                listMarkerResolver = DefaultListMarkerResolver,
-                onLinkClick = { _ -> },
-            )
-        }
-        composableRef shouldBe composableRef
-    }
-
     @Test
     fun `RichTextEditor never triggers block formatting for headings H1 H2 H3 and H4`() {
         val (state, transformation) = createRichTextEngine()

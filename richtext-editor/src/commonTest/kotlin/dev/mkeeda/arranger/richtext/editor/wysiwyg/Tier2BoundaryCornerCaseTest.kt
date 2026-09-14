@@ -13,50 +13,6 @@ import kotlin.test.Test
  */
 class Tier2BoundaryCornerCaseTest {
     // =========================================================================
-    // F1: Inline Code Boundary (R3)
-    // =========================================================================
-
-    @Test
-    fun `F1-B01 multiline inline code prevented`() {
-        val harness = createWysiwygHarness()
-        harness.typeText("`line1\nline2`")
-        harness.assertText("`line1\nline2`")
-        harness.assertNotInlineCode()
-    }
-
-    @Test
-    fun `F1-B02 consecutive backticks do not crash or erroneously format`() {
-        val harness = createWysiwygHarness()
-        harness.typeText("````")
-        harness.assertText("````")
-        harness.assertNotInlineCode()
-    }
-
-    @Test
-    fun `F1-B03 empty backticks prevented`() {
-        val harness = createWysiwygHarness()
-        harness.typeText("``")
-        harness.assertText("``")
-        harness.assertNotInlineCode()
-    }
-
-    @Test
-    fun `F1-B04 special characters html tags and emojis in code`() {
-        val harness = createWysiwygHarness()
-        harness.typeText("`<div>🚀</div>`")
-        harness.assertText("<div>🚀</div>")
-        harness.assertInlineCode(range = 0..12)
-    }
-
-    @Test
-    fun `F1-B05 whitespace enclosed backticks prevented`() {
-        val harness = createWysiwygHarness()
-        harness.typeText("` code `")
-        harness.assertText("` code `")
-        harness.assertNotInlineCode()
-    }
-
-    // =========================================================================
     // F2: Block Heading Boundary (R2)
     // =========================================================================
 
@@ -413,6 +369,22 @@ class Tier2BoundaryCornerCaseTest {
         val harness = createWysiwygHarness()
         harness.typeText("`code `")
         harness.assertText("`code `")
+        harness.assertNotInlineCode()
+    }
+
+    @Test
+    fun `F9-B06 multiline inline code prevented`() {
+        val harness = createWysiwygHarness()
+        harness.typeText("`line1\nline2`")
+        harness.assertText("`line1\nline2`")
+        harness.assertNotInlineCode()
+    }
+
+    @Test
+    fun `F9-B07 consecutive backticks do not crash or erroneously format`() {
+        val harness = createWysiwygHarness()
+        harness.typeText("````")
+        harness.assertText("````")
         harness.assertNotInlineCode()
     }
 

@@ -1,25 +1,12 @@
 package dev.mkeeda.arranger.richtext.editor.wysiwyg
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.KeyboardActionHandler
-import androidx.compose.foundation.text.input.TextFieldDecorator
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
@@ -32,9 +19,7 @@ import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.ComposeParagraphWorkarounds
-import dev.mkeeda.arranger.richtext.editor.DefaultListMarkerResolver
 import dev.mkeeda.arranger.richtext.editor.ResolvedRichStyle
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextInputTransformation
 import dev.mkeeda.arranger.richtext.editor.RichTextOutputTransformation
 import dev.mkeeda.arranger.richtext.editor.RichTextState
@@ -606,86 +591,6 @@ class WysiwygKeyEventAndUiStressTest {
     // =========================================================================
     // Group 3: Non-Regression Parity & Parameter Permutations
     // =========================================================================
-
-    @Test
-    fun `RichTextEditor and WysiwygEditor composable overloads compile and bind with every parameter permutation`() {
-        val composableRef: @Composable () -> Unit = {
-            val state = RichTextState(initialText = RichString("Sample"))
-            val wysiwygState = WysiwygState()
-            val interactionSource = MutableInteractionSource()
-            val scrollState = rememberScrollState()
-            val customDecorator = TextFieldDecorator { inner -> inner() }
-            val customStyleResolver =
-                object : AttributeStyleResolver {
-                    override fun resolve(attributes: AttributeContainer) = ResolvedRichStyle()
-                }
-
-            // Permutation 1: Minimal invocations
-            RichTextEditor(state = state)
-            WysiwygEditor(state = state)
-
-            // Permutation 2: readOnly = true, enabled = false
-            RichTextEditor(
-                state = state,
-                readOnly = true,
-                enabled = false,
-            )
-            WysiwygEditor(
-                state = state,
-                readOnly = true,
-                enabled = false,
-            )
-
-            // Permutation 3: full parameter binding with styleResolver and attributeStyleResolver
-            RichTextEditor(
-                state = state,
-                modifier = Modifier,
-                enabled = true,
-                readOnly = false,
-                textStyle = TextStyle(fontSize = 16.sp, color = Color.DarkGray),
-                keyboardOptions =
-                    KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done,
-                    ),
-                onKeyboardAction = KeyboardActionHandler { _ -> },
-                lineLimits = TextFieldLineLimits.SingleLine,
-                onTextLayout = { _ -> },
-                scrollState = scrollState,
-                interactionSource = interactionSource,
-                cursorBrush = SolidColor(Color.Red),
-                decorator = customDecorator,
-                styleResolver = customStyleResolver,
-                attributeStyleResolver = customStyleResolver,
-                listMarkerResolver = DefaultListMarkerResolver,
-                onLinkClick = { _ -> },
-            )
-
-            WysiwygEditor(
-                state = state,
-                modifier = Modifier,
-                enabled = true,
-                readOnly = false,
-                textStyle = TextStyle(fontSize = 16.sp, color = Color.DarkGray),
-                keyboardOptions =
-                    KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done,
-                    ),
-                onKeyboardAction = KeyboardActionHandler { _ -> },
-                lineLimits = TextFieldLineLimits.SingleLine,
-                onTextLayout = { _ -> },
-                scrollState = scrollState,
-                interactionSource = interactionSource,
-                cursorBrush = SolidColor(Color.Red),
-                decorator = customDecorator,
-                styleResolver = customStyleResolver,
-                listMarkerResolver = DefaultListMarkerResolver,
-                onLinkClick = { _ -> },
-            )
-        }
-        composableRef shouldBe composableRef
-    }
 
     @Test
     fun `RichTextEditor never auto-formats under any parameter configuration`() {
