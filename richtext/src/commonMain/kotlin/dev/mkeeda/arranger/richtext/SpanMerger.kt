@@ -38,46 +38,36 @@ internal fun List<RichSpan>.transformSpans(
                 add(span.range.first)
                 add(span.range.last + 1)
             }
-        }
-
-    val sortedBoundaries = boundaries.distinct().sorted()
+        }.distinct().sorted()
 
     // 2. Derive chunks and calculate properties
-    var currentSpanIndex = 0
     val resultSpans = mutableListOf<RichSpan>()
 
-    for (i in 0 until sortedBoundaries.size - 1) {
-        val chunkStart = sortedBoundaries[i]
-        val chunkEnd = sortedBoundaries[i + 1] - 1
-
-        // Advance existing span pointer to catch up with the current chunk
-        while (
-            currentSpanIndex < this.size &&
-            this[currentSpanIndex].range.last < chunkStart
-        ) {
-            currentSpanIndex++
-        }
+    for (i in 0 until boundaries.size - 1) {
+        val chunkStart = boundaries[i]
+        val chunkEnd = boundaries[i + 1] - 1
 
         val isInsideTarget = nonEmptyTargetRange != null && chunkStart >= nonEmptyTargetRange.first && chunkEnd <= nonEmptyTargetRange.last
 
-        val isInsideExistingSpan =
-            currentSpanIndex < this.size &&
-                chunkStart >= this[currentSpanIndex].range.first &&
-                chunkEnd <= this[currentSpanIndex].range.last
+        var chunkAttributes = AttributeContainer.empty()
+        for (span in this@transformSpans) {
+            if (span.range.first <= chunkStart && chunkEnd <= span.range.last) {
+                chunkAttributes += span.attributes
+            }
+        }
 
-        val chunkAttributes: AttributeContainer =
-            when {
-                isInsideTarget && isInsideExistingSpan -> transform(this[currentSpanIndex].attributes)
-                isInsideTarget -> transform(AttributeContainer.empty())
-                isInsideExistingSpan -> this[currentSpanIndex].attributes
-                else -> continue // Blank gap (no attributes), skip this chunk
+        val transformedAttributes =
+            if (isInsideTarget) {
+                transform(chunkAttributes)
+            } else {
+                chunkAttributes
             }
 
-        if (chunkAttributes.isEmpty()) {
+        if (transformedAttributes.isEmpty()) {
             continue
         }
 
-        val nextSpan = RichSpan(range = chunkStart..chunkEnd, attributes = chunkAttributes)
+        val nextSpan = RichSpan(range = chunkStart..chunkEnd, attributes = transformedAttributes)
 
         if (resultSpans.isNotEmpty()) {
             val lastSpan = resultSpans.last()

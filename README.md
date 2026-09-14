@@ -32,8 +32,8 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 * ⚡ **High-Level Editor Behaviors:** Built-in paragraph formatting (Headings, Blockquotes, Alignments, Bullet & Ordered Lists), dynamic enter-key strategies, and robust Undo/Redo history tracking.
 * 🔄 **Declarative & Type-Safe Mutation DSL:** Atomically mutate text and apply rich attributes within a type-safe builder DSL, eliminating manual index calculations and ensuring synchronized state.
 * 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
+* ✍️ **WYSIWYG Auto-Formatting Editor (`WysiwygEditor`):** Real-time Markdown shorthand conversions (headings, lists, blockquotes, bold, italic, inline code, strikethrough) as you type, complete with immediate backspace reversal and Undo/Redo integration.
 * 🌐 **Markdown & HTML Interoperability:** Bi-directional import/export converters between `RichString` and Markdown / HTML representations (`:richtext-markdown`, `:richtext-html`).
-* 🧩 **Native Compose Multiplatform Integration:** Elegantly separate headless core state management (`RichTextState`) and UI rendering (`RichTextEditor`) across Android, iOS, Desktop, and Web.
 
 ## Why Arranger?
 
@@ -733,6 +733,45 @@ val exported = state.richString.export(myCustomExporter)
 val imported = RichString.import(payload, myCustomImporter)
 ```
 
+## WYSIWYG Auto-Formatting (`WysiwygEditor`)
+
+For modern, keyboard-first writing workflows (similar to Notion, Slack, or Bear), Arranger provides `WysiwygEditor`. While `RichTextEditor` offers a clean canvas for toolbar-driven editing without unexpected conversions, `WysiwygEditor` actively parses Markdown shortcuts on the fly and converts them into rich text formatting in real time.
+
+### Quick Start
+
+```kotlin
+@Composable
+fun WysiwygEditorSample(modifier: Modifier = Modifier) {
+    val state = rememberRichTextState()
+
+    WysiwygEditor(
+        state = state,
+        modifier = modifier.fillMaxSize(),
+    )
+}
+```
+
+### Supported Markdown Shortcuts
+
+| Category | Trigger Pattern | Resulting Formatting |
+| :--- | :--- | :--- |
+| **Heading 1** | `# ` at line / paragraph start | Formats paragraph as Heading 1 |
+| **Heading 2** | `## ` at line / paragraph start | Formats paragraph as Heading 2 |
+| **Heading 3** | `### ` at line / paragraph start | Formats paragraph as Heading 3 |
+| **Bullet List** | `- ` or `* ` at line / paragraph start | Formats paragraph as Bullet List item |
+| **Ordered List** | `1. ` at line / paragraph start | Formats paragraph as Ordered List item |
+| **Blockquote** | `> ` at line / paragraph start | Formats paragraph as Blockquote |
+| **Bold** | `**text**` | Applies Bold span style |
+| **Italic** | `*text*` or `_text_` | Applies Italic span style |
+| **Inline Code** | `` `text` `` | Applies Inline Code span style |
+| **Strikethrough** | `~text~` | Applies Strikethrough span style |
+
+### Backspace Reversal & Editing Ergonomics
+
+- **Immediate Backspace Reversal**: If you type `# ` or `**word**` and did not intend to trigger a formatting shortcut, pressing **Backspace** immediately will cancel the auto-formatting and restore the original raw Markdown characters.
+- **Undo / Redo Integration**: Every auto-formatting conversion is recorded in the editor's undo stack (`state.undoState`), allowing standard Undo/Redo shortcuts (e.g., `Cmd+Z` / `Ctrl+Z`) to seamlessly roll back conversions without losing typed content.
+- **Component Separation**: `RichTextEditor` and `WysiwygEditor` are kept completely distinct. Use `RichTextEditor` when you desire full manual or toolbar-based control without auto-formatting interference; use `WysiwygEditor` when you want live Markdown shorthand conversion.
+
 ## Practical Examples
 
 Arranger can be used to build rich and complex text input interfaces. Below are some real-world use cases demonstrating how to integrate Arranger into your applications.
@@ -740,6 +779,7 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 | Sample | Screenshot |
 | --- | --- |
 | **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, insert hyperlinks via dialogs, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as an Android, iOS, Desktop (macOS, Windows, Linux), and Web (Wasm) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
+| **[WYSIWYG Auto-Formatting Editor](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/WysiwygEditorSample.kt)**<br><br>Demonstrates real-time typing of Markdown shortcuts with instant rich text conversion.<br>Supports headings, bullet/ordered lists, blockquotes, bold, italic, inline code, strikethrough, and single-tap backspace reversal.<br>Available across Android, Desktop, and Web (Wasm). | <img src="./docs/images/wysiwyg.gif" width="400" alt="wysiwyg editor sample"/> |
 
 ### Running the Sample Applications
 
@@ -749,7 +789,6 @@ You can run the sample application on any of the supported platforms:
 - **Desktop:** `./gradlew :sample:desktop:run`
 - **Android:** Open the project in Android Studio and run the `:sample:android` configuration.
 - **iOS:** Open `sample/ios/ArrangerSample.xcodeproj` in Xcode and press **Run (Cmd + R)**.
-
 ## Development Roadmap
 
 Arranger is evolving towards a stable **v1.0.0 (Production-Ready Release)**.

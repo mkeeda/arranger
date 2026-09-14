@@ -37,6 +37,7 @@ import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
 import dev.mkeeda.arranger.sample.shared.HyperlinkSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
+import dev.mkeeda.arranger.sample.shared.WysiwygEditorSample
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
 private enum class SampleDestination(val title: String) {
@@ -49,6 +50,7 @@ private enum class SampleDestination(val title: String) {
     UndoRedo("Undo / Redo"),
     DocumentEditor("Document Editor"),
     Hyperlink("Hyperlink"),
+    WysiwygEditor("WYSIWYG Editor"),
 }
 
 fun main() =
@@ -156,6 +158,7 @@ private fun SampleDetailPane(
                 SampleDestination.UndoRedo -> UndoRedoSample()
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
                 SampleDestination.Hyperlink -> HyperlinkSample()
+                SampleDestination.WysiwygEditor -> WysiwygEditorSample()
             }
         }
     }

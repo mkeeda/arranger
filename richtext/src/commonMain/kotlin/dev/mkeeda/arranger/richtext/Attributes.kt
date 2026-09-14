@@ -62,6 +62,14 @@ public object UnderlineKey : SpanAttributeKey<Unit> {
 }
 
 /**
+ * The standard [AttributeKey] to denote inline code text.
+ */
+public data object InlineCodeKey : SpanAttributeKey<Unit> {
+    override val name: String = "inlineCode"
+    override val defaultValue: Unit = Unit
+}
+
+/**
  * The standard [AttributeKey] to denote the foreground text color.
  * Contains a [RgbaColor] when specified, or [RgbaColor.Unspecified] otherwise.
  */
