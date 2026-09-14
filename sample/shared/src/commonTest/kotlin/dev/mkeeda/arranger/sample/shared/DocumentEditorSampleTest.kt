@@ -137,4 +137,34 @@ class DocumentEditorSampleTest {
             onNodeWithContentDescription("Hyperlink").performClick()
             onNodeWithContentDescription("Hyperlink").assertIsOff()
         }
+
+    @Test
+    fun `toolbar applies Strikethrough after other styles on selection`() =
+        runComposeUiTest {
+            setContent {
+                ArrangerTheme {
+                    DocumentEditorSample()
+                }
+            }
+
+            val textInputNode = onNodeWithTag("DocumentEditor")
+            textInputNode.performTextInput("Hello World")
+
+            // Select "Hello"
+            textInputNode.performTextInputSelection(TextRange(0, 5))
+
+            // Toggle Bold on
+            onNodeWithContentDescription("Bold").performClick()
+            onNodeWithContentDescription("Bold").assertIsOn()
+
+            // Toggle Underline on
+            onNodeWithContentDescription("Underline").performClick()
+            onNodeWithContentDescription("Underline").assertIsOn()
+
+            // Toggle Strikethrough on
+            onNodeWithContentDescription("Strikethrough").performClick()
+            onNodeWithContentDescription("Strikethrough").assertIsOn()
+            onNodeWithContentDescription("Underline").assertIsOn()
+            onNodeWithContentDescription("Bold").assertIsOn()
+        }
 }
