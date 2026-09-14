@@ -1,6 +1,5 @@
 package dev.mkeeda.arranger.richtext.editor.wysiwyg
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.ui.text.TextRange
@@ -19,7 +18,6 @@ import dev.mkeeda.arranger.richtext.editor.EditorSnapshot
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.UndoMergePolicy
 
-@OptIn(ExperimentalFoundationApi::class)
 internal object WysiwygAutoFormatter {
     internal fun formatBlockIfMatched(
         buffer: TextFieldBuffer,
