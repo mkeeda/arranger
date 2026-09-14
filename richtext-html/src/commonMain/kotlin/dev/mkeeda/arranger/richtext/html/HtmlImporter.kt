@@ -89,6 +89,8 @@ internal class HtmlImporter : RichTextImporter<String> {
 
             is Element -> {
                 val tagName = node.tagName().lowercase()
+                if (tagName in ignoredTags) return
+
                 val inlineAttrs = extractInlineAttributes(node, activeSpanAttributes)
 
                 when (tagName) {
@@ -218,14 +220,13 @@ internal class HtmlImporter : RichTextImporter<String> {
                     }
 
                     "br" -> {
+                        if (!context.inParagraph) {
+                            context.startParagraph()
+                        }
                         context.textBuilder.append('\n')
                     }
 
                     else -> {
-                        val isInline = tagName in inlineTags
-                        if (isInline && !context.inParagraph) {
-                            context.startParagraph()
-                        }
                         parseElementChildren(node, context, inlineAttrs, listDepth, isOrderedList)
                     }
                 }
@@ -234,24 +235,40 @@ internal class HtmlImporter : RichTextImporter<String> {
     }
 
     private fun isEmptyParagraph(element: Element): Boolean {
-        val children = element.childNodes()
-        if (children.isEmpty()) return true
-        val nonWhitespace =
-            children.filter { child ->
+        var hasNonBlankText = false
+        var brCount = 0
+        var otherElementCount = 0
+
+        fun inspect(node: Node) {
+            if (hasNonBlankText || brCount > 1 || otherElementCount > 0) return
+
+            for (child in node.childNodes()) {
                 when (child) {
-                    is TextNode -> child.text().isNotBlank()
-                    is Element -> true
-                    else -> false
+                    is TextNode -> {
+                        if (child.text().isNotBlank()) {
+                            hasNonBlankText = true
+                            return
+                        }
+                    }
+
+                    is Element -> {
+                        val tag = child.tagName().lowercase()
+                        if (tag in ignoredTags) {
+                            continue
+                        } else if (tag == "br") {
+                            brCount++
+                        } else if (tag in inlineTags) {
+                            inspect(child)
+                        } else {
+                            otherElementCount++
+                        }
+                    }
                 }
             }
-        if (nonWhitespace.isEmpty()) return true
-        if (nonWhitespace.size == 1) {
-            val single = nonWhitespace[0]
-            if (single is Element && single.tagName().equals("br", ignoreCase = true)) {
-                return true
-            }
         }
-        return false
+
+        inspect(element)
+        return !hasNonBlankText && brCount <= 1 && otherElementCount == 0
     }
 
     private fun containsBlockChild(element: Element): Boolean {
@@ -261,6 +278,7 @@ internal class HtmlImporter : RichTextImporter<String> {
 
     private companion object {
         val inlineTags = setOf("strong", "b", "em", "i", "s", "del", "strike", "u", "a", "span")
+        val ignoredTags = setOf("script", "style", "meta", "noscript", "template", "head", "title")
     }
 
     private fun extractInlineAttributes(
