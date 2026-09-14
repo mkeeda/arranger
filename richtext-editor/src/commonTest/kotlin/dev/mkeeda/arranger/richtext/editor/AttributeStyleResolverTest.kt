@@ -17,6 +17,7 @@ import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -149,9 +150,8 @@ class AttributeStyleResolverTest {
             )
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
-        val decoration = resolved.spanStyle?.textDecoration
-        (decoration != null) shouldBe true
-        (TextDecoration.LineThrough in decoration!!) shouldBe true
+        val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
+        (TextDecoration.LineThrough in decoration) shouldBe true
         (TextDecoration.Underline in decoration) shouldBe true
     }
 
@@ -165,9 +165,8 @@ class AttributeStyleResolverTest {
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
         resolved.spanStyle?.color shouldBe Color(0xFF1E88E5)
-        val decoration = resolved.spanStyle?.textDecoration
-        (decoration != null) shouldBe true
-        (TextDecoration.LineThrough in decoration!!) shouldBe true
+        val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
+        (TextDecoration.LineThrough in decoration) shouldBe true
         (TextDecoration.Underline in decoration) shouldBe true
     }
 
@@ -193,9 +192,8 @@ class AttributeStyleResolverTest {
             )
         val resolved = combinedResolver.resolve(container)
 
-        val decoration = resolved.spanStyle?.textDecoration
-        (decoration != null) shouldBe true
-        (TextDecoration.LineThrough in decoration!!) shouldBe true
+        val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
+        (TextDecoration.LineThrough in decoration) shouldBe true
         (TextDecoration.Underline in decoration) shouldBe true
     }
 
