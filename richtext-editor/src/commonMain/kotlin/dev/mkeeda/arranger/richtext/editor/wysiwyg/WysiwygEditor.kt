@@ -77,13 +77,15 @@ public fun WysiwygEditor(
         }
 
     val keyModifier =
-        modifier.onPreviewKeyEvent { event ->
-            handleWysiwygKeyEvent(event, state, wysiwygState)
+        remember(state, wysiwygState) {
+            Modifier.onPreviewKeyEvent { event ->
+                handleWysiwygKeyEvent(event, state, wysiwygState)
+            }
         }
 
     BaseRichTextEditor(
         state = state,
-        modifier = keyModifier,
+        modifier = modifier.then(keyModifier),
         enabled = enabled,
         readOnly = readOnly,
         inputTransformation = transformation,
