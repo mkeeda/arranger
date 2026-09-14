@@ -3,12 +3,14 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.AlignmentAttributeKey
 import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
@@ -126,5 +128,13 @@ class AttributeStyleResolverTest {
 
         resolved.spanStyle?.color shouldBe Color(0xFF1E88E5)
         resolved.spanStyle?.textDecoration shouldBe TextDecoration.Underline
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves InlineCodeKey to monospace font`() {
+        val container = attributeContainerOf(InlineCodeKey to Unit)
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
     }
 }

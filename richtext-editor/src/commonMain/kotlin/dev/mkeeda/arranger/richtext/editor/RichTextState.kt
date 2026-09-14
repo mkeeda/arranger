@@ -11,11 +11,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.EnterKeyContext
+import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.InheritParagraphStrategy
+import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RichSpan
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.RichStringScope
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.mergeSpan
 import dev.mkeeda.arranger.richtext.resnapParagraphSpans
@@ -208,6 +214,15 @@ public class RichTextState(initialText: RichString = RichString("")) {
         typingAttributesAnchor = null
     }
 
+    internal fun restoreTypingAttributes(
+        typing: AttributeContainer?,
+        removed: Set<AttributeKey<*>>?,
+    ) {
+        typingAttributes = typing
+        removedTypingAttributes = removed
+        typingAttributesAnchor = if (typing != null || removed != null) selection else null
+    }
+
     /**
      * The current selection range within the text field.
      * Returns [TextRange.Zero] when no selection is active (cursor at position 0).
@@ -246,6 +261,48 @@ public class RichTextState(initialText: RichString = RichString("")) {
         spans = richString.spans.resnapParagraphSpans(richString.text)
         clearTypingAttributes()
         undoState.clearHistory()
+    }
+
+    internal fun <T> setParagraphAttributeDirectly(
+        key: ParagraphAttributeKey<T>,
+        value: T,
+        range: IntRange,
+        currentText: String,
+    ) {
+        val scope = RichStringScope(spans, currentText)
+        if (key is BlockTypeAttributeKey<*>) {
+            scope.removeParagraphAttribute(HeadingKey, range)
+            scope.removeParagraphAttribute(BulletListKey, range)
+            scope.removeParagraphAttribute(OrderedListKey, range)
+            scope.removeParagraphAttribute(BlockquoteKey, range)
+        }
+        scope.setParagraphAttribute(key, value, range)
+        spans = scope.spans.resnapParagraphSpans(currentText)
+    }
+
+    internal fun <T> setSpanAttributeDirectly(
+        key: SpanAttributeKey<T>,
+        value: T,
+        range: IntRange,
+        currentText: String,
+    ) {
+        val scope = RichStringScope(spans, currentText)
+        scope.setSpanAttribute(key, value, range)
+        spans = scope.spans.resnapParagraphSpans(currentText)
+    }
+
+    internal fun shiftSpansDirectly(
+        editStart: Int,
+        editEnd: Int,
+        newLength: Int,
+        offsetDiff: Int,
+        deletedText: String = "",
+    ) {
+        spans = spans.shiftSpans(editStart, editEnd, newLength, offsetDiff, deletedText)
+    }
+
+    internal fun updateSpans(newSpans: List<RichSpan>) {
+        spans = newSpans
     }
 
     @OptIn(ExperimentalFoundationApi::class)
@@ -365,6 +422,9 @@ public class RichTextState(initialText: RichString = RichString("")) {
             getSpans = { spans },
             setSpans = { spans = it },
             clearTypingAttributes = { clearTypingAttributes() },
+            getTypingAttributes = { typingAttributes },
+            getRemovedTypingAttributes = { removedTypingAttributes },
+            restoreTypingAttributes = { typing, removed -> restoreTypingAttributes(typing, removed) },
         )
 
     private fun handleNewlineInsertion(

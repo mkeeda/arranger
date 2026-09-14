@@ -34,9 +34,11 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
 - [x] **Markdown & HTML Bi-directional Conversion:**
   - Import / Export converters between `RichString` and CommonMark Markdown / HTML representations (`:richtext-markdown` and `:richtext-html`).
   - Lossless parsing and serialization of inline and block formatting.
-- [ ] **WYSIWYG Auto-formatting:**
-  - Live typing auto-conversions (e.g., `# ` triggers H1 heading, `- ` / `* ` triggers bullet lists, `1. ` triggers ordered lists).
-  - Inline syntax auto-formatting (e.g., `*italic*`, `**bold**`, `~strikethrough~`, `` `code` ``).
+- [x] **WYSIWYG Auto-formatting:**
+  - Dedicated `WysiwygEditor` component separate from `RichTextEditor`.
+  - Live typing auto-conversions (e.g., `# ` triggers H1 heading, `- ` / `* ` triggers bullet lists, `1. ` triggers ordered lists, `> ` triggers blockquotes).
+  - Inline syntax auto-formatting (e.g., `*italic*`, `_italic_`, `**bold**`, `~strikethrough~`, `` `code` ``).
+  - Immediate Backspace reversal and seamless Undo/Redo integration.
 - [ ] **Interactive Custom Attribute UX:**
   - [x] **Hyperlink Support:** `LinkKey` attribute, URL parsing (`UrlParser`), interactive tap/click navigation via `LocalUriHandler`, and `detectAndApplyLinks()` API.
   - [ ] **Domain-Specific Interactive Attributes:** `@mentions`, `#hashtags`, and custom interactive spans with popup/chip support.

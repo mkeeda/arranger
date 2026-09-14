@@ -3,6 +3,7 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
@@ -19,6 +20,7 @@ import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
@@ -68,6 +70,12 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
         }
         spanStyle(UnderlineKey) {
             SpanStyle(textDecoration = TextDecoration.Underline)
+        }
+        spanStyle(InlineCodeKey) {
+            SpanStyle(
+                fontFamily = FontFamily.Monospace,
+                background = Color(0x14000000),
+            )
         }
         spanStyle(LinkKey) {
             SpanStyle(
