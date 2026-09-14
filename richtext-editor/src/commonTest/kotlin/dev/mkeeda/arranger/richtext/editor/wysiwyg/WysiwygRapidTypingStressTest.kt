@@ -13,7 +13,6 @@ import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
 import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -204,20 +203,6 @@ class WysiwygRapidTypingStressTest {
         // Line 4: Blockquote + Strikethrough
         typeText(state, transformation, "> Quote with ~Strike~")
 
-        println("ACTUAL TEXT:\n" + state.textFieldState.text.toString())
-        for (span in state.richString.spans) {
-            println("SPAN: ${span.range} -> ${span.attributes.keys.map { it.name }}")
-        }
-
-        println("HEADING RUNS: ${state.richString.runs(HeadingKey).toList()}")
-        println("BULLET RUNS: ${state.richString.runs(BulletListKey).toList()}")
-        println("ORDERED RUNS: ${state.richString.runs(OrderedListKey).toList()}")
-        println("QUOTE RUNS: ${state.richString.runs(BlockquoteKey).toList()}")
-        println("BOLD RUNS: ${state.richString.runs(BoldKey).toList()}")
-        println("CODE RUNS: ${state.richString.runs(InlineCodeKey).toList()}")
-        println("ITALIC RUNS: ${state.richString.runs(ItalicKey).toList()}")
-        println("STRIKE RUNS: ${state.richString.runs(StrikethroughKey).toList()}")
-
         val expectedText =
             "First Line with Bold\n" +
                 "Item with Code inside\n" +
@@ -247,7 +232,6 @@ class WysiwygRapidTypingStressTest {
         boldRuns.size shouldBe 1
 
         val codeRuns = state.richString.runs(InlineCodeKey).toList()
-        println("CODE RUNS: " + codeRuns)
         codeRuns.size shouldBe 1
 
         val italicRuns = state.richString.runs(ItalicKey).toList()
@@ -259,27 +243,8 @@ class WysiwygRapidTypingStressTest {
         val (state, _, transformation) = createEngine()
 
         typeText(state, transformation, "- Item 1\n")
-        println("=== AFTER '- Item 1\\n' ===")
-        println("TEXT: '${state.textFieldState.text}'")
-        for (span in state.richString.spans) {
-            println("SPAN: ${span.range} -> ${span.attributes.keys.map { it.name }}")
-        }
-        println("TYPING ATTRS: ${state.typingAttributes?.keys?.map { it.name }}")
-
         typeText(state, transformation, "1. ")
-        println("=== AFTER '1. ' ===")
-        println("TEXT: '${state.textFieldState.text}'")
-        for (span in state.richString.spans) {
-            println("SPAN: ${span.range} -> ${span.attributes.keys.map { it.name }}")
-        }
-        println("TYPING ATTRS: ${state.typingAttributes?.keys?.map { it.name }}")
-
         typeText(state, transformation, "Item 2")
-        println("=== AFTER 'Item 2' ===")
-        println("TEXT: '${state.textFieldState.text}'")
-        for (span in state.richString.spans) {
-            println("SPAN: ${span.range} -> ${span.attributes.keys.map { it.name }}")
-        }
 
         val orderedRuns = state.richString.runs(OrderedListKey).toList()
         orderedRuns.size shouldBe 1
@@ -293,16 +258,8 @@ class WysiwygRapidTypingStressTest {
         typeText(state, transformation, "# Heading 1\n")
         typeText(state, transformation, "- List 1")
 
-        println("=== HEADING TO BULLET ===")
-        println("TEXT: '${state.textFieldState.text}'")
-        for (span in state.richString.spans) {
-            println("SPAN: ${span.range} -> ${span.attributes.keys.map { it.name }}")
-        }
-
         val headingRuns = state.richString.runs(HeadingKey).toList()
-        println("HEADING RUNS: $headingRuns")
         val bulletRuns = state.richString.runs(BulletListKey).toList()
-        println("BULLET RUNS: $bulletRuns")
 
         headingRuns.size shouldBe 1
         bulletRuns.size shouldBe 1
@@ -315,16 +272,8 @@ class WysiwygRapidTypingStressTest {
         typeText(state, transformation, "- List 1\n")
         typeText(state, transformation, "# Heading 2")
 
-        println("=== BULLET TO HEADING ===")
-        println("TEXT: '${state.textFieldState.text}'")
-        for (span in state.richString.spans) {
-            println("SPAN: ${span.range} -> ${span.attributes.keys.map { it.name }}")
-        }
-
         val bulletRuns = state.richString.runs(BulletListKey).toList()
-        println("BULLET RUNS: $bulletRuns")
         val headingRuns = state.richString.runs(HeadingKey).toList()
-        println("HEADING RUNS: $headingRuns")
 
         bulletRuns.size shouldBe 1
         headingRuns.size shouldBe 1
@@ -344,27 +293,18 @@ class WysiwygRapidTypingStressTest {
         state.selection shouldBe TextRange(5)
         state.richString.spans.firstOrNull { it.attributes.containsKey(BoldKey) } shouldNotBe null
 
-        println("Undo stack size before undo: canUndo=${state.undoState.canUndo}")
-
         // 2. 1st Undo -> State B ("**hello**", selection: 9)
         state.undoState.undo()
-        println(
-            "After 1st undo: text='${state.textFieldState.text}', canUndo=${state.undoState.canUndo}, canRedo=${state.undoState.canRedo}",
-        )
         state.textFieldState.text.toString() shouldBe "**hello**"
         state.richString.spans.none { it.attributes.containsKey(BoldKey) } shouldBe true
 
         // 3. Redo -> State C ("hello", selection: 5, Bold)
         state.undoState.redo()
-        println("After redo: text='${state.textFieldState.text}', canUndo=${state.undoState.canUndo}, canRedo=${state.undoState.canRedo}")
         state.textFieldState.text.toString() shouldBe "hello"
         state.richString.spans.firstOrNull { it.attributes.containsKey(BoldKey) } shouldNotBe null
 
         // 4. Execute Undo (State C -> State B)
         state.undoState.undo()
-        println(
-            "After undo to State B: text='${state.textFieldState.text}', canUndo=${state.undoState.canUndo}, canRedo=${state.undoState.canRedo}",
-        )
         state.textFieldState.text.toString() shouldBe "**hello**"
     }
 
