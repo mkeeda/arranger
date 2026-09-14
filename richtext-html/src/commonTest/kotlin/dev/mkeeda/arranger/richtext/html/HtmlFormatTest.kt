@@ -675,4 +675,106 @@ class HtmlFormatTest {
         val richString = RichString("")
         richString.toHtml() shouldBe ""
     }
+
+    @Test
+    fun `importing leading empty paragraph preserves newline`() {
+        val html = "<p></p><p>Text</p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "\nText"
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing trailing empty paragraph preserves newline`() {
+        val html = "<p>Text</p><p></p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "Text\n"
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing multiple trailing empty paragraphs preserves multiple newlines`() {
+        val html = "<p>Text</p><p></p><p></p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "Text\n\n"
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing single empty paragraph returns empty string`() {
+        val html = "<p></p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe ""
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing consecutive empty paragraphs preserves newlines`() {
+        val html2 = "<p></p><p></p>"
+        RichString.fromHtml(html2).text shouldBe "\n"
+
+        val html3 = "<p></p><p></p><p></p>"
+        RichString.fromHtml(html3).text shouldBe "\n\n"
+    }
+
+    @Test
+    fun `importing intermediate empty paragraph preserves empty line`() {
+        val html = "<p>Line 1</p><p></p><p>Line 2</p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "Line 1\n\nLine 2"
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing empty paragraph with placeholder br preserves empty line`() {
+        val html = "<p>Line 1</p><p><br></p><p>Line 2</p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "Line 1\n\nLine 2"
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing single empty paragraph with placeholder br returns empty string`() {
+        val html = "<p><br></p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe ""
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing empty paragraph with placeholder br nested in inline element preserves empty line`() {
+        val html = "<p>Line 1</p><p><span><br></span></p><p>Line 2</p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "Line 1\n\nLine 2"
+        richString.spans.shouldBeEmpty()
+
+        val singleHtml = "<p><span style=\"font-size: 16.0sp;\"><br></span></p>"
+        RichString.fromHtml(singleHtml).text shouldBe ""
+    }
+
+    @Test
+    fun `importing empty inline elements before paragraph does not insert leading newline`() {
+        val html = "<a id=\"top\"></a><span></span><p>Hello</p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "Hello"
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing html ignores non content tags like script style and noscript`() {
+        val html = "<p>Hello</p><script>console.log('test');</script><style>body { color: red; }</style><p>World</p>"
+        val richString = RichString.fromHtml(html)
+        richString.text shouldBe "Hello\nWorld"
+        richString.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `round tripping text with multiple empty paragraphs`() {
+        val text = "\n\nTitle\n\n\nText"
+        val richString = RichString(text)
+        val exportedHtml = richString.toHtml()
+        val reimported = RichString.fromHtml(exportedHtml)
+        reimported.text shouldBe text
+        reimported.spans.shouldBeEmpty()
+    }
 }
