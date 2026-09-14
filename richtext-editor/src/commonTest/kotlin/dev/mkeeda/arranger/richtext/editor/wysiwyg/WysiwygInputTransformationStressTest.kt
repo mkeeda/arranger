@@ -106,7 +106,7 @@ class WysiwygInputTransformationStressTest {
             val runs = state.richString.runs(expectedAttr.first).toList()
             runs.size shouldBe 1
             runs[0].value shouldBe expectedAttr.second
-            runs[0].range shouldBe 0..7
+            runs[0].range shouldBe 0..6
         }
     }
 

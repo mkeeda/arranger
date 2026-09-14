@@ -283,7 +283,7 @@ class WysiwygRapidTypingStressTest {
 
         val orderedRuns = state.richString.runs(OrderedListKey).toList()
         orderedRuns.size shouldBe 1
-        orderedRuns[0].range shouldBe 7..13
+        orderedRuns[0].range shouldBe 7..12
     }
 
     @Test

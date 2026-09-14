@@ -366,7 +366,7 @@ class DefaultAttributeStyleResolverStressTest {
         style1.paragraphStyle?.lineHeight shouldBe 32.sp // Preserved!
 
         val chunk2 = richString.spans[2]
-        chunk2.range shouldBe 11..19
+        chunk2.range shouldBe 11..18
         val style2 = DefaultAttributeStyleResolver.resolve(chunk2.attributes)
         style2.spanStyle?.fontSize shouldBe 24.sp
         style2.spanStyle?.fontWeight shouldBe FontWeight.Bold

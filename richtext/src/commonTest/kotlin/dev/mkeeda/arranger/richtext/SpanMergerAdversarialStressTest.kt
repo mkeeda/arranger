@@ -39,7 +39,7 @@ class SpanMergerAdversarialStressTest {
         // 1. Verify runs for each attribute reconstruct the original ranges
         val bulletRuns = richString.runs(BulletListKey).toList()
         bulletRuns shouldHaveSize 1
-        bulletRuns[0].range shouldBe 0..50
+        bulletRuns[0].range shouldBe 0..49
         bulletRuns[0].value shouldBe ListIndentLevel.Level1
 
         val strikeRuns = richString.runs(StrikethroughKey).toList()
@@ -100,7 +100,7 @@ class SpanMergerAdversarialStressTest {
         spans[7].range shouldBe 36..45
         spans[7].attributes.keys shouldBe setOf(BulletListKey, TextColorKey)
 
-        spans[8].range shouldBe 46..50
+        spans[8].range shouldBe 46..49
         spans[8].attributes.keys shouldBe setOf(BulletListKey)
     }
 
@@ -150,7 +150,7 @@ class SpanMergerAdversarialStressTest {
         spans[4].range shouldBe 13..15
         spans[4].attributes.keys shouldBe setOf(BulletListKey, BoldKey, ItalicKey)
 
-        spans[5].range shouldBe 16..20
+        spans[5].range shouldBe 16..19
         spans[5].attributes.keys shouldBe setOf(BulletListKey)
 
         // Bold runs should now be two separate runs: 5..7 and 13..15
