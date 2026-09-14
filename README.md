@@ -34,7 +34,6 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 * 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
 * ✍️ **WYSIWYG Auto-Formatting Editor (`WysiwygEditor`):** Real-time Markdown shorthand conversions (headings, lists, blockquotes, bold, italic, inline code, strikethrough) as you type, complete with immediate backspace reversal and Undo/Redo integration.
 * 🌐 **Markdown & HTML Interoperability:** Bi-directional import/export converters between `RichString` and Markdown / HTML representations (`:richtext-markdown`, `:richtext-html`).
-* 🧩 **Native Compose Multiplatform Integration:** Elegantly separate headless core state management (`RichTextState`) and UI rendering (`RichTextEditor`, `WysiwygEditor`) across Android, iOS, Desktop, and Web.
 
 ## Why Arranger?
 
@@ -780,7 +779,7 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 | Sample | Screenshot |
 | --- | --- |
 | **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, insert hyperlinks via dialogs, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as an Android, iOS, Desktop (macOS, Windows, Linux), and Web (Wasm) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="400" alt="document editor sample"/> |
-| **[WYSIWYG Auto-Formatting Editor](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/WysiwygEditorSample.kt)**<br><br>Demonstrates real-time typing of Markdown shortcuts with instant rich text conversion.<br>Supports headings, bullet/ordered lists, blockquotes, bold, italic, inline code, strikethrough, and single-tap backspace reversal.<br>Available across Android, Desktop, and Web (Wasm). | <img src="./docs/images/rich-text-editor-demo.gif" width="400" alt="wysiwyg editor sample"/> |
+| **[WYSIWYG Auto-Formatting Editor](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/WysiwygEditorSample.kt)**<br><br>Demonstrates real-time typing of Markdown shortcuts with instant rich text conversion.<br>Supports headings, bullet/ordered lists, blockquotes, bold, italic, inline code, strikethrough, and single-tap backspace reversal.<br>Available across Android, Desktop, and Web (Wasm). | <img src="./docs/images/wysiwyg.gif" width="400" alt="wysiwyg editor sample"/> |
 
 ### Running the Sample Applications
 
