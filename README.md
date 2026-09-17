@@ -392,10 +392,46 @@ fun HyperlinkSample(modifier: Modifier = Modifier) {
 
 </details>
 
-### Interactive Tap / Click Handling
-`RichTextEditor` automatically styles links (blue text with underline by default) and handles tap/click gestures:
-* **Native Navigation:** Clicking or tapping a hyperlink automatically invokes Compose's standard `LocalUriHandler.current.openUri(url)`.
-* **Custom URI Handlers:** To customize link navigation behavior (e.g., in-app web views or custom routing), provide a custom handler using standard Compose `CompositionLocalProvider(LocalUriHandler provides customUriHandler)`.
+### Interactive Tap / Click Handling (`onSpanClick`)
+`RichTextEditor` and `WysiwygEditor` provide an extensible interaction API via `onSpanClick: ((SpanClickEvent) -> Unit)? = null` to handle clicks on hyperlinks or any custom interactive spans (such as `@mentions` and `#hashtags`):
+
+```kotlin
+val uriHandler = LocalUriHandler.current
+
+RichTextEditor(
+    state = state,
+    onSpanClick = { event ->
+        val span = event.span
+        when {
+            // Handle @mentions
+            span.attributes.containsKey(MentionKey) -> {
+                val userId = span.attributes[MentionKey]
+                showUserProfile(userId)
+                event.consume() // Suppresses editor caret placement
+            }
+            // Handle #hashtags
+            span.attributes.containsKey(HashtagKey) -> {
+                val tag = span.attributes[HashtagKey]
+                searchHashtag(tag)
+                event.consume()
+            }
+            // Handle hyperlinks
+            span.attributes.containsKey(LinkKey) -> {
+                val url = span.attributes[LinkKey]
+                if (!url.isNullOrEmpty()) {
+                    uriHandler.openUri(url)
+                    event.consume()
+                }
+            }
+            // Non-interactive spans: do not call consume() to allow normal cursor placement
+        }
+    },
+)
+```
+
+* **Explicit Consumption (`event.consume()`):** Calling `event.consume()` marks the event as handled, suppressing default editor touch gestures (such as cursor placement or text selection).
+* **Unconsumed Fallback:** If `event.consume()` is not called (or if `onSpanClick` is null), the editor proceeds with standard text field gestures like positioning the cursor.
+
 
 ### URL Parsing & Auto-Linking
 Arranger includes a pure Kotlin `UrlParser` utility that detects URLs in plain text and normalizes them (e.g., prepending `https://` to `www.` domains).
