@@ -36,7 +36,6 @@ import dev.mkeeda.arranger.richtext.RichSpan
  * @param cursorBrush The brush used to draw the cursor.
  * @param decorator Allows modifying how the text field is drawn with decorations around it (e.g. placeholder, border).
  * @param styleResolver A resolver that specifies how [AttributeContainer]s should be translated into visually rendered Compose [SpanStyle]s.
- * @param attributeStyleResolver Alternative/alias parameter for [styleResolver] for backward compatibility.
  * @param listMarkerResolver A resolver that specifies how list markers (e.g. bullets, ordered numbers) should be rendered.
  * @param onSpanClick Optional callback invoked when a [RichSpan] is tapped or clicked.
  */
@@ -57,17 +56,9 @@ public fun RichTextEditor(
     cursorBrush: Brush = SolidColor(Color.Black),
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
-    attributeStyleResolver: AttributeStyleResolver = styleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
 ) {
-    val effectiveStyleResolver =
-        if (attributeStyleResolver !== DefaultAttributeStyleResolver) {
-            attributeStyleResolver
-        } else {
-            styleResolver
-        }
-
     BaseRichTextEditor(
         state = state,
         modifier = modifier,
@@ -83,7 +74,7 @@ public fun RichTextEditor(
         interactionSource = interactionSource,
         cursorBrush = cursorBrush,
         decorator = decorator,
-        styleResolver = effectiveStyleResolver,
+        styleResolver = styleResolver,
         listMarkerResolver = listMarkerResolver,
         onSpanClick = onSpanClick,
     )
