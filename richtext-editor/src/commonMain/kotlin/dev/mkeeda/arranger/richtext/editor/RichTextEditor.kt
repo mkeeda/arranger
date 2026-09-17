@@ -25,6 +25,7 @@ import dev.mkeeda.arranger.richtext.AttributeContainer
  * @param modifier The modifier to be applied to the text field.
  * @param styleResolver A resolver that specifies how [AttributeContainer]s
  * should be translated into visually rendered Compose [SpanStyle]s.
+ * @param onSpanClick Optional callback invoked when a [dev.mkeeda.arranger.richtext.RichSpan] is tapped or clicked.
  */
 @Composable
 public fun RichTextEditor(
@@ -44,7 +45,7 @@ public fun RichTextEditor(
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     attributeStyleResolver: AttributeStyleResolver = styleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    onLinkClick: ((String) -> Unit)? = null,
+    onSpanClick: ((SpanClickEvent) -> Unit)? = null,
 ) {
     val effectiveStyleResolver =
         if (attributeStyleResolver !== DefaultAttributeStyleResolver) {
@@ -70,6 +71,6 @@ public fun RichTextEditor(
         decorator = decorator,
         styleResolver = effectiveStyleResolver,
         listMarkerResolver = listMarkerResolver,
-        onLinkClick = onLinkClick,
+        onSpanClick = onSpanClick,
     )
 }

@@ -29,6 +29,7 @@ import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.DefaultListMarkerResolver
 import dev.mkeeda.arranger.richtext.editor.ListMarkerResolver
 import dev.mkeeda.arranger.richtext.editor.RichTextState
+import dev.mkeeda.arranger.richtext.editor.SpanClickEvent
 
 /**
  * A WYSIWYG text editor component that automatically formats Markdown syntax into rich text styling in real time.
@@ -48,7 +49,7 @@ import dev.mkeeda.arranger.richtext.editor.RichTextState
  * @param decorator Allows adding decorations around the text field.
  * @param styleResolver A resolver that specifies how [AttributeContainer]s should be translated into visually rendered Compose styles.
  * @param listMarkerResolver A resolver that specifies how list markers should be rendered.
- * @param onLinkClick Optional custom callback when a hyperlink is tapped.
+ * @param onSpanClick Optional callback invoked when a [dev.mkeeda.arranger.richtext.RichSpan] is tapped or clicked.
  */
 @Composable
 public fun WysiwygEditor(
@@ -67,7 +68,7 @@ public fun WysiwygEditor(
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    onLinkClick: ((String) -> Unit)? = null,
+    onSpanClick: ((SpanClickEvent) -> Unit)? = null,
 ) {
     val wysiwygState = remember(state) { WysiwygState() }
 
@@ -100,7 +101,7 @@ public fun WysiwygEditor(
         decorator = decorator,
         styleResolver = styleResolver,
         listMarkerResolver = listMarkerResolver,
-        onLinkClick = onLinkClick,
+        onSpanClick = onSpanClick,
     )
 }
 

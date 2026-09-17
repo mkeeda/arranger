@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -26,15 +27,12 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
-import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.ListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.extractListItems
@@ -61,7 +59,7 @@ internal fun BaseRichTextEditor(
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    onLinkClick: ((String) -> Unit)? = null,
+    onSpanClick: ((SpanClickEvent) -> Unit)? = null,
 ) {
     val workarounds = remember { ComposeParagraphWorkarounds() }
 
@@ -87,16 +85,25 @@ internal fun BaseRichTextEditor(
 
     val listItems = remember(state.richString) { state.richString.extractListItems() }
 
-    val uriHandler = LocalUriHandler.current
-    val linkTapModifier =
-        remember(state, textLayoutResult, uriHandler, workarounds, onLinkClick) {
-            Modifier.linkTapHandler(state, textLayoutResult, uriHandler, workarounds, onLinkClick)
+    val currentOnSpanClick by rememberUpdatedState(onSpanClick)
+    val spanTapModifier =
+        if (enabled) {
+            remember(state, workarounds) {
+                Modifier.spanTapHandler(
+                    state = state,
+                    textLayoutResultProvider = { textLayoutResult },
+                    workarounds = workarounds,
+                    onSpanClickProvider = { currentOnSpanClick },
+                )
+            }
+        } else {
+            Modifier
         }
 
     val drawModifier =
         Modifier
             .clipToBounds()
-            .then(linkTapModifier)
+            .then(spanTapModifier)
             .drawBehind {
                 val layoutResult = textLayoutResult ?: return@drawBehind
 
@@ -163,34 +170,32 @@ internal fun DrawScope.drawListItems(
     }
 }
 
-internal fun Modifier.linkTapHandler(
+internal fun Modifier.spanTapHandler(
     state: RichTextState,
-    textLayoutResult: TextLayoutResult?,
-    uriHandler: UriHandler,
+    textLayoutResultProvider: () -> TextLayoutResult?,
     workarounds: ComposeParagraphWorkarounds,
-    onLinkClick: ((String) -> Unit)? = null,
+    onSpanClickProvider: () -> ((SpanClickEvent) -> Unit)?,
 ): Modifier =
-    pointerInput(state, textLayoutResult, uriHandler, onLinkClick) {
+    pointerInput(state) {
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
                 val change = event.changes.firstOrNull() ?: continue
                 if (change.changedToUp() && !change.isConsumed) {
                     val tapOffset = change.position
-                    val layoutResult = textLayoutResult ?: continue
+                    val layoutResult = textLayoutResultProvider() ?: continue
                     val rawOffset = layoutResult.getOffsetForPosition(tapOffset)
                     val unmappedOffset = workarounds.unmapCharacterIndex(rawOffset)
                     val targetSpan =
                         state.richString.spans.find { span ->
-                            span.attributes.containsKey(LinkKey) && unmappedOffset in span.range
+                            unmappedOffset in span.range
                         }
-                    val url = targetSpan?.attributes?.get(LinkKey)
-                    if (!url.isNullOrEmpty()) {
-                        change.consume()
-                        if (onLinkClick != null) {
-                            onLinkClick(url)
-                        } else {
-                            uriHandler.openUri(url)
+                    val onSpanClick = onSpanClickProvider()
+                    if (targetSpan != null && onSpanClick != null) {
+                        val clickEvent = SpanClickEvent(span = targetSpan)
+                        onSpanClick(clickEvent)
+                        if (clickEvent.isConsumed) {
+                            change.consume()
                         }
                     }
                 }
