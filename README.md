@@ -358,6 +358,9 @@ You can combine these strategies (or create your own custom strategies) to build
 
 Arranger provides a unified, extensible interaction API across `RichTextEditor` and `WysiwygEditor` via `onSpanClick: ((SpanClickEvent) -> Unit)? = null`. You can handle tap and click interactions on any rich text span—such as `@mentions`, `#hashtags`, or hyperlinks—with explicit Compose pointer event consumption (`event.consume()`).
 
+<details>
+<summary><b>Show Code</b></summary>
+
 ```kotlin
 val uriHandler = LocalUriHandler.current
 
@@ -391,6 +394,8 @@ RichTextEditor(
     },
 )
 ```
+
+</details>
 
 * **Explicit Consumption (`event.consume()`):** Calling `event.consume()` marks the event as handled, suppressing default editor touch gestures (such as cursor placement or text selection).
 * **Unconsumed Fallback:** If `event.consume()` is not called (or if `onSpanClick` is null), the editor proceeds with standard text field gestures like positioning the cursor.
