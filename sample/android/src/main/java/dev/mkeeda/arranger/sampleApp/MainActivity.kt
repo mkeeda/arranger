@@ -44,6 +44,7 @@ import dev.mkeeda.arranger.sample.shared.DocumentEditorSample
 import dev.mkeeda.arranger.sample.shared.DynamicEditingSample
 import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
 import dev.mkeeda.arranger.sample.shared.HyperlinkSample
+import dev.mkeeda.arranger.sample.shared.InteractiveSpanSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
 import dev.mkeeda.arranger.sample.shared.WysiwygEditorSample
@@ -65,6 +66,7 @@ internal enum class SampleDestination(val title: String) : NavKey {
     DocumentEditor("Document Editor"),
     Hyperlink("Hyperlink"),
     WysiwygEditor("WYSIWYG Editor"),
+    InteractiveSpan("Interactive Spans"),
 }
 
 class MainActivity : ComponentActivity() {
@@ -212,6 +214,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
                 SampleDestination.Hyperlink -> HyperlinkSample()
                 SampleDestination.WysiwygEditor -> WysiwygEditorSample()
+                SampleDestination.InteractiveSpan -> InteractiveSpanSample()
             }
         }
     }

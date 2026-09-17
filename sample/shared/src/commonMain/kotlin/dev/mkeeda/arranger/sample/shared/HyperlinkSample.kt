@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.RichString
@@ -30,6 +31,7 @@ import dev.mkeeda.arranger.richtext.editor.removeFormat
 
 @Composable
 public fun HyperlinkSample(modifier: Modifier = Modifier) {
+    val uriHandler = LocalUriHandler.current
     val initialText = "Check out https://kotlinlang.org and www.google.com for more info."
 
     val state = remember { RichTextState(initialText = RichString(initialText)) }
@@ -80,6 +82,13 @@ public fun HyperlinkSample(modifier: Modifier = Modifier) {
                     Modifier
                         .fillMaxWidth()
                         .height(200.dp),
+                onSpanClick = { event ->
+                    val url = event.span.attributes[LinkKey]
+                    if (!url.isNullOrEmpty()) {
+                        uriHandler.openUri(url)
+                        event.consume()
+                    }
+                },
             )
         }
     }
