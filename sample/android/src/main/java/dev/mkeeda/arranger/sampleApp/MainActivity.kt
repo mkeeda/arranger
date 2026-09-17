@@ -20,6 +20,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -181,6 +183,7 @@ private fun SampleListScreen(onSampleSelected: (SampleDestination) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Unit) {
+    val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -195,6 +198,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 },
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
         Box(
             modifier =
@@ -214,7 +218,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
                 SampleDestination.Hyperlink -> HyperlinkSample()
                 SampleDestination.WysiwygEditor -> WysiwygEditorSample()
-                SampleDestination.InteractiveSpan -> InteractiveSpanSample()
+                SampleDestination.InteractiveSpan -> InteractiveSpanSample(snackbarHostState = snackbarHostState)
             }
         }
     }

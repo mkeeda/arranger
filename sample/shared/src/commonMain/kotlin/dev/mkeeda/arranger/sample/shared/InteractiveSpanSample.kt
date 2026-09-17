@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,7 +67,10 @@ private val interactiveStyleResolver =
     }
 
 @Composable
-public fun InteractiveSpanSample(modifier: Modifier = Modifier) {
+public fun InteractiveSpanSample(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState? = null,
+) {
     val initialText =
         "Welcome to Arranger!\n\n" +
             "Tap interactive spans below:\n" +
@@ -93,89 +94,79 @@ public fun InteractiveSpanSample(modifier: Modifier = Modifier) {
             )
         }
 
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
     var lastInteraction by remember { mutableStateOf<String?>(null) }
 
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-    ) { paddingValues ->
-        Column(
+    Column(
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Text(
+            text = "Interactive Spans Sample",
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (lastInteraction != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
+            ) {
+                Text(
+                    text = "Last Event: $lastInteraction",
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        RichTextEditor(
+            state = state,
+            styleResolver = interactiveStyleResolver,
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-        ) {
-            Text(
-                text = "Interactive Spans Sample",
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (lastInteraction != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        ),
-                ) {
-                    Text(
-                        text = "Last Event: $lastInteraction",
-                        modifier = Modifier.padding(12.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-            RichTextEditor(
-                state = state,
-                styleResolver = interactiveStyleResolver,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                onSpanClick = { event ->
-                    val span = event.span
-                    when {
-                        span.attributes.containsKey(MentionKey) -> {
-                            val user = span.attributes[MentionKey].orEmpty()
-                            val message = "Mention clicked: @$user"
-                            lastInteraction = message
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(message)
-                            }
-                            event.consume()
+                    .fillMaxWidth()
+                    .weight(1f),
+            onSpanClick = { event ->
+                val span = event.span
+                when {
+                    span.attributes.containsKey(MentionKey) -> {
+                        val user = span.attributes[MentionKey].orEmpty()
+                        val message = "Mention clicked: @$user"
+                        lastInteraction = message
+                        coroutineScope.launch {
+                            snackbarHostState?.showSnackbar(message)
                         }
-
-                        span.attributes.containsKey(HashtagKey) -> {
-                            val tag = span.attributes[HashtagKey].orEmpty()
-                            val message = "Hashtag clicked: #$tag"
-                            lastInteraction = message
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(message)
-                            }
-                            event.consume()
-                        }
-
-                        span.attributes.containsKey(LinkKey) -> {
-                            val url = span.attributes[LinkKey].orEmpty()
-                            val message = "Opening link: $url"
-                            lastInteraction = message
-                            uriHandler.openUri(url)
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(message)
-                            }
-                            event.consume()
-                        }
+                        event.consume()
                     }
-                },
-            )
-        }
+
+                    span.attributes.containsKey(HashtagKey) -> {
+                        val tag = span.attributes[HashtagKey].orEmpty()
+                        val message = "Hashtag clicked: #$tag"
+                        lastInteraction = message
+                        coroutineScope.launch {
+                            snackbarHostState?.showSnackbar(message)
+                        }
+                        event.consume()
+                    }
+
+                    span.attributes.containsKey(LinkKey) -> {
+                        val url = span.attributes[LinkKey].orEmpty()
+                        val message = "Opening link: $url"
+                        lastInteraction = message
+                        uriHandler.openUri(url)
+                        coroutineScope.launch {
+                            snackbarHostState?.showSnackbar(message)
+                        }
+                        event.consume()
+                    }
+                }
+            },
+        )
     }
 }
