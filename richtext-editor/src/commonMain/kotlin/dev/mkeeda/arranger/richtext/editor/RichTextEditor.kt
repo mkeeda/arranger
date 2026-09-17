@@ -17,15 +17,29 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Density
 import dev.mkeeda.arranger.richtext.AttributeContainer
+import dev.mkeeda.arranger.richtext.RichSpan
 
 /**
  * A basic text editor component tailored for editing and displaying RichText content.
  *
  * @param state The [RichTextState] holding the text and its attributes.
  * @param modifier The modifier to be applied to the text field.
- * @param styleResolver A resolver that specifies how [AttributeContainer]s
- * should be translated into visually rendered Compose [SpanStyle]s.
+ * @param enabled Controls the enabled state of the text field. When false, the text field is not focusable or editable, and pointer interactions are disabled.
+ * @param readOnly Controls the editable state of the text field. When true, the text cannot be modified, but it can still be focused and spans can still be clicked.
+ * @param textStyle The [TextStyle] to be applied to the text.
+ * @param keyboardOptions Software keyboard options that configure keyboard behaviors such as keyboard type and IME action.
+ * @param onKeyboardAction Called when the user triggers an IME action on the software keyboard.
+ * @param lineLimits Whether the text field should be single line, or multi line with specific bounds.
+ * @param onTextLayout Callback that is executed when a new text layout is calculated.
+ * @param scrollState Scroll state that manages the vertical scroll position of the editor content.
+ * @param interactionSource The [MutableInteractionSource] representing the stream of interactions for this text field.
+ * @param cursorBrush The brush used to draw the cursor.
+ * @param decorator Allows modifying how the text field is drawn with decorations around it (e.g. placeholder, border).
+ * @param styleResolver A resolver that specifies how [AttributeContainer]s should be translated into visually rendered Compose [SpanStyle]s.
+ * @param listMarkerResolver A resolver that specifies how list markers (e.g. bullets, ordered numbers) should be rendered.
+ * @param onSpanClick Optional callback invoked when a [RichSpan] is tapped or clicked.
  */
+
 @Composable
 public fun RichTextEditor(
     state: RichTextState,
@@ -42,17 +56,9 @@ public fun RichTextEditor(
     cursorBrush: Brush = SolidColor(Color.Black),
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
-    attributeStyleResolver: AttributeStyleResolver = styleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    onLinkClick: ((String) -> Unit)? = null,
+    onSpanClick: ((SpanClickEvent) -> Unit)? = null,
 ) {
-    val effectiveStyleResolver =
-        if (attributeStyleResolver !== DefaultAttributeStyleResolver) {
-            attributeStyleResolver
-        } else {
-            styleResolver
-        }
-
     BaseRichTextEditor(
         state = state,
         modifier = modifier,
@@ -68,8 +74,8 @@ public fun RichTextEditor(
         interactionSource = interactionSource,
         cursorBrush = cursorBrush,
         decorator = decorator,
-        styleResolver = effectiveStyleResolver,
+        styleResolver = styleResolver,
         listMarkerResolver = listMarkerResolver,
-        onLinkClick = onLinkClick,
+        onSpanClick = onSpanClick,
     )
 }

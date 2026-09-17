@@ -13,6 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,6 +35,7 @@ import dev.mkeeda.arranger.sample.shared.DocumentEditorSample
 import dev.mkeeda.arranger.sample.shared.DynamicEditingSample
 import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
 import dev.mkeeda.arranger.sample.shared.HyperlinkSample
+import dev.mkeeda.arranger.sample.shared.InteractiveSpanSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
 import dev.mkeeda.arranger.sample.shared.WysiwygEditorSample
@@ -50,6 +53,7 @@ private enum class SampleDestination(val title: String) {
     DocumentEditor("Document Editor"),
     Hyperlink("Hyperlink"),
     WysiwygEditor("WYSIWYG Editor"),
+    InteractiveSpan("Interactive Spans"),
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -146,6 +150,7 @@ private fun SampleDetailPane(
     modifier: Modifier = Modifier,
     currentDestination: SampleDestination,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -153,6 +158,7 @@ private fun SampleDetailPane(
                 title = { Text(text = currentDestination.title) },
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
         Box(
             modifier =
@@ -172,6 +178,7 @@ private fun SampleDetailPane(
                 SampleDestination.DocumentEditor -> DocumentEditorSample()
                 SampleDestination.Hyperlink -> HyperlinkSample()
                 SampleDestination.WysiwygEditor -> WysiwygEditorSample()
+                SampleDestination.InteractiveSpan -> InteractiveSpanSample(snackbarHostState = snackbarHostState)
             }
         }
     }

@@ -32,6 +32,7 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 * ⚡ **High-Level Editor Behaviors:** Built-in paragraph formatting (Headings, Blockquotes, Alignments, Bullet & Ordered Lists), dynamic enter-key strategies, and robust Undo/Redo history tracking.
 * 🔄 **Declarative & Type-Safe Mutation DSL:** Atomically mutate text and apply rich attributes within a type-safe builder DSL, eliminating manual index calculations and ensuring synchronized state.
 * 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
+* 👆 **Interactive Spans & Tap Handling:** First-class pointer interaction (`onSpanClick`, `SpanClickEvent`) for mentions, hashtags, and hyperlinks with explicit Compose event consumption.
 * ✍️ **WYSIWYG Auto-Formatting Editor (`WysiwygEditor`):** Real-time Markdown shorthand conversions (headings, lists, blockquotes, bold, italic, inline code, strikethrough) as you type, complete with immediate backspace reversal and Undo/Redo integration.
 * 🌐 **Markdown & HTML Interoperability:** Bi-directional import/export converters between `RichString` and Markdown / HTML representations (`:richtext-markdown`, `:richtext-html`).
 
@@ -353,11 +354,57 @@ The library includes three built-in strategies:
 
 You can combine these strategies (or create your own custom strategies) to build a seamless editing experience.
 
-## Hyperlinks & URL Detection
+## Interactive Spans & Click Handling
 
-Arranger provides native support for rich hyperlinks with `LinkKey`. You can apply links to text ranges, automatically detect URLs in plain text, and provide seamless tap/click navigation across all platforms.
+Arranger provides a unified, extensible interaction API across `RichTextEditor` and `WysiwygEditor` via `onSpanClick: ((SpanClickEvent) -> Unit)? = null`. You can handle tap and click interactions on any rich text span—such as `@mentions`, `#hashtags`, or hyperlinks—with explicit Compose pointer event consumption (`event.consume()`).
 
-### Applying Hyperlinks
+<details>
+<summary><b>Show Code</b></summary>
+
+```kotlin
+val uriHandler = LocalUriHandler.current
+
+RichTextEditor(
+    state = state,
+    onSpanClick = { event ->
+        val span = event.span
+        when {
+            // Handle @mentions
+            span.attributes.containsKey(MentionKey) -> {
+                val userId = span.attributes[MentionKey]
+                showUserProfile(userId)
+                event.consume() // Suppresses editor caret placement
+            }
+            // Handle #hashtags
+            span.attributes.containsKey(HashtagKey) -> {
+                val tag = span.attributes[HashtagKey]
+                searchHashtag(tag)
+                event.consume()
+            }
+            // Handle hyperlinks
+            span.attributes.containsKey(LinkKey) -> {
+                val url = span.attributes[LinkKey]
+                if (!url.isNullOrEmpty()) {
+                    uriHandler.openUri(url)
+                    event.consume()
+                }
+            }
+            // Non-interactive spans: do not call consume() to allow normal cursor placement
+        }
+    },
+)
+```
+
+</details>
+
+* **Explicit Consumption (`event.consume()`):** Calling `event.consume()` marks the event as handled, suppressing default editor touch gestures (such as cursor placement or text selection).
+* **Unconsumed Fallback:** If `event.consume()` is not called (or if `onSpanClick` is null), the editor proceeds with standard text field gestures like positioning the cursor.
+
+### Hyperlinks & URL Detection
+
+Arranger provides built-in support for rich hyperlinks via the `LinkKey` attribute. You can apply links to text ranges, automatically detect URLs in plain text, and handle navigation seamlessly via `onSpanClick`.
+
+#### Applying Hyperlinks
 You can apply a URL link to a selected range using the standard `applyFormat(LinkKey, url)` extension on `RichTextState`, or `link(url)` within a `RichString` builder:
 
 <details>
@@ -392,12 +439,7 @@ fun HyperlinkSample(modifier: Modifier = Modifier) {
 
 </details>
 
-### Interactive Tap / Click Handling
-`RichTextEditor` automatically styles links (blue text with underline by default) and handles tap/click gestures:
-* **Native Navigation:** Clicking or tapping a hyperlink automatically invokes Compose's standard `LocalUriHandler.current.openUri(url)`.
-* **Custom URI Handlers:** To customize link navigation behavior (e.g., in-app web views or custom routing), provide a custom handler using standard Compose `CompositionLocalProvider(LocalUriHandler provides customUriHandler)`.
-
-### URL Parsing & Auto-Linking
+#### URL Parsing & Auto-Linking
 Arranger includes a pure Kotlin `UrlParser` utility that detects URLs in plain text and normalizes them (e.g., prepending `https://` to `www.` domains).
 To automatically scan the document and apply `LinkKey` spans to all detected URLs in one atomic transaction, use `state.detectAndApplyLinks()`:
 
