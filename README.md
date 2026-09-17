@@ -32,6 +32,7 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 * ⚡ **High-Level Editor Behaviors:** Built-in paragraph formatting (Headings, Blockquotes, Alignments, Bullet & Ordered Lists), dynamic enter-key strategies, and robust Undo/Redo history tracking.
 * 🔄 **Declarative & Type-Safe Mutation DSL:** Atomically mutate text and apply rich attributes within a type-safe builder DSL, eliminating manual index calculations and ensuring synchronized state.
 * 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
+* 👆 **Interactive Spans & Tap Handling:** First-class pointer interaction (`onSpanClick`, `SpanClickEvent`) for mentions, hashtags, and hyperlinks with explicit Compose event consumption.
 * ✍️ **WYSIWYG Auto-Formatting Editor (`WysiwygEditor`):** Real-time Markdown shorthand conversions (headings, lists, blockquotes, bold, italic, inline code, strikethrough) as you type, complete with immediate backspace reversal and Undo/Redo integration.
 * 🌐 **Markdown & HTML Interoperability:** Bi-directional import/export converters between `RichString` and Markdown / HTML representations (`:richtext-markdown`, `:richtext-html`).
 
@@ -353,47 +354,9 @@ The library includes three built-in strategies:
 
 You can combine these strategies (or create your own custom strategies) to build a seamless editing experience.
 
-## Hyperlinks & URL Detection
+## Interactive Spans & Click Handling
 
-Arranger provides native support for rich hyperlinks with `LinkKey`. You can apply links to text ranges, automatically detect URLs in plain text, and provide seamless tap/click navigation across all platforms.
-
-### Applying Hyperlinks
-You can apply a URL link to a selected range using the standard `applyFormat(LinkKey, url)` extension on `RichTextState`, or `link(url)` within a `RichString` builder:
-
-<details>
-<summary><b>Show Code</b></summary>
-
-```kotlin
-@Composable
-fun HyperlinkSample(modifier: Modifier = Modifier) {
-    val initialText = "Visit Kotlin website or Google for search."
-
-    val state =
-        remember {
-            RichTextState(
-                initialText =
-                    RichString(text = initialText).edit {
-                        editAttributes(range = initialText.rangeOf("Kotlin website")) {
-                            link("https://kotlinlang.org")
-                        }
-                        editAttributes(range = initialText.rangeOf("Google")) {
-                            link("https://google.com")
-                        }
-                    },
-            )
-        }
-
-    RichTextEditor(
-        state = state,
-        modifier = modifier.fillMaxWidth(),
-    )
-}
-```
-
-</details>
-
-### Interactive Tap / Click Handling (`onSpanClick`)
-`RichTextEditor` and `WysiwygEditor` provide an extensible interaction API via `onSpanClick: ((SpanClickEvent) -> Unit)? = null` to handle clicks on hyperlinks or any custom interactive spans (such as `@mentions` and `#hashtags`):
+Arranger provides a unified, extensible interaction API across `RichTextEditor` and `WysiwygEditor` via `onSpanClick: ((SpanClickEvent) -> Unit)? = null`. You can handle tap and click interactions on any rich text span—such as `@mentions`, `#hashtags`, or hyperlinks—with explicit Compose pointer event consumption (`event.consume()`).
 
 ```kotlin
 val uriHandler = LocalUriHandler.current
@@ -432,8 +395,46 @@ RichTextEditor(
 * **Explicit Consumption (`event.consume()`):** Calling `event.consume()` marks the event as handled, suppressing default editor touch gestures (such as cursor placement or text selection).
 * **Unconsumed Fallback:** If `event.consume()` is not called (or if `onSpanClick` is null), the editor proceeds with standard text field gestures like positioning the cursor.
 
+### Hyperlinks & URL Detection
 
-### URL Parsing & Auto-Linking
+Arranger provides built-in support for rich hyperlinks via the `LinkKey` attribute. You can apply links to text ranges, automatically detect URLs in plain text, and handle navigation seamlessly via `onSpanClick`.
+
+#### Applying Hyperlinks
+You can apply a URL link to a selected range using the standard `applyFormat(LinkKey, url)` extension on `RichTextState`, or `link(url)` within a `RichString` builder:
+
+<details>
+<summary><b>Show Code</b></summary>
+
+```kotlin
+@Composable
+fun HyperlinkSample(modifier: Modifier = Modifier) {
+    val initialText = "Visit Kotlin website or Google for search."
+
+    val state =
+        remember {
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        editAttributes(range = initialText.rangeOf("Kotlin website")) {
+                            link("https://kotlinlang.org")
+                        }
+                        editAttributes(range = initialText.rangeOf("Google")) {
+                            link("https://google.com")
+                        }
+                    },
+            )
+        }
+
+    RichTextEditor(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+```
+
+</details>
+
+#### URL Parsing & Auto-Linking
 Arranger includes a pure Kotlin `UrlParser` utility that detects URLs in plain text and normalizes them (e.g., prepending `https://` to `www.` domains).
 To automatically scan the document and apply `LinkKey` spans to all detected URLs in one atomic transaction, use `state.detectAndApplyLinks()`:
 
