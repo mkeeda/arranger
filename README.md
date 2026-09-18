@@ -33,6 +33,7 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 * 🔄 **Declarative & Type-Safe Mutation DSL:** Atomically mutate text and apply rich attributes within a type-safe builder DSL, eliminating manual index calculations and ensuring synchronized state.
 * 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
 * 👆 **Interactive Spans & Tap Handling:** First-class pointer interaction (`onSpanClick`, `SpanClickEvent`) for mentions, hashtags, and hyperlinks with explicit Compose event consumption.
+* 💬 **Autocompletion & Suggestion Hooks:** Real-time prefix trigger detection (`@mentions`, `#channels`, `:emoji:`) with zero-math cursor popup positioning (`createPopupPositionProvider`) and seamless rich completion insertion.
 * ✍️ **WYSIWYG Auto-Formatting Editor (`WysiwygEditor`):** Real-time Markdown shorthand conversions (headings, lists, blockquotes, bold, italic, inline code, strikethrough) as you type, complete with immediate backspace reversal and Undo/Redo integration.
 * 🌐 **Markdown & HTML Interoperability:** Bi-directional import/export converters between `RichString` and Markdown / HTML representations (`:richtext-markdown`, `:richtext-html`).
 
@@ -448,6 +449,61 @@ To automatically scan the document and apply `LinkKey` spans to all detected URL
 state.detectAndApplyLinks()
 ```
 
+### Autocompletion Hooks (Mentions & Suggestions)
+
+Arranger provides a declarative hook system for building interactive autocompletion popups (such as `@mentions`, `#channels`, or `:emoji:`) without requiring manual pixel or cursor coordinate calculations.
+
+Configure `autocompleteTriggers` and listen to `onAutocompleteChange` on `RichTextEditor` or `WysiwygEditor`:
+
+<details>
+<summary><b>Show Code</b></summary>
+
+```kotlin
+var autocompleteMatch by remember { mutableStateOf<AutocompleteMatch?>(null) }
+
+Box {
+    RichTextEditor(
+        state = state,
+        autocompleteTriggers = listOf(
+            AutocompleteTrigger(prefix = "@"),
+            AutocompleteTrigger(prefix = "#"),
+        ),
+        onAutocompleteChange = { match ->
+            autocompleteMatch = match
+        },
+        modifier = Modifier.fillMaxWidth(),
+    )
+
+    autocompleteMatch?.let { match ->
+        Popup(
+            // Automatically adjusts for editor scroll, aligns to cursor bottom,
+            // flips above if space is constrained, and clamps to screen bounds.
+            popupPositionProvider = match.createPopupPositionProvider(offset = IntOffset(0, -8)),
+            onDismissRequest = { autocompleteMatch = null },
+        ) {
+            SuggestionMenu(
+                query = match.query,
+                onSelectUser = { user ->
+                    state.applyCompletion(
+                        match = match,
+                        replacement = "@${user.name} ",
+                        attributes = attributeContainerOf(BoldKey to Unit),
+                    )
+                    autocompleteMatch = null
+                },
+            )
+        }
+    }
+}
+```
+
+</details>
+
+* **Zero-Math Cursor Positioning (`createPopupPositionProvider`):** `match.createPopupPositionProvider()` automatically subtracts vertical scroll offsets (`scrollState`), aligns the popup to the cursor bottom, automatically flips it upward when viewport space is constrained, and prevents overflow off the screen edges.
+* **Seamless Rich Completion (`state.applyCompletion`):** Atomically replaces the trigger prefix and query text with plain text or styled `RichString` spans, positions the cursor immediately following the replacement, and registers the change cleanly into the undo/redo stack.
+
+
+
 ## Custom Attribute Mapping
 
 You can define custom attribute keys and map them to Compose styles. Below shows an example of implementing a simple highlight feature by creating a custom `SpanAttributeKey` and styling it with an `AttributeStyleResolver`.
@@ -824,6 +880,8 @@ Arranger can be used to build rich and complex text input interfaces. Below are 
 | Sample | Screenshot |
 | --- | --- |
 | **[Document Editor with Full UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)**<br><br>This sample demonstrates a full-screen document editor UI equipped with a rich formatting toolbar.<br>It showcases how to handle text selection, manage undo/redo history, insert hyperlinks via dialogs, and seamlessly integrate state with Compose Multiplatform.<br>This sample app can be run as an Android, iOS, Desktop (macOS, Windows, Linux), and Web (Wasm) app.<br><br>**Tip:** Check this sample to see how you can easily apply formatting using the idiomatic `RichTextState` extension functions (e.g., `toggleFormat()`, `applyFormat()`, `removeFormat()`, and `clearFormats()`). | <img src="./docs/images/document-editor.png" width="200" alt="document editor sample"/> |
+| **[Mention Autocomplete (Chat UI)](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/MentionAutocompleteSample.kt)**<br><br>This sample demonstrates a modern chat interface featuring real-time `@mention` and `#channel` autocompletion.<br>It showcases how to configure `autocompleteTriggers`, automatically anchor suggestion popups using `match.createPopupPositionProvider()` without manual pixel math, and insert styled user mentions (`@Alice`) into message bubbles. | <img src="./docs/images/mention-autocomplete.png" width="200" alt="mention autocomplete sample"/> |
+
 
 ### Running the Sample Applications
 
