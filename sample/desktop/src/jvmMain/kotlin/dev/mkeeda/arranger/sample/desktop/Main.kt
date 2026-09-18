@@ -39,6 +39,7 @@ import dev.mkeeda.arranger.sample.shared.HashtagHighlightSample
 import dev.mkeeda.arranger.sample.shared.HyperlinkSample
 import dev.mkeeda.arranger.sample.shared.InteractiveSpanSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
+import dev.mkeeda.arranger.sample.shared.MentionAutocompleteSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
 import dev.mkeeda.arranger.sample.shared.WysiwygEditorSample
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
@@ -55,6 +56,7 @@ private enum class SampleDestination(val title: String) {
     Hyperlink("Hyperlink"),
     WysiwygEditor("WYSIWYG Editor"),
     InteractiveSpan("Interactive Spans"),
+    MentionAutocomplete("Mention Autocomplete"),
 }
 
 fun main() =
@@ -166,6 +168,7 @@ private fun SampleDetailPane(
                 SampleDestination.Hyperlink -> HyperlinkSample()
                 SampleDestination.WysiwygEditor -> WysiwygEditorSample()
                 SampleDestination.InteractiveSpan -> InteractiveSpanSample(snackbarHostState = snackbarHostState)
+                SampleDestination.MentionAutocomplete -> MentionAutocompleteSample()
             }
         }
     }
