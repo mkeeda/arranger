@@ -13,10 +13,10 @@ Arrangerにおけるアーキテクチャ設計および実装に関する根本
 - **[人間が求める理想の実装]:** 
   - 公式の [Compose API Guidelines](https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-api-guidelines.md) に厳密に従う。
   - `RichTextState` を単一の真実の源（Single Source of Truth）兼 State Holder とし、`rememberRichTextState()` 等で状態を保持・昇格（State Hoisting）させる。UIコンポーネント（`RichTextEditor`）自体は無状態（Stateless）または State Holder を受け取る構造とし、渡された状態と Modifier に基づいて純粋かつ宣言的に描画を行う。
-  - **再利用可能UIコンポーネント内での Scaffold ネスト禁止**: エディタコンポーネントやサンプルコンポーネント内部で勝手に `Scaffold` を生成せず、必要な状態（`SnackbarHostState` 等）は上位から State Hoisting して受け取る。
+  - **再利用可能UIコンポーネントの自立性とState Hoisting**: コンポーネント内部で画面全体の特定レイアウト構造を勝手に決め打ちせず、必要な状態や通知は上位から State Hoisting して受け取ることで、利用側が任意の画面レイアウトに柔軟に組み込める疎結合な構造を保つ。
 - **[拒否されるアンチパターン]:** 
   - UIコンポーネント内部で描画状態を直接保持・操作したり、状態とイベントの流れが双方向で追跡不能になる設計。
-  - コンポーネント内で `Scaffold` を多重ネストさせ、利用側のレイアウト制御を奪う設計。
+  - コンポーネント内部で特定の画面全体レイアウトやコンテナを決め打ち・多重ネストさせ、利用側のレイアウト制御を奪う設計。
 
 ---
 

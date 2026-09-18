@@ -27,7 +27,7 @@ commandExecutionPolicy: sandbox
 2. **プロジェクト原則への完全準拠チェック**:
    - **アーキテクチャ原則 (`architecture-principles.md`)**:
      - **DX-First & カプセル化**: 内部専用Stateクラスが露出していないか、利用者に生座標（`Rect`）の計算を強いていないか、高レベルAPIが提供されているか。
-     - **Compose イディオム**: イベント消費が `consume()` / `isConsumed` に従っているか、`Scaffold` が不要にネストされていないか、`pointerInput` のキーが最適化（`rememberUpdatedState` / provider利用）されているか、`enabled = false` が考慮されているか。
+     - **Compose イディオム**: イベント消費が `consume()` / `isConsumed` に従っているか、コンポーネントが外部レイアウトに依存せず State Hoisting されているか、`pointerInput` のキーが最適化（`rememberUpdatedState` / provider利用）されているか、`enabled = false` が考慮されているか。
      - **KMP・パフォーマンス**: UDF、`AttributeKey<T>` による型安全性、Compose再描画の局所化、KMP責務分離、高頻度アロケーションの抑制。
    - **テスト戦略 (`testing-strategy.md`)**:
      - **価値主導テスト**: `// Arrange`, `// Act`, `// Assert` コメントが混入していないか。コンパイラが保証する自明な型チェックや内部結合テストがないか。特定の具象クラスのみを偏重した無意味なストレステストがないか。
