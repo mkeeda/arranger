@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -80,19 +81,60 @@ private data class ChatMessage(
 
 private val sampleUsers =
     listOf(
-        ChatUser("1", "Alice", "Product Designer", Color(0xFFE91E63)),
-        ChatUser("2", "Bob", "Android Engineer", Color(0xFF2196F3)),
-        ChatUser("3", "Charlie", "Tech Lead", Color(0xFF4CAF50)),
-        ChatUser("4", "Diana", "QA Engineer", Color(0xFFFF9800)),
-        ChatUser("5", "Emma", "Project Manager", Color(0xFF9C27B0)),
+        ChatUser(
+            id = "1",
+            name = "Alice",
+            role = "Product Designer",
+            color = Color(0xFFE91E63),
+        ),
+        ChatUser(
+            id = "2",
+            name = "Bob",
+            role = "Android Engineer",
+            color = Color(0xFF2196F3),
+        ),
+        ChatUser(
+            id = "3",
+            name = "Charlie",
+            role = "Tech Lead",
+            color = Color(0xFF4CAF50),
+        ),
+        ChatUser(
+            id = "4",
+            name = "Diana",
+            role = "QA Engineer",
+            color = Color(0xFFFF9800),
+        ),
+        ChatUser(
+            id = "5",
+            name = "Emma",
+            role = "Project Manager",
+            color = Color(0xFF9C27B0),
+        ),
     )
 
 private val sampleChannels =
     listOf(
-        ChatChannel("general", "general", "General team discussion"),
-        ChatChannel("random", "random", "Casual chatter and memes"),
-        ChatChannel("arranger", "arranger-dev", "Arranger library development"),
-        ChatChannel("releases", "releases", "Release announcements"),
+        ChatChannel(
+            id = "general",
+            name = "general",
+            description = "General team discussion",
+        ),
+        ChatChannel(
+            id = "random",
+            name = "random",
+            description = "Casual chatter and memes",
+        ),
+        ChatChannel(
+            id = "arranger",
+            name = "arranger-dev",
+            description = "Arranger library development",
+        ),
+        ChatChannel(
+            id = "releases",
+            name = "releases",
+            description = "Release announcements",
+        ),
     )
 
 @Composable
@@ -114,199 +156,264 @@ fun MentionAutocompleteSample(modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
+    fun sendMessage() {
+        val text = editorState.richString.text.trim()
+        if (text.isNotEmpty()) {
+            messages.add(
+                ChatMessage(
+                    id = (messages.size + 1).toString(),
+                    sender = "You",
+                    content = editorState.richString,
+                    isCurrentUser = true,
+                ),
+            )
+            editorState.setRichString(RichString(""))
+            autocompleteMatch = null
+            coroutineScope.launch {
+                listState.animateScrollToItem(index = messages.size - 1)
+            }
+        }
+    }
+
     Column(
         modifier =
             modifier
                 .fillMaxSize()
                 .imePadding(),
     ) {
-        // Chat messages timeline
-        LazyColumn(
-            state = listState,
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-            items(messages, key = { it.id }) { message ->
-                ChatMessageBubble(message = message)
-            }
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-        }
+        ChatMessageTimeline(
+            messages = messages,
+            listState = listState,
+            modifier = Modifier.weight(1f),
+        )
 
         HorizontalDivider()
 
-        // Editor input area with autocompletion popup
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
         ) {
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            shape = RoundedCornerShape(20.dp),
+            ChatInputBar(
+                editorState = editorState,
+                onAutocompleteChange = { match -> autocompleteMatch = match },
+                onSendMessage = ::sendMessage,
+            )
+
+            autocompleteMatch?.let { match ->
+                AutocompletePopup(
+                    match = match,
+                    onDismiss = { autocompleteMatch = null },
+                    onSelectUser = { user ->
+                        editorState.applyCompletion(
+                            match = match,
+                            replacement = "@${user.name} ",
+                            attributes =
+                                attributeContainerOf(
+                                    BoldKey to Unit,
+                                    TextColorKey to user.color.toRgbaColor(),
+                                ),
                         )
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(20.dp),
+                        autocompleteMatch = null
+                    },
+                    onSelectChannel = { channel ->
+                        editorState.applyCompletion(
+                            match = match,
+                            replacement = "#${channel.name} ",
+                            attributes =
+                                attributeContainerOf(
+                                    BoldKey to Unit,
+                                    TextColorKey to Color(0xFF1976D2).toRgbaColor(),
+                                ),
                         )
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    if (editorState.richString.text.isEmpty()) {
-                        Text(
-                            text = "Type '@' for mention, '#' for channel...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        )
-                    }
-                    RichTextEditor(
-                        state = editorState,
-                        modifier = Modifier.fillMaxWidth(),
-                        textStyle =
-                            MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                            ),
-                        autocompleteTriggers =
-                            listOf(
-                                AutocompleteTrigger(prefix = "@"),
-                                AutocompleteTrigger(prefix = "#"),
-                            ),
-                        onAutocompleteChange = { match ->
-                            autocompleteMatch = match
-                        },
+                        autocompleteMatch = null
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChatMessageTimeline(
+    messages: List<ChatMessage>,
+    listState: LazyListState,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        state = listState,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+        items(items = messages, key = { it.id }) { message ->
+            ChatMessageBubble(message = message)
+        }
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+    }
+}
+
+@Composable
+private fun ChatInputBar(
+    editorState: RichTextState,
+    onAutocompleteChange: (AutocompleteMatch?) -> Unit,
+    onSendMessage: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(20.dp),
+                )
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(20.dp),
+                )
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
+            if (editorState.richString.text.isEmpty()) {
+                Text(
+                    text = "Type '@' for mention, '#' for channel...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                )
+            }
+            RichTextEditor(
+                state = editorState,
+                modifier = Modifier.fillMaxWidth(),
+                textStyle =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+                autocompleteTriggers =
+                    listOf(
+                        AutocompleteTrigger(prefix = "@"),
+                        AutocompleteTrigger(prefix = "#"),
+                    ),
+                onAutocompleteChange = onAutocompleteChange,
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Button(
+            onClick = onSendMessage,
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Text(text = "Send")
+        }
+    }
+}
+
+@Composable
+private fun AutocompletePopup(
+    match: AutocompleteMatch,
+    onDismiss: () -> Unit,
+    onSelectUser: (ChatUser) -> Unit,
+    onSelectChannel: (ChatChannel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Popup(
+        popupPositionProvider = match.createPopupPositionProvider(offset = IntOffset(x = 0, y = -8)),
+        onDismissRequest = onDismiss,
+    ) {
+        ElevatedCard(
+            modifier =
+                modifier
+                    .width(280.dp)
+                    .heightIn(max = 240.dp),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
+            colors =
+                CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+        ) {
+            when (match.trigger.prefix) {
+                "@" -> {
+                    UserSuggestionList(
+                        query = match.query,
+                        onSelectUser = onSelectUser,
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Button(
-                    onClick = {
-                        val text = editorState.richString.text.trim()
-                        if (text.isNotEmpty()) {
-                            messages.add(
-                                ChatMessage(
-                                    id = (messages.size + 1).toString(),
-                                    sender = "You",
-                                    content = editorState.richString,
-                                    isCurrentUser = true,
-                                ),
-                            )
-                            editorState.setRichString(RichString(""))
-                            autocompleteMatch = null
-                            coroutineScope.launch {
-                                listState.animateScrollToItem(messages.size - 1)
-                            }
-                        }
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                ) {
-                    Text("Send")
+                "#" -> {
+                    ChannelSuggestionList(
+                        query = match.query,
+                        onSelectChannel = onSelectChannel,
+                    )
                 }
             }
+        }
+    }
+}
 
-            // Autocompletion Suggestion Popup
-            autocompleteMatch?.let { match ->
-                Popup(
-                    popupPositionProvider = match.createPopupPositionProvider(offset = IntOffset(0, -8)),
-                    onDismissRequest = { autocompleteMatch = null },
-                ) {
-                    ElevatedCard(
-                        modifier =
-                            Modifier
-                                .width(280.dp)
-                                .heightIn(max = 240.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-                        colors =
-                            CardDefaults.elevatedCardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                            ),
-                    ) {
-                        if (match.trigger.prefix == "@") {
-                            val filteredUsers =
-                                sampleUsers.filter {
-                                    it.name.contains(match.query, ignoreCase = true) ||
-                                        it.role.contains(match.query, ignoreCase = true)
-                                }
-                            if (filteredUsers.isEmpty()) {
-                                Box(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = "No users found",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            } else {
-                                LazyColumn {
-                                    items(filteredUsers) { user ->
-                                        UserSuggestionItem(
-                                            user = user,
-                                            onClick = {
-                                                val replacement = "@${user.name} "
-                                                editorState.applyCompletion(
-                                                    match = match,
-                                                    replacement = replacement,
-                                                    attributes =
-                                                        attributeContainerOf(
-                                                            BoldKey to Unit,
-                                                            TextColorKey to user.color.toRgbaColor(),
-                                                        ),
-                                                )
-                                                autocompleteMatch = null
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-                        } else if (match.trigger.prefix == "#") {
-                            val filteredChannels =
-                                sampleChannels.filter {
-                                    it.name.contains(match.query, ignoreCase = true)
-                                }
-                            if (filteredChannels.isEmpty()) {
-                                Box(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = "No channels found",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            } else {
-                                LazyColumn {
-                                    items(filteredChannels) { channel ->
-                                        ChannelSuggestionItem(
-                                            channel = channel,
-                                            onClick = {
-                                                val replacement = "#${channel.name} "
-                                                editorState.applyCompletion(
-                                                    match = match,
-                                                    replacement = replacement,
-                                                    attributes =
-                                                        attributeContainerOf(
-                                                            BoldKey to Unit,
-                                                            TextColorKey to Color(0xFF1976D2).toRgbaColor(),
-                                                        ),
-                                                )
-                                                autocompleteMatch = null
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+@Composable
+private fun UserSuggestionList(
+    query: String,
+    onSelectUser: (ChatUser) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val filteredUsers =
+        sampleUsers.filter {
+            it.name.contains(query, ignoreCase = true) ||
+                it.role.contains(query, ignoreCase = true)
+        }
+    if (filteredUsers.isEmpty()) {
+        Box(modifier = modifier.padding(16.dp)) {
+            Text(
+                text = "No users found",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    } else {
+        LazyColumn(modifier = modifier) {
+            items(items = filteredUsers, key = { it.id }) { user ->
+                UserSuggestionItem(
+                    user = user,
+                    onClick = { onSelectUser(user) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChannelSuggestionList(
+    query: String,
+    onSelectChannel: (ChatChannel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val filteredChannels =
+        sampleChannels.filter {
+            it.name.contains(query, ignoreCase = true)
+        }
+    if (filteredChannels.isEmpty()) {
+        Box(modifier = modifier.padding(16.dp)) {
+            Text(
+                text = "No channels found",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    } else {
+        LazyColumn(modifier = modifier) {
+            items(items = filteredChannels, key = { it.id }) { channel ->
+                ChannelSuggestionItem(
+                    channel = channel,
+                    onClick = { onSelectChannel(channel) },
+                )
             }
         }
     }
