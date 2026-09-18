@@ -23,14 +23,11 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete matches trigger at beginning of document`() {
-        // Arrange
         val text = "@"
         val triggers = listOf(AutocompleteTrigger(prefix = "@"))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 1, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "@"
         match.query shouldBe ""
@@ -41,14 +38,11 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete matches trigger at line start`() {
-        // Arrange
         val text = "Hello\n@"
         val triggers = listOf(AutocompleteTrigger(prefix = "@"))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 7, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "@"
         match.query shouldBe ""
@@ -59,14 +53,11 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete matches trigger after whitespace`() {
-        // Arrange
         val text = "Hello @"
         val triggers = listOf(AutocompleteTrigger(prefix = "@"))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 7, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "@"
         match.query shouldBe ""
@@ -77,27 +68,21 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete fails in middle of word when requireLeadingWhitespace is true`() {
-        // Arrange
         val text = "email@test.com"
         val triggers = listOf(AutocompleteTrigger(prefix = "@", requireLeadingWhitespace = true))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 6, triggers = triggers)
 
-        // Assert
         match.shouldBeNull()
     }
 
     @Test
     fun `detectAutocomplete succeeds in middle of word when requireLeadingWhitespace is false`() {
-        // Arrange
         val text = "email@test.com"
         val triggers = listOf(AutocompleteTrigger(prefix = "@", requireLeadingWhitespace = false))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 10, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "@"
         match.query shouldBe "test"
@@ -107,14 +92,11 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete matches query during typing`() {
-        // Arrange
         val text = "Hello @ali"
         val triggers = listOf(AutocompleteTrigger(prefix = "@"))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 10, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "@"
         match.query shouldBe "ali"
@@ -125,27 +107,21 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete terminates when space is typed and allowSpacesInQuery is false`() {
-        // Arrange
         val text = "Hello @ali "
         val triggers = listOf(AutocompleteTrigger(prefix = "@", allowSpacesInQuery = false))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 11, triggers = triggers)
 
-        // Assert
         match.shouldBeNull()
     }
 
     @Test
     fun `detectAutocomplete allows spaces when allowSpacesInQuery is true`() {
-        // Arrange
         val text = "Hello @ali "
         val triggers = listOf(AutocompleteTrigger(prefix = "@", allowSpacesInQuery = true))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 11, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.query shouldBe "ali "
         match.range shouldBe 6..10
@@ -154,7 +130,6 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete prioritizes the nearest trigger before cursor`() {
-        // Arrange
         val text = "@alice #tag"
         val triggers =
             listOf(
@@ -162,10 +137,8 @@ class AutocompleteTest {
                 AutocompleteTrigger(prefix = "#"),
             )
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 11, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "#"
         match.query shouldBe "tag"
@@ -175,40 +148,32 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete returns null when query exceeds maxQueryLength`() {
-        // Arrange
         val text = "@" + "a".repeat(11)
         val triggers = listOf(AutocompleteTrigger(prefix = "@", maxQueryLength = 10))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = text.length, triggers = triggers)
 
-        // Assert
         match.shouldBeNull()
     }
 
     @Test
     fun `detectAutocomplete does not match across newline`() {
-        // Arrange
         val text = "@alice\nbob"
         val triggers = listOf(AutocompleteTrigger(prefix = "@"))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = 10, triggers = triggers)
 
-        // Assert
         match.shouldBeNull()
     }
 
     @Test
     fun `detectAutocomplete reflects cursor repositioning inside query`() {
-        // Arrange
         val text = "@alice"
         val triggers = listOf(AutocompleteTrigger(prefix = "@"))
 
-        // Act: Cursor at index 3 ("@al|ice")
+        // Cursor at index 3 ("@al|ice")
         val match = detectAutocomplete(text = text, cursorPosition = 3, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.query shouldBe "al"
         match.range shouldBe 0..2
@@ -226,14 +191,13 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete recognizes trigger preceded by full-width ideographic space`() {
-        // Arrange: full-width space (\u3000) followed by '@alice'
+        // full-width space (\u3000) followed by '@alice'
         val text = "こんにちは\u3000@alice"
         val triggers = listOf(AutocompleteTrigger(prefix = "@", requireLeadingWhitespace = true))
 
-        // Act: Cursor at the end of the text
+        // Cursor at the end of the text
         val match = detectAutocomplete(text = text, cursorPosition = text.length, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "@"
         match.query shouldBe "alice"
@@ -243,28 +207,22 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete rejects trigger immediately preceded by Japanese character without whitespace`() {
-        // Arrange
         val text = "こんにちは@alice"
         val triggers = listOf(AutocompleteTrigger(prefix = "@", requireLeadingWhitespace = true))
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = text.length, triggers = triggers)
 
-        // Assert
         match.shouldBeNull()
     }
 
     @Test
     fun `detectAutocomplete extracts Japanese query with full-width characters`() {
-        // Arrange
         val text = "チームのみんな @山田太郎 さん"
         val triggers = listOf(AutocompleteTrigger(prefix = "@"))
         val cursorPosition = 13 // right after "山田太郎"
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = cursorPosition, triggers = triggers)
 
-        // Assert
         match.shouldNotBeNull()
         match.query shouldBe "山田太郎"
         match.range shouldBe 8..12
@@ -273,7 +231,7 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete handles full-width space inside query based on allowSpacesInQuery flag`() {
-        // Arrange: full-width space between last and first name
+        // full-width space between last and first name
         val text = "@山田\u3000太郎"
         val cursorPosition = text.length
 
@@ -326,14 +284,11 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete works with multi-character emoji trigger prefix`() {
-        // Arrange: Trigger prefix is an emoji "🎉" (2 chars surrogate pair)
         val text = "Great news 🎉celebrate"
         val trigger = AutocompleteTrigger(prefix = "🎉")
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = text.length, triggers = listOf(trigger))
 
-        // Assert
         match.shouldNotBeNull()
         match.trigger.prefix shouldBe "🎉"
         match.query shouldBe "celebrate"
@@ -344,14 +299,11 @@ class AutocompleteTest {
 
     @Test
     fun `detectAutocomplete handles RTL text with Arabic script`() {
-        // Arrange: Arabic greeting and mention
         val text = "مرحبا @علي"
         val trigger = AutocompleteTrigger(prefix = "@")
 
-        // Act
         val match = detectAutocomplete(text = text, cursorPosition = text.length, triggers = listOf(trigger))
 
-        // Assert
         match.shouldNotBeNull()
         match.query shouldBe "علي"
         match.range shouldBe 6..9
@@ -430,7 +382,6 @@ class AutocompleteTest {
 
     @Test
     fun `applyCompletion with plain text replaces range and sets cursor at end`() {
-        // Arrange
         val state = RichTextState(RichString("Hello @ali, welcome"))
         val match =
             AutocompleteMatch(
@@ -441,10 +392,8 @@ class AutocompleteTest {
                 cursorPosition = 10,
             )
 
-        // Act
         state.applyCompletion(match, replacement = "Alice Smith ")
 
-        // Assert
         state.richString.text shouldBe "Hello Alice Smith , welcome"
         state.selection.start shouldBe 18
         state.selection.end shouldBe 18
@@ -452,7 +401,6 @@ class AutocompleteTest {
 
     @Test
     fun `applyCompletion with RichString applies styling and shifts spans`() {
-        // Arrange
         val state = RichTextState(RichString("Hello @ali"))
         val match =
             AutocompleteMatch(
@@ -467,10 +415,8 @@ class AutocompleteTest {
                 setSpanAttribute(BoldKey, Unit, 0..11)
             }
 
-        // Act
         state.applyCompletion(match, replacement = replacement)
 
-        // Assert
         state.richString.text shouldBe "Hello @Alice Smith"
         state.selection.start shouldBe 18
         val boldSpans = state.richString.spans.filter { it.attributes.containsKey(BoldKey) }
@@ -480,7 +426,6 @@ class AutocompleteTest {
 
     @Test
     fun `applyCompletion with attributes applies attribute container to replacement`() {
-        // Arrange
         val state = RichTextState(RichString("Hello @ali"))
         val match =
             AutocompleteMatch(
@@ -491,10 +436,8 @@ class AutocompleteTest {
                 cursorPosition = 10,
             )
 
-        // Act
         state.applyCompletion(match, replacement = "@Alice", attributes = attributeContainerOf(BoldKey to Unit))
 
-        // Assert
         state.richString.text shouldBe "Hello @Alice"
         state.selection.start shouldBe 12
         val boldSpans = state.richString.spans.filter { it.attributes.containsKey(BoldKey) }
@@ -504,7 +447,6 @@ class AutocompleteTest {
 
     @Test
     fun `applyCompletion supports Undo and Redo operations`() {
-        // Arrange
         val initialText = "Hello @ali"
         val state = RichTextState(RichString(initialText))
         val match =
@@ -516,30 +458,27 @@ class AutocompleteTest {
                 cursorPosition = 10,
             )
 
-        // Act: Apply completion
+        // Apply completion
         state.applyCompletion(match, replacement = "Alice ")
         state.richString.text shouldBe "Hello Alice "
 
-        // Act: Undo
+        // Undo
         state.undoState.canUndo.shouldBeTrue()
         state.undoState.undo()
 
-        // Assert: Reverted back to initial state
         state.richString.text shouldBe initialText
         state.selection.start shouldBe 10
 
-        // Act: Redo
+        // Redo
         state.undoState.canRedo.shouldBeTrue()
         state.undoState.redo()
 
-        // Assert: Restored to completed state
         state.richString.text shouldBe "Hello Alice "
         state.selection.start shouldBe 12
     }
 
     @Test
     fun `applyCompletion with cursor in middle of query replaces up to cursor preserving suffix`() {
-        // Arrange: User typed "@developer", but cursor is at index 4 ("@dev|eloper")
         val state = RichTextState(RichString("@developer"))
         val match =
             AutocompleteMatch(
@@ -550,10 +489,8 @@ class AutocompleteTest {
                 cursorPosition = 4,
             )
 
-        // Act: Apply replacement "coder"
         state.applyCompletion(match, replacement = "coder")
 
-        // Assert: "@dev" (0..3) is replaced with "coder", "eloper" remains
         state.richString.text shouldBe "codereloper"
         state.selection.start shouldBe 5
         state.selection.end shouldBe 5
@@ -561,7 +498,6 @@ class AutocompleteTest {
 
     @Test
     fun `applyCompletion within existing styled span shifts subsequent spans properly`() {
-        // Arrange: "Start [Bold Section] End" where Bold is 6..17
         val initial =
             RichString("Start Hello @ali End").edit {
                 setSpanAttribute(BoldKey, Unit, 6..15) // covers "Hello @ali"
@@ -576,22 +512,17 @@ class AutocompleteTest {
                 cursorPosition = 16,
             )
 
-        // Act: Replace "@ali" with "Alice LongName " (length 15 instead of 4, +11 chars)
         state.applyCompletion(match, replacement = "Alice LongName ")
 
-        // Assert: Text updated
         state.richString.text shouldBe "Start Hello Alice LongName  End"
-        // The original bold span originally spanning 6..15 should now be expanded or adjusted
         val boldSpans = state.richString.spans.filter { it.attributes.containsKey(BoldKey) }
         boldSpans.size shouldBe 1
-        // Verify span correctly covers the expanded text
         boldSpans.first().range.first shouldBe 6
         boldSpans.first().range.last shouldBe 26
     }
 
     @Test
     fun `applyCompletion with RichString applies multiple attributes and maintains offsets`() {
-        // Arrange
         val state = RichTextState(RichString("Mention: @target"))
         val match =
             AutocompleteMatch(
@@ -602,17 +533,14 @@ class AutocompleteTest {
                 cursorPosition = 16,
             )
 
-        // Replacement RichString with Bold for "@Alice" and Italic for "[Admin]"
         val replacement =
             RichString("@Alice [Admin]").edit {
                 setSpanAttribute(BoldKey, Unit, 0..5) // "@Alice"
                 setSpanAttribute(ItalicKey, Unit, 7..13) // "[Admin]"
             }
 
-        // Act
         state.applyCompletion(match, replacement = replacement)
 
-        // Assert
         state.richString.text shouldBe "Mention: @Alice [Admin]"
         state.selection.start shouldBe 23
 
@@ -625,7 +553,6 @@ class AutocompleteTest {
 
     @Test
     fun `applyCompletion supports empty replacement string removing the matched trigger`() {
-        // Arrange
         val state = RichTextState(RichString("Hello @tag world"))
         val match =
             AutocompleteMatch(
@@ -636,17 +563,14 @@ class AutocompleteTest {
                 cursorPosition = 10,
             )
 
-        // Act: Delete trigger by replacing with empty string
         state.applyCompletion(match, replacement = "")
 
-        // Assert
         state.richString.text shouldBe "Hello  world"
         state.selection.start shouldBe 6
     }
 
     @Test
     fun `applyCompletion with attributes can be undone and redone with complete style restoration`() {
-        // Arrange
         val state = RichTextState(RichString("Check @dev please"))
         val match =
             AutocompleteMatch(
@@ -658,7 +582,7 @@ class AutocompleteTest {
             )
         val color = RgbaColor(0xFFFF0000)
 
-        // Act 1: Apply completion with TextColor and Bold
+        // Apply completion with TextColor and Bold
         state.applyCompletion(
             match = match,
             replacement = "@Alice ",
@@ -668,12 +592,12 @@ class AutocompleteTest {
         state.richString.text shouldBe "Check @Alice  please"
         state.richString.spans.any { it.attributes.containsKey(TextColorKey) }.shouldBeTrue()
 
-        // Act 2: Undo
+        // Undo
         state.undoState.undo()
         state.richString.text shouldBe "Check @dev please"
         state.richString.spans.any { it.attributes.containsKey(TextColorKey) }.shouldBeFalse()
 
-        // Act 3: Redo
+        // Redo
         state.undoState.redo()
         state.richString.text shouldBe "Check @Alice  please"
         val redSpans = state.richString.spans.filter { it.attributes[TextColorKey] == color }
@@ -687,7 +611,6 @@ class AutocompleteTest {
 
     @Test
     fun `createPopupPositionProvider positions popup below cursor when space is sufficient`() {
-        // Arrange
         val match =
             AutocompleteMatch(
                 trigger = AutocompleteTrigger("@"),
@@ -702,10 +625,8 @@ class AutocompleteTest {
         val windowSize = IntSize(width = 1000, height = 1000)
         val popupSize = IntSize(width = 200, height = 150)
 
-        // Act
         val position = provider.calculatePosition(anchorBounds, windowSize, LayoutDirection.Ltr, popupSize)
 
-        // Assert
         // windowCursorLeft = 10 + 50 = 60
         // windowCursorBottom = 20 + 120 = 140
         // spaceBelow = 1000 - 140 = 860 >= 150 -> places below cursor at 140
@@ -715,7 +636,6 @@ class AutocompleteTest {
 
     @Test
     fun `createPopupPositionProvider flips popup above cursor when space below is insufficient`() {
-        // Arrange
         val match =
             AutocompleteMatch(
                 trigger = AutocompleteTrigger("@"),
@@ -730,10 +650,8 @@ class AutocompleteTest {
         val windowSize = IntSize(width = 1000, height = 900)
         val popupSize = IntSize(width = 200, height = 150)
 
-        // Act
         val position = provider.calculatePosition(anchorBounds, windowSize, LayoutDirection.Ltr, popupSize)
 
-        // Assert
         // windowCursorBottom = 0 + 820 = 820
         // spaceBelow = 900 - 820 = 80 < 150
         // spaceAbove = 800 >= 150
@@ -744,7 +662,6 @@ class AutocompleteTest {
 
     @Test
     fun `createPopupPositionProvider clamps X to window bounds when overflowing right`() {
-        // Arrange
         val match =
             AutocompleteMatch(
                 trigger = AutocompleteTrigger("@"),
@@ -759,10 +676,8 @@ class AutocompleteTest {
         val windowSize = IntSize(width = 800, height = 600)
         val popupSize = IntSize(width = 200, height = 100)
 
-        // Act
         val position = provider.calculatePosition(anchorBounds, windowSize, LayoutDirection.Ltr, popupSize)
 
-        // Assert
         // windowCursorLeft = 100 + 750 = 850
         // maxX = 800 - 200 = 600 -> clamped to 600
         position.x shouldBe 600
@@ -770,7 +685,6 @@ class AutocompleteTest {
 
     @Test
     fun `createPopupPositionProvider applies extra offset`() {
-        // Arrange
         val match =
             AutocompleteMatch(
                 trigger = AutocompleteTrigger("@"),
@@ -785,10 +699,8 @@ class AutocompleteTest {
         val windowSize = IntSize(width = 1000, height = 1000)
         val popupSize = IntSize(width = 200, height = 100)
 
-        // Act
         val position = provider.calculatePosition(anchorBounds, windowSize, LayoutDirection.Ltr, popupSize)
 
-        // Assert
         // x = 50 + 10 = 60
         // y = 120 + 15 = 135
         position.x shouldBe 60
