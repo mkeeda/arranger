@@ -3,6 +3,7 @@ package dev.mkeeda.arranger.richtext.editor
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
+import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.AttributeEditScope
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 import dev.mkeeda.arranger.richtext.RichRun
@@ -24,6 +25,12 @@ public class RichTextBuffer internal constructor(
 
     public val text: String
         get() = textFieldBuffer.toString()
+
+    public var selection: TextRange
+        get() = textFieldBuffer.selection
+        set(value) {
+            textFieldBuffer.selection = value
+        }
 
     private inline fun withAttributeScope(block: RichStringScope.() -> Unit) {
         val scope = RichStringScope(currentSpans, textFieldBuffer.toString())

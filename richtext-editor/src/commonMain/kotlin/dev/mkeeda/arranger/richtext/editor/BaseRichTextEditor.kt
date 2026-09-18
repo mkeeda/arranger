@@ -10,6 +10,8 @@ import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -60,6 +63,8 @@ internal fun BaseRichTextEditor(
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
+    autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
+    onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
 ) {
     val workarounds = remember { ComposeParagraphWorkarounds() }
 
@@ -86,6 +91,55 @@ internal fun BaseRichTextEditor(
     val listItems = remember(state.richString) { state.richString.extractListItems() }
 
     val currentOnSpanClick by rememberUpdatedState(onSpanClick)
+    val currentOnAutocompleteChange by rememberUpdatedState(onAutocompleteChange)
+
+    if (autocompleteTriggers.isNotEmpty() && onAutocompleteChange != null) {
+        LaunchedEffect(
+            state.textFieldState.text,
+            state.textFieldState.selection,
+            scrollState.value,
+            textLayoutResult,
+            autocompleteTriggers,
+        ) {
+            if (!state.selection.collapsed) {
+                currentOnAutocompleteChange?.invoke(null)
+                return@LaunchedEffect
+            }
+
+            val match =
+                detectAutocomplete(
+                    text = state.textFieldState.text,
+                    cursorPosition = state.selection.start,
+                    triggers = autocompleteTriggers,
+                )
+
+            if (match == null) {
+                currentOnAutocompleteChange?.invoke(null)
+                return@LaunchedEffect
+            }
+
+            val layout = textLayoutResult
+            val cursorRect =
+                layout?.let {
+                    val cursor = state.selection.start.coerceIn(0, it.layoutInput.text.length)
+                    val mappedCursor =
+                        workarounds.mapCharacterIndex(cursor)
+                            .coerceIn(0, it.layoutInput.text.length)
+                    val rawRect = it.getCursorRect(mappedCursor)
+                    val scrollY = scrollState.value.toFloat()
+                    Rect(rawRect.left, rawRect.top - scrollY, rawRect.right, rawRect.bottom - scrollY)
+                }
+
+            currentOnAutocompleteChange?.invoke(match.copy(cursorRect = cursorRect))
+        }
+
+        DisposableEffect(onAutocompleteChange, autocompleteTriggers) {
+            onDispose {
+                currentOnAutocompleteChange?.invoke(null)
+            }
+        }
+    }
+
     val spanTapModifier =
         if (enabled) {
             remember(state, workarounds) {

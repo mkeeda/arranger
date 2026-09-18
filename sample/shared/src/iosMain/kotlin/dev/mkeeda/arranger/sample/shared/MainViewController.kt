@@ -42,6 +42,7 @@ private enum class SampleDestination(val title: String) {
     Hyperlink("Hyperlink"),
     WysiwygEditor("WYSIWYG Editor"),
     InteractiveSpan("Interactive Spans"),
+    MentionAutocomplete("Mention Autocomplete"),
 }
 
 // Disable PlistSanityCheck to prevent crashes related to implicit Info.plist checks
@@ -154,6 +155,7 @@ private fun SampleDetailScreen(destination: SampleDestination, onBack: () -> Uni
                 SampleDestination.Hyperlink -> HyperlinkSample()
                 SampleDestination.WysiwygEditor -> WysiwygEditorSample()
                 SampleDestination.InteractiveSpan -> InteractiveSpanSample(snackbarHostState = snackbarHostState)
+                SampleDestination.MentionAutocomplete -> MentionAutocompleteSample()
             }
         }
     }
