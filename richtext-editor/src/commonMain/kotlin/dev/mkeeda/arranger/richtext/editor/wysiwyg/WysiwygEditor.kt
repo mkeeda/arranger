@@ -24,6 +24,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Density
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
+import dev.mkeeda.arranger.richtext.editor.AutocompleteMatch
+import dev.mkeeda.arranger.richtext.editor.AutocompleteTrigger
 import dev.mkeeda.arranger.richtext.editor.BaseRichTextEditor
 import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
 import dev.mkeeda.arranger.richtext.editor.DefaultListMarkerResolver
@@ -50,6 +52,8 @@ import dev.mkeeda.arranger.richtext.editor.SpanClickEvent
  * @param styleResolver A resolver that specifies how [AttributeContainer]s should be translated into visually rendered Compose styles.
  * @param listMarkerResolver A resolver that specifies how list markers should be rendered.
  * @param onSpanClick Optional callback invoked when a [dev.mkeeda.arranger.richtext.RichSpan] is tapped or clicked.
+ * @param autocompleteTriggers The list of [AutocompleteTrigger] patterns to observe during typing.
+ * @param onAutocompleteChange Callback invoked whenever the active [AutocompleteMatch] changes, or `null` when no trigger is matched.
  */
 @Composable
 public fun WysiwygEditor(
@@ -69,6 +73,8 @@ public fun WysiwygEditor(
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
+    autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
+    onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
 ) {
     val wysiwygState = remember(state) { WysiwygState() }
 
@@ -102,6 +108,8 @@ public fun WysiwygEditor(
         styleResolver = styleResolver,
         listMarkerResolver = listMarkerResolver,
         onSpanClick = onSpanClick,
+        autocompleteTriggers = autocompleteTriggers,
+        onAutocompleteChange = onAutocompleteChange,
     )
 }
 

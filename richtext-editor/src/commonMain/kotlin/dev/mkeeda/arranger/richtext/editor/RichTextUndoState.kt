@@ -85,6 +85,11 @@ public class RichTextUndoState internal constructor(
         undoManager.pushSnapshot(snapshotBefore, mergePolicy)
     }
 
+    internal fun captureSnapshot(mergePolicy: UndoMergePolicy = UndoMergePolicy.Separate) {
+        val snapshot = takeSnapshot()
+        undoManager.pushSnapshot(snapshot, mergePolicy)
+    }
+
     private fun takeSnapshot(): EditorSnapshot {
         return EditorSnapshot(
             text = textFieldState.text.toString(),

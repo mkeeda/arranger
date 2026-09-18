@@ -38,8 +38,9 @@ import dev.mkeeda.arranger.richtext.RichSpan
  * @param styleResolver A resolver that specifies how [AttributeContainer]s should be translated into visually rendered Compose [SpanStyle]s.
  * @param listMarkerResolver A resolver that specifies how list markers (e.g. bullets, ordered numbers) should be rendered.
  * @param onSpanClick Optional callback invoked when a [RichSpan] is tapped or clicked.
+ * @param autocompleteTriggers The list of [AutocompleteTrigger] patterns to observe during typing.
+ * @param onAutocompleteChange Callback invoked whenever the active [AutocompleteMatch] changes, or `null` when no trigger is matched.
  */
-
 @Composable
 public fun RichTextEditor(
     state: RichTextState,
@@ -58,6 +59,8 @@ public fun RichTextEditor(
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
+    autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
+    onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
 ) {
     BaseRichTextEditor(
         state = state,
@@ -77,5 +80,7 @@ public fun RichTextEditor(
         styleResolver = styleResolver,
         listMarkerResolver = listMarkerResolver,
         onSpanClick = onSpanClick,
+        autocompleteTriggers = autocompleteTriggers,
+        onAutocompleteChange = onAutocompleteChange,
     )
 }
