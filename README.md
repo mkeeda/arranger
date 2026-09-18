@@ -28,14 +28,18 @@ Think of Arranger as the foundational framework (similar to ProseMirror or Lexic
 
 ## Core Features
 
-* 🛡️ **Type-Safe Custom Attributes:** Define and apply UI-specific styles (like `SpanStyle`) and domain-specific attributes (e.g., `@Mention`, `#Hashtag`, `LinkKey`) with full compile-time safety.
-* ⚡ **High-Level Editor Behaviors:** Built-in paragraph formatting (Headings, Blockquotes, Alignments, Bullet & Ordered Lists), dynamic enter-key strategies, and robust Undo/Redo history tracking.
-* 🔄 **Declarative & Type-Safe Mutation DSL:** Atomically mutate text and apply rich attributes within a type-safe builder DSL, eliminating manual index calculations and ensuring synchronized state.
-* 🔍 **Semantic "Runs":** Treat text not just as characters, but as "Runs" (chunks of text with identical attributes) for semantic iteration, searching, and batch editing.
-* 👆 **Interactive Spans & Tap Handling:** First-class pointer interaction (`onSpanClick`, `SpanClickEvent`) for mentions, hashtags, and hyperlinks with explicit Compose event consumption.
-* 💬 **Autocompletion & Suggestion Hooks:** Real-time prefix trigger detection (`@mentions`, `#channels`, `:emoji:`) with zero-math cursor popup positioning (`createPopupPositionProvider`) and seamless rich completion insertion.
-* ✍️ **WYSIWYG Auto-Formatting Editor (`WysiwygEditor`):** Real-time Markdown shorthand conversions (headings, lists, blockquotes, bold, italic, inline code, strikethrough) as you type, complete with immediate backspace reversal and Undo/Redo integration.
-* 🌐 **Markdown & HTML Interoperability:** Bi-directional import/export converters between `RichString` and Markdown / HTML representations (`:richtext-markdown`, `:richtext-html`).
+* ✍️ **Modern Rich Editor Experiences & Interactions**
+  * **WYSIWYG Markdown Formatting (`WysiwygEditor`):** Instant auto-conversion for Markdown shorthand (headings, lists, blockquotes, bold, italic, code, strikethrough) as you type, with one-tap backspace reversal.
+  * **Autocompletion & Suggestion Hooks:** Real-time prefix triggers (`@mentions`, `#channels`, `:emoji:`) with zero-math cursor popup positioning (`createPopupPositionProvider`) and synchronized completion insertion.
+  * **Interactive Spans & Tap Handling:** First-class pointer interactions (`onSpanClick`, `SpanClickEvent`) for mentions, hashtags, and hyperlinks with explicit event consumption.
+  * **Intelligent Editor Behaviors:** Smart enter-key handling (list continuation, auto-indent, heading resets), nested list marker resolution, and atomic Undo/Redo history tracking.
+* 🛡️ **Declarative, Type-Safe Core Engine**
+  * **Declarative Mutation DSL:** Atomically mutate text and formatting attributes synchronously without manual index calculations.
+  * **Custom Domain Attributes:** Define UI styles (`SpanStyle`) and domain metadata (e.g., `@Mention`, `#Hashtag`, `LinkKey`) with complete compile-time safety.
+  * **Semantic "Runs":** Iterate and batch-edit chunks of text with identical attributes (inspired by SwiftUI's `AttributedString.Runs`).
+* 🌐 **Ecosystem & Interoperability**
+  * **Markdown & HTML Converters:** Lossless bi-directional import/export between `RichString` and Markdown / HTML (`:richtext-markdown`, `:richtext-html`).
+  * **Full Multiplatform Support:** Consistent, native behavior across Android, Desktop (JVM), iOS, and Web (WasmJs).
 
 ## Why Arranger?
 
