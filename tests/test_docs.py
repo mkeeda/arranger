@@ -646,6 +646,10 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
                                 errors.append(
                                     f"{f.relative_to(REPO_ROOT)}:L{open_line}: Unrecognized code language '{open_lang}'"
                                 )
+                        else:
+                            errors.append(
+                                f"{f.relative_to(REPO_ROOT)}:L{open_line}: Missing code block language tag"
+                            )
                     else:
                         in_code = False
 
