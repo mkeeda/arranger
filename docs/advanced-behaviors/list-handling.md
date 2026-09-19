@@ -90,7 +90,7 @@ public data class OrderedListItem(
 
 ### Automatic Numbering Counter
 
-`RichString.extractListItems()` automatically computes sequential indices for `OrderedListItem`:
+Arranger automatically computes sequential indices for `OrderedListItem`:
 
 - Maintains an array of counters across all indent levels (`IntArray(ListIndentLevel.entries.size) { 1 }`).
 - Increments the counter for each paragraph within the continuous ordered list run.

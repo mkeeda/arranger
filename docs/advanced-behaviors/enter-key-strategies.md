@@ -1,4 +1,4 @@
-# Enter Key Strategies
+# Paragraph Enter Key Behavior
 
 In rich text editing, pressing the **Enter** key does not merely insert a newline character (`\n`). In document editors, pressing Enter has context-sensitive semantics:
 
@@ -176,25 +176,6 @@ public object CodeBlockEnterStrategy : EnterKeyStrategy {
         }
     }
 }
-```
-
-### Example: Chat Composer Send Action
-
-In chat message composers, pressing Enter can either submit the message or insert a newline when Shift is held:
-
-```kotlin
-RichTextEditor(
-    state = state,
-    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-    onKeyboardAction = {
-        if (state.richString.text.isNotBlank()) {
-            sendMessage(state.richString)
-            state.setRichString(RichString(""))
-        }
-    }
-)
-```
-
 ---
 
 ## Summary

@@ -35,43 +35,24 @@ Block-level styling applied across entire newline-delimited paragraphs (`\n`).
 In Arranger, attribute categorization and behaviors are guaranteed at compile time via Kotlin's type hierarchy.
 
 ```mermaid
-classDiagram
-    class AttributeKey~T~ {
-        <<sealed interface>>
-        +String name
-        +T defaultValue
-    }
+flowchart TD
+    AttributeKey["AttributeKey (Root Interface)"]
+    SpanKey["SpanAttributeKey<br>(Character-level: Bold, Color, Link)"]
+    ParagraphKey["ParagraphAttributeKey<br>(Block-level: Heading, List, Alignment)"]
+    BlockTypeKey["BlockTypeAttributeKey<br>(Mutually exclusive block types)"]
+    AlignmentKey["AlignmentAttributeKey<br>(Mutually exclusive alignments)"]
 
-    class SpanAttributeKey~T~ {
-        <<interface>>
-    }
-
-    class ParagraphAttributeKey~T~ {
-        <<sealed interface>>
-        +EnterKeyStrategy enterKeyStrategy
-    }
-
-    class BlockTypeAttributeKey~T~ {
-        <<interface>>
-        (Mutually exclusive within paragraph)
-    }
-
-    class AlignmentAttributeKey~T~ {
-        <<interface>>
-        (Mutually exclusive horizontal alignment)
-    }
-
-    AttributeKey <|-- SpanAttributeKey
-    AttributeKey <|-- ParagraphAttributeKey
-    ParagraphAttributeKey <|-- BlockTypeAttributeKey
-    ParagraphAttributeKey <|-- AlignmentAttributeKey
+    AttributeKey --> SpanKey
+    AttributeKey --> ParagraphKey
+    ParagraphKey --> BlockTypeKey
+    ParagraphKey --> AlignmentKey
 ```
 
 ---
 
 ## Paragraph Snapping
 
-When a user selects only a few words within a paragraph and applies a heading or blockquote, Arranger automatically snaps the target range across the entire line boundary (`snapToParagraphs`) to maintain document integrity.
+When a user selects only a few words within a paragraph and applies a heading or blockquote, Arranger automatically snaps the target range across the entire paragraph boundary to maintain document integrity.
 
 ```kotlin
 state.edit {
