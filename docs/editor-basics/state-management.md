@@ -1,4 +1,4 @@
-# State Management
+# State Management & History
 
 State management in Arranger is centered around `@Stable class RichTextState`, strictly adhering to Compose state hoisting principles. It serves as the Single Source of Truth (SSOT), encapsulating text content, attribute spans, cursor selection, undo/redo history, and pending typing attributes.
 
@@ -125,7 +125,7 @@ Arranger includes a built-in undo/redo engine that tracks both plain text modifi
 
 <div align="center" markdown>
 
-![Undo Redo Demo](../images/undo-redo.gif){ width="500" }
+![Undo Redo Demo](../images/undo-redo.gif){ width="380" }
 
 </div>
 
@@ -137,11 +137,35 @@ Arranger includes a built-in undo/redo engine that tracks both plain text modifi
 - `state.undoState.redo()`: Reapplies the previously reverted operation.
 - `state.undoState.clearHistory()`: Clears the undo/redo history stacks.
 
+### Wiring Toolbar Buttons
+
+```kotlin
+Row {
+    IconButton(
+        onClick = { state.undoState.undo() },
+        enabled = state.undoState.canUndo,
+        modifier = Modifier.focusProperties { canFocus = false },
+    ) {
+        Icon(Icons.Default.Undo, contentDescription = "Undo")
+    }
+
+    IconButton(
+        onClick = { state.undoState.redo() },
+        enabled = state.undoState.canRedo,
+        modifier = Modifier.focusProperties { canFocus = false },
+    ) {
+        Icon(Icons.Default.Redo, contentDescription = "Redo")
+    }
+}
+```
+
+### Keyboard Shortcuts
+
+Native keyboard shortcuts (<kbd>Cmd/Ctrl</kbd> + <kbd>Z</kbd> and <kbd>Shift</kbd> + <kbd>Cmd/Ctrl</kbd> + <kbd>Z</kbd>) are automatically handled by the editor component.
+
 ### Intelligent Mutation Coalescing
 
-Creating a separate undo entry for every single keystroke forces users to press undo dozens of times just to revert a single word.
-
-Arranger coalesces mutations automatically:
+Creating a separate undo entry for every single keystroke forces users to press undo dozens of times just to revert a single word. Arranger coalesces mutations automatically:
 
 - **Continuous alphanumeric typing**: Coalesced into a single undo step.
 - **Whitespace, newlines (Enter), Backspace, and paste events**: Discrete operation boundaries that split coalescing batches.

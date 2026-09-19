@@ -3,46 +3,29 @@
 Arranger features a modular Service Provider Interface (SPI) designed to serialize rich text to and from arbitrary data representations. Whether your application communicates with a Slack API using `mrkdwn`, persists structured rich text in SQLite/PostgreSQL as JSON, or synchronizes collaborative edits using a Delta format, Arranger's format abstraction makes custom format integration straightforward and type-safe.
 
 ```mermaid
-classDiagram
-    direction TB
-    class RichTextExporter~T~ {
-        <<interface>>
-        +export(richString: RichString) T
-    }
-    class RichTextImporter~T~ {
-        <<interface>>
-        +import(input: T) RichString
-    }
-    class RichTextFormat~T~ {
-        <<interface>>
-    }
-    RichTextExporter <|-- RichTextFormat
-    RichTextImporter <|-- RichTextFormat
+flowchart TD
+    Exporter["RichTextExporter&lt;T&gt;<br><i>export(richString): T</i>"]
+    Importer["RichTextImporter&lt;T&gt;<br><i>import(input): RichString</i>"]
+    Format["RichTextFormat&lt;T&gt;<br><i>(Optional combination)</i>"]
 
-    class MarkdownFormat {
-        <<object>>
-    }
-    class HtmlFormat {
-        <<object>>
-    }
-    class MyCustomFormat {
-        <<class / object>>
-    }
+    Exporter -.-> Format
+    Importer -.-> Format
 
-    RichTextFormat <|.. MarkdownFormat
-    RichTextFormat <|.. HtmlFormat
-    RichTextFormat <|.. MyCustomFormat
+    Exporter --> CustomExporter["SlackMrkdwnExporter / JsonExporter"]
+    Importer --> CustomImporter["SlackMrkdwnImporter / JsonImporter"]
 ```
 
 ---
 
-## The Format SPI Architecture
+## Independent Exporter & Importer Interfaces
 
-Arranger's format abstraction adheres strictly to the **Interface Segregation Principle**. You can implement an exporter, an importer, or a unified bi-directional format:
+In many applications, only one direction is required:
+- **Export only**: Sending formatted chat messages to a REST API or Slack webhook.
+- **Import only**: Loading structured templates or legacy content into the editor.
+
+Arranger embraces the **Interface Segregation Principle**: `RichTextExporter<T>` and `RichTextImporter<T>` are completely independent interfaces:
 
 ```kotlin
-package dev.mkeeda.arranger.richtext
-
 public interface RichTextExporter<T> {
     public fun export(richString: RichString): T
 }
@@ -50,7 +33,11 @@ public interface RichTextExporter<T> {
 public interface RichTextImporter<T> {
     public fun import(input: T): RichString
 }
+```
 
+If you need bidirectional conversion, you can optionally implement `RichTextFormat<T>`, which simply combines both:
+
+```kotlin
 public interface RichTextFormat<T> : RichTextExporter<T>, RichTextImporter<T>
 ```
 

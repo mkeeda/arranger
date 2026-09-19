@@ -2,9 +2,7 @@
 
 Managing rich text inside a reactive declarative framework like Jetpack Compose presents a fundamental synchronization challenge: text input operates on mutable character buffers and cursor selections, whereas formatting attributes operate on style ranges.
 
-This guide provides an overview of how `RichTextState` maintains synchronization with Compose Foundation's `TextFieldState`, executes atomic edits, and manages undo/redo history.
-
-![Undo/Redo History Lifecycle](../images/undo-redo.gif){ width="600" }
+This guide provides an overview of how `RichTextState` coordinates text buffers and formatting models, executes atomic edits, and manages the undo snapshot lifecycle.
 
 ---
 
@@ -90,44 +88,21 @@ The state update commits atomically: raw text and span ranges update together. C
 
 ---
 
-## Undo & Redo Management
+## Undo Snapshot Mechanics & Memory Bounds
 
-Arranger includes built-in undo/redo history tailored specifically for rich text editing.
+Arranger manages history via internal immutable snapshots captured before each mutation:
 
-### Using Undo / Redo in Your UI
+### Keystroke Coalescing Policies
 
-You can wire undo and redo actions to toolbar buttons and inspect whether undo or redo is available:
+Creating a separate undo entry for every individual character keystroke would force users to undo dozens of times just to revert a single word. Arranger automatically coalesces modifications:
 
-```kotlin
-Row(modifier = Modifier.fillMaxWidth()) {
-    IconButton(
-        onClick = { state.undo() },
-        enabled = state.canUndo,
-    ) {
-        Icon(Icons.Default.Undo, contentDescription = "Undo")
-    }
+- **Continuous Typing**: Successive character insertions within a single word boundary merge into a single undo frame.
+- **Boundary Events**: Whitespace, newlines, deletions (Backspace/Delete), and external paste events create new, discrete undo checkpoints.
+- **Explicit Formatting**: Toolbar style toggles and programmatic `state.edit` blocks always create isolated checkpoints.
 
-    IconButton(
-        onClick = { state.redo() },
-        enabled = state.canRedo,
-    ) {
-        Icon(Icons.Default.Redo, contentDescription = "Redo")
-    }
-}
-```
+### Bounded Memory Capacity
 
-### Keyboard Shortcuts
+To prevent unbound memory growth during long editing sessions, the undo stack enforces a strict limit of **100 operations**. When capacity is reached, the oldest snapshots are dropped in FIFO order.
 
-Native keyboard shortcuts (<kbd>Cmd/Ctrl</kbd> + <kbd>Z</kbd> and <kbd>Shift</kbd> + <kbd>Cmd/Ctrl</kbd> + <kbd>Z</kbd>) are automatically handled by the editor component.
-
-### Intelligent Keystroke Grouping
-
-To provide a natural undo experience, Arranger automatically groups typing into meaningful undo chunks:
-
-- **Merged Keystrokes:** Continuous typing of words is merged into a single undo step.
-- **Isolated Snapshots:** Whitespace, newlines, deletions (Backspace/Delete), multi-character paste operations, and explicit formatting toolbar clicks always create discrete undo checkpoints.
-
-### Memory Safety
-
-Arranger maintains an internal limit of **100 undo steps** by default. When the history reaches capacity, the oldest snapshots are safely dropped in FIFO order.
+For practical UI integration (such as wiring toolbar buttons and checking `canUndo`/`canRedo`), refer to [**State Management & History**](../editor-basics/state-management.md).
 
