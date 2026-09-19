@@ -112,4 +112,4 @@ Explore Arranger's capabilities by topic:
 - [**Custom Attributes**](styling/custom-attributes.md): Defining domain-specific attributes (e.g. mentions, comments) and custom style resolvers.
 - [**Theming and Material 3**](styling/theming-and-m3.md): Dynamic styling via `AttributeStyleResolver` and Material 3 design token integration.
 - [**Architecture Overview**](architecture/overview.md): High-level system structure, modular artifacts, and design principles.
-- [**API Reference**](api/): Complete Dokka KDoc reference across all Arranger artifacts.
+- [**API Reference**](https://mkeeda.github.io/arranger/api/): Complete Dokka KDoc reference across all Arranger artifacts.
