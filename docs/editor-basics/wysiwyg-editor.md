@@ -1,4 +1,4 @@
-# WysiwygEditor
+# Markdown Shortcut Editor (WYSIWYG)
 
 `WysiwygEditor` is a real-time WYSIWYG editor component that detects Markdown formatting syntax on the fly and immediately converts it into rich text styles. Like Notion, Bear, or Slack, users can format documents effortlessly without lifting their hands from the keyboard.
 
@@ -92,40 +92,11 @@ This reversal bypasses the undo stack, keeping your typing flow completely seaml
 
 ---
 
-## Full Working Example
+## Sample Application
 
-```kotlin
-@Composable
-fun WysiwygEditorExample() {
-    val state = remember { RichTextState() }
+For a complete, interactive sample demonstrating `WysiwygEditor` in a multiplatform Compose application, explore the sample repository:
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "WYSIWYG Markdown Editor",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp),
-            )
-            Text(
-                text = "Try typing # for heading, - for lists, **bold**, and more",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-
-            WysiwygEditor(
-                state = state,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-            )
-        }
-    }
-}
-```
+- [**WysiwygEditorSample.kt**](https://github.com/mkeeda/arranger/blob/main/sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/WysiwygEditorSample.kt)
 
 ---
 

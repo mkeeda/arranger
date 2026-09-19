@@ -5,7 +5,7 @@ Building a rich text formatting toolbar in Jetpack Compose requires solving two 
 1. **Focus Stealing Prevention**: By default in Compose, tapping any `Button` or `IconButton` requests focus, immediately stealing focus away from the editor, dismissing the software keyboard, or collapsing the active text selection.
 2. **State Synchronization**: High-level commands must seamlessly toggle formatting on selections when text is highlighted, or apply typing attributes when the cursor is collapsed.
 
-Arranger provides the `RichTextStateFormatExt` extension suite and recommended Compose focus management patterns to build professional formatting toolbars with minimal boilerplate.
+Arranger provides high-level convenience extensions on `RichTextState` and recommended Compose focus management patterns to build professional formatting toolbars with minimal boilerplate.
 
 ---
 
@@ -40,13 +40,9 @@ This guarantees that:
 
 ---
 
-## High-Level Formatting APIs (RichTextStateFormatExt)
+## High-Level Formatting APIs
 
-The `:richtext-editor` module provides high-level convenience extensions on `RichTextState`:
-
-```kotlin
-package dev.mkeeda.arranger.richtext.editor
-```
+`RichTextState` provides high-level convenience functions to toggle, apply, or clear formatting without requiring manual `state.edit { ... }` blocks:
 
 ### 1. toggleFormat
 
@@ -84,7 +80,7 @@ state.clearFormats()
 
 ### 4. detectAndApplyLinks
 
-Scans the document text with `UrlParser` and automatically converts all discovered web URLs into `LinkKey` spans:
+Scans the document text and automatically converts all discovered web URLs into `LinkKey` spans:
 
 ```kotlin
 state.detectAndApplyLinks()
@@ -92,89 +88,40 @@ state.detectAndApplyLinks()
 
 ---
 
-## Complete Working Compose Toolbar Example
+## Complete Document Editor Sample
 
-Here is a complete, production-ready document editor with a formatting toolbar including Undo, Redo, Bold, Italic, Heading, List controls, and Clear Formatting:
+The following screenshot demonstrates a full document editor with formatting toolbar, undo/redo controls, and heading toggles:
 
-![Document Editor](../images/document-editor.png){ width="600" }
+<div align="center" markdown>
+
+![Document Editor](../images/document-editor.png){ width="380" }
+
+</div>
+
+### Essential Toolbar Setup
 
 ```kotlin
 @Composable
-fun DocumentEditorScreen() {
-    val state = remember { RichTextState() }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding()
-            .clip(RoundedCornerShape(8.dp))
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surface)
-    ) {
-        DocumentToolbar(state = state)
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            RichTextEditor(
-                state = state,
-                modifier = Modifier.fillMaxSize(),
-                textStyle = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
-}
-
-@Composable
 fun DocumentToolbar(state: RichTextState, modifier: Modifier = Modifier) {
-    // Crucial: Prevent all buttons from stealing focus from the editor!
+    // Prevent buttons from stealing focus from the editor!
     val unfocusable = Modifier.focusProperties { canFocus = false }
 
-    FlowRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 4.dp, vertical = 2.dp)
-    ) {
+    FlowRow(modifier = modifier) {
         // Undo / Redo
         IconButton(
             onClick = { state.undoState.undo() },
             enabled = state.undoState.canUndo,
             modifier = unfocusable
-        ) {
-            Text("↶")
-        }
-        IconButton(
-            onClick = { state.undoState.redo() },
-            enabled = state.undoState.canRedo,
-            modifier = unfocusable
-        ) {
-            Text("↷")
-        }
+        ) { Text("↶") }
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Bold Toggle
+        // Bold toggle
         IconToggleButton(
             checked = state.currentAttributes.containsKey(BoldKey),
             onCheckedChange = { state.toggleFormat(BoldKey) },
             modifier = unfocusable
-        ) {
-            Text("B", style = MaterialTheme.typography.titleMedium)
-        }
+        ) { Text("B") }
 
-        // Italic Toggle
-        IconToggleButton(
-            checked = state.currentAttributes.containsKey(ItalicKey),
-            onCheckedChange = { state.toggleFormat(ItalicKey) },
-            modifier = unfocusable
-        ) {
-            Text("I", style = MaterialTheme.typography.titleMedium)
-        }
-
-        // Heading 1 Toggle
+        // Heading 1 toggle
         IconToggleButton(
             checked = state.currentAttributes[HeadingKey] == HeadingLevel.H1,
             onCheckedChange = {
@@ -185,35 +132,20 @@ fun DocumentToolbar(state: RichTextState, modifier: Modifier = Modifier) {
                 }
             },
             modifier = unfocusable
-        ) {
-            Text("H1")
-        }
+        ) { Text("H1") }
 
-        // Bullet List Toggle
-        IconToggleButton(
-            checked = state.currentAttributes.containsKey(BulletListKey),
-            onCheckedChange = {
-                if (state.currentAttributes.containsKey(BulletListKey)) {
-                    state.removeFormat(BulletListKey)
-                } else {
-                    state.applyFormat(BulletListKey, ListIndentLevel.Level1)
-                }
-            },
-            modifier = unfocusable
-        ) {
-            Text("• List")
-        }
-
-        // Clear All Formats
+        // Clear formatting
         IconButton(
             onClick = { state.clearFormats() },
             modifier = unfocusable
-        ) {
-            Text("✕ Clear")
-        }
+        ) { Text("✕ Clear") }
     }
 }
 ```
+
+For the complete, production-ready implementation of the document editor screen (with responsive layout, keyboard padding, and full button sets), check out the sample repository:
+
+- [**DocumentEditorSample.kt**](https://github.com/mkeeda/arranger/blob/main/sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)
 
 ---
 
@@ -223,3 +155,4 @@ fun DocumentToolbar(state: RichTextState, modifier: Modifier = Modifier) {
 - Use `state.toggleFormat()` for Unit-based attributes (`BoldKey`, `ItalicKey`, `UnderlineKey`, etc.).
 - Use `state.applyFormat()` and `state.removeFormat()` for parameterized attributes (`TextColorKey`, `HeadingKey`, `BulletListKey`, etc.).
 - Use `state.detectAndApplyLinks()` to auto-link URLs in document text.
+- Refer to [DocumentEditorSample.kt](https://github.com/mkeeda/arranger/blob/main/sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt) for the complete reference implementation.

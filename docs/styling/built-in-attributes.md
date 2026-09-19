@@ -101,27 +101,11 @@ Within `RichStringScope.editAttributes` or `RichTextBuffer` scopes, the followin
 
 ---
 
-## High-Level Toolbar Extensions (RichTextStateFormatExt)
+## Applying Formatting from Toolbars
 
-When implementing toolbar action buttons, you can invoke these high-level extension functions directly. They handle toggling and applying formatting safely across active selections or typing attributes without requiring lower-level `state.edit` blocks:
+To apply, toggle, or clear formatting from toolbar buttons and menus without writing low-level `state.edit` blocks, `RichTextState` provides high-level convenience extensions (`toggleFormat`, `applyFormat`, `removeFormat`, `clearFormats`).
 
-```kotlin
-// Toggle bold (applies/removes bold over selection, or toggles typingAttributes if collapsed)
-state.toggleFormat(BoldKey)
-
-// Apply parameterized attribute
-state.applyFormat(TextColorKey, Color.Red.toRgbaColor())
-state.applyFormat(HeadingKey, HeadingLevel.H2)
-
-// Remove specific attribute
-state.removeFormat(HeadingKey)
-
-// Clear all formatting over selection or typingAttributes
-state.clearFormats()
-
-// Detect all URLs in text and automatically apply LinkKey
-state.detectAndApplyLinks()
-```
+For full details, patterns, and focus-prevention guidelines, see [**Toolbars & Focus Management**](../interactions/toolbars.md).
 
 ---
 
