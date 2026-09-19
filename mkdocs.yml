@@ -5,7 +5,7 @@ site_url: https://mkeeda.github.io/arranger/
 repo_url: https://github.com/mkeeda/arranger
 repo_name: mkeeda/arranger
 edit_uri: edit/main/docs/
-copyright: Copyright &copy; 2024-2026 mkeeda
+copyright: Copyright &copy; 2026 mkeeda
 
 docs_dir: docs
 site_dir: site
