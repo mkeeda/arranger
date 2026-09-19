@@ -101,16 +101,17 @@ nav:
       - Installation: getting-started/installation.md
       - Quick Start: getting-started/quickstart.md
   - Editor Basics:
-      - RichTextEditor: editor-basics/rich-text-editor.md
-      - WysiwygEditor: editor-basics/wysiwyg-editor.md
+      - Core Editor: editor-basics/rich-text-editor.md
+      - Markdown Shortcuts: editor-basics/wysiwyg-editor.md
       - State Management: editor-basics/state-management.md
   - Styling & Formatting:
       - Spans & Paragraphs: styling/spans-and-paragraphs.md
       - Built-in Attributes: styling/built-in-attributes.md
       - Custom Attributes: styling/custom-attributes.md
       - Theming & Material 3: styling/theming-and-m3.md
+      - Inspecting Runs: styling/inspecting-runs.md
   - Advanced Behaviors:
-      - Enter Key Strategies: advanced-behaviors/enter-key-strategies.md
+      - Paragraph Enter Keys: advanced-behaviors/enter-key-strategies.md
       - List Handling: advanced-behaviors/list-handling.md
       - Style Normalization: advanced-behaviors/span-merging.md
   - Interactive Features:
@@ -121,7 +122,7 @@ nav:
       - Markdown: interop/markdown.md
       - HTML: interop/html.md
       - Custom Formats: interop/custom-formats.md
-  - Architecture & Internal Design:
+  - Architecture & Concepts:
       - Architecture Overview: architecture/overview.md
       - State Lifecycle: architecture/state-lifecycle.md
   - API Reference: https://mkeeda.github.io/arranger/api/
