@@ -18,3 +18,10 @@ local.properties
 bin/
 .idea/deploymentTargetSelector.xml
 **/.kotlin/
+
+# MkDocs & Python
+/site/
+.cache/
+.venv/
+__pycache__/
+*.pyc
