@@ -9,6 +9,7 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
       - 'requirements.txt'
+      - 'tests/**'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
@@ -57,6 +58,9 @@ jobs:
         run: |
           mkdir -p site/api
           cp -r build/dokka/html/* site/api/
+
+      - name: Verify Site Integrity (Links, Images, Anchors & Dokka Integration)
+        run: python -m unittest discover -s tests -p "test_*.py"
 
       - name: Upload GitHub Pages Artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
