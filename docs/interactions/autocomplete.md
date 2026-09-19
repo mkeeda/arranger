@@ -49,7 +49,7 @@ val triggers = listOf(
 - **`allowSpacesInQuery`**: Set to `true` for queries with spaces, such as full names (`@Jane Doe`). By default (`false`), typing a space automatically dismisses the popup.
 - **`maxQueryLength`**: Upper limit on query length (default `50`). Typing beyond this limit dismisses the popup.
 
-For detailed constructor signatures, refer to the [AutocompleteTrigger API Reference](https://mkeeda.github.io/arranger/api/arranger-richtext-editor/dev.mkeeda.arranger.richtext.editor/-autocomplete-trigger/index.html).
+For detailed constructor signatures, refer to the [AutocompleteTrigger API Reference](https://mkeeda.github.io/arranger/api/richtext-editor/dev.mkeeda.arranger.richtext.editor/-autocomplete-trigger/index.html).
 
 ---
 

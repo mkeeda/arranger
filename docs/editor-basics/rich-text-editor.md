@@ -30,7 +30,7 @@ fun SimpleEditor() {
 
 Standard Compose parameters—such as `modifier`, `enabled`, `textStyle`, `keyboardOptions`, `onKeyboardAction`, and `decorator`—are supported with familiar Compose conventions.
 
-For the exhaustive list of parameters and signatures, refer directly to the [RichTextEditor API Reference](https://mkeeda.github.io/arranger/api/arranger-richtext-editor/dev.mkeeda.arranger.richtext.editor/-rich-text-editor.html).
+For the exhaustive list of parameters and signatures, refer directly to the [RichTextEditor API Reference](https://mkeeda.github.io/arranger/api/richtext-editor/dev.mkeeda.arranger.richtext.editor/-rich-text-editor.html).
 
 ---
 
