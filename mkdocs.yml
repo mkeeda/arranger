@@ -128,3 +128,6 @@ nav:
       - State Lifecycle: architecture/state-lifecycle.md
   - API Reference: https://mkeeda.github.io/arranger/api/
 
+
+hooks:
+  - hooks.py
