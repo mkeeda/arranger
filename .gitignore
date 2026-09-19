@@ -25,3 +25,9 @@ bin/
 .venv/
 __pycache__/
 *.pyc
+
+# Agent teamwork temporary directories
+/.agents/*
+!/.agents/agents/
+!/.agents/rules/
+!/.agents/skills/
