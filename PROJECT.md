@@ -91,9 +91,9 @@ Arranger は Compose Multiplatform 向けのリッチテキストエディタエ
 |---|------|-------|-------------|--------|
 | M1 | MkDocs Site Infrastructure & CI/CD | `mkdocs.yml`, `requirements.txt`, `.gitignore`, `.github/workflows/docs.yml`, 全26ページのプレースホルダー配置 | none | DONE |
 | M2 | Core Guides (Getting Started, Editor Basics, Styling) | `docs/index.md`, `docs/getting-started/*.md`, `docs/editor-basics/*.md`, `docs/styling/*.md` の完全執筆 | M1 | DONE |
-| M3 | Advanced, Interactive, Interop & Architecture Docs | `docs/advanced-behaviors/*.md`, `docs/interactions/*.md`, `docs/interop/*.md`, `docs/architecture/*.md` の完全執筆 | M1 | IN_PROGRESS |
-| M4 | Dokka Integration, API Guides & Root README Slimming | Dokka設定・生成、DokkaとMkDocs/CI統合、`docs/api/*.md` 執筆、`README.md` のスリム化更新 | M2, M3 | PLANNED |
-| M5 | Final Acceptance & Adversarial Hardening | Phase 1: E2E テストスイート 100% 合格 (`mkdocs build --strict` 完全通過、Dokkaビルド確認)<br>Phase 2: Adversarial Coverage Hardening | M4, E2E Testing Track | PLANNED |
+| M3 | Advanced, Interactive, Interop & Architecture Docs | `docs/advanced-behaviors/*.md`, `docs/interactions/*.md`, `docs/interop/*.md`, `docs/architecture/*.md` の完全執筆 | M1 | DONE |
+| M4 | Dokka Integration, API Guides & Root README Slimming | Dokka設定・生成、DokkaとMkDocs/CI統合、`docs/api/*.md` 執筆、`README.md` のスリム化更新 | M2, M3 | DONE |
+| M5 | Final Acceptance & Adversarial Hardening | Phase 1: E2E テストスイート 100% 合格 (`mkdocs build --strict` 完全通過、Dokkaビルド確認)<br>Phase 2: Adversarial Coverage Hardening | M4, E2E Testing Track | DONE |
 
 ---
 
