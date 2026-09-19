@@ -137,7 +137,7 @@ When exporting:
 
 ### Boundary Normalization & Delimiter Nesting
 
-When rich text contains overlapping inline styles (for example, text that is both bold and italic, or a link with underlined text), `MarkdownExporter` performs sweep-line interval slicing. It builds an active delimiter stack to guarantee that closing tags never cross or produce malformed Markdown:
+When rich text contains overlapping inline styles (for example, text that is both bold and italic, or a link with underlined text), `MarkdownExporter` automatically resolves delimiter nesting to guarantee that closing tags never cross or produce malformed Markdown:
 
 ```kotlin
 // Given: "Bold and italic" where Bold covers 0..14 and Italic covers 9..14

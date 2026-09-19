@@ -250,7 +250,7 @@ richString.runs(BoldKey).forEach { run ->
 
 **Best for:** Exporting isolated styles, building run-length encoded formats, or highlighting specific tokens.
 
-### 2. Sweep-Line Boundary Slicing (`transformSpans`)
+### 2. Segmenting by Boundary Coordinates
 
 When multiple overlapping styles must be exported in strictly nested trees (like XML, HTML, or Markdown delimiters):
 

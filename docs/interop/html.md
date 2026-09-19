@@ -163,7 +163,7 @@ HTML lists often feature complex hierarchies with mixed ordered and unordered su
 </ul>
 ```
 
-`HtmlExporter` manages an internal `ListStack` that dynamically opens and closes `<ul>`, `<ol>`, and `<li>` tags as the paragraph `ListIndentLevel` fluctuates. When transitioning back to normal paragraphs or headings, all open lists are properly closed.
+`HtmlExporter` automatically balances nested `<ul>`, `<ol>`, and `<li>` tags according to the paragraph `ListIndentLevel`. When transitioning back to normal paragraphs or headings, open lists are cleanly closed.
 
 ### HTML Entity Escaping & Security
 
