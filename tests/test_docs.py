@@ -383,6 +383,24 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
         self.assertIn(".venv", content, ".gitignore must ignore .venv")
         self.assertIn(".cache", content, ".gitignore must ignore .cache")
 
+    def test_nav_collapsible_sections(self):
+        """Verify navigation sections are collapsible by ensuring navigation.sections is disabled."""
+        from mkdocs.config import load_config
+        config = load_config(str(MKDOCS_YML))
+        features = config.get("theme", {}).get("features", [])
+        self.assertNotIn(
+            "navigation.sections",
+            features,
+            "navigation.sections must not be enabled so that top-level sections remain collapsible accordions",
+        )
+        if SITE_DIR.exists() and (SITE_DIR / "index.html").exists():
+            index_html = (SITE_DIR / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn(
+                "md-nav__item--section",
+                index_html,
+                "Rendered navigation should not contain 'md-nav__item--section' so sections can be collapsed",
+            )
+
 
 # ============================================================================
 # Tier 2: Boundary & Corner Cases Tests
