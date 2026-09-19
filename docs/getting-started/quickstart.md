@@ -70,9 +70,7 @@ Run the example above and try typing characters inside or deleting characters ar
 
 </div>
 
-In traditional Compose implementations, whenever the text length changes through insertions or deletions, developers must manually recalculate and shift subsequent style range offsets (`AnnotatedString.Range`).
-
-Arranger eliminates this friction: the editor engine diffs text mutations in real time and **automatically shifts and stretches existing span boundaries**:
+As you type, the editor engine diffs text mutations in real time and **automatically shifts and stretches existing span boundaries**:
 
 - *Typing inside formatted ranges*: Formatting automatically extends to newly inserted characters.
 - *Typing outside formatted ranges*: Existing span offsets shift forward or backward safely without corruption.

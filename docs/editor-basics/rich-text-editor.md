@@ -1,6 +1,6 @@
-# RichTextEditor
+# The Core Rich Text Editor
 
-`RichTextEditor` is the core Compose UI editor component of Arranger. Built on Compose Foundation 2.x (`BasicTextField`), it integrates rich attribute rendering, bidirectional state synchronization, keyboard shortcuts, tap detection, and autocomplete while preserving peak rendering performance.
+`RichTextEditor` is the primary Compose editor component of Arranger. It seamlessly integrates rich formatting, bidirectional state synchronization, keyboard shortcuts, interactive span taps, and autocomplete while preserving smooth rendering performance.
 
 <div align="center" markdown>
 
@@ -10,94 +10,44 @@
 
 ---
 
-## Overview & Signature
+## Basic Usage
 
-`RichTextEditor` can be positioned and customized intuitively, adhering to standard Compose Foundation conventions.
-
-```kotlin
-@Composable
-fun RichTextEditor(
-    state: RichTextState,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-    textStyle: TextStyle = TextStyle.Default,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    onKeyboardAction: KeyboardActionHandler? = null,
-    lineLimits: TextFieldLineLimits = TextFieldLineLimits.Default,
-    onTextLayout: (Density.(getResult: () -> TextLayoutResult?) -> Unit)? = null,
-    scrollState: ScrollState = rememberScrollState(),
-    interactionSource: MutableInteractionSource? = null,
-    cursorBrush: Brush = SolidColor(Color.Black),
-    decorator: TextFieldDecorator? = null,
-    styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
-    listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    onSpanClick: ((SpanClickEvent) -> Unit)? = null,
-    autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
-    onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
-)
-```
-
----
-
-## Parameter Reference
-
-| Parameter | Type | Default Value | Description |
-|---|---|---|---|
-| `state` | `RichTextState` | *(Required)* | State object managing the editor's text content, attribute spans, selection range, and undo/redo history. |
-| `modifier` | `Modifier` | `Modifier` | Compose modifier specifying size, layout, padding, and outer styling. |
-| `enabled` | `Boolean` | `true` | Controls whether the editor is interactive. When `false`, focus, text input, and tap events are disabled. |
-| `readOnly` | `Boolean` | `false` | Read-only mode. Disables text mutations while preserving text selection and span click interactions (`onSpanClick`). |
-| `textStyle` | `TextStyle` | `TextStyle.Default` | Base typography and styling (font family, font size, default text color) applied across the editor. |
-| `keyboardOptions` | `KeyboardOptions` | `KeyboardOptions.Default` | Software keyboard configuration (IME action, capitalization, autocorrect, keyboard type). |
-| `onKeyboardAction` | `KeyboardActionHandler?` | `null` | Callback handler executed when the user triggers an IME action (e.g. Done, Search, Send). |
-| `lineLimits` | `TextFieldLineLimits` | `Default` | Line count configuration (`SingleLine` or `MultiLine(min, max)`). |
-| `onTextLayout` | `(Density.(...) -> Unit)?` | `null` | Low-level callback invoked when text layout calculation completes. |
-| `scrollState` | `ScrollState` | `rememberScrollState()` | Scroll state managing and synchronizing vertical scrolling for multi-line editors. |
-| `interactionSource` | `MutableInteractionSource?` | `null` | Stream of interaction events (hover, press, focus) for custom UI feedback. |
-| `cursorBrush` | `Brush` | `SolidColor(Color.Black)` | Brush used to draw the cursor (caret). Can be styled with solid colors or gradients matching your theme. |
-| `decorator` | `TextFieldDecorator?` | `null` | Compose Foundation 2.x decorator for outer borders, padding, and placeholders. |
-| `styleResolver` | `AttributeStyleResolver` | `DefaultAttributeStyleResolver` | Resolver translating `AttributeContainer` entries into Compose `SpanStyle` and `ParagraphStyle`. |
-| `listMarkerResolver` | `ListMarkerResolver` | `DefaultListMarkerResolver` | Renderer mapping list depth and paragraph index to bullet characters or numbering text. |
-| `onSpanClick` | `((SpanClickEvent) -> Unit)?` | `null` | Event handler invoked when a formatted span is clicked or tapped. Calling `event.consume()` suppresses cursor movement. |
-| `autocompleteTriggers` | `List<AutocompleteTrigger>` | `emptyList()` | List of trigger definitions monitoring autocomplete queries (such as `@mentions` and `#tags`). |
-| `onAutocompleteChange` | `((AutocompleteMatch?) -> Unit)?` | `null` | Invoked when an autocomplete query matches or is dismissed, used to drive suggestion popups. |
-
----
-
-## Key Capabilities & Patterns
-
-### 1. Placeholders and Decorators (`decorator`)
-
-Compose Foundation 2.x provides the `TextFieldDecorator` interface, allowing developers to wrap the text input area with outer borders, padding, and conditional placeholder text when content is empty.
+Rendering an editor requires only passing a `RichTextState`:
 
 ```kotlin
 @Composable
-fun DecoratedRichTextEditor(state: RichTextState) {
+fun SimpleEditor() {
+    val state = remember { RichTextState() }
+
     RichTextEditor(
         state = state,
         modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
-            .padding(12.dp),
-        decorator = { innerTextField ->
-            Box {
-                if (state.richString.text.isEmpty()) {
-                    Text(
-                        text = "Type here...",
-                        color = Color.Gray,
-                    )
-                }
-                innerTextField()
-            }
-        }
+            .fillMaxSize()
+            .padding(16.dp),
     )
 }
 ```
 
+Standard Compose parameters—such as `modifier`, `enabled`, `textStyle`, `keyboardOptions`, `onKeyboardAction`, and `decorator`—are supported with familiar Compose conventions.
+
+For the exhaustive list of parameters and signatures, refer directly to the [RichTextEditor API Reference](https://mkeeda.github.io/arranger/api/arranger-richtext-editor/dev.mkeeda.arranger.richtext.editor/-rich-text-editor.html).
+
+---
+
+## Core Capabilities & Patterns
+
+While `RichTextEditor` adheres to standard Compose conventions, it adds rich-text capabilities specifically designed for document editing:
+
+### 1. Custom Style & Marker Resolvers
+
+You can fully customize how attributes and lists are visually rendered by supplying custom resolvers:
+
+- **`styleResolver`**: Translates formatting attributes into Compose `SpanStyle` and `ParagraphStyle`. See [Theming & Material 3](../styling/theming-and-m3.md) and [Custom Attributes](../styling/custom-attributes.md).
+- **`listMarkerResolver`**: Controls the prefix markers for bullet points and ordered lists. See [List Handling](../advanced-behaviors/list-handling.md).
+
 ### 2. Interactive Span Clicks (`onSpanClick`)
 
-You can handle click and tap events on formatted spans (such as links, user mentions, or hashtag badges).
+Handle taps on formatted spans (such as links, user mentions, or hashtag badges) with cursor suppression:
 
 ```kotlin
 RichTextEditor(
@@ -106,34 +56,35 @@ RichTextEditor(
         val url = event.span.attributes[LinkKey]
         if (url != null) {
             println("URL clicked: $url")
-            // Consume the event to prevent moving the text cursor to the tapped position
-            event.consume()
+            event.consume() // Prevent repositioning the text cursor
         }
     }
 )
 ```
 
-!!! tip "Importance of event.consume()"
-    Calling `event.consume()` informs the editor engine that this tap was handled as a link or span action, automatically canceling the default caret relocation and text selection. See [Interactive Spans](../interactions/span-clicks.md) for full details.
+Calling `event.consume()` informs the editor engine that this tap was handled as a link or span action, preventing the text cursor from relocating. See [Interactive Spans & Click Handling](../interactions/span-clicks.md) for full details.
 
 ### 3. Read-Only Rich Text Viewer (`readOnly = true`)
 
-By setting `readOnly = true`, the editor functions as a non-editable rich text viewer while preserving text selection and span click interactions.
+By setting `readOnly = true`, the editor functions as a non-editable rich text viewer while preserving text selection and span click interactions:
 
 ```kotlin
 RichTextEditor(
     state = state,
     readOnly = true,
     onSpanClick = { event ->
-        // Link clicks remain fully functional in read-only mode
         event.span.attributes[LinkKey]?.let { openBrowser(it) }
     }
 )
 ```
 
-### 4. Comprehensive Demo
+### 4. Autocomplete & Mentions
 
-See the full editor in action below, showcasing toolbar interaction, formatting, and style resolution:
+Pass `autocompleteTriggers` (e.g. `@` or `#`) and `onAutocompleteChange` to display suggestion popups anchored to the cursor. See [Autocomplete & Mentions](../interactions/autocomplete.md).
+
+---
+
+## Visual Demo
 
 <div align="center" markdown>
 
@@ -145,6 +96,6 @@ See the full editor in action below, showcasing toolbar interaction, formatting,
 
 ## Related Documentation
 
-- [**WysiwygEditor**](wysiwyg-editor.md): Real-time Markdown shortcut styling editor component.
-- [**State Management (RichTextState)**](state-management.md): Batch edits, typing attributes, and undo/redo history.
+- [**Markdown Shortcut Editor (WYSIWYG)**](wysiwyg-editor.md): Real-time Markdown shortcut styling editor component.
+- [**State Management & History**](state-management.md): Batch edits, typing attributes, and undo/redo history.
 - [**Theming and Material 3**](../styling/theming-and-m3.md): Custom styling via `AttributeStyleResolver` and Material 3 token mapping.

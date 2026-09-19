@@ -9,8 +9,7 @@ Arranger is published on Maven Central. Configure dependencies according to your
 To use Arranger, ensure your development environment meets the following minimum requirements:
 
 - **Kotlin**: 2.4.10 or higher
-- **Compose Multiplatform**: 1.12.0 or higher (Foundation 2.x architecture)
-- **Android Gradle Plugin (AGP)**: 8.5+ (when targeting Android)
+- **Compose Multiplatform**: 1.12.0 or higher
 
 ---
 
