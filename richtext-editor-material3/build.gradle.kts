@@ -7,7 +7,7 @@ plugins {
     id("arranger.wasmjs.target")
     id("arranger.kmp.compose")
     id("arranger.maven.publish")
-    id("arranger.dokka")
+    alias(libs.plugins.dokka)
 }
 
 kotlin {

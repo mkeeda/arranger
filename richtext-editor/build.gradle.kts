@@ -7,7 +7,7 @@ plugins {
     id("arranger.kmp.compose")
     id("arranger.maven.publish")
     id("arranger.android.screenshot")
-    id("arranger.dokka")
+    alias(libs.plugins.dokka)
 }
 
 kotlin {
