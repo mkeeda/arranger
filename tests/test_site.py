@@ -657,6 +657,42 @@ class AdversarialStressScenariosTests(unittest.TestCase):
             f"Found empty or whitespace-only link/image references:\n" + "\n".join(empty_tags)
         )
 
+    def test_extra_css_and_accent_color(self):
+        """Assert extra.css exists, is linked in all MkDocs HTML pages, and properly overrides link/nav accent colors."""
+        extra_css_path = SITE_DIR / "stylesheets" / "extra.css"
+        self.assertTrue(extra_css_path.is_file(), "site/stylesheets/extra.css does not exist")
+
+        content = extra_css_path.read_text(encoding="utf-8")
+
+        # Check slate / dark mode override
+        self.assertIn("#ff764d", content, "extra.css missing dark mode accent color #ff764d")
+        self.assertIn("data-md-color-scheme=\"slate\"", content, "extra.css missing slate scheme selector")
+        self.assertIn("data-md-color-primary=\"black\"", content, "extra.css missing primary black selector")
+
+        # Check default / light mode override
+        self.assertIn("#d84315", content, "extra.css missing light mode accent color #d84315")
+        self.assertIn("data-md-color-scheme=\"default\"", content, "extra.css missing default scheme selector")
+
+        # Check active nav link rule
+        self.assertIn(".md-nav__link--active", content, "extra.css missing active nav link style rule")
+
+        # Check all MkDocs HTML pages link to extra.css
+        site_data = get_parsed_site_data()
+        api_dir_str = str((SITE_DIR / "api").resolve())
+        unlinked_pages = []
+        for p in site_data:
+            if not str(p).startswith(api_dir_str):
+                html_text = p.read_text(encoding="utf-8")
+                if "stylesheets/extra.css" not in html_text:
+                    unlinked_pages.append(str(p.relative_to(SITE_DIR)))
+
+        self.assertEqual(
+            unlinked_pages,
+            [],
+            f"Found MkDocs pages not linking to extra.css: {unlinked_pages}"
+        )
+
+
 
 # ============================================================================
 # Adversarial Test Runner & Comprehensive Report Generator
