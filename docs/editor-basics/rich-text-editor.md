@@ -72,19 +72,6 @@ fun RichTextEditor(
 Compose Foundation 2.x provides the `TextFieldDecorator` interface, allowing developers to wrap the text input area with outer borders, padding, and conditional placeholder text when content is empty.
 
 ```kotlin
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.shape.RoundedCornerShape
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-
 @Composable
 fun DecoratedRichTextEditor(state: RichTextState) {
     RichTextEditor(

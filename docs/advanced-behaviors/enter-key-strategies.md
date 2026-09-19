@@ -158,11 +158,6 @@ Custom block types can define their own Enter key behavior by implementing `Ente
 Consider a code block where pressing Enter creates normal newlines inside code, but pressing Enter twice on an empty line exits the code block:
 
 ```kotlin
-import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
-import dev.mkeeda.arranger.richtext.EnterKeyContext
-import dev.mkeeda.arranger.richtext.EnterKeyResult
-import dev.mkeeda.arranger.richtext.EnterKeyStrategy
-
 public data object CodeBlockKey : BlockTypeAttributeKey<Unit> {
     override val name: String = "code-block"
     override val defaultValue: Unit = Unit

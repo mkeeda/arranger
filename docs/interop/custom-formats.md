@@ -79,12 +79,6 @@ Here is a complete implementation of a bi-directional `SlackMrkdwnFormat`:
 We can inspect consecutive styled chunks using `richString.runs`:
 
 ```kotlin
-import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.ItalicKey
-import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.RichTextExporter
-import dev.mkeeda.arranger.richtext.StrikethroughKey
-
 public object SlackMrkdwnExporter : RichTextExporter<String> {
     override fun export(richString: RichString): String {
         if (richString.text.isEmpty()) return ""
@@ -127,11 +121,6 @@ public object SlackMrkdwnExporter : RichTextExporter<String> {
 We parse the input string and construct a `RichString` with `RichSpan`s:
 
 ```kotlin
-import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.RichTextImporter
-import dev.mkeeda.arranger.richtext.edit
-
 public object SlackMrkdwnImporter : RichTextImporter<String> {
     private val BOLD_REGEX = Regex("""\*(.*?)\*""")
 
@@ -167,18 +156,6 @@ For cloud synchronization (e.g. Firebase, Couchbase, Ktor REST APIs), serializin
 Using `kotlinx.serialization`:
 
 ```kotlin
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import dev.mkeeda.arranger.richtext.AttributeContainer
-import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.HeadingKey
-import dev.mkeeda.arranger.richtext.HeadingLevel
-import dev.mkeeda.arranger.richtext.ItalicKey
-import dev.mkeeda.arranger.richtext.LinkKey
-import dev.mkeeda.arranger.richtext.RichSpan
-import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.RichTextFormat
-
 @Serializable
 public data class SerializedSpan(
     val start: Int,

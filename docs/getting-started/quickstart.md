@@ -9,15 +9,6 @@ Get started with Arranger in just a few lines of Compose code. This guide walks 
 To start, create a minimal Composable rendering an empty editor.
 
 ```kotlin
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-
 @Composable
 fun SimpleEditor() {
     // 1. Remember RichTextState to manage editor state
@@ -42,20 +33,6 @@ With just this setup, you have a fully functional rich text editor supporting ke
 To pre-populate the editor with formatted text upon launch, use `RichString` and its mutation DSL (`edit { ... }`).
 
 ```kotlin
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.bold
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.textColor
-import dev.mkeeda.arranger.richtext.rangeOf
-
 @Composable
 fun DynamicEditingSample(modifier: Modifier = Modifier) {
     val initialText = "Edit this styled text to see the magic."

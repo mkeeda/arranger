@@ -120,24 +120,6 @@ Applying a new alignment attribute automatically supersedes any previous alignme
 ## Practical Styling Example
 
 ```kotlin
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import dev.mkeeda.arranger.richtext.HeadingLevel
-import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.TextAlignment
-import dev.mkeeda.arranger.richtext.blockquote
-import dev.mkeeda.arranger.richtext.bold
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.textColor
-import dev.mkeeda.arranger.richtext.headingLevel
-import dev.mkeeda.arranger.richtext.rangeOf
-import dev.mkeeda.arranger.richtext.textAlignment
-import dev.mkeeda.arranger.richtext.underline
-
 @Composable
 fun StylingExample() {
     val text = "Chapter 1 Introduction\nThis paragraph is centered.\nA quoted callout block."

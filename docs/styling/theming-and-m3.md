@@ -43,13 +43,6 @@ When no custom resolver is specified, `DefaultAttributeStyleResolver` is used by
 You can inherit from an existing resolver and override or add styling rules for specific attribute keys:
 
 ```kotlin
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontFamily
-import dev.mkeeda.arranger.richtext.InlineCodeKey
-import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
-
 val CustomStyleResolver = AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
     // Override inline code background and font styling
     spanStyle(InlineCodeKey) {
@@ -82,17 +75,6 @@ dependencies {
 Invoke the `@Composable fun rememberMaterial3AttributeStyleResolver()` function and pass the result to the editor's `styleResolver` parameter:
 
 ```kotlin
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
-
 @Composable
 fun Material3EditorScreen() {
     val state = remember { RichTextState() }

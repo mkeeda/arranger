@@ -28,8 +28,6 @@ An example of a custom flag span attribute without a parameter value (`Unit`):
 ### Step 1: Define Attribute Key
 
 ```kotlin
-import dev.mkeeda.arranger.richtext.SpanAttributeKey
-
 // Define as a singleton object or data object
 object HighlightKey : SpanAttributeKey<Unit> {
     override val name: String = "Highlight"
@@ -42,8 +40,6 @@ object HighlightKey : SpanAttributeKey<Unit> {
 Add extension functions so the attribute can be called intuitively inside `edit { ... }` blocks.
 
 ```kotlin
-import dev.mkeeda.arranger.richtext.AttributeEditScope
-
 fun AttributeEditScope.highlight() {
     setSpanAttribute(HighlightKey, Unit)
 }
@@ -58,12 +54,6 @@ fun AttributeEditScope.clearHighlight() {
 Using `AttributeStyleResolver(base = DefaultAttributeStyleResolver)` allows you to retain all default formatting rules (bold, underline, etc.) while layering in custom styling rules.
 
 ```kotlin
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
-import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
-
 val CustomAttributeResolver = AttributeStyleResolver(base = DefaultAttributeStyleResolver) {
     spanStyle(HighlightKey) {
         SpanStyle(
@@ -78,15 +68,6 @@ val CustomAttributeResolver = AttributeStyleResolver(base = DefaultAttributeStyl
 ### Step 4: Render in Editor
 
 ```kotlin
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import dev.mkeeda.arranger.richtext.RichString
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.rangeOf
-
 @Composable
 fun CustomAttributeScreen() {
     val text = "Arranger provides robust support for custom attributes."

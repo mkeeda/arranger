@@ -99,42 +99,6 @@ Here is a complete, production-ready document editor with a formatting toolbar i
 ![Document Editor](../images/document-editor.png){ width="600" }
 
 ```kotlin
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.unit.dp
-import dev.mkeeda.arranger.richtext.BoldKey
-import dev.mkeeda.arranger.richtext.BulletListKey
-import dev.mkeeda.arranger.richtext.HeadingKey
-import dev.mkeeda.arranger.richtext.HeadingLevel
-import dev.mkeeda.arranger.richtext.ItalicKey
-import dev.mkeeda.arranger.richtext.ListIndentLevel
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.applyFormat
-import dev.mkeeda.arranger.richtext.editor.clearFormats
-import dev.mkeeda.arranger.richtext.editor.removeFormat
-import dev.mkeeda.arranger.richtext.editor.toggleFormat
-
 @Composable
 fun DocumentEditorScreen() {
     val state = remember { RichTextState() }

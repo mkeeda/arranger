@@ -126,13 +126,6 @@ RichTextEditor(
 ## Complete Multi-Type Click Handler Example
 
 ```kotlin
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import dev.mkeeda.arranger.richtext.LinkKey
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-
 @Composable
 fun InteractiveArticleViewer(
     state: RichTextState,
