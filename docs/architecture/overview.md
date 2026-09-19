@@ -4,8 +4,6 @@ Arranger is designed to solve a central challenge in modern UI development: **hi
 
 Instead of coupling text layout, styling models, and platform widgets into an opaque monolith, Arranger is strictly organized into **three modular layers**.
 
-![Arranger Document Editor Architecture](../images/document-editor.png){ width="600" }
-
 ---
 
 ## High-Level System Architecture

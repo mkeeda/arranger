@@ -2,8 +2,6 @@
 
 Arranger offers rich bi-directional HTML import and export capabilities via the `arranger-richtext-html` module. Utilizing [ksoup](https://github.com/fleeksoft/ksoup) — a pure Kotlin Multiplatform port of the popular jsoup HTML parsing library — this module enables full HTML round-tripping across Android, iOS, Desktop (JVM), and Web (Wasm/JS) without platform-specific webview or browser dependencies.
 
-![Advanced Formatting](../images/advanced-formatting.png){ width="600" }
-
 ---
 
 ## Installation
@@ -181,7 +179,7 @@ On import, `ksoup` decodes all valid HTML entities (`&copy;`, `&mdash;`, `&#1285
 
 ## Current Nuances & Limitations
 
-!!! warning "Inline Code (<code>) Tag in v0.4.0-alpha"
+!!! warning "Inline Code Tag in v0.4.0-alpha"
     The current `HtmlImporter` and `HtmlExporter` implementations do not map `<code>` or `<pre>` tags to Arranger's `InlineCodeKey`. If code formatting is required, wrap text with inline styles or implement a custom format handler.
 
 !!! info "Block vs Inline Separation"

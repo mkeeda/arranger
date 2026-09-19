@@ -2,8 +2,6 @@
 
 Arranger provides first-class support for bi-directional Markdown conversion through the `arranger-richtext-markdown` module. Powered by JetBrains' official [Markdown parser](https://github.com/JetBrains/markdown) using the GitHub Flavored Markdown (GFM) specification, this module enables seamless serialization between rich text in-memory models (`RichString`) and standardized Markdown text.
 
-![WYSIWYG Markdown Formatting](../images/wysiwyg.gif){ width="600" }
-
 ---
 
 ## Installation

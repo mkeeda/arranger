@@ -4,8 +4,6 @@ When users format rich text documents, formatting ranges frequently overlap, fra
 
 Arranger handles these range intersections automatically behind the scenes. You never have to calculate character offsets or manage nested formatting spans manually.
 
-![Attribute Batch Editing](../images/attribute-batch-edit.gif){ width="600" }
-
 ---
 
 ## How Range Overlaps Work

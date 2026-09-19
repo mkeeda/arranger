@@ -17,76 +17,54 @@ The engine provides full trigger detection, query extraction, atomic completion 
 
 Typing `@` followed by a user's name displays an elevated popup positioned directly below the active cursor. Selecting a user inserts a stylized mention badge.
 
-![Mention Autocomplete](../images/mention-autocomplete.png){ width="500" }
+![Mention Autocomplete](../images/mention-autocomplete.png){ width="380" }
 
 ### Hashtag Trigger
 
 Hashtag detection works in real time, highlighting matching tags and channels as you type.
 
-![Hashtag Highlight](../images/hashtag-highlight.gif){ width="500" }
+![Hashtag Highlight](../images/hashtag-highlight.gif){ width="380" }
 
 ---
 
-## AutocompleteTrigger Configuration
+## Configuring Triggers
 
-Define triggers using `AutocompleteTrigger`:
-
-```kotlin
-package dev.mkeeda.arranger.richtext.editor
-
-@Immutable
-public data class AutocompleteTrigger(
-    val prefix: String,
-    val id: String = prefix,
-    val requireLeadingWhitespace: Boolean = true,
-    val allowSpacesInQuery: Boolean = false,
-    val maxQueryLength: Int = 50,
-) {
-    public constructor(
-        character: Char,
-        id: String = character.toString(),
-        requireLeadingWhitespace: Boolean = true,
-        allowSpacesInQuery: Boolean = false,
-        maxQueryLength: Int = 50,
-    )
-}
-```
-
-### Trigger Parameters
-
-- `prefix`: The triggering character or string (e.g. `"@"` or `"#"`).
-- `id`: Optional unique identifier when multiple triggers share characters.
-- `requireLeadingWhitespace`: When `true` (default), prevents false triggers inside words (for example, `user@example.com` will **not** trigger mention autocomplete).
-- `allowSpacesInQuery`: When `false` (default), typing a space dismisses the autocomplete popup. Set to `true` for queries with spaces, such as full names (`@John Doe`).
-- `maxQueryLength`: Upper limit on query length (default `50`). Typing beyond this limit automatically dismisses the popup.
-
----
-
-## AutocompleteMatch & Detection
-
-Arranger continuously analyzes the cursor position via `detectAutocomplete`:
+Define triggers using `AutocompleteTrigger` for each pattern your editor supports (such as `@` for mentions or `#` for channels):
 
 ```kotlin
-public fun detectAutocomplete(
-    text: CharSequence,
-    cursorPosition: Int,
-    triggers: List<AutocompleteTrigger>,
-): AutocompleteMatch?
-```
-
-When an active trigger matches, Arranger produces an `AutocompleteMatch`:
-
-```kotlin
-@Immutable
-public data class AutocompleteMatch(
-    val trigger: AutocompleteTrigger,
-    val query: String,
-    val range: IntRange,        // Includes prefix and query: e.g. 5..10 for "@alice"
-    val queryRange: IntRange,   // Query only: e.g. 6..10 for "alice"
-    val cursorPosition: Int,
-    val cursorRect: Rect? = null, // Viewport-relative cursor bounding box
+val triggers = listOf(
+    // Trigger for user mentions (e.g. @alice)
+    AutocompleteTrigger(prefix = "@"),
+    // Trigger for full names allowing spaces (e.g. @Jane Doe)
+    AutocompleteTrigger(prefix = "@", allowSpacesInQuery = true),
+    // Trigger for channel/topic hashtags (e.g. #general)
+    AutocompleteTrigger(prefix = "#"),
 )
 ```
+
+### Key Trigger Options
+
+- **`prefix`**: The triggering character or string (e.g. `"@"` or `"#"`).
+- **`requireLeadingWhitespace`**: When `true` (default), prevents false triggers inside words (e.g. `user@example.com` will **not** trigger mention autocomplete).
+- **`allowSpacesInQuery`**: Set to `true` for queries with spaces, such as full names (`@Jane Doe`). By default (`false`), typing a space automatically dismisses the popup.
+- **`maxQueryLength`**: Upper limit on query length (default `50`). Typing beyond this limit dismisses the popup.
+
+For detailed constructor signatures, refer to the [AutocompleteTrigger API Reference](https://mkeeda.github.io/arranger/api/arranger-richtext-editor/dev.mkeeda.arranger.richtext.editor/-autocomplete-trigger/index.html).
+
+---
+
+## Receiving Autocomplete Matches
+
+Pass your triggers to `RichTextEditor(autocompleteTriggers = triggers, onAutocompleteChange = { match -> ... })`.
+
+When an active trigger matches the cursor position, Arranger delivers an `AutocompleteMatch` containing:
+
+- **`match.query`**: The query text typed after the prefix (e.g. `"ali"` in `"@ali"`).
+- **`match.range`**: The full character range in the document including the prefix (`5..9`).
+- **`match.queryRange`**: The character range of the query alone (`6..9`).
+- **`match.cursorRect`**: The bounding box of the cursor, used for popup positioning.
+
+When the cursor leaves the trigger area, `onAutocompleteChange` is called with `null` so you can dismiss suggestions.
 
 ---
 
