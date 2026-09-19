@@ -91,19 +91,19 @@ To use Arranger, ensure your development environment meets the following minimum
 
 ---
 
-## Modules & Responsibilities
+## Artifacts & Responsibilities
 
-Arranger is modularized into discrete libraries so you can include only what your application requires:
+Arranger is published as discrete artifacts so you can include only what your application requires:
 
-| Module | Artifact | Responsibilities & Key Features | Dependencies |
-|---|---|---|---|
-| `:richtext` | `arranger-richtext` | **Pure core data model layer**.<br>Independent of Compose UI. Provides immutable data structures (`RichString`, `RichSpan`), attribute systems (`AttributeKey`, `AttributeContainer`), sweep-line interval partitioning, paragraph snapping, and list extraction algorithms. | None (Kotlin stdlib only) |
-| `:richtext-editor` | `arranger-richtext-editor` | **Compose UI editor engine layer**.<br>Provides `RichTextEditor`, `WysiwygEditor`, state management via `RichTextState`, undo/redo history, enter key strategies, tap detection, and autocomplete support. | `:richtext`, Compose UI / Foundation |
-| `:richtext-editor-material3` | `arranger-richtext-editor-material3` | **Material 3 integration layer**.<br>Reads `MaterialTheme.typography` and `colorScheme`, providing `rememberMaterial3AttributeStyleResolver` to automatically align headings and blockquotes with M3 design tokens. | `:richtext-editor`, Compose Material 3 |
-| `:richtext-markdown` | `arranger-richtext-markdown` | **Bidirectional Markdown conversion layer**.<br>Leverages the JetBrains Markdown parser (GFM) to convert bidirectionally between `RichString` and Markdown text. | `:richtext`, `org.jetbrains:markdown` |
-| `:richtext-html` | `arranger-richtext-html` | **Bidirectional HTML conversion layer**.<br>Uses the multiplatform HTML parser `ksoup` to convert between `RichString` and HTML, with full support for inline CSS styling (colors, font sizes, alignments, etc.). | `:richtext`, `ksoup` |
+| Artifact | Responsibilities & Key Features | Dependencies |
+|---|---|---|
+| `arranger-richtext` | **Pure core data model layer**.<br>Independent of Compose UI. Provides immutable data structures (`RichString`, `RichSpan`), attribute systems (`AttributeKey`, `AttributeContainer`), sweep-line interval partitioning, paragraph snapping, and list extraction algorithms. | None (Kotlin stdlib only) |
+| `arranger-richtext-editor` | **Compose UI editor engine layer**.<br>Provides `RichTextEditor`, `WysiwygEditor`, state management via `RichTextState`, undo/redo history, enter key strategies, tap detection, and autocomplete support. | `arranger-richtext`, Compose UI / Foundation |
+| `arranger-richtext-editor-material3` | **Material 3 integration layer**.<br>Reads `MaterialTheme.typography` and `colorScheme`, providing `rememberMaterial3AttributeStyleResolver` to automatically align headings and blockquotes with M3 design tokens. | `arranger-richtext-editor`, Compose Material 3 |
+| `arranger-richtext-markdown` | **Bidirectional Markdown conversion layer**.<br>Leverages the JetBrains Markdown parser (GFM) to convert bidirectionally between `RichString` and Markdown text. | `arranger-richtext`, `org.jetbrains:markdown` |
+| `arranger-richtext-html` | **Bidirectional HTML conversion layer**.<br>Uses the multiplatform HTML parser `ksoup` to convert between `RichString` and HTML, with full support for inline CSS styling (colors, font sizes, alignments, etc.). | `arranger-richtext`, `ksoup` |
 
-!!! tip "Using Core Modules Headless"
+!!! tip "Using Core Artifacts Headless"
     If you are building backend services, Ktor server-side applications, or CLI tools that only need to manipulate rich text data models or perform Markdown/HTML conversions, you can include `arranger-richtext`, `arranger-richtext-markdown`, and `arranger-richtext-html` without any Compose UI dependencies for a lightweight footprint.
 
 ---
