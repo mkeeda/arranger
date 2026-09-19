@@ -33,8 +33,6 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - navigation.tracking
-    - navigation.tabs
-    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
     - navigation.path
@@ -100,8 +98,8 @@ validation:
     anchors: warn
 
 nav:
-  - Home / Getting Started:
-      - Overview: index.md
+  - Overview: index.md
+  - Getting Started:
       - Installation: getting-started/installation.md
       - Quick Start: getting-started/quickstart.md
   - Editor Basics:
@@ -128,10 +126,5 @@ nav:
   - Architecture & Internal Design:
       - Architecture Overview: architecture/overview.md
       - State Lifecycle: architecture/state-lifecycle.md
-  - API Reference:
-      - API Overview: api/overview.md
-      - richtext: api/richtext.md
-      - richtext-editor: api/richtext-editor.md
-      - richtext-editor-material3: api/richtext-editor-material3.md
-      - richtext-markdown: api/richtext-markdown.md
-      - richtext-html: api/richtext-html.md
+  - API Reference: https://mkeeda.github.io/arranger/api/
+

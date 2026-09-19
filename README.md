@@ -26,7 +26,7 @@ Comprehensive guides, API references, and interactive tutorials are available at
 - **[Advanced Behaviors](https://mkeeda.github.io/arranger/advanced-behaviors/enter-key-strategies/)**: Enter-key strategies, list handling, and sweep-line span merging.
 - **[Interactive Features](https://mkeeda.github.io/arranger/interactions/autocomplete/)**: Mentions, hashtags, popup positioning, and clickable spans.
 - **[Markdown & HTML Interop](https://mkeeda.github.io/arranger/interop/markdown/)**: Bi-directional conversion and custom AST serializers.
-- **[API Reference](https://mkeeda.github.io/arranger/api/overview/)**: Detailed specifications for all modules and interactive Dokka reference.
+- **[API Reference](https://mkeeda.github.io/arranger/api/)**: Comprehensive API documentation generated directly from KDoc via Dokka.
 
 ---
 
