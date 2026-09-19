@@ -4,23 +4,12 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'docs/**'
-      - 'mkdocs.yml'
-      - 'requirements.txt'
-      - '.github/workflows/docs.yml'
-      - 'richtext*/**'
-      - 'gradle/**'
-      - '*.gradle.kts'
   pull_request:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
       - 'requirements.txt'
       - '.github/workflows/docs.yml'
-      - 'richtext*/**'
-      - 'gradle/**'
-      - '*.gradle.kts'
   workflow_dispatch:
 
 concurrency:
@@ -48,7 +37,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Generate Dokka API Reference
-        run: ./gradlew dokkaHtmlMultiModule
+        run: ./gradlew dokkaGeneratePublicationHtml
 
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
@@ -66,8 +55,8 @@ jobs:
 
       - name: Merge Dokka API Reference into MkDocs Site
         run: |
-          mkdir -p site/api/dokka
-          cp -r build/dokka/html/* site/api/dokka/
+          mkdir -p site/api
+          cp -r build/dokka/html/* site/api/
 
       - name: Upload GitHub Pages Artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
