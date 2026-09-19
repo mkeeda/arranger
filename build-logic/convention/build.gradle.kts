@@ -69,5 +69,9 @@ gradlePlugin {
             id = "arranger.android.screenshot"
             implementationClass = "AndroidScreenshotTestConventionPlugin"
         }
+        register("dokka") {
+            id = "arranger.dokka"
+            implementationClass = "DokkaConventionPlugin"
+        }
     }
 }
