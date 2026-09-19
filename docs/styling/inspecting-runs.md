@@ -22,6 +22,7 @@ Consider a document where the user applies **Bold** across an entire sentence, a
 ```
 
 Internally, Arranger tracks this as three distinct spans:
+
 1. `0..5` ("Hello "): Bold
 2. `6..14` ("wonderful"): Bold + TextColor(Green)
 3. `15..20` (" world"): Bold
@@ -46,58 +47,110 @@ public data class RichRun<T>(
 
 - `text`: The exact substring for this run.
 - `range`: The 0-based character range (inclusive) in the original document.
-- `value`: The resolved attribute value for the queried key or predicate.
+- `value`: The resolved attribute value for the queried key (`T`), or the full `AttributeContainer` when queried with a predicate.
 
 ---
 
-## Extracting Runs by Attribute Key
+## 1. Extracting Runs by Attribute Key
 
-To extract all regions where a specific attribute is applied, pass the `AttributeKey`:
+Signature:
+```kotlin
+public fun <T : Any> RichString.runs(key: AttributeKey<T>): Sequence<RichRun<T>>
+```
+
+Pass an `AttributeKey` to extract all contiguous blocks where that attribute is continuously applied.
+
+### Flag Attributes (Bold, Italic, Underline)
+
+For Unit-based attributes, any adjacent spans possessing the attribute are combined into one run, ignoring differences in other attributes:
 
 ```kotlin
 val boldRuns = richString.runs(BoldKey)
 
 boldRuns.forEach { run ->
-    println("Bold text: '${run.text}' at ${run.range}")
+    println("Bold text: '${run.text}' spanning ${run.range}")
 }
 ```
 
-Adjacent spans that share the **exact same attribute value** are automatically combined into a single `RichRun`, regardless of differences in any other attributes.
+### Parameterized Attributes (Colors & Links)
 
-### Parameterized Attributes Example (Colors & Links)
+For parameterized attributes (such as `TextColorKey` or `LinkKey`), adjacent spans are merged **if and only if they share the exact same parameter value**. When the value changes, a new run begins:
 
-For parameterized attributes (such as `TextColorKey` or `LinkKey`), adjacent spans are merged only if they have the same parameter value:
+```text
+Document: "Apple Orange Grape Kiwi"
+Color:    [#FF0000] [#FF0000] [#0000FF] [#0000FF]
+Runs:     [== Run 1: Red ==] [== Run 2: Blue ====]
+```
 
 ```kotlin
-// Extract all hyperlinks from the document
-val links = richString.runs(LinkKey)
+// Query all text color runs
+val colorRuns = richString.runs(TextColorKey)
 
-links.forEach { run ->
-    val url: String = run.value
-    println("Found link '${run.text}' pointing to $url (${run.range})")
+colorRuns.forEach { run ->
+    val color: RgbaColor = run.value
+    println("Text: '${run.text}', Color: $color, Range: ${run.range}")
 }
+
+// Output:
+// Text: 'Apple Orange ', Color: RgbaColor(0xFFFF0000), Range: 0..12
+// Text: 'Grape Kiwi',    Color: RgbaColor(0xFF0000FF), Range: 13..22
 ```
 
-If adjacent words share the same URL, they merge into one link run. If the URL changes, a separate run begins.
+Unstyled text between formatted regions produces no runs; gaps are skipped automatically.
 
 ---
 
-## Filtering Runs with a Predicate
+## 2. Filtering Runs with a Predicate
 
-For advanced inspection, you can query runs using a custom predicate function `(AttributeContainer) -> Boolean`:
+Signature:
+```kotlin
+public fun RichString.runs(
+    predicate: (AttributeContainer) -> Boolean,
+): Sequence<RichRun<AttributeContainer>>
+```
+
+When you need multi-attribute queries, pass a predicate `(AttributeContainer) -> Boolean`. 
+
+The returned sequence yields `RichRun<AttributeContainer>`, where `run.value` is the complete attribute container for that block.
+
+### Merging Rules for Predicates
+
+1. Only spans satisfying the predicate are included.
+2. Adjacent matching spans are merged **only if their entire attribute sets are identical** (`attributes == currentVal`).
+3. If an adjacent span matches the predicate but has different attributes (for example, one is Bold+Red and the next is Bold+Italic+Red), they are emitted as separate runs.
+
+### Example 1: Multi-Attribute Query (Bold AND Italic)
 
 ```kotlin
-// Extract all text that is both Bold AND Italic
-val boldItalicRuns = richString.runs { attrs ->
+// Extract text that is simultaneously Bold AND Italic
+val boldAndItalicRuns = richString.runs { attrs ->
     attrs.containsKey(BoldKey) && attrs.containsKey(ItalicKey)
 }
 
-boldItalicRuns.forEach { run ->
-    println("Bold+Italic: '${run.text}' (${run.range})")
+boldAndItalicRuns.forEach { run ->
+    println("Bold+Italic: '${run.text}' at ${run.range}")
 }
 ```
 
-When using a predicate, adjacent spans that satisfy the condition are merged only if their entire `AttributeContainer` is identical.
+### Example 2: Interactive Element Inspection (Links or Mentions)
+
+```kotlin
+// Extract any interactive spans (either a link or a mention attribute)
+val interactiveRuns = richString.runs { attrs ->
+    attrs.containsKey(LinkKey) || attrs.containsKey(MentionKey)
+}
+
+interactiveRuns.forEach { run ->
+    when {
+        run.value.containsKey(LinkKey) -> {
+            println("Link to ${run.value[LinkKey]}: '${run.text}'")
+        }
+        run.value.containsKey(MentionKey) -> {
+            println("Mention of ${run.value[MentionKey]}: '${run.text}'")
+        }
+    }
+}
+```
 
 ---
 
@@ -106,6 +159,7 @@ When using a predicate, adjacent spans that satisfy the condition are merged onl
 `RichString.runs(...)` returns a standard Kotlin `Sequence<RichRun<T>>`.
 
 Runs are computed **lazily on demand**:
+
 - If you only need the first matching link or mention (`runs(LinkKey).firstOrNull()`), evaluation halts immediately once found without scanning the remainder of the document.
 - Zero extra memory allocations for unconsumed elements.
 
@@ -131,13 +185,13 @@ fun extractAllUrls(richString: RichString): List<String> {
 
 ### 2. Custom Format Serialization
 
-When exporting a `RichString` to external systems (such as chat services or CMS backends), `runs` simplifies tokenization:
+When exporting a `RichString` to external systems (such as chat services or Markdown processors), `runs` simplifies tokenization:
 
 ```kotlin
 fun exportToSlackFormat(richString: RichString): String {
     val boldRanges = richString.runs(BoldKey).map { it.range }.toSet()
     val italicRanges = richString.runs(ItalicKey).map { it.range }.toSet()
-    // Process boundaries and wrap delimiters
+    // Process boundaries and wrap delimiters (*bold*, _italic_)
     return formattedText
 }
 ```
@@ -156,7 +210,6 @@ val highlightedWordCount = richString.runs(HighlightKey)
 
 ## Summary
 
-- Use `richString.runs(key)` to extract continuous blocks of a specific formatting attribute, ignoring unrelated overlapping styles.
-- Use `richString.runs { predicate }` for complex multi-attribute queries.
-- Returns a lazy Kotlin `Sequence<RichRun<T>>` with `text`, `range`, and `value`.
-- Ideal for extracting links/mentions, document statistics, and custom format serialization.
+- **By Key (`runs(key)`)**: Merges contiguous spans sharing the same value for `key`, bridging across differences in other overlapping styles. Returns `Sequence<RichRun<T>>`.
+- **By Predicate (`runs { predicate }`)**: Merges contiguous spans satisfying the predicate that share the exact same full attribute set. Returns `Sequence<RichRun<AttributeContainer>>`.
+- **Lazy Evaluation**: Evaluates on demand using Kotlin sequences for optimal speed and memory usage.

@@ -4,7 +4,7 @@
 
 <div align="center" markdown>
 
-![RichTextEditor Basic Usage](../images/basic-usage.png){ width="500" }
+![RichTextEditor Demo](../images/rich-text-editor-demo.gif){ width="400" }
 
 </div>
 
@@ -81,16 +81,6 @@ RichTextEditor(
 ### 4. Autocomplete & Mentions
 
 Pass `autocompleteTriggers` (e.g. `@` or `#`) and `onAutocompleteChange` to display suggestion popups anchored to the cursor. See [Autocomplete & Mentions](../interactions/autocomplete.md).
-
----
-
-## Visual Demo
-
-<div align="center" markdown>
-
-![RichTextEditor Demo](../images/rich-text-editor-demo.gif){ width="400" }
-
-</div>
 
 ---
 
