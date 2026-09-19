@@ -65,7 +65,7 @@ data class RichRun<T>(
 Formatting and semantic metadata in Arranger are strongly typed using `AttributeKey<T>`.
 
 ### Key Hierarchy
-```
+```text
 AttributeKey<T> (sealed interface)
 ├── SpanAttributeKey<T> (character-level formatting)
 └── ParagraphAttributeKey<T> (block/paragraph-level formatting)

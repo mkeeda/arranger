@@ -18,7 +18,7 @@ Without proper interval normalization, naive span arrays suffer from exponential
 
 Arranger implements interval chunking in `dev.mkeeda.arranger.richtext.SpanMerger.kt` via `transformSpans`.
 
-```
+```text
 Existing Spans:
 [==== Span A (Bold) ====]          (0..10)
                  [==== Span B (Italic) ====]  (5..15)

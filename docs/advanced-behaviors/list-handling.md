@@ -31,7 +31,7 @@ Indentation depth maps directly to start padding in Compose UI via `toIndent()`:
 
 | Indentation Level | Visual Indent (`sp`) | Default Bullet Symbol | Ordered Numbering |
 |---|---|---|---|
-| `Level1` | `24.sp` | `・` (Solid circle) | `1.`, `2.`, `3.` |
+| `Level1` | `24.sp` | `•` (Solid circle) | `1.`, `2.`, `3.` |
 | `Level2` | `48.sp` | `○` (Open circle) | `1.`, `2.` (Nested reset) |
 | `Level3` | `72.sp` | `▪` (Square) | `1.` |
 | `Level4` | `96.sp` | `▪` (Square) | `1.` |
