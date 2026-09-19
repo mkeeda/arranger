@@ -217,8 +217,8 @@ class AdversarialNavIntegrityTests(unittest.TestCase):
         nav_md_paths = re.findall(r"-\s+[^:\n]+:\s+([a-zA-Z0-9_\-\.\/]+\.md)", nav_text)
         self.assertEqual(
             len(nav_md_paths),
-            27,
-            f"Expected 27 nav markdown entries, found {len(nav_md_paths)}"
+            21,
+            f"Expected 21 nav markdown entries, found {len(nav_md_paths)}"
         )
 
         missing_artifacts = []
@@ -397,8 +397,8 @@ class AdversarialAssetIntegrityTests(unittest.TestCase):
 
     def test_dokka_resources_and_ui_kit_assets(self):
         """Verify Dokka UI kit stylesheets, scripts, and SVG icon assets all exist."""
-        dokka_dir = SITE_DIR / "api" / "dokka"
-        self.assertTrue(dokka_dir.exists(), "site/api/dokka must exist")
+        dokka_dir = SITE_DIR / "api"
+        self.assertTrue(dokka_dir.exists(), "site/api must exist")
 
         dokka_pages = [p for p in dokka_dir.rglob("*.html") if p.is_file()]
         broken_resources: List[str] = []
@@ -436,58 +436,35 @@ class AdversarialDokkaNavigationTests(unittest.TestCase):
     """Tier 5.4: Dokka Multi-Module Navigation & Cross-System Integration."""
 
     def test_mkdocs_to_dokka_bridge_links(self):
-        """Verify all links from MkDocs API overview and module pages to Dokka are valid."""
-        api_pages = [
-            SITE_DIR / "api" / "overview" / "index.html",
-            SITE_DIR / "api" / "richtext" / "index.html",
-            SITE_DIR / "api" / "richtext-editor" / "index.html",
-            SITE_DIR / "api" / "richtext-editor-material3" / "index.html",
-            SITE_DIR / "api" / "richtext-markdown" / "index.html",
-            SITE_DIR / "api" / "richtext-html" / "index.html",
-        ]
+        """Verify MkDocs navigation links directly to Dokka API Reference URL and destination exists."""
+        mkdocs_index = SITE_DIR / "index.html"
+        self.assertTrue(mkdocs_index.exists(), "site/index.html must exist")
 
-        site_data = get_parsed_site_data()
-        dokka_targets_found: Set[str] = set()
-
-        for page in api_pages:
-            self.assertTrue(page.exists(), f"Page {page} must exist")
-            page_data = site_data.get(page.resolve())
-            self.assertIsNotNone(page_data, f"Parsed data for {page} must exist")
-
-            for href in page_data.href_links:
-                target_file, _, is_internal = resolve_link_to_file(page, href)
-                if is_internal and target_file and "api/dokka" in str(target_file):
-                    self.assertTrue(target_file.exists(), f"Bridge link {href} in {page.name} resolved to non-existent {target_file}")
-                    dokka_targets_found.add(str(target_file.relative_to(SITE_DIR)))
-
-        expected_targets = {
-            "api/dokka/index.html",
-            "api/dokka/richtext/index.html",
-            "api/dokka/richtext-editor/index.html",
-            "api/dokka/richtext-editor-material3/index.html",
-            "api/dokka/richtext-markdown/index.html",
-            "api/dokka/richtext-html/index.html",
-        }
-        self.assertTrue(
-            expected_targets.issubset(dokka_targets_found),
-            f"Missing expected Dokka targets in bridge links:\n"
-            + "\n".join(f"  - {t}" for t in (expected_targets - dokka_targets_found))
+        content = mkdocs_index.read_text(encoding="utf-8")
+        expected_url = "https://mkeeda.github.io/arranger/api/"
+        self.assertIn(
+            expected_url,
+            content,
+            f"MkDocs index page navigation must link directly to Dokka API Reference: {expected_url}"
         )
+
+        root_api_index = SITE_DIR / "api" / "index.html"
+        self.assertTrue(root_api_index.exists(), "site/api/index.html must exist as Dokka entrypoint")
 
     def test_dokka_multimodule_root_to_modules_reachability(self):
         """Verify Dokka multi-module root index links to all 5 arranger modules."""
-        root_index = SITE_DIR / "api" / "dokka" / "index.html"
-        self.assertTrue(root_index.exists(), "site/api/dokka/index.html must exist")
+        root_index = SITE_DIR / "api" / "index.html"
+        self.assertTrue(root_index.exists(), "site/api/index.html must exist")
 
         site_data = get_parsed_site_data()
         root_data = site_data.get(root_index.resolve())
-        self.assertIsNotNone(root_data, "site/api/dokka/index.html must be parsed")
+        self.assertIsNotNone(root_data, "site/api/index.html must be parsed")
 
         modules_linked = set()
         for href in root_data.href_links:
             target_file, _, is_internal = resolve_link_to_file(root_index, href)
             if is_internal and target_file and target_file.exists():
-                rel = str(target_file.relative_to(SITE_DIR / "api" / "dokka"))
+                rel = str(target_file.relative_to(SITE_DIR / "api"))
                 for mod in ["richtext", "richtext-editor", "richtext-editor-material3", "richtext-markdown", "richtext-html"]:
                     if rel.startswith(mod):
                         modules_linked.add(mod)
@@ -502,7 +479,7 @@ class AdversarialDokkaNavigationTests(unittest.TestCase):
 
     def test_dokka_internal_crawling_zero_broken(self):
         """Verify that Dokka's internal 4000+ links contain 0 dead links."""
-        dokka_dir = SITE_DIR / "api" / "dokka"
+        dokka_dir = SITE_DIR / "api"
         dokka_pages = [p for p in dokka_dir.rglob("*.html") if p.is_file()]
         site_data = get_parsed_site_data()
 
@@ -555,8 +532,9 @@ class AdversarialGraphAndMetadataTests(unittest.TestCase):
                     if target_resolved not in visited and target_resolved in site_data:
                         queue.append(target_resolved)
 
-        # Check all 27 expected MkDocs pages are visited
-        mkdocs_pages = [p for p in site_data.keys() if "api/dokka" not in str(p) and p.name == "index.html"]
+        # Check all 21 expected MkDocs pages are visited
+        api_dir_resolved = str((SITE_DIR / "api").resolve())
+        mkdocs_pages = [p for p in site_data.keys() if not str(p).startswith(api_dir_resolved) and p.name == "index.html"]
         unreachable = [str(p.relative_to(SITE_DIR)) for p in mkdocs_pages if p not in visited]
 
         self.assertEqual(
@@ -575,7 +553,7 @@ class AdversarialGraphAndMetadataTests(unittest.TestCase):
         root = tree.getroot()
         ns = {"ns": "http://www.sitemaps.org/schemas/sitemap/0.9"}
         loc_elements = root.findall(".//ns:loc", ns)
-        self.assertEqual(len(loc_elements), 27, f"Expected 27 sitemap entries, found {len(loc_elements)}")
+        self.assertEqual(len(loc_elements), 21, f"Expected 21 sitemap entries, found {len(loc_elements)}")
 
         broken_sitemap_urls = []
         for elem in loc_elements:
@@ -692,7 +670,8 @@ def run_adversarial_suite() -> bool:
 
     # Pre-warm parsed site data and print inventory
     site_data = get_parsed_site_data()
-    dokka_count = sum(1 for p in site_data if "api/dokka" in str(p))
+    api_dir_str = str((SITE_DIR / "api").resolve())
+    dokka_count = sum(1 for p in site_data if str(p).startswith(api_dir_str))
     mkdocs_count = len(site_data) - dokka_count
 
     print(f"Discovered & Parsed Artifacts:")

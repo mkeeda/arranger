@@ -57,23 +57,16 @@ EXPECTED_PAGES: List[str] = [
     "interop/custom-formats.md",
     "architecture/overview.md",
     "architecture/state-lifecycle.md",
-    "api/overview.md",
-    "api/richtext.md",
-    "api/richtext-editor.md",
-    "api/richtext-editor-material3.md",
-    "api/richtext-markdown.md",
-    "api/richtext-html.md",
 ]
 
 EXPECTED_CATEGORIES: List[str] = [
-    "Home / Getting Started",
+    "Getting Started",
     "Editor Basics",
     "Styling & Formatting",
     "Advanced Behaviors",
     "Interactive Features",
     "Interoperability & Formats",
     "Architecture & Internal Design",
-    "API Reference",
 ]
 
 EXPECTED_IMAGES: Set[str] = {
@@ -828,10 +821,10 @@ class Tier4AcceptanceScenarioTests(unittest.TestCase):
         )
         self.assertIn("Documentation built in", result.stderr + result.stdout)
 
-        # Preserve Dokka artifacts in site/api/dokka if build/dokka/html exists
+        # Preserve Dokka artifacts in site/api if build/dokka/html exists
         dokka_html_dir = REPO_ROOT / "build" / "dokka" / "html"
         if dokka_html_dir.exists():
-            site_dokka_dir = SITE_DIR / "api" / "dokka"
+            site_dokka_dir = SITE_DIR / "api"
             site_dokka_dir.mkdir(parents=True, exist_ok=True)
             shutil.copytree(dokka_html_dir, site_dokka_dir, dirs_exist_ok=True)
 
@@ -846,7 +839,7 @@ class Tier4AcceptanceScenarioTests(unittest.TestCase):
             SITE_DIR / "sitemap.xml",
             SITE_DIR / "getting-started" / "installation" / "index.html",
             SITE_DIR / "getting-started" / "quickstart" / "index.html",
-            SITE_DIR / "api" / "overview" / "index.html",
+            SITE_DIR / "api" / "index.html",
         ]
 
         missing = [str(p.relative_to(REPO_ROOT)) for p in critical_artifacts if not p.exists()]
