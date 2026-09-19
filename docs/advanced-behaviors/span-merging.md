@@ -1,122 +1,125 @@
-# Span Merging & Paragraph Snapping
+# Overlapping Styles & Automatic Normalization
 
-In rich text document architectures, managing overlapping, fragmented, and boundary-misaligned formatting spans is a classic computational challenge.
+When users format rich text documents, formatting ranges frequently overlap, fragment, and shift. For instance, a user might apply **Bold** to a full sentence, make a few words *Italic*, and later remove Bold from a partial selection.
 
-For example:
-
-- A user applies **Bold** to characters `0..10`.
-- Then the user applies *Italic* to characters `5..15`.
-- Next, the user removes Bold from characters `3..7`.
-
-Without proper interval normalization, naive span arrays suffer from exponential span fragmentation, conflicting nested spans, and memory bloat. Arranger solves this cleanly using a mathematical **Sweep-line interval partitioning algorithm** combined with **Paragraph Snapping**.
+Arranger handles these range intersections automatically behind the scenes. You never have to calculate character offsets or manage nested formatting spans manually.
 
 ![Attribute Batch Editing](../images/attribute-batch-edit.gif){ width="600" }
 
 ---
 
-## Sweep-Line Interval Partitioning
+## How Range Overlaps Work
 
-Arranger implements interval chunking in `dev.mkeeda.arranger.richtext.SpanMerger.kt` via `transformSpans`.
+Arranger normalizes formatting so that every character belongs to a predictable set of attributes.
+
+### 1. Overlapping Multiple Styles
+
+Applying different attributes over intersecting ranges seamlessly combines them:
 
 ```text
-Existing Spans:
-[==== Span A (Bold) ====]          (0..10)
-                 [==== Span B (Italic) ====]  (5..15)
+Existing Text:
+"Compose Multiplatform Rich Text Editor"
+ [==== Bold (0..19) ====]
+                 [==== Italic (16..38) ====]
 
-Target Range:
-         [=== Transform (Remove Bold) ===]    (3..7)
-
-Sweep-line Boundary Points:
-|        |       |      |          |       |
-0        3       5      8          11      16
+Resulting Formatting:
+- "Compose Multi"   (0..15)  -> Bold
+- "platform"        (16..19) -> Bold + Italic
+- " Rich Text Editor" (20..38) -> Italic
 ```
 
-### The 6-Step Algorithm
+### 2. Partial Formatting Removal
 
-```kotlin
-internal fun List<RichSpan>.transformSpans(
-    targetRange: IntRange,
-    transform: (AttributeContainer) -> AttributeContainer,
-): List<RichSpan>
+Clearing an attribute from a sub-range cleanly slices the surrounding format into separate spans:
+
+```text
+Existing Text:
+"A quick brown fox jumps over"
+ [======== Bold (0..27) ========]
+
+Action: Remove Bold from "brown fox" (8..17)
+
+Resulting Formatting:
+- "A quick " (0..7)   -> Bold
+- "brown fox" (8..17) -> Plain text (unformatted)
+- " jumps over" (18..27) -> Bold
 ```
 
-1. **Extract Boundaries**: Collect interval start points (`range.first`) and exclusive end points (`range.last + 1`) from all existing spans and the `targetRange`.
-2. **Sort and Deduplicate**: Deduplicate and sort all boundary coordinates in ascending order (`boundaries.distinct().sorted()`).
-3. **Partition into Tessellated Chunks**: Form non-overlapping sub-intervals `[boundaries[i] .. boundaries[i + 1] - 1]`. Every character inside a given chunk shares the exact same attribute state.
-4. **Evaluate and Transform**:
-    - For each chunk, collect all overlapping attributes from the original spans.
-    - If the chunk lies within `targetRange`, apply the `transform` function (which can add, replace, or remove attributes).
-    - If the chunk lies outside `targetRange`, retain its original attributes untouched.
-5. **Drop Empty Chunks**: If a chunk's resulting `AttributeContainer` is empty, omit it from the result.
-6. **Adjacent Coalescing (Normalization)**: Iterate through surviving chunks. If a chunk immediately abuts the previous chunk (`lastSpan.range.last + 1 == nextSpan.range.first`) and has **identical attributes** (`lastSpan.attributes == nextSpan.attributes`), merge them into a single continuous `RichSpan`.
+### 3. Automatic Coalescing (De-fragmentation)
 
-### Merge Span Convenience Extension
+When adjacent text ranges share identical formatting attributes, Arranger automatically coalesces them into a single continuous range. This prevents memory bloat and span fragmentation as users type, edit, and paste text.
 
-Applying a new span onto an existing span list is simply a transformation that unions the attribute containers:
+---
+
+## Applying Formatting via the Public API
+
+You can manipulate formatting ranges using intuitive methods on `RichTextState`:
+
+### Toggling Format on Selection or Typing Position
+
+The simplest and most common approach (e.g. from toolbar buttons) is `toggleSpanAttribute`:
 
 ```kotlin
-@InternalArrangerApi
-public fun List<RichSpan>.mergeSpan(newSpan: RichSpan): List<RichSpan> {
-    return transformSpans(targetRange = newSpan.range) { existingAttributes ->
-        existingAttributes + newSpan.attributes
+// If text is selected, toggles Bold over the selected range.
+// If no text is selected, sets active typing attributes for incoming characters.
+state.toggleSpanAttribute(BoldKey)
+```
+
+### Explicit Range Editing with `state.edit`
+
+For custom toolbar actions or programmatic formatting, use `state.edit`:
+
+```kotlin
+state.edit {
+    // Apply highlight to a specific character range
+    setSpanAttribute(
+        range = 0..15,
+        key = BackgroundColorKey,
+        value = Color.Yellow,
+    )
+
+    // Remove an attribute from a range
+    removeSpanAttribute(range = 5..10, key = BoldKey)
+}
+```
+
+### Batch Editing with Semantic "Runs"
+
+Arranger's `runs()` API lets you query and transform all text segments sharing a given attribute without manual string searching:
+
+```kotlin
+state.edit {
+    // Find all bold runs in the document and color them blue
+    val boldRuns = state.richString.runs(BoldKey)
+    editAll(boldRuns) {
+        textColor(Color.Blue)
     }
 }
 ```
 
 ---
 
-## Paragraph Snapping
+## Automatic Paragraph Snapping
 
-Unlike character spans (such as bold, italic, or text color) which can start and end at arbitrary character offsets, **paragraph attributes** (such as headings, lists, blockquotes, and alignment) must strictly cover **entire paragraphs**.
+While inline character styles (bold, italic, color) apply to exact character ranges, **block-level paragraph attributes** (such as headings, blockquotes, lists, and alignments) must always apply to whole paragraphs.
 
-Paragraphs in Arranger are delimited by the newline character `\n`.
-
-### snapToParagraphs
-
-`IntRange.snapToParagraphs(text: String)` expands any character range to cover the surrounding paragraph boundaries:
+Whenever a paragraph attribute is applied, Arranger automatically **snaps** the range to the enclosing newline (`\n`) boundaries:
 
 ```kotlin
-@InternalArrangerApi
-public fun IntRange.snapToParagraphs(text: String): IntRange {
-    val start = text.lastIndexOf('\n', startIndex = this.first - 1).let {
-        if (it == -1) 0 else it + 1
-    }
-    val safeLast = maxOf(this.first, this.last)
-    val end = text.indexOf('\n', startIndex = safeLast).let {
-        if (it != -1) it else text.lastIndex
-    }
-    return start..end
-}
+// Even if the user only selected a single word in a paragraph:
+state.toggleParagraphAttribute(HeadingKey(HeadingLevel.H1))
+
+// Arranger automatically expands the range to cover the entire line:
+// "\nFirst line of text\n" -> The whole line becomes an H1 heading.
 ```
 
-### resnapParagraphSpans
-
-During typing, deleting, or pasting, text mutations can shift character indices or introduce newlines within an existing paragraph block.
-
-`resnapParagraphSpans` ensures paragraph attributes maintain valid boundaries:
-
-```kotlin
-@InternalArrangerApi
-public fun List<RichSpan>.resnapParagraphSpans(text: String): List<RichSpan>
-```
-
-1. **Partition Attributes**: Splits spans into pure character `SpanAttributeKey` spans and block-level `ParagraphAttributeKey` spans.
-2. **Boundary Realignment**: For each paragraph span, clamps its range to `text.length` and invokes `snapToParagraphs(text)`.
-3. **Re-merging**: Re-applies the aligned paragraph attributes across the text using `transformSpans`.
-4. **Cleanup**: Paragraph spans whose ranges collapse to empty (for example, when all text in a paragraph is deleted) are safely dropped.
+If the user deletes characters or inserts newlines within a paragraph block, Arranger dynamically realigns paragraph boundaries so your document formatting always remains structurally sound.
 
 ---
 
-## Performance Guarantees
+## Key Takeaways
 
-- **Tessellation**: Guarantees zero overlapping spans in memory. Every character index maps to at most one `RichSpan` with composite attributes.
-- **Normalization**: Guarantees minimal span count. Adjacent runs with identical attributes are always unified into one span.
-- **Predictable Complexity**: Sweep-line interval sorting runs in $O(N \log N)$ where $N$ is the number of active spans in the edit region, keeping operations lightning fast even on large documents.
-
----
-
-## Summary
-
-- Arranger uses a sweep-line interval partitioning algorithm to maintain non-overlapping, normalized spans.
-- Contiguous runs with identical attributes are automatically coalesced.
-- `snapToParagraphs` and `resnapParagraphSpans` enforce clean paragraph boundaries for headings, lists, and quotes across all text mutations.
+- **Automatic Range Slicing**: Overlapping styles seamlessly combine without conflicting tags or corrupted boundaries.
+- **De-fragmentation**: Adjacent identical styles are automatically unified.
+- **Zero Offset Math**: Use `state.toggleSpanAttribute()`, `state.edit { ... }`, and `runs()` to manipulate rich text safely.
+- **Automatic Paragraph Snapping**: Block-level styles (headings, lists, quotes) automatically cover complete lines from newline to newline.

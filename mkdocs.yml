@@ -112,7 +112,7 @@ nav:
   - Advanced Behaviors:
       - Enter Key Strategies: advanced-behaviors/enter-key-strategies.md
       - List Handling: advanced-behaviors/list-handling.md
-      - Span Merging: advanced-behaviors/span-merging.md
+      - Style Normalization: advanced-behaviors/span-merging.md
   - Interactive Features:
       - Autocomplete: interactions/autocomplete.md
       - Span Clicks: interactions/span-clicks.md
