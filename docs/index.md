@@ -72,57 +72,44 @@ state.edit {
 
 ---
 
-## Architecture Overview
+## Quick Look
 
-Arranger is designed around a strict layered architecture with clean separation of concerns.
+Getting started with Arranger requires only a few lines of code in Compose:
 
-```mermaid
-graph TD
-    subgraph UI ["Compose UI Layer"]
-        Editor["RichTextEditor / WysiwygEditor"]
-        M3["richtext-editor-material3"]
-        State["RichTextState (Compose State Hoisting)"]
-    end
+```kotlin
+@Composable
+fun MyEditor() {
+    val state = rememberRichTextState()
 
-    subgraph Core ["Pure Kotlin Multiplatform Layer (:richtext)"]
-        RS["RichString (Immutable Data Model)"]
-        Attrs["AttributeContainer & AttributeKey"]
-        Merger["Sweep-line Span Merging Algorithm"]
-        Snapper["Paragraph Snapping & Mutual Exclusion"]
-    end
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // Toggle bold formatting for current selection or typing position
+        Button(onClick = { state.toggleSpanAttribute(BoldKey) }) {
+            Text("Bold")
+        }
 
-    subgraph Interop ["Interoperability Layer"]
-        MD["richtext-markdown (GFM)"]
-        HTML["richtext-html (ksoup)"]
-    end
-
-    Editor --> State
-    State --> RS
-    M3 --> Editor
-    RS --> Attrs
-    RS --> Merger
-    RS --> Snapper
-    MD --> RS
-    HTML --> RS
+        // Full-featured rich text editor component
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth().weight(1f),
+        )
+    }
+}
 ```
-
-- **`:richtext` (Core)**: A pure Kotlin Multiplatform library with zero UI dependencies. Provides the immutable data model `RichString`, type-safe `AttributeKey`, sweep-line interval partitioning, and paragraph boundary snapping algorithms.
-- **`:richtext-editor` (UI Engine)**: Integrates with Compose Foundation's `BasicTextField`, providing bidirectional state management via `RichTextState`, real-time keystroke processing, WYSIWYG conversions, and keyboard shortcuts.
-- **`:richtext-editor-material3`**: Automatically maps Material 3 design tokens (Typography and ColorScheme) to editor styles.
-- **`:richtext-markdown` / `:richtext-html`**: Provides bidirectional data conversion for external document formats.
 
 ---
 
 ## Documentation Guide
 
-Browse the documentation by topic:
+Explore Arranger's capabilities by topic:
 
 - [**Installation Guide**](getting-started/installation.md): Gradle dependency setup (KMP, Android, Version Catalog) and supported platforms.
-- [**Quick Start**](getting-started/quickstart.md): Render a minimal rich text editor in just a few lines of code.
-- [**RichTextEditor Basics**](editor-basics/rich-text-editor.md): In-depth guide to the standard editor component and its parameter reference.
+- [**Quick Start**](getting-started/quickstart.md): Step-by-step tutorial to build an interactive rich text editor with toolbars.
+- [**RichTextEditor Basics**](editor-basics/rich-text-editor.md): In-depth guide to the standard editor component and its customization options.
 - [**WysiwygEditor Basics**](editor-basics/wysiwyg-editor.md): Real-time Markdown shortcut styling editor component.
-- [**State Management**](editor-basics/state-management.md): `RichTextState`, typing attributes, logical intersection model, and undo/redo history.
-- [**Spans and Paragraphs**](styling/spans-and-paragraphs.md): Inline span attributes vs block paragraph attributes, snapping, and mutual exclusion.
-- [**Built-in Attributes**](styling/built-in-attributes.md): Standard attributes for bold, italic, text color, headings, lists, and more.
-- [**Custom Attributes**](styling/custom-attributes.md): Defining domain-specific attributes and custom style resolvers.
-- [**Theming and Material 3**](styling/theming-and-m3.md): Custom styling via `AttributeStyleResolver` and seamless Material 3 integration.
+- [**State Management**](editor-basics/state-management.md): `RichTextState`, typing attributes, and robust undo/redo history.
+- [**Spans and Paragraphs**](styling/spans-and-paragraphs.md): Inline span attributes vs block paragraph attributes and snapping rules.
+- [**Built-in Attributes**](styling/built-in-attributes.md): Standard attributes for bold, italic, text color, headings, lists, and alignments.
+- [**Custom Attributes**](styling/custom-attributes.md): Defining domain-specific attributes (e.g. mentions, comments) and custom style resolvers.
+- [**Theming and Material 3**](styling/theming-and-m3.md): Dynamic styling via `AttributeStyleResolver` and Material 3 design token integration.
+- [**Architecture Overview**](architecture/overview.md): High-level system structure, modular artifacts, and design principles.
+- [**API Reference**](api/): Complete Dokka KDoc reference across all Arranger artifacts.
