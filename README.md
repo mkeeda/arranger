@@ -12,6 +12,9 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
   <img src="./docs/images/rich-text-editor-demo.gif" width="380" alt="Arranger Rich Text Editor Demo"/>
 </div>
 
+> [!WARNING]
+> **Work In Progress**: This library is currently under active development. APIs are unstable and subject to change without notice. We highly welcome your feedback, feature requests, and bug reports via GitHub Issues!
+
 ---
 
 ### 📖 Official Documentation & Guides
