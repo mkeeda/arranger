@@ -26,16 +26,16 @@ To use Arranger, ensure your development environment meets the following minimum
             commonMain.dependencies {
                 // UI editor components (RichTextEditor, WysiwygEditor)
                 // Core data models (:arranger-richtext) are included transitively
-                implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha03")
+                implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha04")
 
                 // Optional: Material 3 style resolver (rememberMaterial3AttributeStyleResolver)
-                implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha03")
+                implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha04")
 
                 // Optional: Bidirectional Markdown conversion (toMarkdown / fromMarkdown)
-                implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha03")
+                implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha04")
 
                 // Optional: Bidirectional HTML conversion (toHtml / fromHtml)
-                implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha03")
+                implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha04")
             }
         }
     }
@@ -49,16 +49,16 @@ To use Arranger, ensure your development environment meets the following minimum
     // app/build.gradle.kts
     dependencies {
         // Core UI editor component
-        implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha03")
+        implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha04")
 
         // Optional: Material 3 integration
-        implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha03")
+        implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha04")
 
         // Optional: Bidirectional Markdown conversion
-        implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha03")
+        implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha04")
 
         // Optional: Bidirectional HTML conversion
-        implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha03")
+        implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha04")
     }
     ```
 
@@ -69,7 +69,7 @@ To use Arranger, ensure your development environment meets the following minimum
     ```toml
     # gradle/libs.versions.toml
     [versions]
-    arranger = "0.4.0-alpha03"
+    arranger = "0.4.0-alpha04"
 
     [libraries]
     arranger-richtext-core = { module = "dev.mkeeda.arranger:arranger-richtext", version.ref = "arranger" }
