@@ -48,6 +48,9 @@ theme:
 extra_css:
   - stylesheets/extra.css
 
+exclude_docs: |
+  tests/**
+
 markdown_extensions:
   - admonition
   - pymdownx.details

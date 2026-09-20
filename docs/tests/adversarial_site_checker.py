@@ -16,7 +16,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SITE_DIR = REPO_ROOT / "site"
 BASE_URL = "https://mkeeda.github.io/arranger/"
 
