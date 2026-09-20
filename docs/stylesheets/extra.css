@@ -1,0 +1,18 @@
+:root,
+body[data-md-color-scheme="default"],
+body[data-md-color-scheme="default"][data-md-color-primary="white"],
+[data-md-color-scheme="default"][data-md-color-primary="white"] {
+  --md-typeset-a-color: #d84315;
+}
+
+body[data-md-color-scheme="slate"],
+body[data-md-color-scheme="slate"][data-md-color-primary="black"],
+[data-md-color-scheme="slate"][data-md-color-primary="black"] {
+  --md-typeset-a-color: #ff764d;
+}
+
+.md-nav__item .md-nav__link--active,
+.md-nav__item .md-nav__link--active code,
+.md-nav--primary .md-nav__item--active > .md-nav__link {
+  color: var(--md-typeset-a-color);
+}

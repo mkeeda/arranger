@@ -28,7 +28,7 @@ description: 新しいバージョンをリリースするための準備（バ�
 ユーザーからリリースノートの内容や追記内容について合意を得たら、コードの変更作業に入ります。
 1. 最新のデフォルトブランチ（main）から、リリース作業用の新しいブランチ（例: `release/vX.Y.Z`）を作成します。
 2. `gradle.properties` に記載されているバージョン番号を更新します。
-3. `README.md` に記載されているバージョン番号（インストール手順の依存関係など）を更新します。
+3. `README.md` および `docs/` 配下の全ドキュメント（`docs/getting-started/installation.md` や `docs/styling/theming-and-m3.md` 等）を走査（grep等で検索）し、記載されているバージョン番号（インストール手順の依存関係やバージョン表記）をすべて新しいバージョンに更新します。
 4. 上記の変更をコミットします。（コミットメッセージは `git-commit-formatter` のルールに従ってください）
 5. `mcp_github_create_pull_request` ツールなどを使用して、mainブランチに向けたPull Requestを作成します。（PR自体のルールは `pr-creator` スキルに従います）
 

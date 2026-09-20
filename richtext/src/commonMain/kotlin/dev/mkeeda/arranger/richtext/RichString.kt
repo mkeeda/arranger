@@ -14,7 +14,7 @@ public data class RichString(
     public val spans: List<RichSpan> = emptyList(),
 ) {
     /**
-     * Creates a new [RichString] having the given [initialAttributes] applied to the entire text.
+     * Creates a new [RichString] having the given `initialAttributes` applied to the entire text.
      */
     public constructor(text: String, initialAttributes: AttributeContainer) : this(
         text = text,

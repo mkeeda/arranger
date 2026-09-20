@@ -5,6 +5,7 @@ plugins {
     id("arranger.ios.target")
     id("arranger.wasmjs.target")
     id("arranger.maven.publish")
+    alias(libs.plugins.dokka)
 }
 
 kotlin {

@@ -18,3 +18,16 @@ local.properties
 bin/
 .idea/deploymentTargetSelector.xml
 **/.kotlin/
+
+# MkDocs & Python
+/site/
+.cache/
+.venv/
+__pycache__/
+*.pyc
+
+# Agent teamwork temporary directories
+/.agents/*
+!/.agents/agents/
+!/.agents/rules/
+!/.agents/skills/

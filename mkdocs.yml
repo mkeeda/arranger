@@ -1,0 +1,138 @@
+site_name: Arranger
+site_description: Type-safe Rich Text Editor Engine for Compose Multiplatform
+site_author: mkeeda
+site_url: https://mkeeda.github.io/arranger/
+repo_url: https://github.com/mkeeda/arranger
+repo_name: mkeeda/arranger
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 mkeeda
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - content.action.edit
+
+extra_css:
+  - stylesheets/extra.css
+
+exclude_docs: |
+  tests/**
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.caret
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+plugins:
+  - search:
+      lang: en
+
+validation:
+  nav:
+    omitted_files: info
+    not_found: warn
+    absolute_links: warn
+  links:
+    not_found: warn
+    absolute_links: warn
+    unrecognized_links: warn
+    anchors: warn
+
+nav:
+  - Overview: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quickstart.md
+  - Editor Basics:
+      - Core Editor: editor-basics/rich-text-editor.md
+      - Markdown Shortcuts: editor-basics/wysiwyg-editor.md
+      - State Management: editor-basics/state-management.md
+  - Styling & Formatting:
+      - Spans & Paragraphs: styling/spans-and-paragraphs.md
+      - Built-in Attributes: styling/built-in-attributes.md
+      - Custom Attributes: styling/custom-attributes.md
+      - Theming & Material 3: styling/theming-and-m3.md
+      - Inspecting Runs: styling/inspecting-runs.md
+  - Advanced Behaviors:
+      - Paragraph Enter Keys: advanced-behaviors/enter-key-strategies.md
+      - List Handling: advanced-behaviors/list-handling.md
+      - Style Normalization: advanced-behaviors/span-merging.md
+  - Interactive Features:
+      - Autocomplete: interactions/autocomplete.md
+      - Span Clicks: interactions/span-clicks.md
+      - Toolbars: interactions/toolbars.md
+  - Interoperability & Formats:
+      - Markdown: interop/markdown.md
+      - HTML: interop/html.md
+      - Custom Formats: interop/custom-formats.md
+  - Architecture & Concepts:
+      - Architecture Overview: architecture/overview.md
+      - State Lifecycle: architecture/state-lifecycle.md
+  - API Reference: https://mkeeda.github.io/arranger/api/
+
+
+hooks:
+  - hooks.py

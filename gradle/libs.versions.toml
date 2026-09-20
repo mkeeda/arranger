@@ -20,6 +20,7 @@ vanniktechMavenPublish = "0.37.0"
 roborazzi = "1.72.0"
 markdown = "0.7.9"
 ksoup = "0.2.6"
+dokka = "2.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -72,4 +73,5 @@ compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMu
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechMavenPublish" }
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
