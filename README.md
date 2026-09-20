@@ -44,6 +44,65 @@ Comprehensive guides, deep-dive architecture tutorials, and complete API referen
 
 ---
 
+## Installation
+
+Arranger artifacts are published on **Maven Central**:
+
+```kotlin
+// build.gradle.kts (commonMain)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // Core editor UI (includes arranger-richtext)
+            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha04")
+
+            // Optional: Markdown / HTML conversions
+            implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha04")
+            implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha04")
+
+            // Optional: Material 3 style resolver
+            implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha04")
+        }
+    }
+}
+```
+
+---
+
+## Quick Start
+
+Create a rich text editor in just a few lines of Compose code:
+
+```kotlin
+@Composable
+fun SimpleEditor() {
+    val state = remember {
+        RichTextState(
+            initialText = RichString("Hello Compose!").edit {
+                editAttributes(range = 6..12) { bold() }
+            }
+        )
+    }
+
+    RichTextEditor(
+        state = state,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+```
+
+For live Markdown shortcuts as you type (Notion-style auto-formatting), simply swap in `WysiwygEditor`:
+
+```kotlin
+@Composable
+fun WysiwygSample() {
+    val state = remember { RichTextState() }
+    WysiwygEditor(state = state, modifier = Modifier.fillMaxSize())
+}
+```
+
+---
+
 ## 🚀 Key Highlights & What Makes Arranger Unique
 
 While Compose provides basic text editing primitives, building a production-grade rich text editor (such as Notion, Slack, or Bear) requires orchestrating complex editing interactions. Arranger delivers that complete framework out of the box.
@@ -52,14 +111,6 @@ While Compose provides basic text editing primitives, building a production-grad
 Arranger provides two complementary editor components to fit any writing experience:
 - **`RichTextEditor`**: Clean canvas designed for toolbar-driven editing without unexpected text transformations.
 - **`WysiwygEditor`**: Notion-style instant Markdown auto-formatting as you type (`# `, `**bold**`, `- `, `> `) with immediate **Backspace reversal** (pressing Backspace restores raw markdown text) and seamless undo/redo integration.
-
-```kotlin
-// Live Markdown shorthand conversion with zero configuration
-WysiwygEditor(
-    state = state,
-    modifier = Modifier.fillMaxSize(),
-)
-```
 
 <div align="center">
   <img src="./docs/images/wysiwyg.gif" width="480" alt="WYSIWYG Markdown Formatting Demo"/>
@@ -173,7 +224,7 @@ val htmlString = RichString.fromHtml("<p>Hello <span style=\"color: #ff0000;\"><
 
 ---
 
-## 📱 Practical Examples (Sample App)
+## 📱 Practical Examples & Running the Samples
 
 Arranger includes fully functioning sample applications demonstrating real-world integration across Android, Desktop, iOS, and Web:
 
@@ -183,66 +234,7 @@ Arranger includes fully functioning sample applications demonstrating real-world
 | **[Mention Autocomplete Chat](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/MentionAutocompleteSample.kt)** | <img src="./docs/images/mention-autocomplete.png" width="200" alt="Mention Autocomplete"/> | Modern chat composer featuring real-time `@mention` and `#channel` suggestion popups positioned dynamically with `createPopupPositionProvider()`. |
 | **[WYSIWYG Markdown Shortcuts](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/WysiwygEditorSample.kt)** | <img src="./docs/images/wysiwyg.gif" width="200" alt="WYSIWYG Shortcuts"/> | Keyboard-first writing experience with instant Markdown shorthand expansion and one-tap backspace reversal. |
 
----
-
-## Installation
-
-Arranger artifacts are published on **Maven Central**:
-
-```kotlin
-// build.gradle.kts (commonMain)
-kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            // Core editor UI (includes arranger-richtext)
-            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.4.0-alpha04")
-
-            // Optional: Markdown / HTML conversions
-            implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha04")
-            implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha04")
-
-            // Optional: Material 3 style resolver
-            implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha04")
-        }
-    }
-}
-```
-
----
-
-## Quick Start
-
-```kotlin
-@Composable
-fun SimpleEditor() {
-    val state = remember {
-        RichTextState(
-            initialText = RichString("Hello Compose!").edit {
-                editAttributes(range = 6..12) { bold() }
-            }
-        )
-    }
-
-    RichTextEditor(
-        state = state,
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
-```
-
-For live Markdown shortcuts as you type, simply swap in `WysiwygEditor`:
-
-```kotlin
-@Composable
-fun WysiwygSample() {
-    val state = remember { RichTextState() }
-    WysiwygEditor(state = state, modifier = Modifier.fillMaxSize())
-}
-```
-
----
-
-## Running the Samples
+### Running the Samples Locally
 
 Run the sample application across any supported platform:
 
