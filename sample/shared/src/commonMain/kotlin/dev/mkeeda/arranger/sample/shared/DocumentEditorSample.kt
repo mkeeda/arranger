@@ -74,6 +74,7 @@ import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.applyFormat
 import dev.mkeeda.arranger.richtext.editor.clearFormats
 import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
+import dev.mkeeda.arranger.richtext.editor.rememberRichTextState
 import dev.mkeeda.arranger.richtext.editor.removeFormat
 import dev.mkeeda.arranger.richtext.editor.toggleFormat
 import org.jetbrains.compose.resources.DrawableResource
@@ -81,7 +82,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun DocumentEditorSample(modifier: Modifier = Modifier) {
-    val state = remember { RichTextState() }
+    val state = rememberRichTextState()
 
     DocumentEditorBox(
         state = state,
