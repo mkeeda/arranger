@@ -907,6 +907,45 @@ class RichTextStateTest {
         state.undoState.canUndo shouldBe false
         state.richString.text shouldBe "Reset"
     }
+
+    @Test
+    fun `default initial selection places cursor at the end of initial text`() {
+        val stateWithText = RichTextState(initialText = RichString("Hello"))
+        stateWithText.selection shouldBe TextRange(5)
+
+        val emptyState = RichTextState()
+        emptyState.selection shouldBe TextRange.Zero
+    }
+
+    @Test
+    fun `custom initial selection places cursor at the start of initial text`() {
+        val state =
+            RichTextState(
+                initialText = RichString("Hello"),
+                initialSelection = TextRange.Zero,
+            )
+        state.selection shouldBe TextRange.Zero
+    }
+
+    @Test
+    fun `custom initial selection places cursor at specific index`() {
+        val state =
+            RichTextState(
+                initialText = RichString("Hello"),
+                initialSelection = TextRange(2),
+            )
+        state.selection shouldBe TextRange(2)
+    }
+
+    @Test
+    fun `custom initial selection selects text range`() {
+        val state =
+            RichTextState(
+                initialText = RichString("Hello"),
+                initialSelection = TextRange(0, 5),
+            )
+        state.selection shouldBe TextRange(0, 5)
+    }
 }
 
 private fun RichTextState.simulateTypingAtEnd(text: String) {
