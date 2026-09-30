@@ -35,10 +35,18 @@ import dev.mkeeda.arranger.richtext.snapToParagraphs
  * integrating seamlessly with standard Compose text APIs.
  *
  * @param initialText The initial [RichString] to display in the editor. Defaults to an empty [RichString].
+ * @param initialSelection The initial [TextRange] selection or cursor position. Defaults to the end of [initialText].
  */
 @Stable
-public class RichTextState(initialText: RichString = RichString("")) {
-    internal val textFieldState = TextFieldState(initialText.text)
+public class RichTextState(
+    initialText: RichString = RichString(""),
+    initialSelection: TextRange = TextRange(initialText.text.length),
+) {
+    internal val textFieldState =
+        TextFieldState(
+            initialText = initialText.text,
+            initialSelection = initialSelection,
+        )
 
     // The Single Source of Truth for spans
     private var spans: List<RichSpan> by mutableStateOf(initialText.spans.resnapParagraphSpans(initialText.text))
