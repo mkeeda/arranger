@@ -17,7 +17,7 @@ Rendering an editor requires only passing a `RichTextState`:
 ```kotlin
 @Composable
 fun SimpleEditor() {
-    val state = remember { RichTextState() }
+    val state = rememberRichTextState()
 
     RichTextEditor(
         state = state,

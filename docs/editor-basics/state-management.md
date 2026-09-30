@@ -191,8 +191,107 @@ Calling `setRichString` safely executes the following operations:
 
 ---
 
+## State Preservation Across Configuration Changes & Process Death
+
+Mobile and multiplatform environments frequently recreate UI components due to screen rotation, split-screen resizing (Configuration Changes), or operating system memory reclamation (Process Death).
+
+### 1. Composable Scope: `rememberRichTextState`
+
+For standard text editing, use `rememberRichTextState()`. It automatically registers with Compose's `rememberSaveable` and uses `RichTextState.Saver` to persist and restore editor state out of the box:
+
+```kotlin
+@Composable
+fun NoteEditorScreen() {
+    // Automatically survives configuration changes and process death
+    val state = rememberRichTextState(
+        initialText = RichString(text = "Hello Arranger!"),
+    )
+
+    RichTextEditor(state = state)
+}
+```
+
+#### What is Saved vs. Excluded
+
+| Data Item | Preserved | Rationale / Behavior |
+| :--- | :---: | :--- |
+| `text` | :white_check_mark: | Raw text string is completely restored. |
+| `selection` | :white_check_mark: | Cursor position and range selection are restored. |
+| `spans` | :white_check_mark: | All built-in attributes (bold, italic, colors, headings, lists, links, etc.) are serialized. Custom attributes use registered serializers. |
+| `typingAttributes` | :white_check_mark: | Pending keyboard styles reserved at cursor are maintained. |
+| `undoState` | :x: | **Intentionally excluded**. Storing dozens of full document snapshots causes Android Bundle size explosions (`TransactionTooLargeException`). Restored instances reset with a clean, safe history (matching standard `EditText` and Compose `rememberTextFieldState`). |
+
+---
+
+### 2. Large Document Scope: ViewModel Hoisting Pattern
+
+For complex editors, long-form documents, or applications where **undo/redo history must survive configuration changes**, hoist `RichTextState` directly in a `ViewModel`:
+
+```kotlin
+class EditorViewModel : ViewModel() {
+    // Hoisted in memory: surviving configuration changes with 100% of undo history intact
+    val state = RichTextState(
+        initialText = RichString(text = "Long document content..."),
+    )
+
+    fun onSaveDocument() {
+        val currentContent = state.richString
+        // Persist to local database, file storage, or cloud API
+    }
+}
+
+@Composable
+fun DocumentEditorScreen(viewModel: EditorViewModel = viewModel()) {
+    // UI simply observes and controls the ViewModel-held state
+    RichTextEditor(state = viewModel.state)
+}
+```
+
+!!! tip "Handling Process Death for Long Documents"
+    Android Bundles are limited to ~1MB across the entire application. When dealing with large articles or books, do not rely on `SavedStateHandle` or `Bundle` for full text storage. Instead, implement a debounce auto-save pattern that periodically serializes `state.richString` into a SQLite database (e.g. Room) or local disk.
+
+---
+
+### 3. Custom Attribute Serialization (`AttributeSerializer`)
+
+If you define custom `AttributeKey<T>` types, register them with `AttributeSerializer` so `RichTextState.Saver` knows how to serialize and restore your custom values:
+
+```kotlin
+data class NoteAnnotation(val comment: String)
+
+val NoteAnnotationKey = object : SpanAttributeKey<NoteAnnotation> {
+    override val name: String = "noteAnnotation"
+    override val defaultValue: NoteAnnotation = NoteAnnotation(comment = "")
+}
+
+// 1. Define custom serializer
+val noteSerializer = attributeSerializer(
+    key = NoteAnnotationKey,
+    save = { note -> note.comment },
+    restore = { saved -> NoteAnnotation(comment = saved as String) },
+)
+
+// 2. Create custom Saver
+val customSaver = RichTextState.saver(
+    customSerializers = listOf(noteSerializer),
+)
+
+// 3. Use in Composable
+@Composable
+fun CustomEditorScreen() {
+    val state = rememberRichTextState(
+        saver = customSaver,
+    )
+
+    RichTextEditor(state = state)
+}
+```
+
+---
+
 ## Related Documentation
 
 - [**RichTextEditor Basics**](rich-text-editor.md): Editor component placement and UI parameters.
 - [**Spans and Paragraphs**](../styling/spans-and-paragraphs.md): Differences between span and paragraph attributes.
 - [**Toolbar Integration**](../interactions/toolbars.md): High-level helper APIs such as `toggleFormat` and focus protection tips.
+
