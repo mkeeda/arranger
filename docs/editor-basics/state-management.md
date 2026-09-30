@@ -206,8 +206,8 @@ Unlike desktop or web environments where processes run continuously without UI t
 3. **The 1MB Binder Transaction Limit (`TransactionTooLargeException`)**:
    Data preserved via Compose's `rememberSaveable` is ultimately transmitted through Android's inter-process communication (IPC) Binder transaction buffer, which is strictly capped at approximately **1MB for the entire application**. Attempting to serialize large text documents or extensive undo histories into a `Bundle` can crash the app with a fatal `TransactionTooLargeException`.
 
-> [!NOTE] Non-Android Platforms (Desktop, iOS, Web/Wasm)
-> On Desktop, iOS, and Web/Wasm, Activity recreation and the 1MB Android Binder limit do not apply. However, `rememberRichTextState()` functions consistently across all Compose Multiplatform targets, supporting in-app navigation backstacks and platform-level state saving seamlessly.
+!!! note "Non-Android Platforms (Desktop, iOS, Web/Wasm)"
+    On Desktop, iOS, and Web/Wasm, Activity recreation and the 1MB Android Binder limit do not apply. However, `rememberRichTextState()` functions consistently across all Compose Multiplatform targets, supporting in-app navigation backstacks and platform-level state saving seamlessly.
 
 Arranger provides two complementary approaches to handle state preservation depending on your editing use case:
 
