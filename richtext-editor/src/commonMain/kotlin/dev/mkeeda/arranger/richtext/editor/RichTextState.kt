@@ -35,7 +35,7 @@ import dev.mkeeda.arranger.richtext.snapToParagraphs
  * integrating seamlessly with standard Compose text APIs.
  *
  * @param initialText The initial [RichString] to display in the editor. Defaults to an empty [RichString].
- * @param initialSelection The initial [TextRange] selection or cursor position. Defaults to the end of [initialText].
+ * @param initialSelection The initial [TextRange] selection or cursor position. Defaults to the end of `initialText`.
  */
 @Stable
 public class RichTextState(
