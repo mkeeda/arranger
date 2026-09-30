@@ -191,8 +191,130 @@ Calling `setRichString` safely executes the following operations:
 
 ---
 
+## State Preservation Across Android Configuration Changes & Process Death
+
+When building Compose applications—especially on **Android**—state preservation requires careful attention to the underlying platform lifecycle.
+
+### Understanding Android Lifecycle Constraints
+
+Unlike desktop or web environments where processes run continuously without UI teardown, **Android** enforces unique lifecycle constraints that every developer must navigate:
+
+1. **Configuration Changes (Android-Specific)**:
+   Events like **screen rotation**, fold/unfold on foldables, dark/light theme toggling, and multi-window resizing cause Android to completely destroy and recreate the hosting `Activity` and Composable hierarchy. Standard `remember { ... }` state is discarded during this recreation.
+2. **Process Death & OS Memory Reclamation (Android-Specific)**:
+   When an application is in the background, the Android operating system may terminate the hosting process under memory pressure (via the Low Memory Killer). When the user returns, the application must restore its state from the OS-managed `savedInstanceState` `Bundle`.
+3. **The 1MB Binder Transaction Limit (`TransactionTooLargeException`)**:
+   Data preserved via Compose's `rememberSaveable` is ultimately transmitted through Android's inter-process communication (IPC) Binder transaction buffer, which is strictly capped at approximately **1MB for the entire application**. Attempting to serialize large text documents or extensive undo histories into a `Bundle` can crash the app with a fatal `TransactionTooLargeException`.
+
+> [!NOTE] Non-Android Platforms (Desktop, iOS, Web/Wasm)
+> On Desktop, iOS, and Web/Wasm, Activity recreation and the 1MB Android Binder limit do not apply. However, `rememberRichTextState()` functions consistently across all Compose Multiplatform targets, supporting in-app navigation backstacks and platform-level state saving seamlessly.
+
+Arranger provides two complementary approaches to handle state preservation depending on your editing use case:
+
+---
+
+### 1. Composable Scope: `rememberRichTextState` (Standard & Short-to-Medium Text)
+
+For standard editors, chat composer fields, comment inputs, or form fields, use `rememberRichTextState()`. It automatically integrates with Compose's `rememberSaveable` and utilizes `RichTextState.Saver` to persist and restore editor state across Android configuration changes and process death out of the box:
+
+```kotlin
+@Composable
+fun NoteEditorScreen() {
+    // Automatically survives Android configuration changes (screen rotation) and process death
+    val state = rememberRichTextState(
+        initialText = RichString(text = "Hello Arranger!"),
+    )
+
+    RichTextEditor(state = state)
+}
+```
+
+#### What is Saved vs. Excluded
+
+| Data Item | Preserved | Rationale / Behavior |
+| :--- | :---: | :--- |
+| `text` | :white_check_mark: | Raw text string is completely restored. |
+| `selection` | :white_check_mark: | Cursor position and selection range (including reversed selection) are restored. |
+| `spans` | :white_check_mark: | All built-in attributes (bold, italic, colors, headings, lists, links, etc.) are serialized. Custom attributes use registered serializers. |
+| `typingAttributes` | :white_check_mark: | Pending keyboard styles reserved at cursor are maintained. |
+| `undoState` | :x: | **Intentionally excluded**. Storing dozens of full document snapshots causes Android Bundle size explosions (`TransactionTooLargeException`). Restored instances reset with a clean, safe history (matching standard Android `EditText` and Compose `rememberTextFieldState`). |
+
+---
+
+### 2. Long-Form Document Scope: Android ViewModel Hoisting Pattern
+
+For long-form documents, article editors, or applications where **undo/redo history must survive screen rotation**, hoist `RichTextState` directly in an Android `ViewModel`:
+
+```kotlin
+class EditorViewModel : ViewModel() {
+    // Hoisted in memory: survives Android configuration changes with 100% of undo history intact!
+    val state = RichTextState(
+        initialText = RichString(text = "Long document content..."),
+    )
+
+    fun onSaveDocument() {
+        val currentContent = state.richString
+        // Persist to local database (e.g., Room) or file storage
+    }
+}
+
+@Composable
+fun DocumentEditorScreen(viewModel: EditorViewModel = viewModel()) {
+    // UI simply observes and controls the ViewModel-held state
+    RichTextEditor(state = viewModel.state)
+}
+```
+
+#### Why ViewModel Hoisting Excels for Long Documents on Android:
+- **Zero Bundle Overhead & Zero Crash Risk**: The `ViewModel` remains in memory across Activity recreations (screen rotations). Because no Binder IPC or `Bundle` serialization occurs, there is **zero risk** of `TransactionTooLargeException`, even with 100,000+ characters.
+- **Full Undo/Redo Preservation**: Undo and redo stacks survive screen rotation completely intact without memory duplication.
+- **Zero Serialization Latency**: Recreating the Composable UI tree simply rebinds to the existing in-memory state object without parsing overhead.
+
+!!! tip "Handling Android Process Death for Long Documents"
+    Because Android Bundles are limited to ~1MB across the entire app, long-form documents should never rely on `SavedStateHandle` or `Bundle` for full text persistence across process death. Instead, implement a debounce auto-save pattern that periodically writes `state.richString` into a local SQLite database (e.g. Room) or local disk, and store only the document ID in `SavedStateHandle` to reload on process restoration.
+
+---
+
+### 3. Custom Attribute Serialization (`AttributeSerializer`)
+
+If you define custom `AttributeKey<T>` types, register them with `AttributeSerializer` so `RichTextState.Saver` knows how to serialize and restore your custom values:
+
+```kotlin
+data class NoteAnnotation(val comment: String)
+
+val NoteAnnotationKey = object : SpanAttributeKey<NoteAnnotation> {
+    override val name: String = "noteAnnotation"
+    override val defaultValue: NoteAnnotation = NoteAnnotation(comment = "")
+}
+
+// 1. Define custom serializer
+val noteSerializer = attributeSerializer(
+    key = NoteAnnotationKey,
+    save = { note -> note.comment },
+    restore = { saved -> NoteAnnotation(comment = saved as String) },
+)
+
+// 2. Create custom Saver
+val customSaver = RichTextState.saver(
+    customSerializers = listOf(noteSerializer),
+)
+
+// 3. Use in Composable
+@Composable
+fun CustomEditorScreen() {
+    val state = rememberRichTextState(
+        saver = customSaver,
+    )
+
+    RichTextEditor(state = state)
+}
+```
+
+---
+
 ## Related Documentation
 
 - [**RichTextEditor Basics**](rich-text-editor.md): Editor component placement and UI parameters.
 - [**Spans and Paragraphs**](../styling/spans-and-paragraphs.md): Differences between span and paragraph attributes.
 - [**Toolbar Integration**](../interactions/toolbars.md): High-level helper APIs such as `toggleFormat` and focus protection tips.
+

@@ -146,7 +146,7 @@ Each completion automatically records an isolated Undo step (`UndoMergePolicy.Se
 ```kotlin
 @Composable
 fun ChatEditorWithMentions() {
-    val state = remember { RichTextState() }
+    val state = rememberRichTextState()
     var activeMatch by remember { mutableStateOf<AutocompleteMatch?>(null) }
 
     val triggers = remember {

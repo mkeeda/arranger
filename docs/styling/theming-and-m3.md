@@ -77,7 +77,7 @@ Invoke the `@Composable fun rememberMaterial3AttributeStyleResolver()` function 
 ```kotlin
 @Composable
 fun Material3EditorScreen() {
-    val state = remember { RichTextState() }
+    val state = rememberRichTextState()
 
     // Generate a style resolver synchronized with current MaterialTheme (typography & colorScheme)
     val m3StyleResolver = rememberMaterial3AttributeStyleResolver()

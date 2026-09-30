@@ -11,8 +11,8 @@ To start, create a minimal Composable rendering an empty editor.
 ```kotlin
 @Composable
 fun SimpleEditor() {
-    // 1. Remember RichTextState to manage editor state
-    val state = remember { RichTextState() }
+    // 1. Remember RichTextState to manage editor state (survives Android configuration changes)
+    val state = rememberRichTextState()
 
     // 2. Render RichTextEditor passing state
     RichTextEditor(
@@ -38,17 +38,15 @@ fun DynamicEditingSample(modifier: Modifier = Modifier) {
     val initialText = "Edit this styled text to see the magic."
 
     // 1. Create RichTextState with initial text and formatting
-    val state = remember {
-        RichTextState(
-            initialText = RichString(text = initialText).edit {
-                // Safely locate occurrences of "styled text" and apply bold and purple color
-                editAttributes(range = initialText.rangeOf("styled text")) {
-                    bold()
-                    textColor(Color(0xFF6200EA)) // Purple
-                }
+    val state = rememberRichTextState(
+        initialText = RichString(text = initialText).edit {
+            // Safely locate occurrences of "styled text" and apply bold and purple color
+            editAttributes(range = initialText.rangeOf("styled text")) {
+                bold()
+                textColor(Color(0xFF6200EA)) // Purple
             }
-        )
-    }
+        },
+    )
 
     // 2. Render editor
     RichTextEditor(

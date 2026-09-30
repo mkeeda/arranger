@@ -79,13 +79,11 @@ Create a rich text editor in just a few lines of Compose code:
 ```kotlin
 @Composable
 fun SimpleEditor() {
-    val state = remember {
-        RichTextState(
-            initialText = RichString("Hello Compose!").edit {
-                editAttributes(range = 6..12) { bold() }
-            }
-        )
-    }
+    val state = rememberRichTextState(
+        initialText = RichString("Hello Compose!").edit {
+            editAttributes(range = 6..12) { bold() }
+        },
+    )
 
     RichTextEditor(
         state = state,
@@ -99,7 +97,7 @@ For live Markdown shortcuts as you type (Notion-style auto-formatting), simply s
 ```kotlin
 @Composable
 fun WysiwygSample() {
-    val state = remember { RichTextState() }
+    val state = rememberRichTextState()
     WysiwygEditor(state = state, modifier = Modifier.fillMaxSize())
 }
 ```

@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.applyFormat
 import dev.mkeeda.arranger.richtext.editor.clearFormats
 import dev.mkeeda.arranger.richtext.editor.detectAndApplyLinks
+import dev.mkeeda.arranger.richtext.editor.rememberRichTextState
 import dev.mkeeda.arranger.richtext.editor.removeFormat
 
 @Composable
@@ -34,7 +34,7 @@ public fun HyperlinkSample(modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current
     val initialText = "Check out https://kotlinlang.org and www.google.com for more info."
 
-    val state = remember { RichTextState(initialText = RichString(initialText)) }
+    val state = rememberRichTextState(initialText = RichString(initialText))
     var inputUrl by remember { mutableStateOf("https://example.com") }
 
     Scaffold(modifier = modifier) { paddingValues ->
