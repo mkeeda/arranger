@@ -7,6 +7,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.AttributeContainer
@@ -69,7 +70,7 @@ public class RichTextState(
      * When text is typed, these attributes will be forcefully cleared from the new text
      * so that inherited attributes don't apply.
      */
-    private var removedTypingAttributes: Set<AttributeKey<*>>? by mutableStateOf(null)
+    internal var removedTypingAttributes: Set<AttributeKey<*>>? by mutableStateOf(null)
 
     /**
      * Records the selection state at the exact moment typing attributes were modified.
@@ -529,6 +530,28 @@ public class RichTextState(
                 }
             acc + filteredAttrs
         }
+    }
+
+    public companion object {
+        /**
+         * Standard [Saver] implementation for [RichTextState].
+         *
+         * Out of the box, it supports all built-in attributes (bold, italic, colors,
+         * headings, lists, links, etc.), cursor selection, and pending typing attributes.
+         *
+         * Note that undo/redo history is deliberately excluded from serialization
+         * to prevent Bundle size explosion (TransactionTooLargeException).
+         */
+        public val Saver: Saver<RichTextState, Any> = saver()
+
+        /**
+         * Creates a [Saver] for [RichTextState] with custom attribute key support.
+         *
+         * @param customSerializers List of [AttributeSerializer]s to handle user-defined [AttributeKey]s.
+         */
+        public fun saver(
+            customSerializers: List<AttributeSerializer<*>> = emptyList(),
+        ): Saver<RichTextState, Any> = createRichTextStateSaver(customSerializers = customSerializers)
     }
 }
 
