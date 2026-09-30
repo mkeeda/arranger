@@ -56,6 +56,7 @@ import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.applyCompletion
 import dev.mkeeda.arranger.richtext.editor.createPopupPositionProvider
+import dev.mkeeda.arranger.richtext.editor.rememberRichTextState
 import dev.mkeeda.arranger.richtext.editor.toRgbaColor
 import kotlinx.coroutines.launch
 
@@ -139,7 +140,7 @@ private val sampleChannels =
 
 @Composable
 fun MentionAutocompleteSample(modifier: Modifier = Modifier) {
-    val editorState = remember { RichTextState(RichString("")) }
+    val editorState = rememberRichTextState()
     var autocompleteMatch by remember { mutableStateOf<AutocompleteMatch?>(null) }
     val messages =
         remember {

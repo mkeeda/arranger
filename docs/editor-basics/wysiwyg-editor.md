@@ -28,7 +28,7 @@ Like `RichTextEditor`, simply provide a `RichTextState` to run `WysiwygEditor`.
 ```kotlin
 @Composable
 fun SimpleWysiwygScreen() {
-    val state = remember { RichTextState() }
+    val state = rememberRichTextState()
 
     WysiwygEditor(
         state = state,
