@@ -11,7 +11,7 @@ To start, create a minimal Composable rendering an empty editor.
 ```kotlin
 @Composable
 fun SimpleEditor() {
-    // 1. Remember RichTextState to manage editor state (survives configuration changes)
+    // 1. Remember RichTextState to manage editor state (survives Android configuration changes)
     val state = rememberRichTextState()
 
     // 2. Render RichTextEditor passing state
