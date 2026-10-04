@@ -9,11 +9,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.AlignmentAttributeKey
+import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.HeadingKey
+import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.InlineCodeKey
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
+import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import io.kotest.matchers.nulls.shouldBeNull
@@ -134,11 +138,29 @@ class AttributeStyleResolverTest {
     }
 
     @Test
-    fun `DefaultAttributeStyleResolver resolves InlineCodeKey to monospace font`() {
+    fun `DefaultAttributeStyleResolver resolves InlineCodeKey to monospace font and neutral background`() {
         val container = attributeContainerOf(InlineCodeKey to Unit)
         val resolved = DefaultAttributeStyleResolver.resolve(container)
 
         resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
+        resolved.spanStyle?.background shouldBe Color(0x1F888888)
+    }
+
+    @Test
+    fun `defaultAttributeStyleResolver allows customizing link and inline code colors`() {
+        val customResolver =
+            defaultAttributeStyleResolver(
+                linkColor = Color.Green,
+                inlineCodeBackgroundColor = Color.Yellow,
+            )
+        val linkContainer = attributeContainerOf(LinkKey to "https://example.com")
+        val codeContainer = attributeContainerOf(InlineCodeKey to Unit)
+
+        val resolvedLink = customResolver.resolve(linkContainer)
+        resolvedLink.spanStyle?.color shouldBe Color.Green
+
+        val resolvedCode = customResolver.resolve(codeContainer)
+        resolvedCode.spanStyle?.background shouldBe Color.Yellow
     }
 
     @Test
@@ -216,5 +238,50 @@ class AttributeStyleResolverTest {
         val resolved = overridingResolver.resolve(container)
 
         resolved.spanStyle?.textDecoration shouldBe TextDecoration.None
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver preserves TextColorKey when combined with InlineCodeKey`() {
+        val container =
+            attributeContainerOf(
+                InlineCodeKey to Unit,
+                TextColorKey to Color.Red.toRgbaColor(),
+            )
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.spanStyle?.color shouldBe Color.Red
+        resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
+        resolved.spanStyle?.background shouldBe Color(0x1F888888)
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver preserves TextColorKey and BackgroundColorKey when combined with HeadingKey`() {
+        val container =
+            attributeContainerOf(
+                HeadingKey to HeadingLevel.H1,
+                TextColorKey to Color.Blue.toRgbaColor(),
+                BackgroundColorKey to Color.Yellow.toRgbaColor(),
+            )
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.spanStyle?.color shouldBe Color.Blue
+        resolved.spanStyle?.background shouldBe Color.Yellow
+        resolved.spanStyle?.fontSize shouldBe 32.sp
+        resolved.spanStyle?.fontWeight shouldBe FontWeight.Bold
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver preserves BackgroundColorKey when combined with LinkKey`() {
+        val container =
+            attributeContainerOf(
+                LinkKey to "https://example.com",
+                BackgroundColorKey to Color.LightGray.toRgbaColor(),
+            )
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.spanStyle?.color shouldBe Color(0xFF1E88E5)
+        resolved.spanStyle?.background shouldBe Color.LightGray
+        val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
+        (TextDecoration.Underline in decoration) shouldBe true
     }
 }
