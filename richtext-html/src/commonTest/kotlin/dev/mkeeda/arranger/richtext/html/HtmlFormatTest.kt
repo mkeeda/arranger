@@ -844,4 +844,55 @@ class HtmlFormatTest {
 
         exported shouldBe input
     }
+
+    @Test
+    fun `code block preserves special characters in html import and export`() {
+        val input = "<pre><code class=\"language-xml\">&lt;div class=&quot;main&quot;&gt;&amp;amp;&lt;/div&gt;</code></pre>"
+        val richString = RichString.fromHtml(input)
+        richString.text shouldBe "<div class=\"main\">&amp;</div>"
+        val exported = richString.toHtml()
+        exported shouldBe input
+    }
+
+    @Test
+    fun `exporting contiguous code blocks with different languages separates pre code blocks`() {
+        val text = "println(\"kt\")\nprint(\"py\")"
+        val richString =
+            RichString(text)
+                .edit { editAttributes(text.rangeOf("println(\"kt\")")) { codeBlock("kotlin") } }
+                .edit { editAttributes(text.rangeOf("print(\"py\")")) { codeBlock("python") } }
+
+        val html = richString.toHtml()
+        val expected =
+            "<pre><code class=\"language-kotlin\">println(&quot;kt&quot;)</code></pre>" +
+                "<pre><code class=\"language-python\">print(&quot;py&quot;)</code></pre>"
+        html shouldBe expected
+    }
+
+    @Test
+    fun `exporting code block with blank line inside preserves single code block`() {
+        val input = "<pre><code class=\"language-kotlin\">val x = 1\n\nval y = 2</code></pre>"
+        val richString = RichString.fromHtml(input)
+        val exported = richString.toHtml()
+        exported shouldBe input
+    }
+
+    @Test
+    fun `exporting code block with multiple blank lines preserves single code block`() {
+        val input = "<pre><code class=\"language-kotlin\">val x = 1\n\n\nval y = 2</code></pre>"
+        val richString = RichString.fromHtml(input)
+        val exported = richString.toHtml()
+        exported shouldBe input
+    }
+
+    @Test
+    fun `exporting blockquote with blank line inside preserves blockquote tag on blank line`() {
+        val text = "Line 1\n\nLine 2"
+        val richString =
+            RichString(text).edit {
+                setParagraphAttribute(BlockquoteKey, Unit, 0 until text.length)
+            }
+        val exported = richString.toHtml()
+        exported shouldBe "<blockquote><p>Line 1</p></blockquote><blockquote><p></p></blockquote><blockquote><p>Line 2</p></blockquote>"
+    }
 }

@@ -710,4 +710,65 @@ class MarkdownFormatTest {
 
         exported shouldBe input
     }
+
+    @Test
+    fun `importing indented code block produces CodeBlockKey span without language`() {
+        val markdown = "    val a = 1\n    val b = 2"
+        val richString = RichString.fromMarkdown(markdown)
+        richString.text shouldBe "val a = 1\nval b = 2"
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..18,
+                attributes = attributeContainerOf(CodeBlockKey to null),
+            ),
+        )
+    }
+
+    @Test
+    fun `code block preserves special markdown characters in import and export`() {
+        val input = "```markdown\n# Heading\n* bullet\n**bold**\n```"
+        val richString = RichString.fromMarkdown(input)
+        richString.text shouldBe "# Heading\n* bullet\n**bold**"
+        val exported = richString.toMarkdown()
+        exported shouldBe input
+    }
+
+    @Test
+    fun `exporting contiguous code blocks with different languages separates code fences`() {
+        val text = "println(\"kt\")\nprint(\"py\")"
+        val richString =
+            RichString(text)
+                .edit { editAttributes(text.rangeOf("println(\"kt\")")) { codeBlock("kotlin") } }
+                .edit { editAttributes(text.rangeOf("print(\"py\")")) { codeBlock("python") } }
+
+        val markdown = richString.toMarkdown()
+        markdown shouldBe "```kotlin\nprintln(\"kt\")\n```\n```python\nprint(\"py\")\n```"
+    }
+
+    @Test
+    fun `exporting code block with blank line inside preserves single code block`() {
+        val input = "```kotlin\nval x = 1\n\nval y = 2\n```"
+        val richString = RichString.fromMarkdown(input)
+        val exported = richString.toMarkdown()
+        exported shouldBe input
+    }
+
+    @Test
+    fun `exporting code block with multiple blank lines preserves single code block`() {
+        val input = "```kotlin\nval x = 1\n\n\nval y = 2\n```"
+        val richString = RichString.fromMarkdown(input)
+        val exported = richString.toMarkdown()
+        exported shouldBe input
+    }
+
+    @Test
+    fun `exporting blockquote with blank line inside preserves blockquote prefix`() {
+        val text = "Line 1\n\nLine 2"
+        val richString =
+            RichString(text).edit {
+                setParagraphAttribute(BlockquoteKey, Unit, 0 until text.length)
+            }
+        val exported = richString.toMarkdown()
+        exported shouldBe "> Line 1\n> \n> Line 2"
+    }
 }

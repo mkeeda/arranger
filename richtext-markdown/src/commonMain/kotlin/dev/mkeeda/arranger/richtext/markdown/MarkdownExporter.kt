@@ -30,11 +30,7 @@ internal class MarkdownExporter : RichTextExporter<String> {
         var currentCodeLang: String? = null
 
         for ((index, line) in lines.withIndex()) {
-            val lineRange = currentOffset until (currentOffset + line.length)
-            val lineSpans =
-                richString.spans.filter { span ->
-                    maxOf(lineRange.first, span.range.first) <= minOf(lineRange.last, span.range.last)
-                }
+            val lineSpans = richString.spansForLine(line = line, lineOffset = currentOffset)
 
             val codeBlockSpan = lineSpans.firstOrNull { it.attributes.containsKey(CodeBlockKey) }
             val isCodeBlock = codeBlockSpan != null
@@ -59,12 +55,9 @@ internal class MarkdownExporter : RichTextExporter<String> {
             if (isCodeBlock) {
                 result.append(line)
                 if (index < lines.size - 1) {
-                    val nextLineRange =
-                        (currentOffset + line.length + 1) until (currentOffset + line.length + 1 + lines[index + 1].length)
-                    val nextLineSpans =
-                        richString.spans.filter { span ->
-                            maxOf(nextLineRange.first, span.range.first) <= minOf(nextLineRange.last, span.range.last)
-                        }
+                    val nextLine = lines[index + 1]
+                    val nextLineOffset = currentOffset + line.length + 1
+                    val nextLineSpans = richString.spansForLine(line = nextLine, lineOffset = nextLineOffset)
                     val nextCodeBlockSpan = nextLineSpans.firstOrNull { it.attributes.containsKey(CodeBlockKey) }
                     val nextIsCodeBlock = nextCodeBlockSpan != null
                     val nextCodeLang = if (nextIsCodeBlock) nextCodeBlockSpan.attributes[CodeBlockKey] else null
@@ -129,6 +122,19 @@ internal class MarkdownExporter : RichTextExporter<String> {
         }
 
         return result.toString()
+    }
+
+    private fun RichString.spansForLine(line: String, lineOffset: Int): List<RichSpan> {
+        return if (line.isEmpty()) {
+            spans.filter { span ->
+                lineOffset in span.range || (lineOffset == text.length && lineOffset > 0 && (lineOffset - 1) in span.range)
+            }
+        } else {
+            val lineRange = lineOffset until (lineOffset + line.length)
+            spans.filter { span ->
+                maxOf(lineRange.first, span.range.first) <= minOf(lineRange.last, span.range.last)
+            }
+        }
     }
 
     private fun exportInlineSpans(
