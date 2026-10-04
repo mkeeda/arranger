@@ -76,7 +76,7 @@ When building Material 3 applications, heading typography and blockquote colors 
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.4.0-alpha04")
+    implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.5.0-alpha01")
 }
 ```
 

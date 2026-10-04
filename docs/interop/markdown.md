@@ -12,15 +12,15 @@ Add the `arranger-richtext-markdown` dependency to your Gradle build script alon
     ```kotlin
     dependencies {
         // Pure KMP Markdown serialization
-        implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.4.0-alpha")
-        implementation("dev.mkeeda.arranger:arranger-richtext:0.4.0-alpha")
+        implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-richtext:0.5.0-alpha01")
     }
     ```
 
 === "Version Catalog (libs.versions.toml)"
     ```toml
     [versions]
-    arranger = "0.4.0-alpha"
+    arranger = "0.5.0-alpha01"
 
     [libraries]
     arranger-richtext-markdown = { module = "dev.mkeeda.arranger:arranger-richtext-markdown", version.ref = "arranger" }
@@ -148,7 +148,7 @@ The delimiter stack ensures correct opening and closing order: `Link` -> `Underl
 
 ## Current Nuances & Limitations
 
-!!! warning "Inline Code Formatting in v0.4.0-alpha"
+!!! warning "Inline Code Formatting in v0.5.0-alpha01"
     While Arranger's core model defines `InlineCodeKey` and `WysiwygEditor` supports typing `` `code` `` shortcuts, the current `arranger-richtext-markdown` parser treats code spans as plain unstyled text, and `MarkdownExporter` does not yet emit backticks for `InlineCodeKey`. Full round-trip inline code serialization is planned for an upcoming release.
 
 !!! note "Block-Level Code Fences"
