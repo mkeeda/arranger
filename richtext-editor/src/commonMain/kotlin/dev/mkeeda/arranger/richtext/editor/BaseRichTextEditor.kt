@@ -178,39 +178,46 @@ internal fun BaseRichTextEditor(
             }
             .richTextKeyboardShortcuts(state)
 
-    Box(
-        modifier = modifier,
-        propagateMinConstraints = true,
-    ) {
-        if (visualBlocks.isNotEmpty()) {
-            BlockDecorationsOverlay(
-                visualBlocks = visualBlocks,
-                blockDecorator = blockDecorator,
-                textLayoutResult = textLayoutResult,
-                scrollState = scrollState,
-                workarounds = workarounds,
-                modifier = Modifier.matchParentSize(),
-            )
-        }
-
-        BasicTextField(
-            state = state.textFieldState,
-            modifier = drawModifier,
-            enabled = enabled,
-            readOnly = readOnly,
-            inputTransformation = effectiveInputTransformation,
-            textStyle = textStyle,
-            keyboardOptions = keyboardOptions,
-            onKeyboardAction = onKeyboardAction,
-            lineLimits = lineLimits,
-            onTextLayout = internalOnTextLayout,
-            scrollState = scrollState,
-            interactionSource = interactionSource,
-            cursorBrush = effectiveCursorBrush,
-            outputTransformation = outputTransformation,
-            decorator = decorator,
-        )
-    }
+    BasicTextField(
+        state = state.textFieldState,
+        modifier = modifier.then(drawModifier),
+        enabled = enabled,
+        readOnly = readOnly,
+        inputTransformation = effectiveInputTransformation,
+        textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
+        onKeyboardAction = onKeyboardAction,
+        lineLimits = lineLimits,
+        onTextLayout = internalOnTextLayout,
+        scrollState = scrollState,
+        interactionSource = interactionSource,
+        cursorBrush = effectiveCursorBrush,
+        outputTransformation = outputTransformation,
+        decorator = { innerTextField ->
+            val decoratedContent: @Composable () -> Unit = {
+                if (decorator != null) {
+                    decorator.Decoration(innerTextField)
+                } else {
+                    innerTextField()
+                }
+            }
+            if (visualBlocks.isNotEmpty()) {
+                Box(propagateMinConstraints = true) {
+                    BlockDecorationsOverlay(
+                        visualBlocks = visualBlocks,
+                        blockDecorator = blockDecorator,
+                        textLayoutResult = textLayoutResult,
+                        scrollState = scrollState,
+                        workarounds = workarounds,
+                        modifier = Modifier.matchParentSize(),
+                    )
+                    decoratedContent()
+                }
+            } else {
+                decoratedContent()
+            }
+        },
+    )
 }
 
 internal fun resolveEffectiveCursorBrush(
