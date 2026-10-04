@@ -43,7 +43,7 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
   - [x] **Hyperlink Support:** `LinkKey` attribute, URL parsing (`UrlParser`), interactive tap/click navigation via `LocalUriHandler`, and `detectAndApplyLinks()` API.
   - [x] **Generic Span Tap/Click Handling:** Extensible interaction API (e.g., `onSpanClick`) allowing custom interactive attributes (such as `@mentions` and `#hashtags`) to trigger application-defined actions.
   - [x] **Typing Trigger Hooks:** Cursor and text change hooks for autocompletion (detecting prefix triggers like `@` or `#` to assist user-built suggestion popups).
-- [ ] **Visual Block Decorations:**
+- [x] **Visual Block Decorations:**
   - Visual container rendering for blockquotes, code blocks, callouts, and background/border styling.
 
 ---
