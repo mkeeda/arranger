@@ -2,15 +2,6 @@
 
 Arranger features a modular Service Provider Interface (SPI) designed to serialize rich text to and from arbitrary data representations. Whether your application communicates with a Slack API using `mrkdwn`, persists structured rich text in SQLite/PostgreSQL as JSON, or synchronizes collaborative edits using a Delta format, Arranger's format abstraction makes custom format integration straightforward and type-safe.
 
-```mermaid
-flowchart TD
-    Exporter["RichTextExporter&lt;T&gt;<br><i>export(richString): T</i>"]
-    Importer["RichTextImporter&lt;T&gt;<br><i>import(input): RichString</i>"]
-
-    Exporter --> CustomExporter["SlackMrkdwnExporter / JsonExporter"]
-    Importer --> CustomImporter["SlackMrkdwnImporter / JsonImporter"]
-```
-
 ---
 
 ## Independent Exporter & Importer Interfaces
