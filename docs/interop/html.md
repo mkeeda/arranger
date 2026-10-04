@@ -12,15 +12,15 @@ Add `arranger-richtext-html` to your module's build configuration:
     ```kotlin
     dependencies {
         // Pure KMP HTML serialization with inline CSS styling
-        implementation("dev.mkeeda.arranger:arranger-richtext-html:0.4.0-alpha")
-        implementation("dev.mkeeda.arranger:arranger-richtext:0.4.0-alpha")
+        implementation("dev.mkeeda.arranger:arranger-richtext-html:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-richtext:0.5.0-alpha01")
     }
     ```
 
 === "Version Catalog (libs.versions.toml)"
     ```toml
     [versions]
-    arranger = "0.4.0-alpha"
+    arranger = "0.5.0-alpha01"
 
     [libraries]
     arranger-richtext-html = { module = "dev.mkeeda.arranger:arranger-richtext-html", version.ref = "arranger" }
@@ -179,7 +179,7 @@ On import, `ksoup` decodes all valid HTML entities (`&copy;`, `&mdash;`, `&#1285
 
 ## Current Nuances & Limitations
 
-!!! warning "Inline Code Tag in v0.4.0-alpha"
+!!! warning "Inline Code Tag in v0.5.0-alpha01"
     The current `HtmlImporter` and `HtmlExporter` implementations do not map `<code>` or `<pre>` tags to Arranger's `InlineCodeKey`. If code formatting is required, wrap text with inline styles or implement a custom format handler.
 
 !!! info "Block vs Inline Separation"
