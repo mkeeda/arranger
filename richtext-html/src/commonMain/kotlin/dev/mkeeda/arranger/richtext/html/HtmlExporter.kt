@@ -23,7 +23,10 @@ import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 
-internal class HtmlExporter : RichTextExporter<String> {
+/**
+ * An exporter that converts a [RichString] into an HTML [String].
+ */
+public object HtmlExporter : RichTextExporter<String> {
     override fun export(richString: RichString): String {
         if (richString.text.isEmpty()) return ""
 
