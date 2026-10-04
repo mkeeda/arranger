@@ -17,6 +17,7 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -83,6 +84,9 @@ public fun defaultAttributeStyleResolver(
                 fontFamily = FontFamily.Monospace,
                 background = inlineCodeBackgroundColor,
             )
+        }
+        spanStyle(CodeBlockKey) {
+            SpanStyle(fontFamily = FontFamily.Monospace)
         }
         spanStyle(LinkKey) {
             SpanStyle(
@@ -174,6 +178,13 @@ public fun defaultAttributeStyleResolver(
             ParagraphStyle(
                 textIndent = TextIndent(firstLine = 16.sp, restLine = 16.sp),
                 lineHeight = 24.sp,
+                lineBreak = LineBreak.Paragraph,
+                lineHeightStyle = blockLineHeightStyle,
+            )
+        }
+        paragraphStyle(CodeBlockKey) {
+            ParagraphStyle(
+                textIndent = TextIndent(firstLine = 12.sp, restLine = 12.sp),
                 lineBreak = LineBreak.Paragraph,
                 lineHeightStyle = blockLineHeightStyle,
             )

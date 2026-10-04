@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.InlineCodeKey
@@ -117,6 +118,29 @@ class WysiwygAutoFormatterTest {
         state.textFieldState.text.toString() shouldBe ""
         state.selection shouldBe TextRange(0)
         state.typingAttributes?.get(BlockquoteKey) shouldBe Unit
+        wysiwygState.canRevert(state) shouldBe true
+    }
+
+    @Test
+    fun `code block trigger without language removes backticks and sets CodeBlockKey`() {
+        val (state, wysiwygState, transformation) = createEngine()
+        typeText(state, transformation, "``` ")
+
+        state.textFieldState.text.toString() shouldBe ""
+        state.selection shouldBe TextRange(0)
+        state.typingAttributes?.containsKey(CodeBlockKey) shouldBe true
+        state.typingAttributes?.get(CodeBlockKey) shouldBe null
+        wysiwygState.canRevert(state) shouldBe true
+    }
+
+    @Test
+    fun `code block trigger with language removes backticks and sets CodeBlockKey with language`() {
+        val (state, wysiwygState, transformation) = createEngine()
+        typeText(state, transformation, "```kotlin ")
+
+        state.textFieldState.text.toString() shouldBe ""
+        state.selection shouldBe TextRange(0)
+        state.typingAttributes?.get(CodeBlockKey) shouldBe "kotlin"
         wysiwygState.canRevert(state) shouldBe true
     }
 
@@ -295,6 +319,20 @@ class WysiwygAutoFormatterTest {
         state.textFieldState.text.toString() shouldBe "# "
         state.selection shouldBe TextRange(2)
         state.typingAttributes?.get(HeadingKey) shouldBe null
+    }
+
+    @Test
+    fun `reverting code block auto-format restores raw backtick text`() {
+        val (state, wysiwygState, transformation) = createEngine()
+        typeText(state, transformation, "```kotlin ")
+
+        wysiwygState.canRevert(state) shouldBe true
+        val reverted = wysiwygState.revert(state)
+        reverted shouldBe true
+
+        state.textFieldState.text.toString() shouldBe "```kotlin "
+        state.selection shouldBe TextRange(10)
+        state.typingAttributes?.get(CodeBlockKey) shouldBe null
     }
 
     @Test

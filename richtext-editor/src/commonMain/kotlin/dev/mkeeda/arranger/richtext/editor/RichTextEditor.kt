@@ -37,6 +37,7 @@ import dev.mkeeda.arranger.richtext.RichSpan
  * @param decorator Allows modifying how the text field is drawn with decorations around it (e.g. placeholder, border).
  * @param styleResolver A resolver that specifies how [AttributeContainer]s should be translated into visually rendered Compose [SpanStyle]s.
  * @param listMarkerResolver A resolver that specifies how list markers (e.g. bullets, ordered numbers) should be rendered.
+ * @param blockDecorator The decorator used to render visual containers around blockquotes and code blocks.
  * @param onSpanClick Optional callback invoked when a [RichSpan] is tapped or clicked.
  * @param autocompleteTriggers The list of [AutocompleteTrigger] patterns to observe during typing.
  * @param onAutocompleteChange Callback invoked whenever the active [AutocompleteMatch] changes, or `null` when no trigger is matched.
@@ -58,6 +59,7 @@ public fun RichTextEditor(
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
+    blockDecorator: BlockDecorator = DefaultBlockDecorator,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
     autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
     onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
@@ -79,6 +81,7 @@ public fun RichTextEditor(
         decorator = decorator,
         styleResolver = styleResolver,
         listMarkerResolver = listMarkerResolver,
+        blockDecorator = blockDecorator,
         onSpanClick = onSpanClick,
         autocompleteTriggers = autocompleteTriggers,
         onAutocompleteChange = onAutocompleteChange,

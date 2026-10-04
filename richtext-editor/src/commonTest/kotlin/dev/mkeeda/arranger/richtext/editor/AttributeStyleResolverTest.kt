@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.AlignmentAttributeKey
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.InlineCodeKey
@@ -283,5 +284,22 @@ class AttributeStyleResolverTest {
         resolved.spanStyle?.background shouldBe Color.LightGray
         val decoration = resolved.spanStyle?.textDecoration.shouldNotBeNull()
         (TextDecoration.Underline in decoration) shouldBe true
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves spanStyle for CodeBlockKey with monospace fontFamily`() {
+        val container = attributeContainerOf(CodeBlockKey to "kotlin")
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves paragraphStyle for CodeBlockKey with textIndent`() {
+        val container = attributeContainerOf(CodeBlockKey to null)
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.paragraphStyle?.textIndent?.firstLine shouldBe 12.sp
+        resolved.paragraphStyle?.textIndent?.restLine shouldBe 12.sp
     }
 }
