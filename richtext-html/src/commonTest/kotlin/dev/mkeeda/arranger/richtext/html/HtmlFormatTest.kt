@@ -4,6 +4,7 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -21,6 +22,7 @@ import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.codeBlock
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -776,5 +778,70 @@ class HtmlFormatTest {
         val reimported = RichString.fromHtml(exportedHtml)
         reimported.text shouldBe text
         reimported.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `importing code block with language produces CodeBlockKey span with language`() {
+        val html = "<pre><code class=\"language-kotlin\">val x = 1\nval y = 2</code></pre>"
+        val richString = RichString.fromHtml(html)
+
+        richString.text shouldBe "val x = 1\nval y = 2"
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..18,
+                attributes = attributeContainerOf(CodeBlockKey to "kotlin"),
+            ),
+        )
+    }
+
+    @Test
+    fun `importing code block without language produces CodeBlockKey span with null language`() {
+        val html = "<pre><code>echo hi</code></pre>"
+        val richString = RichString.fromHtml(html)
+
+        richString.text shouldBe "echo hi"
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..6,
+                attributes = attributeContainerOf(CodeBlockKey to null),
+            ),
+        )
+    }
+
+    @Test
+    fun `exporting code block with language produces pre code with language class`() {
+        val text = "val x = 1\nval y = 2"
+        val richString =
+            RichString(text).edit {
+                editAttributes(text.indices) {
+                    codeBlock("kotlin")
+                }
+            }
+
+        val html = richString.toHtml()
+        html shouldBe "<pre><code class=\"language-kotlin\">val x = 1\nval y = 2</code></pre>"
+    }
+
+    @Test
+    fun `exporting code block without language produces plain pre code`() {
+        val text = "echo hi"
+        val richString =
+            RichString(text).edit {
+                editAttributes(text.indices) {
+                    codeBlock()
+                }
+            }
+
+        val html = richString.toHtml()
+        html shouldBe "<pre><code>echo hi</code></pre>"
+    }
+
+    @Test
+    fun `round tripping html code block preserves code block and language`() {
+        val input = "<pre><code class=\"language-kotlin\">println(42)</code></pre>"
+        val richString = RichString.fromHtml(input)
+        val exported = richString.toHtml()
+
+        exported shouldBe input
     }
 }

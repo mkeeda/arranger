@@ -3,6 +3,7 @@ package dev.mkeeda.arranger.richtext.markdown
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
@@ -14,6 +15,7 @@ import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.codeBlock
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -645,8 +647,67 @@ class MarkdownFormatTest {
     }
 
     @Test
-    fun `exporting empty rich string returns empty markdown`() {
-        val richString = RichString("")
-        richString.toMarkdown() shouldBe ""
+    fun `importing code block with language produces CodeBlockKey span with language`() {
+        val markdown = "```kotlin\nval x = 1\nval y = 2\n```"
+        val richString = RichString.fromMarkdown(markdown)
+
+        richString.text shouldBe "val x = 1\nval y = 2"
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..18,
+                attributes = attributeContainerOf(CodeBlockKey to "kotlin"),
+            ),
+        )
+    }
+
+    @Test
+    fun `importing code block without language produces CodeBlockKey span with null language`() {
+        val markdown = "```\necho hi\n```"
+        val richString = RichString.fromMarkdown(markdown)
+
+        richString.text shouldBe "echo hi"
+        richString.spans.shouldContainExactly(
+            RichSpan(
+                range = 0..6,
+                attributes = attributeContainerOf(CodeBlockKey to null),
+            ),
+        )
+    }
+
+    @Test
+    fun `exporting code block with language produces fenced markdown with language`() {
+        val text = "val x = 1\nval y = 2"
+        val richString =
+            RichString(text).edit {
+                editAttributes(text.indices) {
+                    codeBlock("kotlin")
+                }
+            }
+
+        val markdown = richString.toMarkdown()
+        markdown shouldBe "```kotlin\nval x = 1\nval y = 2\n```"
+    }
+
+    @Test
+    fun `exporting code block without language produces fenced markdown without language`() {
+        val text = "echo hi"
+        val richString =
+            RichString(text).edit {
+                editAttributes(text.indices) {
+                    codeBlock()
+                }
+            }
+
+        val markdown = richString.toMarkdown()
+        markdown shouldBe "```\necho hi\n```"
+    }
+
+    @Test
+    fun `round tripping code block preserves code block and language`() {
+        val input = "```kotlin\nprintln(42)\n```"
+        val richString = RichString.fromMarkdown(input)
+        val exported = richString.toMarkdown()
+
+        exported shouldBe input
     }
 }

@@ -9,6 +9,7 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -201,6 +202,27 @@ internal class HtmlImporter : RichTextImporter<String> {
                         }
                     }
 
+                    "pre" -> {
+                        context.endParagraph()
+                        val codeChild = node.children().firstOrNull { it.tagName().equals("code", ignoreCase = true) }
+                        val classAttr = (codeChild?.attr("class") ?: "").ifEmpty { node.attr("class") }
+                        val language = parseLanguageFromClass(classAttr)
+                        val codeText = (codeChild ?: node).wholeText().removeSuffix("\n").removeSuffix("\r")
+                        if (codeText.isNotEmpty()) {
+                            context.startParagraph()
+                            val start = context.textBuilder.length
+                            context.textBuilder.append(codeText)
+                            val end = context.textBuilder.length
+                            context.spans.add(
+                                RichSpan(
+                                    range = start until end,
+                                    attributes = attributeContainerOf(CodeBlockKey to language),
+                                ),
+                            )
+                            context.endParagraph()
+                        }
+                    }
+
                     "p" -> {
                         context.endParagraph()
                         if (isEmptyParagraph(node)) {
@@ -272,8 +294,25 @@ internal class HtmlImporter : RichTextImporter<String> {
     }
 
     private fun containsBlockChild(element: Element): Boolean {
-        val blockTags = setOf("p", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "ul", "ol", "li", "div")
+        val blockTags = setOf("p", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "ul", "ol", "li", "div", "pre")
         return element.children().any { it.tagName().lowercase() in blockTags }
+    }
+
+    private fun parseLanguageFromClass(className: String): String? {
+        if (className.isEmpty()) return null
+        val tokens = className.split(' ', '\t')
+        for (token in tokens) {
+            val trimmed = token.trim()
+            if (trimmed.startsWith("language-", ignoreCase = true)) {
+                val lang = trimmed.substring("language-".length)
+                if (lang.isNotEmpty()) return lang
+            }
+            if (trimmed.startsWith("lang-", ignoreCase = true)) {
+                val lang = trimmed.substring("lang-".length)
+                if (lang.isNotEmpty()) return lang
+            }
+        }
+        return null
     }
 
     private companion object {
