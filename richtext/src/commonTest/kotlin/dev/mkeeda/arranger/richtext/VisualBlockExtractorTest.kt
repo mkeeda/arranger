@@ -188,4 +188,52 @@ class VisualBlockExtractorTest {
             ),
         )
     }
+
+    @Test
+    fun `extractVisualBlocks preserves code block containing empty lines`() {
+        val text = "fun foo() {\n\n    return 42\n}"
+        val richString =
+            RichString(text = text).edit {
+                editAttributes(range = text.indices) {
+                    codeBlock(language = "kotlin")
+                }
+            }
+
+        val blocks = richString.extractVisualBlocks()
+
+        blocks.shouldContainExactly(
+            VisualBlock.CodeBlock(
+                range = 0..text.lastIndex,
+                language = "kotlin",
+            ),
+        )
+    }
+
+    @Test
+    fun `extractVisualBlocks merges code block paragraphs when empty line paragraph is styled individually`() {
+        val text = "fun foo() {\n\n    return 42\n}"
+        val richString =
+            RichString(text = text)
+                .edit {
+                    editAttributes(range = 0..11) { codeBlock(language = "kotlin") }
+                }
+                .edit {
+                    editAttributes(range = 12..12) { codeBlock(language = "kotlin") }
+                }
+                .edit {
+                    editAttributes(range = 13..27) { codeBlock(language = "kotlin") }
+                }
+                .edit {
+                    editAttributes(range = 28..28) { codeBlock(language = "kotlin") }
+                }
+
+        val blocks = richString.extractVisualBlocks()
+
+        blocks.shouldContainExactly(
+            VisualBlock.CodeBlock(
+                range = 0..text.lastIndex,
+                language = "kotlin",
+            ),
+        )
+    }
 }

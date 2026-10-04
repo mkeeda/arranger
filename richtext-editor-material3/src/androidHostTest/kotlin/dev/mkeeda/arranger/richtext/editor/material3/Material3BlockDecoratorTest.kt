@@ -73,4 +73,19 @@ class Material3BlockDecoratorTest {
 
         composeTestRule.waitForIdle()
     }
+
+    @Test
+    fun `Material3BlockDecorator renders code block without language tag when language is null`() {
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = lightColorScheme()) {
+                val decorator = rememberMaterial3BlockDecorator()
+                decorator.Decoration(
+                    block = VisualBlock.CodeBlock(range = 0..10, language = null),
+                    context = sampleContext,
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+    }
 }

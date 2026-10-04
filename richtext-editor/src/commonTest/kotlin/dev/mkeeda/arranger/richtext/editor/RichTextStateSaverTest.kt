@@ -27,6 +27,7 @@ import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.extractVisualBlocks
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -798,5 +799,32 @@ class RichTextStateSaverTest {
         restored.richString.spans shouldHaveSize 1
         restored.richString.spans.first().attributes.containsKey(CodeBlockKey) shouldBe true
         restored.richString.spans.first().attributes[CodeBlockKey] shouldBe null
+    }
+
+    @Test
+    fun `restores state preserving code block visual blocks and cursor position`() {
+        val originalState =
+            RichTextState(
+                initialText =
+                    RichString(
+                        text = "fun main() {\n    println(42)\n}",
+                        spans =
+                            listOf(
+                                RichSpan(
+                                    range = 0..30,
+                                    attributes = attributeContainerOf(CodeBlockKey to "kotlin"),
+                                ),
+                            ),
+                    ),
+                initialSelection = TextRange(15),
+            )
+
+        val saved = with(RichTextState.Saver) { testSaverScope.save(originalState) }
+        saved.shouldNotBeNull()
+
+        val restored = RichTextState.Saver.restore(saved)
+        restored.shouldNotBeNull()
+        restored.selection shouldBe TextRange(15)
+        restored.richString.extractVisualBlocks() shouldBe originalState.richString.extractVisualBlocks()
     }
 }
