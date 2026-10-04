@@ -138,7 +138,12 @@ internal fun BaseRichTextEditor(
                             .coerceIn(0, it.layoutInput.text.length)
                     val rawRect = it.getCursorRect(mappedCursor)
                     val scrollY = scrollState.value.toFloat()
-                    Rect(rawRect.left, rawRect.top - scrollY, rawRect.right, rawRect.bottom - scrollY)
+                    Rect(
+                        left = rawRect.left,
+                        top = rawRect.top - scrollY,
+                        right = rawRect.right,
+                        bottom = rawRect.bottom - scrollY,
+                    )
                 }
 
             currentOnAutocompleteChange?.invoke(match.copy(cursorRect = cursorRect))
@@ -337,37 +342,15 @@ internal fun BlockDecorationsOverlay(
                 val lineCount = maxOf(1, endLine - startLine + 1)
                 val editorWidth = layout.size.width.toFloat()
 
-                val bounds =
-                    Rect(
-                        left = 0f,
-                        top = blockTop,
-                        right = editorWidth,
-                        bottom = blockBottom,
-                    )
-
-                var minLeft = Float.MAX_VALUE
-                var maxRight = 0f
-                for (line in startLine..endLine) {
-                    minLeft = minOf(minLeft, layout.getLineLeft(line))
-                    maxRight = maxOf(maxRight, layout.getLineRight(line))
-                }
-                val textBounds =
-                    Rect(
-                        left = if (minLeft == Float.MAX_VALUE) 0f else minLeft,
-                        top = blockTop,
-                        right = maxRight,
-                        bottom = blockBottom,
-                    )
+                val blockHeight = (blockBottom - blockTop).coerceAtLeast(0f)
 
                 val context =
                     BlockDecorationContext(
-                        bounds = bounds,
-                        textBounds = textBounds,
                         lineCount = lineCount,
                         modifier =
                             Modifier.size(
-                                width = with(density) { bounds.width.toDp() },
-                                height = with(density) { bounds.height.toDp() },
+                                width = with(density) { editorWidth.toDp() },
+                                height = with(density) { blockHeight.toDp() },
                             ),
                     )
 

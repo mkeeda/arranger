@@ -5,9 +5,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import dev.mkeeda.arranger.richtext.VisualBlock
 import dev.mkeeda.arranger.richtext.editor.BlockDecorationContext
@@ -23,10 +24,8 @@ class Material3BlockDecoratorTest {
 
     private val sampleContext =
         BlockDecorationContext(
-            bounds = Rect(0f, 0f, 400f, 100f),
-            textBounds = Rect(16f, 0f, 380f, 100f),
             lineCount = 2,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("block_container"),
         )
 
     @Test
@@ -41,6 +40,9 @@ class Material3BlockDecoratorTest {
             }
         }
 
+        composeTestRule.onNodeWithTag("block_container").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("code_block_background").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("language_badge").assertIsDisplayed()
         composeTestRule.onNodeWithText("KOTLIN").assertIsDisplayed()
     }
 
@@ -56,11 +58,14 @@ class Material3BlockDecoratorTest {
             }
         }
 
+        composeTestRule.onNodeWithTag("block_container").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("code_block_background").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("language_badge").assertIsDisplayed()
         composeTestRule.onNodeWithText("RUST").assertIsDisplayed()
     }
 
     @Test
-    fun `Material3BlockDecorator renders blockquote without error`() {
+    fun `Material3BlockDecorator renders blockquote correctly`() {
         composeTestRule.setContent {
             MaterialTheme(colorScheme = lightColorScheme()) {
                 val decorator = rememberMaterial3BlockDecorator()
@@ -71,11 +76,12 @@ class Material3BlockDecoratorTest {
             }
         }
 
-        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("block_container").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("blockquote_bar").assertIsDisplayed()
     }
 
     @Test
-    fun `Material3BlockDecorator renders code block without language tag when language is null`() {
+    fun `Material3BlockDecorator renders code block without language badge when language is null`() {
         composeTestRule.setContent {
             MaterialTheme(colorScheme = lightColorScheme()) {
                 val decorator = rememberMaterial3BlockDecorator()
@@ -86,6 +92,8 @@ class Material3BlockDecoratorTest {
             }
         }
 
-        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("block_container").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("code_block_background").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("language_badge").assertDoesNotExist()
     }
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -26,32 +25,34 @@ class BlockDecoratorTest {
 
     private val sampleContext =
         BlockDecorationContext(
-            bounds = Rect(0f, 0f, 400f, 100f),
-            textBounds = Rect(16f, 0f, 380f, 100f),
             lineCount = 2,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("block_container"),
         )
 
     @Test
-    fun `DefaultBlockDecorator renders Blockquote without error`() {
+    fun `DefaultBlockDecorator renders Blockquote correctly`() {
         composeTestRule.setContent {
             DefaultBlockDecorator.Decoration(
                 block = VisualBlock.Blockquote(range = 0..10),
                 context = sampleContext,
             )
         }
-        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("block_container").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("blockquote_bar").assertIsDisplayed()
     }
 
     @Test
-    fun `DefaultBlockDecorator renders CodeBlock without error`() {
+    fun `DefaultBlockDecorator renders CodeBlock correctly`() {
         composeTestRule.setContent {
             DefaultBlockDecorator.Decoration(
                 block = VisualBlock.CodeBlock(range = 0..10, language = "kotlin"),
                 context = sampleContext,
             )
         }
-        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("block_container").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("code_block_background").assertIsDisplayed()
     }
 
     @Test

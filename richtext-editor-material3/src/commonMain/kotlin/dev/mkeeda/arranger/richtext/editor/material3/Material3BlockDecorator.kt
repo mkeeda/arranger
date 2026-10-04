@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.VisualBlock
 import dev.mkeeda.arranger.richtext.editor.BlockContainer
@@ -49,7 +50,8 @@ public fun material3BlockDecorator(
                                     .background(
                                         color = colorScheme.outlineVariant,
                                         shape = RoundedCornerShape(1.5.dp),
-                                    ),
+                                    )
+                                    .testTag("blockquote_bar"),
                         )
                     },
                 )
@@ -71,7 +73,8 @@ public fun material3BlockDecorator(
                                         width = 1.dp,
                                         color = colorScheme.outlineVariant,
                                         shape = RoundedCornerShape(8.dp),
-                                    ),
+                                    )
+                                    .testTag("code_block_background"),
                         )
                     },
                     header = {
@@ -83,7 +86,8 @@ public fun material3BlockDecorator(
                                 modifier =
                                     Modifier
                                         .align(Alignment.TopEnd)
-                                        .padding(end = 8.dp, top = 4.dp),
+                                        .padding(end = 8.dp, top = 4.dp)
+                                        .testTag("language_badge"),
                             )
                         }
                     },

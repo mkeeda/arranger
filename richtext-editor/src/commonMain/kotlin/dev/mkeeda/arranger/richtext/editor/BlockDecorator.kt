@@ -10,22 +10,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.richtext.VisualBlock
 
 /**
  * Contextual layout information supplied to a [BlockDecorator] for decorating a [VisualBlock].
  *
- * @property bounds The entire rectangular bounding box of the block within the editor coordinates.
- * @property textBounds The actual bounding box of the text content within the block (accounting for indents).
  * @property lineCount The number of lines contained in the block.
- * @property modifier Base modifier sized and positioned according to [bounds].
+ * @property modifier Base modifier sized and positioned for the block.
  */
 public data class BlockDecorationContext(
-    public val bounds: Rect,
-    public val textBounds: Rect,
     public val lineCount: Int,
     public val modifier: Modifier,
 )
@@ -38,7 +34,7 @@ public fun interface BlockDecorator {
      * Composable function called to render decorations for a given [block].
      *
      * @param block The [VisualBlock] to decorate.
-     * @param context Context containing geometry, bounds, and modifier.
+     * @param context Context containing layout information such as [BlockDecorationContext.lineCount] and [BlockDecorationContext.modifier].
      */
     @Composable
     public fun Decoration(
@@ -110,7 +106,8 @@ public val DefaultBlockDecorator: BlockDecorator =
                                     .background(
                                         color = Color(0xFFB0BEC5),
                                         shape = RoundedCornerShape(1.5.dp),
-                                    ),
+                                    )
+                                    .testTag("blockquote_bar"),
                         )
                     },
                 )
@@ -127,7 +124,8 @@ public val DefaultBlockDecorator: BlockDecorator =
                                     .background(
                                         color = Color(0x0A000000),
                                         shape = RoundedCornerShape(6.dp),
-                                    ),
+                                    )
+                                    .testTag("code_block_background"),
                         )
                     },
                 )
