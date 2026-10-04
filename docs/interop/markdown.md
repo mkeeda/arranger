@@ -30,7 +30,7 @@ Add the `arranger-richtext-markdown` dependency to your Gradle build script alon
 
 ## Bi-Directional Conversion API
 
-The module exposes two idiomatic Kotlin extension functions that wrap the underlying `MarkdownFormat` singleton:
+The module exposes two idiomatic Kotlin extension functions that wrap `MarkdownExporter` and `MarkdownImporter`:
 
 ```kotlin
 // Export a RichString model to a Markdown string
@@ -75,22 +75,20 @@ val editorState = RichTextState(initialText = richString)
 
 ---
 
-## Under the Hood: MarkdownFormat
+## Under the Hood: MarkdownExporter & MarkdownImporter
 
-Both extension functions delegate to the `MarkdownFormat` object, which implements Arranger's universal format SPI (`RichTextFormat<String>`):
+Both extension functions delegate to `MarkdownExporter` and `MarkdownImporter`, which implement Arranger's universal serialization SPI (`RichTextExporter<String>` and `RichTextImporter<String>`):
 
 ```kotlin
-public object MarkdownFormat :
-    RichTextFormat<String>,
-    RichTextExporter<String> by MarkdownExporter(),
-    RichTextImporter<String> by MarkdownImporter()
+public object MarkdownExporter : RichTextExporter<String>
+public object MarkdownImporter : RichTextImporter<String>
 ```
 
-You can pass `MarkdownFormat` directly into Arranger's generic format APIs:
+You can pass `MarkdownExporter` and `MarkdownImporter` directly into Arranger's generic format APIs:
 
 ```kotlin
-val markdown: String = richString.export(MarkdownFormat)
-val restored: RichString = RichString.import(markdown, MarkdownFormat)
+val markdown: String = richString.export(MarkdownExporter)
+val restored: RichString = RichString.import(markdown, MarkdownImporter)
 ```
 
 ---

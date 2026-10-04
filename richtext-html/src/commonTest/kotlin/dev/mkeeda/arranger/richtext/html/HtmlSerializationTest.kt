@@ -21,6 +21,8 @@ import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.export
+import dev.mkeeda.arranger.richtext.import
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -28,7 +30,27 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
-class HtmlFormatTest {
+class HtmlSerializationTest {
+    @Test
+    fun `exporting RichString via HtmlExporter directly produces expected html`() {
+        val richString =
+            RichString("Hello World").edit {
+                setSpanAttribute(key = BoldKey, value = Unit, range = 0..4)
+            }
+        val html = richString.export(exporter = HtmlExporter)
+        html shouldBe "<p><strong>Hello</strong> World</p>"
+    }
+
+    @Test
+    fun `importing html via HtmlImporter directly produces expected RichString`() {
+        val html = "<p><strong>Hello</strong> World</p>"
+        val richString = RichString.import(input = html, importer = HtmlImporter)
+        richString.text shouldBe "Hello World"
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
+        )
+    }
+
     @Test
     fun `exporting plain text produces plain html paragraph`() {
         val richString = RichString("Hello World")
@@ -776,5 +798,100 @@ class HtmlFormatTest {
         val reimported = RichString.fromHtml(exportedHtml)
         reimported.text shouldBe text
         reimported.spans.shouldBeEmpty()
+    }
+
+    @Test
+    fun `HtmlExporter is stateless and produces deterministic output across consecutive invocations`() {
+        val listString =
+            RichString("Item 1\nItem 2").edit {
+                setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, 0..5)
+                setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, 7..12)
+            }
+        val plainString = RichString("Plain Paragraph")
+        val headingString =
+            RichString("Heading 1").edit {
+                setParagraphAttribute(HeadingKey, HeadingLevel.H1, 0..8)
+            }
+
+        // Invoke sequentially on the same singleton object
+        val listHtml1 = HtmlExporter.export(listString)
+        val plainHtml = HtmlExporter.export(plainString)
+        val listHtml2 = HtmlExporter.export(listString)
+        val headingHtml = HtmlExporter.export(headingString)
+
+        listHtml1 shouldBe "<ul><li>Item 1</li><li>Item 2</li></ul>"
+        plainHtml shouldBe "<p>Plain Paragraph</p>"
+        listHtml2 shouldBe listHtml1
+        headingHtml shouldBe "<h1>Heading 1</h1>"
+    }
+
+    @Test
+    fun `HtmlImporter is stateless and correctly parses varying documents consecutively`() {
+        val listHtml = "<ul><li>Alpha</li><li>Beta</li></ul>"
+        val plainHtml = "<p>Simple Text</p>"
+        val styledHtml = "<p><strong>Bold</strong> and <em>Italic</em></p>"
+
+        val doc1 = HtmlImporter.import(listHtml)
+        val doc2 = HtmlImporter.import(plainHtml)
+        val doc3 = HtmlImporter.import(styledHtml)
+        val doc1Repeat = HtmlImporter.import(listHtml)
+
+        doc1.text shouldBe "Alpha\nBeta"
+        doc1.spans shouldHaveSize 2
+        doc2.text shouldBe "Simple Text"
+        doc2.spans.shouldBeEmpty()
+        doc3.text shouldBe "Bold and Italic"
+        doc3.spans shouldHaveSize 2
+        doc1Repeat.text shouldBe doc1.text
+        doc1Repeat.spans shouldContainExactly doc1.spans
+    }
+
+    @Test
+    fun `direct HtmlExporter export matches extension toHtml for complex rich string`() {
+        val richString =
+            RichString("Heading\nLine with bold and link").edit {
+                setParagraphAttribute(HeadingKey, HeadingLevel.H2, 0..6)
+                setSpanAttribute(BoldKey, Unit, 18..21)
+                setSpanAttribute(LinkKey, "https://example.com", 27..30)
+            }
+
+        val directExport = richString.export(HtmlExporter)
+        val extensionExport = richString.toHtml()
+
+        directExport shouldBe extensionExport
+        directExport shouldBe "<h2>Heading</h2><p>Line with <strong>bold</strong> and <a href=\"https://example.com\">link</a></p>"
+    }
+
+    @Test
+    fun `direct HtmlImporter import matches extension fromHtml for complex html`() {
+        val html = "<h2>Heading</h2><p>Line with <strong>bold</strong> and <a href=\"https://example.com\">link</a></p>"
+
+        val directImport = RichString.import(html, HtmlImporter)
+        val extensionImport = RichString.fromHtml(html)
+
+        directImport.text shouldBe extensionImport.text
+        directImport.spans shouldContainExactly extensionImport.spans
+    }
+
+    @Test
+    fun `exporting and importing blockquote with text alignment and inline styles`() {
+        val text = "Aligned Quoted Text"
+        val richString =
+            RichString(text).edit {
+                setParagraphAttribute(BlockquoteKey, Unit, 0 until text.length)
+                setParagraphAttribute(TextAlignmentKey, TextAlignment.Right, 0 until text.length)
+                setSpanAttribute(BoldKey, Unit, 0..6)
+            }
+
+        val html = richString.toHtml()
+        html shouldBe "<blockquote><p style=\"text-align: right;\"><strong>Aligned</strong> Quoted Text</p></blockquote>"
+
+        val reimported = RichString.fromHtml(html)
+        reimported.text shouldBe text
+        reimported.spans.shouldContainExactly(
+            RichSpan(range = 0..6, attributes = attributeContainerOf(BoldKey to Unit)),
+            RichSpan(range = 0..18, attributes = attributeContainerOf(TextAlignmentKey to TextAlignment.Right)),
+            RichSpan(range = 0..18, attributes = attributeContainerOf(BlockquoteKey to Unit)),
+        )
     }
 }

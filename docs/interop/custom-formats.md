@@ -2,19 +2,6 @@
 
 Arranger features a modular Service Provider Interface (SPI) designed to serialize rich text to and from arbitrary data representations. Whether your application communicates with a Slack API using `mrkdwn`, persists structured rich text in SQLite/PostgreSQL as JSON, or synchronizes collaborative edits using a Delta format, Arranger's format abstraction makes custom format integration straightforward and type-safe.
 
-```mermaid
-flowchart TD
-    Exporter["RichTextExporter&lt;T&gt;<br><i>export(richString): T</i>"]
-    Importer["RichTextImporter&lt;T&gt;<br><i>import(input): RichString</i>"]
-    Format["RichTextFormat&lt;T&gt;<br><i>(Optional combination)</i>"]
-
-    Exporter -.-> Format
-    Importer -.-> Format
-
-    Exporter --> CustomExporter["SlackMrkdwnExporter / JsonExporter"]
-    Importer --> CustomImporter["SlackMrkdwnImporter / JsonImporter"]
-```
-
 ---
 
 ## Independent Exporter & Importer Interfaces
@@ -35,12 +22,6 @@ public interface RichTextImporter<T> {
 }
 ```
 
-If you need bidirectional conversion, you can optionally implement `RichTextFormat<T>`, which simply combines both:
-
-```kotlin
-public interface RichTextFormat<T> : RichTextExporter<T>, RichTextImporter<T>
-```
-
 ### Extension Helpers
 
 The core library provides generic extension functions that bridge your implementations directly to `RichString`:
@@ -59,7 +40,7 @@ public fun <T> RichString.Companion.import(input: T, importer: RichTextImporter<
 
 Slack uses a unique syntax known as `mrkdwn`, which differs from standard CommonMark (for example, `*bold*` instead of `**bold**`, and `_italic_` instead of `*italic*`).
 
-Here is a complete implementation of a bi-directional `SlackMrkdwnFormat`:
+Here is a complete implementation of custom Slack mrkdwn serialization:
 
 ### Step 1: Implement the Exporter
 
@@ -122,16 +103,14 @@ public object SlackMrkdwnImporter : RichTextImporter<String> {
 }
 ```
 
-### Step 3: Combine into a Unified Format
+### Step 3: Provide Convenient Extension Functions
+
+You can define idiomatic extension functions delegating directly to your exporter and importer:
 
 ```kotlin
-public object SlackMrkdwnFormat : RichTextFormat<String>,
-    RichTextExporter<String> by SlackMrkdwnExporter,
-    RichTextImporter<String> by SlackMrkdwnImporter
-
 // Idiomatic extension functions
-public fun RichString.toSlackMrkdwn(): String = export(SlackMrkdwnFormat)
-public fun RichString.Companion.fromSlackMrkdwn(text: String): RichString = import(text, SlackMrkdwnFormat)
+public fun RichString.toSlackMrkdwn(): String = export(SlackMrkdwnExporter)
+public fun RichString.Companion.fromSlackMrkdwn(text: String): RichString = import(text, SlackMrkdwnImporter)
 ```
 
 ---
@@ -159,7 +138,7 @@ public data class SerializedDocument(
     val spans: List<SerializedSpan>,
 )
 
-public object JsonRichTextFormat : RichTextFormat<String> {
+public object JsonExporter : RichTextExporter<String> {
     private val json = Json { prettyPrint = false; ignoreUnknownKeys = true }
 
     override fun export(richString: RichString): String {
@@ -176,6 +155,10 @@ public object JsonRichTextFormat : RichTextFormat<String> {
         val doc = SerializedDocument(text = richString.text, spans = serializedSpans)
         return json.encodeToString(SerializedDocument.serializer(), doc)
     }
+}
+
+public object JsonImporter : RichTextImporter<String> {
+    private val json = Json { prettyPrint = false; ignoreUnknownKeys = true }
 
     override fun import(input: String): RichString {
         val doc = json.decodeFromString(SerializedDocument.serializer(), input)
@@ -194,6 +177,9 @@ public object JsonRichTextFormat : RichTextFormat<String> {
         return RichString(text = doc.text, spans = spans)
     }
 }
+
+public fun RichString.toJson(): String = export(JsonExporter)
+public fun RichString.Companion.fromJson(json: String): RichString = import(json, JsonImporter)
 ```
 
 ---

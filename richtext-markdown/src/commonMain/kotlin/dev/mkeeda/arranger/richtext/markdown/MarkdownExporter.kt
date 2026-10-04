@@ -17,7 +17,10 @@ import dev.mkeeda.arranger.richtext.SpanAttributeKey
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 
-internal class MarkdownExporter : RichTextExporter<String> {
+/**
+ * An exporter that converts a [RichString] into a Markdown [String].
+ */
+public object MarkdownExporter : RichTextExporter<String> {
     override fun export(richString: RichString): String {
         if (richString.text.isEmpty()) return ""
 

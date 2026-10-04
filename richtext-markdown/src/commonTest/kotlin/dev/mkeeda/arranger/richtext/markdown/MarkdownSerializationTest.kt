@@ -14,6 +14,8 @@ import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.export
+import dev.mkeeda.arranger.richtext.import
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -21,7 +23,27 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
-class MarkdownFormatTest {
+class MarkdownSerializationTest {
+    @Test
+    fun `exporting RichString via MarkdownExporter directly produces expected markdown`() {
+        val richString =
+            RichString("Hello World").edit {
+                setSpanAttribute(key = BoldKey, value = Unit, range = 0..4)
+            }
+        val markdown = richString.export(exporter = MarkdownExporter)
+        markdown shouldBe "**Hello** World"
+    }
+
+    @Test
+    fun `importing markdown via MarkdownImporter directly produces expected RichString`() {
+        val markdown = "**Hello** World"
+        val richString = RichString.import(input = markdown, importer = MarkdownImporter)
+        richString.text shouldBe "Hello World"
+        richString.spans.shouldContainExactly(
+            RichSpan(range = 0..4, attributes = attributeContainerOf(BoldKey to Unit)),
+        )
+    }
+
     @Test
     fun `exporting plain text produces plain markdown`() {
         val richString = RichString("Hello World")
@@ -648,5 +670,100 @@ class MarkdownFormatTest {
     fun `exporting empty rich string returns empty markdown`() {
         val richString = RichString("")
         richString.toMarkdown() shouldBe ""
+    }
+
+    @Test
+    fun `MarkdownExporter is stateless and resets list numbering across consecutive invocations`() {
+        val orderedList1 =
+            RichString("First 1\nFirst 2").edit {
+                setParagraphAttribute(OrderedListKey, ListIndentLevel.Level1, 0..6)
+                setParagraphAttribute(OrderedListKey, ListIndentLevel.Level1, 8..14)
+            }
+        val plainString = RichString("Plain line")
+        val orderedList2 =
+            RichString("Second 1\nSecond 2").edit {
+                setParagraphAttribute(OrderedListKey, ListIndentLevel.Level1, 0..7)
+                setParagraphAttribute(OrderedListKey, ListIndentLevel.Level1, 9..16)
+            }
+
+        val md1 = MarkdownExporter.export(orderedList1)
+        val mdPlain = MarkdownExporter.export(plainString)
+        val md2 = MarkdownExporter.export(orderedList2)
+
+        md1 shouldBe "1. First 1\n2. First 2"
+        mdPlain shouldBe "Plain line"
+        md2 shouldBe "1. Second 1\n2. Second 2"
+    }
+
+    @Test
+    fun `MarkdownImporter is stateless and parses varying documents deterministically`() {
+        val listMd = "* Bullet A\n* Bullet B"
+        val quoteMd = "> Quote text"
+        val styledMd = "**Bold** and *Italic*"
+
+        val doc1 = MarkdownImporter.import(listMd)
+        val doc2 = MarkdownImporter.import(quoteMd)
+        val doc3 = MarkdownImporter.import(styledMd)
+        val doc1Repeat = MarkdownImporter.import(listMd)
+
+        doc1.text shouldBe "Bullet A\nBullet B"
+        doc1.spans shouldHaveSize 2
+        doc2.text shouldBe "Quote text"
+        doc2.spans shouldHaveSize 1
+        doc3.text shouldBe "Bold and Italic"
+        doc3.spans shouldHaveSize 2
+        doc1Repeat.text shouldBe doc1.text
+        doc1Repeat.spans shouldContainExactly doc1.spans
+    }
+
+    @Test
+    fun `direct MarkdownExporter export matches extension toMarkdown for complex document`() {
+        val richString =
+            RichString("Heading\nQuote line\nItem").edit {
+                setParagraphAttribute(HeadingKey, HeadingLevel.H1, 0..6)
+                setParagraphAttribute(BlockquoteKey, Unit, 8..17)
+                setParagraphAttribute(BulletListKey, ListIndentLevel.Level1, 19..22)
+            }
+
+        val directExport = richString.export(MarkdownExporter)
+        val extensionExport = richString.toMarkdown()
+
+        directExport shouldBe extensionExport
+        directExport shouldBe "# Heading\n> Quote line\n* Item"
+    }
+
+    @Test
+    fun `direct MarkdownImporter import matches extension fromMarkdown for complex document`() {
+        val markdown = "# Heading\n> Quote line\n* Item"
+
+        val directImport = RichString.import(markdown, MarkdownImporter)
+        val extensionImport = RichString.fromMarkdown(markdown)
+
+        directImport.text shouldBe extensionImport.text
+        directImport.spans shouldContainExactly extensionImport.spans
+    }
+
+    @Test
+    fun `exporting transition from heading to ordered list then blockquote formats cleanly`() {
+        val text = "Section Title\nStep 1\nStep 2\nImportant note"
+        val richString =
+            RichString(text).edit {
+                setParagraphAttribute(HeadingKey, HeadingLevel.H3, 0..12)
+                setParagraphAttribute(OrderedListKey, ListIndentLevel.Level1, 14..19)
+                setParagraphAttribute(OrderedListKey, ListIndentLevel.Level1, 21..26)
+                setParagraphAttribute(BlockquoteKey, Unit, 28..41)
+            }
+
+        val markdown = richString.toMarkdown()
+        markdown shouldBe "### Section Title\n1. Step 1\n2. Step 2\n> Important note"
+
+        val reimported = RichString.fromMarkdown(markdown)
+        reimported.text shouldBe text
+        reimported.spans.shouldContainExactly(
+            RichSpan(range = 0..12, attributes = attributeContainerOf(HeadingKey to HeadingLevel.H3)),
+            RichSpan(range = 14..19, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 21..26, attributes = attributeContainerOf(OrderedListKey to ListIndentLevel.Level1)),
+            RichSpan(range = 28..41, attributes = attributeContainerOf(BlockquoteKey to Unit)),
+        )
     }
 }
