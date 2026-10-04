@@ -7,6 +7,7 @@ plugins {
     id("arranger.wasmjs.target")
     id("arranger.kmp.compose")
     id("arranger.maven.publish")
+    id("arranger.android.screenshot")
     alias(libs.plugins.dokka)
 }
 
@@ -33,6 +34,11 @@ kotlin {
                 // TODO: Remove and use single desktop dependency once CMP-9175 is resolved
                 // https://youtrack.jetbrains.com/issue/CMP-9175/Introduce-a-single-desktop-dependency-for-all-platforms
                 implementation(compose.desktop.currentOs)
+            }
+        }
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.androidx.activity.compose)
             }
         }
     }
