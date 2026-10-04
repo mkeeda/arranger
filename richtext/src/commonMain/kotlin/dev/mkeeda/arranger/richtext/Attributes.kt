@@ -146,6 +146,16 @@ public object BlockquoteKey : BlockTypeAttributeKey<Unit> {
 }
 
 /**
+ * A semantic marker indicating that the paragraph is a code block.
+ * Can hold an optional programming language identifier (e.g. "kotlin", "python").
+ */
+public data object CodeBlockKey : BlockTypeAttributeKey<String?> {
+    override val name: String = "codeBlock"
+    override val defaultValue: String? = null
+    override val enterKeyStrategy: EnterKeyStrategy = CodeBlockEnterStrategy
+}
+
+/**
  * Represents the indent level of a list item.
  */
 public enum class ListIndentLevel {

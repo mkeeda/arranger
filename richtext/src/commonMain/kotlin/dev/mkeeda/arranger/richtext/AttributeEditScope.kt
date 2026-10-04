@@ -44,6 +44,19 @@ public class AttributeEditScope internal constructor(
     public fun clearAll() {
         buffer.clearAllAttributes(range)
     }
+
+    internal fun <T> setParagraphAttributeDirect(
+        key: ParagraphAttributeKey<T>,
+        value: T,
+    ) {
+        buffer.setParagraphAttribute(key, value, range)
+    }
+
+    internal fun <T> removeParagraphAttributeDirect(
+        key: ParagraphAttributeKey<T>,
+    ) {
+        buffer.removeParagraphAttribute(key, range)
+    }
 }
 
 /**
@@ -269,4 +282,21 @@ public fun AttributeEditScope.link(url: String) {
  */
 public fun AttributeEditScope.clearLink() {
     setSpanAttribute(LinkKey, null)
+}
+
+/**
+ * Convenience function to set the code block attribute of the paragraph within this builder.
+ * The applied range will automatically snap to paragraph boundaries.
+ *
+ * @param language The programming language identifier for syntax highlighting or labeling, or null if none.
+ */
+public fun AttributeEditScope.codeBlock(language: String? = null) {
+    setParagraphAttributeDirect(CodeBlockKey, language)
+}
+
+/**
+ * Convenience function to remove the code block attribute in the range.
+ */
+public fun AttributeEditScope.clearCodeBlock() {
+    removeParagraphAttributeDirect(CodeBlockKey)
 }

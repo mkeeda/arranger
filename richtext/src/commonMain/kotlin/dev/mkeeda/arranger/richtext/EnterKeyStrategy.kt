@@ -95,3 +95,22 @@ public object ListEnterStrategy : EnterKeyStrategy {
         }
     }
 }
+
+/**
+ * A strategy for code blocks.
+ * If the current line contains text, the code block attribute is inherited for the next line.
+ * If the current line is empty (or whitespace-only), pressing Enter exits the code block
+ * by removing the [CodeBlockKey] via [EnterKeyResult.Outdent].
+ */
+public object CodeBlockEnterStrategy : EnterKeyStrategy {
+    override fun execute(context: EnterKeyContext): EnterKeyResult {
+        val paragraphText = context.text.substring(context.paragraphRange)
+        val isEmpty = paragraphText.trim().isEmpty()
+
+        return if (isEmpty) {
+            EnterKeyResult.Outdent(attributes = context.currentAttributes - CodeBlockKey)
+        } else {
+            EnterKeyResult.InheritAttributes(attributes = context.currentAttributes)
+        }
+    }
+}
