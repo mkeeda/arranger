@@ -58,7 +58,7 @@ internal fun BaseRichTextEditor(
     onTextLayout: (Density.(getResult: () -> TextLayoutResult?) -> Unit)? = null,
     scrollState: ScrollState = rememberScrollState(),
     interactionSource: MutableInteractionSource? = null,
-    cursorBrush: Brush = SolidColor(Color.Black),
+    cursorBrush: Brush = SolidColor(Color.Unspecified),
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
@@ -87,6 +87,7 @@ internal fun BaseRichTextEditor(
 
     val textMeasurer = rememberTextMeasurer()
     val currentTextStyle = textStyle.copy(color = textStyle.color.takeOrElse { Color.Black })
+    val effectiveCursorBrush = resolveEffectiveCursorBrush(cursorBrush = cursorBrush, textStyle = textStyle)
 
     val listItems = remember(state.richString) { state.richString.extractListItems() }
 
@@ -180,11 +181,22 @@ internal fun BaseRichTextEditor(
         onTextLayout = internalOnTextLayout,
         scrollState = scrollState,
         interactionSource = interactionSource,
-        cursorBrush = cursorBrush,
+        cursorBrush = effectiveCursorBrush,
         outputTransformation = outputTransformation,
         decorator = decorator,
     )
 }
+
+internal fun resolveEffectiveCursorBrush(
+    cursorBrush: Brush,
+    textStyle: TextStyle,
+): Brush =
+    if (cursorBrush == SolidColor(Color.Unspecified)) {
+        val effectiveColor = textStyle.color.takeOrElse { Color.Black }
+        SolidColor(effectiveColor)
+    } else {
+        cursorBrush
+    }
 
 internal fun DrawScope.drawListItems(
     listItems: List<ListItem>,

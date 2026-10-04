@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.hasTestTag
@@ -14,6 +18,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureRoboGif
@@ -29,6 +34,7 @@ import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.bulletList
 import dev.mkeeda.arranger.richtext.headingLevel
+import dev.mkeeda.arranger.richtext.inlineCode
 import dev.mkeeda.arranger.richtext.italic
 import dev.mkeeda.arranger.richtext.link
 import dev.mkeeda.arranger.richtext.orderedList
@@ -208,6 +214,38 @@ class RichTextEditorScreenshotTest {
                     modifier = Modifier.width(400.dp).height(100.dp).background(Color.White),
                     scrollState = scrollState,
                 )
+            }
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun `render dark mode rich text with cursor and list markers`() {
+        val text = "Dark mode rich text with code\nBullet item 1\nBullet item 2"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("code")) { inlineCode() }
+                        editAttributes(text.rangeOf("Bullet item 1")) { bulletList(ListIndentLevel.Level1) }
+                        editAttributes(text.rangeOf("Bullet item 2")) { bulletList(ListIndentLevel.Level1) }
+                    },
+            )
+
+        composeTestRule.setContent {
+            val focusRequester = remember { FocusRequester() }
+            RichTextEditor(
+                state = state,
+                modifier =
+                    Modifier
+                        .width(400.dp)
+                        .background(Color(0xFF121212))
+                        .focusRequester(focusRequester),
+                textStyle = TextStyle(color = Color.White),
+            )
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
             }
         }
 

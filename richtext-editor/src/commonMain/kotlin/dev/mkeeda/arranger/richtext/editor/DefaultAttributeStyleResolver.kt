@@ -46,9 +46,16 @@ private val blockLineHeightStyle =
     )
 
 /**
- * The standard default [AttributeStyleResolver] mapping the semantic attributes to Compose [SpanStyle].
+ * Creates a default [AttributeStyleResolver] mapping semantic attributes to Compose styles,
+ * with customizable colors for links and inline code background.
+ *
+ * @param linkColor The color applied to [LinkKey] spans.
+ * @param inlineCodeBackgroundColor The background color applied to [InlineCodeKey] spans.
  */
-public val DefaultAttributeStyleResolver: AttributeStyleResolver =
+public fun defaultAttributeStyleResolver(
+    linkColor: Color = Color(0xFF1E88E5),
+    inlineCodeBackgroundColor: Color = Color(0x1F888888),
+): AttributeStyleResolver =
     AttributeStyleResolver {
         spanStyle(TextColorKey) { hex ->
             SpanStyle(color = hex.toColor())
@@ -74,12 +81,12 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
         spanStyle(InlineCodeKey) {
             SpanStyle(
                 fontFamily = FontFamily.Monospace,
-                background = Color(0x14000000),
+                background = inlineCodeBackgroundColor,
             )
         }
         spanStyle(LinkKey) {
             SpanStyle(
-                color = Color(0xFF1E88E5),
+                color = linkColor,
                 textDecoration = TextDecoration.Underline,
             )
         }
@@ -196,3 +203,8 @@ public val DefaultAttributeStyleResolver: AttributeStyleResolver =
             )
         }
     }
+
+/**
+ * The standard default [AttributeStyleResolver] mapping the semantic attributes to Compose [SpanStyle].
+ */
+public val DefaultAttributeStyleResolver: AttributeStyleResolver = defaultAttributeStyleResolver()

@@ -82,6 +82,10 @@ RichTextEditor(
 
 Pass `autocompleteTriggers` (e.g. `@` or `#`) and `onAutocompleteChange` to display suggestion popups anchored to the cursor. See [Autocomplete & Mentions](../interactions/autocomplete.md).
 
+### 5. Theme-Aware Cursor & Dynamic Styling
+
+`RichTextEditor`'s `cursorBrush` automatically falls back to `textStyle.color` when omitted. In dark mode, simply providing a theme-aware text style (e.g., `textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)`) keeps the cursor caret visible and synchronized with the text color without manually specifying `cursorBrush`.
+
 ---
 
 ## Related Documentation

@@ -1,5 +1,8 @@
 package dev.mkeeda.arranger.richtext.editor
 
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -9,16 +12,21 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.bold
+import dev.mkeeda.arranger.richtext.editor.wysiwyg.WysiwygEditor
 import dev.mkeeda.arranger.richtext.rangeOf
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
 import org.junit.Test
@@ -488,5 +496,115 @@ class RichTextEditorTest {
         composeTestRule.waitForIdle()
 
         state.richString.text shouldBe "Hello World"
+    }
+
+    @Test
+    fun `cursorBrush automatically follows textStyle color when unspecified`() {
+        val style = TextStyle(color = Color.White)
+        val resolved =
+            resolveEffectiveCursorBrush(
+                cursorBrush = SolidColor(Color.Unspecified),
+                textStyle = style,
+            )
+        resolved shouldBe SolidColor(Color.White)
+    }
+
+    @Test
+    fun `cursorBrush falls back to black when both cursorBrush and textStyle color are unspecified`() {
+        val style = TextStyle.Default
+        val resolved =
+            resolveEffectiveCursorBrush(
+                cursorBrush = SolidColor(Color.Unspecified),
+                textStyle = style,
+            )
+        resolved shouldBe SolidColor(Color.Black)
+    }
+
+    @Test
+    fun `explicit cursorBrush takes precedence`() {
+        val customBrush = SolidColor(Color.Red)
+        val style = TextStyle(color = Color.White)
+        val resolved =
+            resolveEffectiveCursorBrush(
+                cursorBrush = customBrush,
+                textStyle = style,
+            )
+        resolved shouldBe customBrush
+    }
+
+    @Test
+    fun `custom gradient cursorBrush is preserved`() {
+        val gradient = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val style = TextStyle(color = Color.White)
+        val resolved =
+            resolveEffectiveCursorBrush(
+                cursorBrush = gradient,
+                textStyle = style,
+            )
+        resolved shouldBe gradient
+    }
+
+    @Test
+    fun `transparent cursorBrush is preserved when explicitly set`() {
+        val transparentBrush = SolidColor(Color.Transparent)
+        val style = TextStyle(color = Color.White)
+        val resolved =
+            resolveEffectiveCursorBrush(
+                cursorBrush = transparentBrush,
+                textStyle = style,
+            )
+        resolved shouldBe transparentBrush
+    }
+
+    @Test
+    fun `cursorBrush follows semi-transparent textStyle color`() {
+        val semiTransparent = Color(0x80FFFFFF)
+        val style = TextStyle(color = semiTransparent)
+        val resolved =
+            resolveEffectiveCursorBrush(
+                cursorBrush = SolidColor(Color.Unspecified),
+                textStyle = style,
+            )
+        resolved shouldBe SolidColor(semiTransparent)
+    }
+
+    @Test
+    fun `partial selection formatting applies custom colors accurately in dark mode`() {
+        val text = "Arranger Dark Mode"
+        val state = RichTextState(initialText = RichString(text))
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                textStyle = TextStyle(color = Color.White),
+            )
+        }
+
+        // Select "Dark" (indices 9..13)
+        composeTestRule.onNodeWithText(text).performTextInputSelection(TextRange(9, 13))
+        state.applyFormat(TextColorKey, Color.Yellow.toRgbaColor())
+        state.applyFormat(BackgroundColorKey, Color.DarkGray.toRgbaColor())
+
+        val darkSpan = state.richString.spans.firstOrNull { it.range == 9..12 }
+        darkSpan.shouldNotBeNull()
+        darkSpan.attributes[TextColorKey] shouldBe Color.Yellow.toRgbaColor()
+        darkSpan.attributes[BackgroundColorKey] shouldBe Color.DarkGray.toRgbaColor()
+    }
+
+    @Test
+    fun `WysiwygEditor renders and accepts typing in dark theme with dynamic cursor brush`() {
+        val state = RichTextState(initialText = RichString("Dark theme editor"))
+
+        composeTestRule.setContent {
+            WysiwygEditor(
+                state = state,
+                textStyle = TextStyle(color = Color.White),
+            )
+        }
+
+        composeTestRule.onNodeWithText("Dark theme editor").performTextInput(" works")
+        composeTestRule.waitForIdle()
+
+        state.richString.text shouldBe "Dark theme editor works"
     }
 }

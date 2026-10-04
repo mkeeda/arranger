@@ -30,11 +30,21 @@ When no custom resolver is specified, `DefaultAttributeStyleResolver` is used by
 - `ItalicKey` -> `FontStyle.Italic`
 - `UnderlineKey` -> `TextDecoration.Underline`
 - `StrikethroughKey` -> `TextDecoration.LineThrough`
-- `InlineCodeKey` -> Monospace font (`FontFamily.Monospace`) with light gray background
+- `InlineCodeKey` -> Monospace font (`FontFamily.Monospace`) with neutral semi-transparent background (`Color(0x1F888888)`) adapting cleanly to both light and dark backgrounds
+- `LinkKey` -> Underlined text with default link color (`Color(0xFF1E88E5)`)
 - `TextColorKey` -> Specified `RgbaColor`
 - `BackgroundColorKey` -> Specified `RgbaColor`
 - `HeadingKey` -> Scaled font size and bold weight matching heading levels
 - `TextAlignmentKey` -> Specified horizontal alignment
+
+To customize the link color or inline code background for non-Material setups, use the `defaultAttributeStyleResolver` factory function:
+
+```kotlin
+val resolver = defaultAttributeStyleResolver(
+    linkColor = Color(0xFF2196F3),
+    inlineCodeBackgroundColor = Color(0x33888888),
+)
+```
 
 ---
 
@@ -116,9 +126,22 @@ fun Material3EditorScreen() {
 - **Typography**: `MaterialTheme.typography.bodyMedium`
 - **Color**: `MaterialTheme.colorScheme.onSurfaceVariant` (subtle contrast against body text)
 
-### Automatic Dark / Light Theme Adaptation
+### Hyperlink Mapping (LinkKey)
 
-`rememberMaterial3AttributeStyleResolver()` internally tracks `remember(typography, colorScheme)`. When users toggle system dark mode or switch themes within the application, the entire editor's text colors, headings, and callout styles adapt dynamically without manual recomposition logic.
+- **Style**: `TextDecoration.Underline`
+- **Color**: `MaterialTheme.colorScheme.primary` (theme-aware brand color adapting to dark mode and Dynamic Color)
+
+### Inline Code Mapping (InlineCodeKey)
+
+- **Typography**: `FontFamily.Monospace`
+- **Background**: `MaterialTheme.colorScheme.surfaceContainerHighest`
+- **Color**: `MaterialTheme.colorScheme.onSurfaceVariant`
+
+### Automatic Dark / Light Theme Adaptation & Cursor Behavior
+
+`rememberMaterial3AttributeStyleResolver()` internally tracks `remember(typography, colorScheme)`. When users toggle system dark mode or switch themes within the application, the entire editor's text colors, headings, links, inline code chips, and blockquote styles adapt dynamically without manual recomposition logic.
+
+Furthermore, `RichTextEditor` and `WysiwygEditor` automatically resolve their cursor (`cursorBrush`) to the foreground text color (`textStyle.color`) when not explicitly configured. Setting `textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)` ensures both the text and the caret seamlessly adapt to dark backgrounds.
 
 ---
 
