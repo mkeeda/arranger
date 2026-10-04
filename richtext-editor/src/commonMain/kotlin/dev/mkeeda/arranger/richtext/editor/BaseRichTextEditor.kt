@@ -70,7 +70,7 @@ internal fun BaseRichTextEditor(
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    blockDecorator: BlockDecorator = DefaultBlockDecorator,
+    blockDecorator: BlockDecorator? = null,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
     autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
     onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
@@ -201,7 +201,7 @@ internal fun BaseRichTextEditor(
                     innerTextField()
                 }
             }
-            if (visualBlocks.isNotEmpty()) {
+            if (visualBlocks.isNotEmpty() && blockDecorator != null) {
                 Box(propagateMinConstraints = true) {
                     BlockDecorationsOverlay(
                         visualBlocks = visualBlocks,
