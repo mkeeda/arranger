@@ -59,7 +59,7 @@ public fun RichTextEditor(
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    blockDecorator: BlockDecorator? = null,
+    blockDecorator: BlockDecorator? = DefaultBlockDecorator,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
     autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
     onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,

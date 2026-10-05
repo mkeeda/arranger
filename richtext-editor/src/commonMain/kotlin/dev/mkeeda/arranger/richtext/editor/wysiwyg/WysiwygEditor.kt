@@ -29,6 +29,7 @@ import dev.mkeeda.arranger.richtext.editor.AutocompleteTrigger
 import dev.mkeeda.arranger.richtext.editor.BaseRichTextEditor
 import dev.mkeeda.arranger.richtext.editor.BlockDecorator
 import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
+import dev.mkeeda.arranger.richtext.editor.DefaultBlockDecorator
 import dev.mkeeda.arranger.richtext.editor.DefaultListMarkerResolver
 import dev.mkeeda.arranger.richtext.editor.ListMarkerResolver
 import dev.mkeeda.arranger.richtext.editor.RichTextState
@@ -74,7 +75,7 @@ public fun WysiwygEditor(
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
-    blockDecorator: BlockDecorator? = null,
+    blockDecorator: BlockDecorator? = DefaultBlockDecorator,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
     autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
     onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
