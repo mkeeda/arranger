@@ -376,6 +376,7 @@ internal fun BlockDecorationsOverlay(
                 val endLine = layout.getLineForOffset(effectiveEndOffset)
                 val blockTop = layout.getLineTop(startLine)
                 val blockBottom = layout.getLineBottom(endLine)
+
                 val blockHeight = (blockBottom - blockTop).roundToInt().coerceAtLeast(0)
                 val blockWidth = layout.size.width
 
@@ -389,9 +390,9 @@ internal fun BlockDecorationsOverlay(
                 val block = visualBlocks.getOrNull(index) ?: return@forEachIndexed
                 val startOffset = workarounds.mapCharacterIndex(block.range.first).coerceIn(0, totalLength)
                 val startLine = layout.getLineForOffset(startOffset)
-                val blockTop = layout.getLineTop(startLine).roundToInt()
+                val blockTop = layout.getLineTop(startLine)
 
-                placeable.place(x = 0, y = blockTop - scrollY)
+                placeable.place(x = 0, y = blockTop.roundToInt() - scrollY)
             }
         }
     }

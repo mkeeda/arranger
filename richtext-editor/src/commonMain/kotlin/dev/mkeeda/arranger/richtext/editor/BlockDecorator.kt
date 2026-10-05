@@ -50,7 +50,6 @@ public fun interface BlockDecorator {
  * @param modifier Additional modifier applied to the container.
  * @param background Optional composable content rendered in the background of the entire block.
  * @param leading Optional composable content aligned to the start/leading edge of the block (e.g., vertical bar).
- * @param header Optional composable content rendered at the top of the block (e.g., language badge).
  * @param trailing Optional composable content aligned to the end/trailing edge of the block.
  */
 @Composable
@@ -59,7 +58,6 @@ public fun BlockContainer(
     modifier: Modifier = Modifier,
     background: @Composable (BoxScope.() -> Unit)? = null,
     leading: @Composable (BoxScope.() -> Unit)? = null,
-    header: @Composable (BoxScope.() -> Unit)? = null,
     trailing: @Composable (BoxScope.() -> Unit)? = null,
 ) {
     Box(modifier = context.modifier.then(modifier)) {
@@ -82,7 +80,6 @@ public fun BlockContainer(
                 content = it,
             )
         }
-        header?.invoke(this)
     }
 }
 
