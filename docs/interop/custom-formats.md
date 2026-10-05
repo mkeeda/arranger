@@ -7,6 +7,7 @@ Arranger features a modular Service Provider Interface (SPI) designed to seriali
 ## Independent Exporter & Importer Interfaces
 
 In many applications, only one direction is required:
+
 - **Export only**: Sending formatted chat messages to a REST API or Slack webhook.
 - **Import only**: Loading structured templates or legacy content into the editor.
 
