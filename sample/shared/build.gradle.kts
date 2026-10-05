@@ -25,8 +25,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":richtext-editor-material3"))
-                implementation(project(":richtext-editor"))
+                implementation(project(":arranger-editor-material3"))
+                implementation(project(":arranger-editor"))
                 implementation(libs.jetbrains.compose.components.resources)
                 implementation(libs.jetbrains.compose.components.uiToolingPreview)
                 implementation(libs.jetbrains.compose.foundation)

@@ -51,6 +51,14 @@ import arranger.sample.shared.generated.resources.format_strikethrough
 import arranger.sample.shared.generated.resources.format_underlined
 import arranger.sample.shared.generated.resources.redo
 import arranger.sample.shared.generated.resources.undo
+import dev.mkeeda.arranger.editor.RichTextEditor
+import dev.mkeeda.arranger.editor.RichTextState
+import dev.mkeeda.arranger.editor.applyFormat
+import dev.mkeeda.arranger.editor.clearFormats
+import dev.mkeeda.arranger.editor.material3.rememberMaterial3AttributeStyleResolver
+import dev.mkeeda.arranger.editor.rememberRichTextState
+import dev.mkeeda.arranger.editor.removeFormat
+import dev.mkeeda.arranger.editor.toggleFormat
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
@@ -69,14 +77,6 @@ import dev.mkeeda.arranger.richtext.TextAlignmentKey
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.applyFormat
-import dev.mkeeda.arranger.richtext.editor.clearFormats
-import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.rememberRichTextState
-import dev.mkeeda.arranger.richtext.editor.removeFormat
-import dev.mkeeda.arranger.richtext.editor.toggleFormat
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 

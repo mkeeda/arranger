@@ -1,0 +1,29 @@
+plugins {
+    id("arranger.kmp.library")
+    id("arranger.android.target")
+    id("arranger.desktop.target")
+    id("arranger.ios.target")
+    id("arranger.wasmjs.target")
+    id("arranger.maven.publish")
+    alias(libs.plugins.dokka)
+}
+
+kotlin {
+    android {
+        namespace = "dev.mkeeda.arranger.html"
+    }
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                api(project(":arranger-richtext"))
+                implementation(libs.ksoup)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotest.assertions.core)
+            }
+        }
+    }
+}

@@ -25,9 +25,11 @@
             <option value="$PROJECT_DIR$/build-logic" />
             <option value="$PROJECT_DIR$/build-logic/convention" />
             <option value="$PROJECT_DIR$/build-logic/ktlint-rules" />
-            <option value="$PROJECT_DIR$/richtext" />
-            <option value="$PROJECT_DIR$/richtext-editor" />
-            <option value="$PROJECT_DIR$/richtext-editor-material3" />
+            <option value="$PROJECT_DIR$/arranger-editor" />
+            <option value="$PROJECT_DIR$/arranger-editor-material3" />
+            <option value="$PROJECT_DIR$/arranger-html" />
+            <option value="$PROJECT_DIR$/arranger-markdown" />
+            <option value="$PROJECT_DIR$/arranger-richtext" />
             <option value="$PROJECT_DIR$/sample" />
             <option value="$PROJECT_DIR$/sample/android" />
             <option value="$PROJECT_DIR$/sample/desktop" />

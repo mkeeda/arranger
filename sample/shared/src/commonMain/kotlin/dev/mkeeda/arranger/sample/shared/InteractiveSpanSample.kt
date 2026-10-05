@@ -24,13 +24,13 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import dev.mkeeda.arranger.editor.AttributeStyleResolver
+import dev.mkeeda.arranger.editor.DefaultAttributeStyleResolver
+import dev.mkeeda.arranger.editor.RichTextEditor
+import dev.mkeeda.arranger.editor.RichTextState
 import dev.mkeeda.arranger.richtext.LinkKey
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
-import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.rangeOf
 import kotlinx.coroutines.launch
 

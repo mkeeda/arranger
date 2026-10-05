@@ -6,9 +6,9 @@ plugins {
 }
 
 dependencies {
-    "dokka"(project(":richtext"))
-    "dokka"(project(":richtext-editor"))
-    "dokka"(project(":richtext-editor-material3"))
-    "dokka"(project(":richtext-markdown"))
-    "dokka"(project(":richtext-html"))
+    "dokka"(project(":arranger-richtext"))
+    "dokka"(project(":arranger-editor"))
+    "dokka"(project(":arranger-editor-material3"))
+    "dokka"(project(":arranger-markdown"))
+    "dokka"(project(":arranger-html"))
 }
