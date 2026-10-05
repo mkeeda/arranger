@@ -17,15 +17,20 @@ import androidx.compose.ui.text.font.FontWeight
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.TextColorKey
+import dev.mkeeda.arranger.richtext.VisualBlock
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.bold
+import dev.mkeeda.arranger.richtext.codeBlock
 import dev.mkeeda.arranger.richtext.editor.wysiwyg.WysiwygEditor
+import dev.mkeeda.arranger.richtext.extractVisualBlocks
 import dev.mkeeda.arranger.richtext.rangeOf
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
@@ -606,5 +611,90 @@ class RichTextEditorTest {
         composeTestRule.waitForIdle()
 
         state.richString.text shouldBe "Dark theme editor works"
+    }
+
+    @Test
+    fun `code block multiline editing preserves CodeBlockKey on non-empty line and exits on empty line`() {
+        val initialText = "val a = 1"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text = initialText).edit {
+                        editAttributes(range = initialText.indices) {
+                            codeBlock(language = "kotlin")
+                        }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                blockDecorator = DefaultBlockDecorator,
+            )
+        }
+
+        // Place cursor at end of first line
+        composeTestRule.onNodeWithText(initialText).performTextInputSelection(TextRange(initialText.length))
+
+        // Press Enter to create new line
+        composeTestRule.onNodeWithText(initialText).performTextInput("\n")
+        composeTestRule.waitForIdle()
+
+        // Type code on the second line
+        composeTestRule.onNodeWithText("val a = 1\n").performTextInput("val b = 2")
+        composeTestRule.waitForIdle()
+
+        state.richString.text shouldBe "val a = 1\nval b = 2"
+        val blocks = state.richString.extractVisualBlocks()
+        blocks shouldHaveSize 1
+        blocks.first() shouldBe VisualBlock.CodeBlock(range = 0..18, language = "kotlin")
+
+        // Press Enter after second line
+        composeTestRule.onNodeWithText("val a = 1\nval b = 2").performTextInputSelection(TextRange(19))
+        composeTestRule.onNodeWithText("val a = 1\nval b = 2").performTextInput("\n")
+        composeTestRule.waitForIdle()
+
+        // Press Enter again on the empty third line to exit code block
+        composeTestRule.onNodeWithText("val a = 1\nval b = 2\n").performTextInput("\n")
+        composeTestRule.waitForIdle()
+
+        // Type normal text outside the code block
+        composeTestRule.onNodeWithText("val a = 1\nval b = 2\n").performTextInput("val c = 3")
+        composeTestRule.waitForIdle()
+
+        state.richString.text shouldBe "val a = 1\nval b = 2\nval c = 3"
+        val blocksAfterExit = state.richString.extractVisualBlocks()
+        blocksAfterExit shouldHaveSize 1
+        blocksAfterExit.first() shouldBe VisualBlock.CodeBlock(range = 0..19, language = "kotlin")
+    }
+
+    @Test
+    fun `WysiwygEditor triggers code block with language on typing triple backtick and reverts on backspace`() {
+        val state = RichTextState(initialText = RichString(""))
+
+        composeTestRule.setContent {
+            WysiwygEditor(
+                state = state,
+                blockDecorator = DefaultBlockDecorator,
+            )
+        }
+
+        // Type "```kotlin " to trigger code block
+        composeTestRule.onNodeWithText("").performTextInput("```kotlin ")
+        composeTestRule.waitForIdle()
+
+        state.richString.text shouldBe ""
+        state.typingAttributes?.containsKey(CodeBlockKey) shouldBe true
+        state.typingAttributes?.get(CodeBlockKey) shouldBe "kotlin"
+
+        // Press Backspace to revert auto-format
+        composeTestRule.onNodeWithText("").performKeyInput {
+            keyDown(Key.Backspace)
+            keyUp(Key.Backspace)
+        }
+        composeTestRule.waitForIdle()
+
+        state.richString.text shouldBe "```kotlin "
+        (state.typingAttributes?.containsKey(CodeBlockKey) ?: false) shouldBe false
     }
 }

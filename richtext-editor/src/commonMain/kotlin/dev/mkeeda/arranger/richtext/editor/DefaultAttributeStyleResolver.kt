@@ -17,6 +17,7 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -39,11 +40,13 @@ internal fun ListIndentLevel.toIndent(): TextUnit =
         else -> ((this.ordinal + 1) * ListIndentStepSp).sp
     }
 
-private val blockLineHeightStyle =
+public val DefaultBlockLineHeightStyle: LineHeightStyle =
     LineHeightStyle(
         alignment = LineHeightStyle.Alignment.Center,
         trim = LineHeightStyle.Trim.None,
     )
+
+public val DefaultBlockLineHeight: TextUnit = 24.sp
 
 /**
  * Creates a default [AttributeStyleResolver] mapping semantic attributes to Compose styles,
@@ -84,6 +87,9 @@ public fun defaultAttributeStyleResolver(
                 background = inlineCodeBackgroundColor,
             )
         }
+        spanStyle(CodeBlockKey) {
+            SpanStyle(fontFamily = FontFamily.Monospace)
+        }
         spanStyle(LinkKey) {
             SpanStyle(
                 color = linkColor,
@@ -102,13 +108,18 @@ public fun defaultAttributeStyleResolver(
                 HeadingLevel.Unspecified -> SpanStyle()
             }
         }
+        blockTypeParagraphStyle {
+            ParagraphStyle(
+                lineHeight = DefaultBlockLineHeight,
+                lineHeightStyle = DefaultBlockLineHeightStyle,
+            )
+        }
         paragraphStyle(HeadingKey) { level ->
             when (level) {
                 HeadingLevel.H1 -> {
                     ParagraphStyle(
                         lineHeight = 40.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -116,7 +127,6 @@ public fun defaultAttributeStyleResolver(
                     ParagraphStyle(
                         lineHeight = 32.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -124,7 +134,6 @@ public fun defaultAttributeStyleResolver(
                     ParagraphStyle(
                         lineHeight = 28.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -132,7 +141,6 @@ public fun defaultAttributeStyleResolver(
                     ParagraphStyle(
                         lineHeight = 24.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -140,7 +148,6 @@ public fun defaultAttributeStyleResolver(
                     ParagraphStyle(
                         lineHeight = 20.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
@@ -148,14 +155,11 @@ public fun defaultAttributeStyleResolver(
                     ParagraphStyle(
                         lineHeight = 16.sp,
                         lineBreak = LineBreak.Heading,
-                        lineHeightStyle = blockLineHeightStyle,
                     )
                 }
 
                 HeadingLevel.Unspecified -> {
-                    ParagraphStyle(
-                        lineHeightStyle = blockLineHeightStyle,
-                    )
+                    ParagraphStyle()
                 }
             }
         }
@@ -173,9 +177,13 @@ public fun defaultAttributeStyleResolver(
         paragraphStyle(BlockquoteKey) {
             ParagraphStyle(
                 textIndent = TextIndent(firstLine = 16.sp, restLine = 16.sp),
-                lineHeight = 24.sp,
                 lineBreak = LineBreak.Paragraph,
-                lineHeightStyle = blockLineHeightStyle,
+            )
+        }
+        paragraphStyle(CodeBlockKey) {
+            ParagraphStyle(
+                textIndent = TextIndent(firstLine = 12.sp, restLine = 12.sp),
+                lineBreak = LineBreak.Paragraph,
             )
         }
         spanStyle(BlockquoteKey) {
@@ -188,18 +196,14 @@ public fun defaultAttributeStyleResolver(
             val indent = level.toIndent()
             ParagraphStyle(
                 textIndent = TextIndent(firstLine = indent, restLine = indent),
-                lineHeight = 24.sp,
                 lineBreak = LineBreak.Paragraph,
-                lineHeightStyle = blockLineHeightStyle,
             )
         }
         paragraphStyle(OrderedListKey) { level ->
             val indent = level.toIndent()
             ParagraphStyle(
                 textIndent = TextIndent(firstLine = indent, restLine = indent),
-                lineHeight = 24.sp,
                 lineBreak = LineBreak.Paragraph,
-                lineHeightStyle = blockLineHeightStyle,
             )
         }
     }

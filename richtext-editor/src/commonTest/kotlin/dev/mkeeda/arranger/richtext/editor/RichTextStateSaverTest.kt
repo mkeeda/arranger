@@ -7,6 +7,7 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -26,6 +27,8 @@ import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
+import dev.mkeeda.arranger.richtext.extractVisualBlocks
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
@@ -743,5 +746,85 @@ class RichTextStateSaverTest {
             )
         restoredMalformedSpans.shouldNotBeNull()
         restoredMalformedSpans.richString.spans.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `restores code block attribute with language`() {
+        val originalState =
+            RichTextState(
+                initialText =
+                    RichString(
+                        text = "println(42)",
+                        spans =
+                            listOf(
+                                RichSpan(
+                                    range = 0..10,
+                                    attributes = attributeContainerOf(CodeBlockKey to "kotlin"),
+                                ),
+                            ),
+                    ),
+            )
+
+        val saved = with(RichTextState.Saver) { testSaverScope.save(originalState) }
+        saved.shouldNotBeNull()
+
+        val restored = RichTextState.Saver.restore(saved)
+        restored.shouldNotBeNull()
+        restored.richString.spans shouldHaveSize 1
+        restored.richString.spans.first().attributes[CodeBlockKey] shouldBe "kotlin"
+    }
+
+    @Test
+    fun `restores code block attribute without language`() {
+        val originalState =
+            RichTextState(
+                initialText =
+                    RichString(
+                        text = "echo hi",
+                        spans =
+                            listOf(
+                                RichSpan(
+                                    range = 0..6,
+                                    attributes = attributeContainerOf(CodeBlockKey to null),
+                                ),
+                            ),
+                    ),
+            )
+
+        val saved = with(RichTextState.Saver) { testSaverScope.save(originalState) }
+        saved.shouldNotBeNull()
+
+        val restored = RichTextState.Saver.restore(saved)
+        restored.shouldNotBeNull()
+        restored.richString.spans shouldHaveSize 1
+        restored.richString.spans.first().attributes.containsKey(CodeBlockKey) shouldBe true
+        restored.richString.spans.first().attributes[CodeBlockKey] shouldBe null
+    }
+
+    @Test
+    fun `restores state preserving code block visual blocks and cursor position`() {
+        val originalState =
+            RichTextState(
+                initialText =
+                    RichString(
+                        text = "fun main() {\n    println(42)\n}",
+                        spans =
+                            listOf(
+                                RichSpan(
+                                    range = 0..30,
+                                    attributes = attributeContainerOf(CodeBlockKey to "kotlin"),
+                                ),
+                            ),
+                    ),
+                initialSelection = TextRange(15),
+            )
+
+        val saved = with(RichTextState.Saver) { testSaverScope.save(originalState) }
+        saved.shouldNotBeNull()
+
+        val restored = RichTextState.Saver.restore(saved)
+        restored.shouldNotBeNull()
+        restored.selection shouldBe TextRange(15)
+        restored.richString.extractVisualBlocks() shouldBe originalState.richString.extractVisualBlocks()
     }
 }

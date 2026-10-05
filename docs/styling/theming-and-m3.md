@@ -31,11 +31,13 @@ When no custom resolver is specified, `DefaultAttributeStyleResolver` is used by
 - `UnderlineKey` -> `TextDecoration.Underline`
 - `StrikethroughKey` -> `TextDecoration.LineThrough`
 - `InlineCodeKey` -> Monospace font (`FontFamily.Monospace`) with neutral semi-transparent background (`Color(0x1F888888)`) adapting cleanly to both light and dark backgrounds
+- `CodeBlockKey` -> Monospace font (`FontFamily.Monospace`) and block paragraph indent (`12.sp`)
 - `LinkKey` -> Underlined text with default link color (`Color(0xFF1E88E5)`)
 - `TextColorKey` -> Specified `RgbaColor`
 - `BackgroundColorKey` -> Specified `RgbaColor`
 - `HeadingKey` -> Scaled font size and bold weight matching heading levels
 - `TextAlignmentKey` -> Specified horizontal alignment
+- `BlockTypeAttributeKey` -> Uniform vertical line-height padding (`DefaultBlockLineHeight = 24.sp`, `LineHeightStyle(Center, Trim.None)`) applied across all block types (quotes, code blocks, lists)
 
 To customize the link color or inline code background for non-Material setups, use the `defaultAttributeStyleResolver` factory function:
 
@@ -137,6 +139,23 @@ fun Material3EditorScreen() {
 - **Background**: `MaterialTheme.colorScheme.surfaceContainerHighest`
 - **Color**: `MaterialTheme.colorScheme.onSurfaceVariant`
 
+### Material 3 Block Decoration (Material3BlockDecorator)
+
+The `:arranger-richtext-editor-material3` module also provides `rememberMaterial3BlockDecorator()` to render theme-consistent container decorations behind multi-line blocks:
+
+- **Blockquote**: Draws a vertical quote bar using `colorScheme.primary`.
+- **Code Block**: Draws a rounded container using `colorScheme.surfaceVariant` background and `colorScheme.outlineVariant` border outline.
+
+```kotlin
+RichTextEditor(
+    state = state,
+    styleResolver = rememberMaterial3AttributeStyleResolver(),
+    blockDecorator = rememberMaterial3BlockDecorator(),
+)
+```
+
+See [Visual Block Decorations](block-decorations.md) for full architecture details and custom decorator examples.
+
 ### Automatic Dark / Light Theme Adaptation & Cursor Behavior
 
 `rememberMaterial3AttributeStyleResolver()` internally tracks `remember(typography, colorScheme)`. When users toggle system dark mode or switch themes within the application, the entire editor's text colors, headings, links, inline code chips, and blockquote styles adapt dynamically without manual recomposition logic.
@@ -147,6 +166,7 @@ Furthermore, `RichTextEditor` and `WysiwygEditor` automatically resolve their cu
 
 ## Related Documentation
 
+- [**Visual Block Decorations**](block-decorations.md): BlockContainer, quote bars, code block containers, and uniform padding.
 - [**Spans and Paragraphs**](spans-and-paragraphs.md): Scopes and applicability of span and paragraph attributes.
 - [**Built-in Attributes Reference**](built-in-attributes.md): Complete list of all built-in attribute keys provided by Arranger.
 - [**Custom Attributes**](custom-attributes.md): Defining domain-specific attribute keys and custom resolvers.

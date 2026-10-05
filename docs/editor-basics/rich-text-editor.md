@@ -40,10 +40,11 @@ While `RichTextEditor` adheres to standard Compose conventions, it adds rich-tex
 
 ### 1. Custom Style & Marker Resolvers
 
-You can fully customize how attributes and lists are visually rendered by supplying custom resolvers:
+You can fully customize how attributes, lists, and visual blocks are rendered by supplying custom resolvers and decorators:
 
 - **`styleResolver`**: Translates formatting attributes into Compose `SpanStyle` and `ParagraphStyle`. See [Theming & Material 3](../styling/theming-and-m3.md) and [Custom Attributes](../styling/custom-attributes.md).
-- **`listMarkerResolver`**: Controls the prefix markers for bullet points and ordered lists. See [List Handling](../advanced-behaviors/list-handling.md).
+- **`blockDecorator`**: Renders container backgrounds and accent bars behind multi-line blocks (Blockquotes and Code Blocks). Defaults to `DefaultBlockDecorator`. See [Visual Block Decorations](../styling/block-decorations.md).
+- **`listMarkerResolver`**: Controls prefix markers for bullet points and ordered lists. See [List Handling](../advanced-behaviors/list-handling.md).
 
 ### 2. Interactive Span Clicks (`onSpanClick`)
 
@@ -90,6 +91,7 @@ Pass `autocompleteTriggers` (e.g. `@` or `#`) and `onAutocompleteChange` to disp
 
 ## Related Documentation
 
+- [**Visual Block Decorations**](../styling/block-decorations.md): Customizing quote bars, code block containers, and padding.
 - [**Markdown Shortcut Editor (WYSIWYG)**](wysiwyg-editor.md): Real-time Markdown shortcut styling editor component.
 - [**State Management & History**](state-management.md): Batch edits, typing attributes, and undo/redo history.
 - [**Theming and Material 3**](../styling/theming-and-m3.md): Custom styling via `AttributeStyleResolver` and Material 3 token mapping.

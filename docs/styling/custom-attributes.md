@@ -45,7 +45,7 @@ fun AttributeEditScope.highlight() {
 }
 
 fun AttributeEditScope.clearHighlight() {
-    setSpanAttribute(HighlightKey, null)
+    removeSpanAttribute(HighlightKey)
 }
 ```
 

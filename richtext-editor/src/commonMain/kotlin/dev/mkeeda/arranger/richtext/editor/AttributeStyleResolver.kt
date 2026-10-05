@@ -5,6 +5,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
 import dev.mkeeda.arranger.richtext.ParagraphAttributeKey
 
 /**
@@ -71,8 +72,11 @@ public class AttributeStyleBuilder internal constructor() {
         mapper: (T) -> SpanStyle,
     ) {
         spanResolvers.add { container ->
-            val value = container[key]
-            if (value != null) mapper(value) else null
+            if (container.containsKey(key)) {
+                mapper(container.getOrDefault(key))
+            } else {
+                null
+            }
         }
     }
 
@@ -85,8 +89,28 @@ public class AttributeStyleBuilder internal constructor() {
         mapper: (T) -> ParagraphStyle,
     ) {
         paragraphResolvers.add { container ->
-            val value = container[key]
-            if (value != null) mapper(value) else null
+            if (container.containsKey(key)) {
+                mapper(container.getOrDefault(key))
+            } else {
+                null
+            }
+        }
+    }
+
+    /**
+     * Registers a [ParagraphStyle] mapping applied to any [BlockTypeAttributeKey] present in the container.
+     * When the [AttributeContainer] contains any [BlockTypeAttributeKey], the [mapper] is invoked with that key.
+     */
+    public fun blockTypeParagraphStyle(
+        mapper: (BlockTypeAttributeKey<*>) -> ParagraphStyle,
+    ) {
+        paragraphResolvers.add { container ->
+            val blockKey = container.keys.filterIsInstance<BlockTypeAttributeKey<*>>().firstOrNull()
+            if (blockKey != null) {
+                mapper(blockKey)
+            } else {
+                null
+            }
         }
     }
 

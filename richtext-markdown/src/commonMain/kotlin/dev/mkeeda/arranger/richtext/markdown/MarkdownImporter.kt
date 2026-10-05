@@ -3,6 +3,7 @@ package dev.mkeeda.arranger.richtext.markdown
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
@@ -205,6 +206,64 @@ public object MarkdownImporter : RichTextImporter<String> {
                             context = context,
                         )
                     }
+                }
+            }
+
+            MarkdownElementTypes.CODE_FENCE -> {
+                val fenceLangNode = node.children.firstOrNull { it.type == MarkdownTokenTypes.FENCE_LANG }
+                val language = fenceLangNode?.let { markdown.substring(it.startOffset, it.endOffset).trim() }?.ifEmpty { null }
+                val start = textBuilder.length
+                val fenceStartNode = node.children.firstOrNull { it.type == MarkdownTokenTypes.CODE_FENCE_START }
+                val contentStartOffset =
+                    if (fenceStartNode != null) {
+                        val anchor = fenceLangNode ?: fenceStartNode
+                        val newline = markdown.indexOf('\n', startIndex = anchor.endOffset)
+                        if (newline != -1 && newline < node.endOffset) newline + 1 else anchor.endOffset
+                    } else {
+                        node.startOffset
+                    }
+                val fenceEndNode = node.children.lastOrNull { it.type == MarkdownTokenTypes.CODE_FENCE_END }
+                val contentEndOffset = fenceEndNode?.startOffset ?: node.endOffset
+                val rawContent =
+                    if (contentStartOffset <= contentEndOffset) {
+                        markdown.substring(contentStartOffset, contentEndOffset)
+                    } else {
+                        ""
+                    }
+                val content = rawContent.removeSuffix("\n").removeSuffix("\r")
+                textBuilder.append(content)
+                val end = textBuilder.length
+                if (start < end) {
+                    spans.add(
+                        RichSpan(
+                            range = start until end,
+                            attributes = attributeContainerOf(CodeBlockKey to language),
+                        ),
+                    )
+                }
+            }
+
+            MarkdownElementTypes.CODE_BLOCK -> {
+                val start = textBuilder.length
+                val rawContent = markdown.substring(node.startOffset, node.endOffset)
+                val lines = rawContent.split('\n')
+                val unindented =
+                    lines.joinToString("\n") { line ->
+                        when {
+                            line.startsWith("    ") -> line.substring(4)
+                            line.startsWith("\t") -> line.substring(1)
+                            else -> line
+                        }
+                    }.removeSuffix("\n").removeSuffix("\r")
+                textBuilder.append(unindented)
+                val end = textBuilder.length
+                if (start < end) {
+                    spans.add(
+                        RichSpan(
+                            range = start until end,
+                            attributes = attributeContainerOf(CodeBlockKey to null),
+                        ),
+                    )
                 }
             }
 

@@ -7,11 +7,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.InlineCodeKey
@@ -181,5 +184,23 @@ class Material3AttributeStyleResolverTest {
         val resolved = customResolver.resolve(AttributeContainer.empty() + (LinkKey to "https://example.com"))
 
         resolved.spanStyle?.color shouldBe Color.Cyan
+    }
+
+    @Test
+    fun `codeBlock inherits monospace font and lineHeight from base resolver`() {
+        val resolved = resolver.resolve(AttributeContainer.empty() + (CodeBlockKey to "kotlin"))
+
+        resolved.spanStyle?.fontFamily shouldBe FontFamily.Monospace
+        resolved.paragraphStyle?.lineHeight shouldBe 24.sp
+    }
+
+    @Test
+    fun `blockquote inherits uniform block padding and textIndent from base resolver`() {
+        val resolved = resolver.resolve(AttributeContainer.empty() + (BlockquoteKey to Unit))
+
+        resolved.paragraphStyle?.lineHeight shouldBe 24.sp
+        resolved.paragraphStyle?.lineHeightStyle?.alignment shouldBe LineHeightStyle.Alignment.Center
+        resolved.paragraphStyle?.lineHeightStyle?.trim shouldBe LineHeightStyle.Trim.None
+        resolved.paragraphStyle?.textIndent?.firstLine shouldBe 16.sp
     }
 }

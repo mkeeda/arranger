@@ -6,6 +6,7 @@ import androidx.compose.ui.text.TextRange
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.InlineCodeKey
@@ -74,7 +75,15 @@ internal object WysiwygAutoFormatter {
                 }
 
                 else -> {
-                    return null
+                    if (prefix.startsWith("```") && prefix.endsWith(" ")) {
+                        val rawLang = prefix.substring(3, prefix.length - 1).trim()
+                        val language = if (rawLang.isEmpty()) null else rawLang
+                        Triple(AutoFormatType.CodeBlock, prefix.length) { r: IntRange, txt: String ->
+                            state.setParagraphAttributeDirectly(CodeBlockKey, language, r, txt)
+                        }
+                    } else {
+                        return null
+                    }
                 }
             }
 
@@ -117,6 +126,7 @@ internal object WysiwygAutoFormatter {
         state.removeTypingAttribute(BulletListKey)
         state.removeTypingAttribute(OrderedListKey)
         state.removeTypingAttribute(BlockquoteKey)
+        state.removeTypingAttribute(CodeBlockKey)
 
         // Synchronize typing attributes if line is empty
         if (isLineEmpty) {
@@ -142,6 +152,12 @@ internal object WysiwygAutoFormatter {
 
                 AutoFormatType.Blockquote -> {
                     state.setTypingAttribute(BlockquoteKey, Unit)
+                }
+
+                AutoFormatType.CodeBlock -> {
+                    val rawLang = prefix.substring(3, prefix.length - 1).trim()
+                    val language = if (rawLang.isEmpty()) null else rawLang
+                    state.setTypingAttribute(CodeBlockKey, language)
                 }
 
                 else -> {}

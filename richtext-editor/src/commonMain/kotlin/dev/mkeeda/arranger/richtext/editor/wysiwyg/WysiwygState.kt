@@ -59,6 +59,7 @@ internal enum class AutoFormatType {
     BulletList,
     OrderedList,
     Blockquote,
+    CodeBlock,
     Bold,
     Italic,
     InlineCode,

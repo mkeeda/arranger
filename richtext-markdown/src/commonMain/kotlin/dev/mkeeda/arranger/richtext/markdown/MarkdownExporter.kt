@@ -4,6 +4,7 @@ import dev.mkeeda.arranger.richtext.AttributeContainer
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
@@ -28,65 +29,115 @@ public object MarkdownExporter : RichTextExporter<String> {
         val result = StringBuilder()
         var currentOffset = 0
         val orderedListCounter = mutableMapOf<Int, Int>()
+        var inCodeBlock = false
+        var currentCodeLang: String? = null
 
         for ((index, line) in lines.withIndex()) {
-            val lineRange = currentOffset until (currentOffset + line.length)
-            val lineSpans =
-                richString.spans.filter { span ->
-                    maxOf(lineRange.first, span.range.first) <= minOf(lineRange.last, span.range.last)
-                }
+            val lineSpans = richString.spansForLine(line = line, lineOffset = currentOffset)
 
-            // Paragraph attributes
-            val heading = lineSpans.firstNotNullOfOrNull { it.attributes[HeadingKey] }
-            val isBlockquote = lineSpans.any { it.attributes.containsKey(BlockquoteKey) }
-            val bulletList = lineSpans.firstNotNullOfOrNull { it.attributes[BulletListKey] }
-            val orderedList = lineSpans.firstNotNullOfOrNull { it.attributes[OrderedListKey] }
+            val codeBlockSpan = lineSpans.firstOrNull { it.attributes.containsKey(CodeBlockKey) }
+            val isCodeBlock = codeBlockSpan != null
+            val codeLang = if (isCodeBlock) codeBlockSpan.attributes[CodeBlockKey] else null
 
-            // Handle ordered list numbering
-            if (orderedList != null) {
-                val depth = orderedList.ordinal
-                val count = (orderedListCounter[depth] ?: 0) + 1
-                orderedListCounter[depth] = count
-                orderedListCounter.keys.filter { it > depth }.forEach { orderedListCounter.remove(it) }
-            } else {
-                orderedListCounter.clear()
+            if (inCodeBlock && (!isCodeBlock || codeLang != currentCodeLang)) {
+                result.append('\n').append("```\n")
+                inCodeBlock = false
+                currentCodeLang = null
             }
 
-            val prefix =
-                when {
-                    heading != null && heading != HeadingLevel.Unspecified -> {
-                        "#".repeat(heading.ordinal + 1) + " "
-                    }
+            if (isCodeBlock && !inCodeBlock) {
+                if (result.isNotEmpty() && !result.endsWith('\n')) {
+                    result.append('\n')
+                }
+                val langTag = codeLang ?: ""
+                result.append("```").append(langTag).append('\n')
+                inCodeBlock = true
+                currentCodeLang = codeLang
+            }
 
-                    isBlockquote -> {
-                        "> "
-                    }
-
-                    bulletList != null && bulletList != ListIndentLevel.Unspecified -> {
-                        "  ".repeat(bulletList.ordinal) + "* "
-                    }
-
-                    orderedList != null && orderedList != ListIndentLevel.Unspecified -> {
-                        val count = orderedListCounter[orderedList.ordinal] ?: 1
-                        "   ".repeat(orderedList.ordinal) + "$count. "
-                    }
-
-                    else -> {
-                        ""
+            if (isCodeBlock) {
+                result.append(line)
+                if (index < lines.size - 1) {
+                    val nextLine = lines[index + 1]
+                    val nextLineOffset = currentOffset + line.length + 1
+                    val nextLineSpans = richString.spansForLine(line = nextLine, lineOffset = nextLineOffset)
+                    val nextCodeBlockSpan = nextLineSpans.firstOrNull { it.attributes.containsKey(CodeBlockKey) }
+                    val nextIsCodeBlock = nextCodeBlockSpan != null
+                    val nextCodeLang = if (nextIsCodeBlock) nextCodeBlockSpan.attributes[CodeBlockKey] else null
+                    if (nextIsCodeBlock && nextCodeLang == currentCodeLang) {
+                        result.append('\n')
                     }
                 }
+            } else {
+                // Paragraph attributes
+                val heading = lineSpans.firstNotNullOfOrNull { it.attributes[HeadingKey] }
+                val isBlockquote = lineSpans.any { it.attributes.containsKey(BlockquoteKey) }
+                val bulletList = lineSpans.firstNotNullOfOrNull { it.attributes[BulletListKey] }
+                val orderedList = lineSpans.firstNotNullOfOrNull { it.attributes[OrderedListKey] }
 
-            result.append(prefix)
-            exportInlineSpans(line, currentOffset, lineSpans, result)
+                // Handle ordered list numbering
+                if (orderedList != null) {
+                    val depth = orderedList.ordinal
+                    val count = (orderedListCounter[depth] ?: 0) + 1
+                    orderedListCounter[depth] = count
+                    orderedListCounter.keys.filter { it > depth }.forEach { orderedListCounter.remove(it) }
+                } else {
+                    orderedListCounter.clear()
+                }
 
-            if (index < lines.size - 1) {
-                result.append('\n')
+                val prefix =
+                    when {
+                        heading != null && heading != HeadingLevel.Unspecified -> {
+                            "#".repeat(heading.ordinal + 1) + " "
+                        }
+
+                        isBlockquote -> {
+                            "> "
+                        }
+
+                        bulletList != null && bulletList != ListIndentLevel.Unspecified -> {
+                            "  ".repeat(bulletList.ordinal) + "* "
+                        }
+
+                        orderedList != null && orderedList != ListIndentLevel.Unspecified -> {
+                            val count = orderedListCounter[orderedList.ordinal] ?: 1
+                            "   ".repeat(orderedList.ordinal) + "$count. "
+                        }
+
+                        else -> {
+                            ""
+                        }
+                    }
+
+                result.append(prefix)
+                exportInlineSpans(line, currentOffset, lineSpans, result)
+
+                if (index < lines.size - 1) {
+                    result.append('\n')
+                }
             }
 
             currentOffset += line.length + 1
         }
 
+        if (inCodeBlock) {
+            result.append('\n').append("```")
+        }
+
         return result.toString()
+    }
+
+    private fun RichString.spansForLine(line: String, lineOffset: Int): List<RichSpan> {
+        return if (line.isEmpty()) {
+            spans.filter { span ->
+                lineOffset in span.range || (lineOffset == text.length && lineOffset > 0 && (lineOffset - 1) in span.range)
+            }
+        } else {
+            val lineRange = lineOffset until (lineOffset + line.length)
+            spans.filter { span ->
+                maxOf(lineRange.first, span.range.first) <= minOf(lineRange.last, span.range.last)
+            }
+        }
     }
 
     private fun exportInlineSpans(

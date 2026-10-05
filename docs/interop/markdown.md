@@ -108,6 +108,8 @@ Arranger maps CommonMark and GFM AST nodes directly to its typed attribute syste
 | `# ` to `###### ` | `MarkdownElementTypes.ATX_1`..`6` | `HeadingKey` | Paragraph (`HeadingLevel.H1`..`H6`) |
 | Setext `===` and `---` | `MarkdownElementTypes.SETEXT_1`..`2` | `HeadingKey` | Paragraph (`HeadingLevel.H1`..`H2`) |
 | `> Quote` | `MarkdownElementTypes.BLOCK_QUOTE` | `BlockquoteKey` | Paragraph (`Unit`) |
+| ```` ```lang ... ``` ```` | `MarkdownElementTypes.CODE_FENCE` | `CodeBlockKey` | Paragraph (`String?`) |
+| `    code` (4-space indent) | `MarkdownElementTypes.CODE_BLOCK` | `CodeBlockKey` | Paragraph (`String?`) |
 | `* `, `- `, `+ ` | `MarkdownElementTypes.UNORDERED_LIST` | `BulletListKey` | Paragraph (`ListIndentLevel.Level1`..`Level6`) |
 | `1. `, `2. ` | `MarkdownElementTypes.ORDERED_LIST` | `OrderedListKey` | Paragraph (`ListIndentLevel.Level1`..`Level6`) |
 
@@ -142,15 +144,19 @@ When rich text contains overlapping inline styles (for example, text that is bot
 
 The delimiter stack ensures correct opening and closing order: `Link` -> `Underline` -> `Strikethrough` -> `Bold` -> `Italic`.
 
+### Code Block Serialization & Blank-Line Preservation
+
+Both fenced code blocks (```` ```lang ... ``` ````) and indented blocks are mapped to `CodeBlockKey(language)`. During export:
+
+- Contiguous lines sharing `CodeBlockKey` are grouped into a single fenced code block enclosure.
+- Blank lines (empty lines containing only `\n`) within a code block or blockquote are safely preserved inside the block enclosure without prematurely breaking the block.
+
 ---
 
 ## Current Nuances & Limitations
 
 !!! warning "Inline Code Formatting in v0.5.0-alpha01"
     While Arranger's core model defines `InlineCodeKey` and `WysiwygEditor` supports typing `` `code` `` shortcuts, the current `arranger-richtext-markdown` parser treats code spans as plain unstyled text, and `MarkdownExporter` does not yet emit backticks for `InlineCodeKey`. Full round-trip inline code serialization is planned for an upcoming release.
-
-!!! note "Block-Level Code Fences"
-    Fenced code blocks and indented code blocks are currently imported as plain text. Arranger core prioritizes text styling and document formatting over full syntax-highlighted IDE code blocks.
 
 !!! info "Unsupported GFM Extensions"
     GFM tables, footnotes, task list checkboxes (`- [ ]`), and mathematical expressions are parsed as fallback plain text or standard bullet lists. If your application requires structured table editing, consider implementing a custom format or storing tables as metadata.

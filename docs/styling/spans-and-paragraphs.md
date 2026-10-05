@@ -74,7 +74,7 @@ Certain paragraph block attributes are conceptually mutually exclusive. Arranger
 
 ### 1. Block Type Exclusion (`BlockTypeAttributeKey`)
 
-Headings (H1–H6), bullet lists, ordered lists, and blockquotes implement `BlockTypeAttributeKey`.
+Headings (H1–H6), bullet lists, ordered lists, blockquotes, and code blocks (`CodeBlockKey`) implement `BlockTypeAttributeKey`.
 
 Assigning a new block type to a paragraph **automatically clears any existing block-type attribute** on that paragraph.
 
