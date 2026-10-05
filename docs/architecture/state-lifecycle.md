@@ -71,19 +71,24 @@ flowchart TD
 ```
 
 ### 1. Pre-Mutation Snapshot Recording
+
 Before text or styling is altered, the editor's current state (text, spans, selection, and typing attributes) is captured in the undo stack according to intelligent merging policies (e.g. continuous typing is grouped into a single undo step).
 
 ### 2. Automatic Span Range Adjustment
+
 When text is inserted or deleted, existing formatting ranges located at or after the edit position shift automatically, preserving your styling alignment without manual calculation.
 
 ### 3. Typing Attributes & Enter Key Strategies
+
 - **Regular Typing:** Characters typed inherit active `typingAttributes` (such as bold or text color selected from a toolbar).
 - **Enter Key:** Pressing Enter evaluates the active `EnterKeyStrategy` (e.g. automatically resetting headings to body text, continuing bullet lists, or outdenting nested items).
 
 ### 4. Style Normalization & Paragraph Snapping
+
 Intersecting span ranges are automatically normalized to eliminate conflicts. Block-level styles (headings, quotes, lists) are automatically snapped to full paragraph boundaries (`\n` to `\n`).
 
 ### 5. Atomic Publication & Recomposition
+
 The state update commits atomically: raw text and span ranges update together. Compose recomposes affected UI nodes, and `AttributeStyleResolver` supplies the corresponding `SpanStyle` and `ParagraphStyle` decorations to the layout.
 
 ---
@@ -105,4 +110,3 @@ Creating a separate undo entry for every individual character keystroke would fo
 To prevent unbound memory growth during long editing sessions, the undo stack enforces a strict limit of **100 operations**. When capacity is reached, the oldest snapshots are dropped in FIFO order.
 
 For practical UI integration (such as wiring toolbar buttons and checking `canUndo`/`canRedo`), refer to [**State Management & History**](../editor-basics/state-management.md).
-

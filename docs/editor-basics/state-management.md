@@ -265,7 +265,8 @@ fun DocumentEditorScreen(viewModel: EditorViewModel = viewModel()) {
 }
 ```
 
-#### Why ViewModel Hoisting Excels for Long Documents on Android:
+#### Why ViewModel Hoisting Excels for Long Documents on Android
+
 - **Zero Bundle Overhead & Zero Crash Risk**: The `ViewModel` remains in memory across Activity recreations (screen rotations). Because no Binder IPC or `Bundle` serialization occurs, there is **zero risk** of `TransactionTooLargeException`, even with 100,000+ characters.
 - **Full Undo/Redo Preservation**: Undo and redo stacks survive screen rotation completely intact without memory duplication.
 - **Zero Serialization Latency**: Recreating the Composable UI tree simply rebinds to the existing in-memory state object without parsing overhead.
@@ -317,4 +318,3 @@ fun CustomEditorScreen() {
 - [**RichTextEditor Basics**](rich-text-editor.md): Editor component placement and UI parameters.
 - [**Spans and Paragraphs**](../styling/spans-and-paragraphs.md): Differences between span and paragraph attributes.
 - [**Toolbar Integration**](../interactions/toolbars.md): High-level helper APIs such as `toggleFormat` and focus protection tips.
-

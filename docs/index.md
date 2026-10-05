@@ -21,6 +21,7 @@ Much like ProseMirror and Lexical in the web ecosystem, Arranger provides the ro
 ## Key Features
 
 ### ✍️ Polished Editor Experiences
+
 - **Dual Editor Components**: `RichTextEditor` for toolbar-driven rich editing and `WysiwygEditor` for real-time Markdown shortcut styling while typing.
 - **Intuitive Undo / Redo**: Full tracking of both text edits and formatting mutations with native keyboard shortcut support (<kbd>Cmd/Ctrl</kbd> + <kbd>Z</kbd>, <kbd>Shift</kbd> + <kbd>Cmd/Ctrl</kbd> + <kbd>Z</kbd>).
 - **Smart Enter Key Handling**: Automatic heading reset, list continuation, and multi-level outdenting via `EnterKeyStrategy`.
@@ -28,12 +29,14 @@ Much like ProseMirror and Lexical in the web ecosystem, Arranger provides the ro
 - **Autocomplete Support**: Input query detection for `@mentions` and `#tags` with zero-calculation cursor-following popup positioning (`createPopupPositionProvider`).
 
 ### 🛡️ Type-Safe & Declarative Core Engine
+
 - **Index-Free Mutation DSL**: Atomic, index-safe text and attribute editing via `state.edit { ... }` without manual offset arithmetic.
 - **Semantic Attribute Queries ("Runs")**: Extraction and batch transformation of contiguous styled text ranges inspired by SwiftUI `AttributedString.Runs`.
 - **Extensible Custom Attributes**: Compile-time type-safe `AttributeKey<T>` system for custom styles and domain metadata.
 - **Exclusive Paragraph Categorization**: Automatic mutual exclusion between headings, blockquotes, and lists, as well as horizontal text alignments.
 
 ### 🌐 Interoperability & Ecosystem
+
 - **Bidirectional Markdown & HTML Conversion**: Reversible import and export with external formats via `:arranger-markdown` and `:arranger-html`.
 - **Material 3 Design System Integration**: Native alignment with `MaterialTheme` Typography and ColorScheme via `:arranger-editor-material3`.
 - **Full Kotlin Multiplatform Conformance**: Identical behavior and architecture across Android, macOS, Windows, Linux, iOS, and Web (WasmJs).

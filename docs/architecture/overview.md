@@ -115,4 +115,3 @@ sequenceDiagram
     Resolver-->>Editor: Returns Compose SpanStyle / ParagraphStyle
     Editor-->>User: Renders styled text and caret position
 ```
-
