@@ -99,14 +99,14 @@ class Material3RichTextEditorScreenshotTest {
 
     private fun createVisualBlockState(): RichTextState {
         val text =
-            "Blockquote section with accent bar\n" +
-                "val greeting = \"Hello World\"\nprintln(greeting)\n" +
+            "Blockquote section with accent bar\n\n" +
+                "Visual Block Decorations & Code Blocks\nprintln(\"Hello\")\n\n" +
                 "plain code block"
         return RichTextState(
             initialText =
                 RichString(text).edit {
                     editAttributes(text.rangeOf("Blockquote section with accent bar")) { blockquote() }
-                    editAttributes(text.rangeOf("val greeting = \"Hello World\"\nprintln(greeting)")) { codeBlock("kotlin") }
+                    editAttributes(text.rangeOf("Visual Block Decorations & Code Blocks\nprintln(\"Hello\")")) { codeBlock("kotlin") }
                     editAttributes(text.rangeOf("plain code block")) { codeBlock() }
                 },
         )
