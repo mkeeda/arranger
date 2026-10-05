@@ -72,13 +72,14 @@ public sealed interface EnterKeyResult {
 
 ## Built-in Strategies
 
-Arranger bundles three standard implementations out of the box:
+Arranger bundles four standard implementations out of the box:
 
 | Strategy | Target Key | Behavior on Enter |
 |---|---|---|
 | `InheritParagraphStrategy` | Default for `ParagraphAttributeKey` and `BlockquoteKey` | Clones all paragraph attributes to the newly created line. |
 | `HeadingEnterStrategy` | `HeadingKey` | Clears `HeadingLevel` block attributes on the new line; reverts to standard body text. |
 | `ListEnterStrategy` | `BulletListKey`, `OrderedListKey` | On non-empty line: inherits list level.<br>On empty line with `Level2`+: decrements indent level.<br>On empty line with `Level1`: removes list attribute and exits list. |
+| `CodeBlockEnterStrategy` | `CodeBlockKey` | On non-empty line: inherits code block formatting.<br>On empty line: removes code block and exits back to normal paragraph via `Outdent`. |
 
 ### 1. InheritParagraphStrategy
 
@@ -147,35 +148,57 @@ public object ListEnterStrategy : EnterKeyStrategy {
 }
 ```
 
+### 4. CodeBlockEnterStrategy
+
+When writing code inside a `CodeBlockKey`, pressing Enter creates a new line continuing the code block. When Enter is pressed on an empty code block line, the code block is removed, returning the user back to standard body text without leaving trailing empty code lines:
+
+```kotlin
+public object CodeBlockEnterStrategy : EnterKeyStrategy {
+    override fun execute(context: EnterKeyContext): EnterKeyResult {
+        val paragraphText = context.text.substring(context.paragraphRange)
+        val isEmpty = paragraphText.isBlank() || paragraphText == "\n"
+
+        return if (isEmpty) {
+            // Empty line: exit code block back to normal body text
+            EnterKeyResult.Outdent(attributes = context.currentAttributes - CodeBlockKey)
+        } else {
+            // Line has code: continue code block on next line
+            EnterKeyResult.InheritAttributes(attributes = context.currentAttributes)
+        }
+    }
+}
+```
+
 ---
 
 ## Implementing Custom EnterKeyStrategy
 
 Custom block types can define their own Enter key behavior by implementing `EnterKeyStrategy` and attaching it to a `ParagraphAttributeKey` or `BlockTypeAttributeKey`.
 
-### Example: Code Block Exit Strategy
+### Example: Callout Block Strategy
 
-Consider a code block where pressing Enter creates normal newlines inside code, but pressing Enter twice on an empty line exits the code block:
+Consider a Callout block where pressing Enter creates newlines inside the callout, but pressing Enter on an empty line terminates the callout:
 
 ```kotlin
-public data object CodeBlockKey : BlockTypeAttributeKey<Unit> {
-    override val name: String = "code-block"
+public object CalloutKey : BlockTypeAttributeKey<Unit> {
+    override val name: String = "callout"
     override val defaultValue: Unit = Unit
-    override val enterKeyStrategy: EnterKeyStrategy = CodeBlockEnterStrategy
+    override val enterKeyStrategy: EnterKeyStrategy = CalloutEnterStrategy
 }
 
-public object CodeBlockEnterStrategy : EnterKeyStrategy {
+public object CalloutEnterStrategy : EnterKeyStrategy {
     override fun execute(context: EnterKeyContext): EnterKeyResult {
         val currentLineText = context.text.substring(context.paragraphRange).trimEnd('\n')
 
-        // If the user presses Enter on an empty line within code block, exit code block
         return if (currentLineText.isEmpty()) {
-            EnterKeyResult.Outdent(context.currentAttributes - CodeBlockKey)
+            EnterKeyResult.Outdent(context.currentAttributes - CalloutKey)
         } else {
             EnterKeyResult.InheritAttributes(context.currentAttributes)
         }
     }
 }
+```
+
 ---
 
 ## Summary
@@ -184,4 +207,5 @@ public object CodeBlockEnterStrategy : EnterKeyStrategy {
 - `InheritParagraphStrategy` duplicates block attributes on newline.
 - `HeadingEnterStrategy` resets paragraph attributes back to default body text.
 - `ListEnterStrategy` handles continuation, multi-level outdenting, and clean list termination without leaving stray newlines.
-- Use custom strategies for rich block types like Callouts, Code Blocks, or Checklists.
+- `CodeBlockEnterStrategy` preserves code block context and exits cleanly on empty lines.
+- Use custom strategies for rich block types like Callouts, Warning Boxes, or Checklists.

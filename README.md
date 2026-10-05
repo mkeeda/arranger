@@ -209,18 +209,26 @@ Orchestrate what happens when users press Enter via composable `EnterKeyStrategy
 - **`InheritParagraphStrategy`**: Inherits alignment and blockquote formatting to subsequent lines.
 - **`ListEnterStrategy`**: Automatically increments ordered list numbers (1., 2., 3.), continues bullet points, and outdents or removes list markers when Enter is pressed on an empty line.
 - **`HeadingEnterStrategy`**: Automatically reverts to normal body text on newlines following a heading.
+- **`CodeBlockEnterStrategy`**: Preserves code blocks across newlines and exits cleanly back to standard paragraphs on empty lines.
 
-### 6. Lossless Markdown & HTML Interoperability
-Convert rich text to and from CommonMark Markdown and HTML without data loss:
+### 6. Visual Block Decorations & Code Blocks
+Render rich container decorations around multi-line blocks using composable `BlockDecorator` slots and `BlockContainer`:
+- **Blockquote**: Left accent bars with customizable width and color.
+- **Code Block**: Rounded container backgrounds and outline borders with monospace styling.
+- **Material 3 Integration**: `rememberMaterial3BlockDecorator()` automatically applies `surfaceVariant` backgrounds and `outlineVariant` borders.
+- **Zero Collision Padding**: Uniform vertical line-height padding ensures decorations never overlap adjacent lines.
+
+### 7. Lossless Markdown & HTML Interoperability
+Convert rich text to and from CommonMark Markdown (including fenced/indented code blocks) and HTML (`<pre><code>`) without data loss:
 
 ```kotlin
 // Markdown export / import (:arranger-richtext-markdown)
 val markdown: String = state.richString.toMarkdown()
-val importedString = RichString.fromMarkdown("# Hello **World**\n- Item 1\n- Item 2")
+val importedString = RichString.fromMarkdown("# Hello **World**\n- Item 1\n```kotlin\nval x = 1\n```")
 
 // HTML export / import (:arranger-richtext-html)
 val html: String = state.richString.toHtml()
-val htmlString = RichString.fromHtml("<p>Hello <span style=\"color: #ff0000;\"><strong>Red Bold</strong></span></p>")
+val htmlString = RichString.fromHtml("<p>Hello</p><pre><code class=\"language-kotlin\">val x = 1</code></pre>")
 ```
 
 ---
@@ -234,6 +242,7 @@ Arranger includes fully functioning sample applications demonstrating real-world
 | **[Document Editor UI](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/DocumentEditorSample.kt)** | <img src="./docs/images/document-editor.png" width="200" alt="Document Editor"/> | Full-screen document editor with a rich formatting toolbar, heading dropdowns, list indentation, hyperlinks dialog, and undo/redo history controls. |
 | **[Mention Autocomplete Chat](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/MentionAutocompleteSample.kt)** | <img src="./docs/images/mention-autocomplete.png" width="200" alt="Mention Autocomplete"/> | Modern chat composer featuring real-time `@mention` and `#channel` suggestion popups positioned dynamically with `createPopupPositionProvider()`. |
 | **[WYSIWYG Markdown Shortcuts](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/WysiwygEditorSample.kt)** | <img src="./docs/images/wysiwyg.gif" width="200" alt="WYSIWYG Shortcuts"/> | Keyboard-first writing experience with instant Markdown shorthand expansion and one-tap backspace reversal. |
+| **[Visual Block Decorations](./sample/shared/src/commonMain/kotlin/dev/mkeeda/arranger/sample/shared/VisualBlockSample.kt)** | - | Interactive demo switching between Default and Material 3 decorators for code blocks and blockquotes with uniform padding. |
 
 ### Running the Samples Locally
 

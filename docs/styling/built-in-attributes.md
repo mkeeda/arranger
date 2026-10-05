@@ -20,6 +20,7 @@ Arranger includes a rich set of built-in character and paragraph attributes cove
 | `HeadingKey` | BlockType | `HeadingLevel` | `HeadingLevel.Unspecified` | Heading level (H1 to H6). |
 | `TextAlignmentKey` | Alignment | `TextAlignment` | `TextAlignment.Unspecified` | Paragraph horizontal text alignment (Left, Center, Right, Justify). |
 | `BlockquoteKey` | BlockType | `Unit` | `Unit` | Quoted callout block formatting. |
+| `CodeBlockKey` | BlockType | `String?` | `null` | Preformatted code block container with optional programming language tag. |
 | `BulletListKey` | BlockType | `ListIndentLevel` | `ListIndentLevel.Unspecified` | Bulleted list item (indentation Level1 to Level6). |
 | `OrderedListKey` | BlockType | `ListIndentLevel` | `ListIndentLevel.Unspecified` | Numbered list item (automatic numbering, indentation Level1 to Level6). |
 
@@ -95,9 +96,17 @@ Within `RichStringScope.editAttributes` or `RichTextBuffer` scopes, the followin
 | Heading | `headingLevel(level: HeadingLevel?)` | `clearHeadingLevel()` |
 | Alignment | `textAlignment(alignment: TextAlignment?)` | `clearTextAlignment()` |
 | Blockquote | `blockquote()` | `clearBlockquote()` |
+| Code Block | `codeBlock(language: String? = null)` | `clearCodeBlock()` |
 | Bullet List | `bulletList(level: ListIndentLevel)` | `clearBulletList()` |
 | Ordered List | `orderedList(level: ListIndentLevel)` | `clearOrderedList()` |
 | Clear All | `clearAll()` | - |
+
+### Low-level Primitive Mutation Functions
+
+When implementing custom attributes or dynamic editors, `AttributeEditScope` provides symmetrical `set` and `remove` methods matching `RichStringScope`:
+
+- **`setSpanAttribute(key, value)`** / **`removeSpanAttribute(key)`**: Sets or removes a character-level span attribute.
+- **`setParagraphAttribute(key, value)`** / **`removeParagraphAttribute(key)`**: Sets or removes a paragraph-level attribute (automatically snapping to paragraph boundaries). Nullable attribute values (such as `CodeBlockKey` with `null` language) are safely set without being treated as removals.
 
 ---
 

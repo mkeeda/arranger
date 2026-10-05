@@ -55,6 +55,7 @@ When typing, entering the following syntax triggers immediate conversion as soon
 | `- ` or `* ` (Line start + space) | Bullet List | `BulletListKey` (`ListIndentLevel.Level1`) |
 | `1. ` (Line start + space) | Ordered List | `OrderedListKey` (`ListIndentLevel.Level1`) |
 | `> ` (Line start + space) | Blockquote | `BlockquoteKey` (`Unit`) |
+| ```` ``` ```` or ```` ```lang ```` (Line start + space) | Code Block | `CodeBlockKey` (`null` or language string) |
 
 ### Inline Formatting (Enclosing Symbols)
 

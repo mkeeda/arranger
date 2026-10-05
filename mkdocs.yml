@@ -113,6 +113,7 @@ nav:
   - Styling & Formatting:
       - Spans & Paragraphs: styling/spans-and-paragraphs.md
       - Built-in Attributes: styling/built-in-attributes.md
+      - Block Decorations: styling/block-decorations.md
       - Custom Attributes: styling/custom-attributes.md
       - Theming & Material 3: styling/theming-and-m3.md
       - Inspecting Runs: styling/inspecting-runs.md
