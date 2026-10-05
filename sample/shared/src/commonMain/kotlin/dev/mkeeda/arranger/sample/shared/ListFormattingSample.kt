@@ -14,14 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.mkeeda.arranger.editor.ListMarkerResolver
+import dev.mkeeda.arranger.editor.RichTextEditor
+import dev.mkeeda.arranger.editor.RichTextState
 import dev.mkeeda.arranger.richtext.BulletListItem
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListItem
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.bulletList
-import dev.mkeeda.arranger.richtext.editor.ListMarkerResolver
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.orderedList
 
 @Composable

@@ -1,18 +1,18 @@
 # Markdown Interoperability
 
-Arranger provides first-class support for bi-directional Markdown conversion through the `arranger-richtext-markdown` module. Powered by JetBrains' official [Markdown parser](https://github.com/JetBrains/markdown) using the GitHub Flavored Markdown (GFM) specification, this module enables seamless serialization between rich text in-memory models (`RichString`) and standardized Markdown text.
+Arranger provides first-class support for bi-directional Markdown conversion through the `arranger-markdown` module. Powered by JetBrains' official [Markdown parser](https://github.com/JetBrains/markdown) using the GitHub Flavored Markdown (GFM) specification, this module enables seamless serialization between rich text in-memory models (`RichString`) and standardized Markdown text.
 
 ---
 
 ## Installation
 
-Add the `arranger-richtext-markdown` dependency to your Gradle build script alongside the core library:
+Add the `arranger-markdown` dependency to your Gradle build script alongside the core library:
 
 === "Kotlin DSL (build.gradle.kts)"
     ```kotlin
     dependencies {
         // Pure KMP Markdown serialization
-        implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-markdown:0.5.0-alpha01")
         implementation("dev.mkeeda.arranger:arranger-richtext:0.5.0-alpha01")
     }
     ```
@@ -23,7 +23,7 @@ Add the `arranger-richtext-markdown` dependency to your Gradle build script alon
     arranger = "0.5.0-alpha01"
 
     [libraries]
-    arranger-richtext-markdown = { module = "dev.mkeeda.arranger:arranger-richtext-markdown", version.ref = "arranger" }
+    arranger-markdown = { module = "dev.mkeeda.arranger:arranger-markdown", version.ref = "arranger" }
     ```
 
 ---
@@ -156,7 +156,7 @@ Both fenced code blocks (```` ```lang ... ``` ````) and indented blocks are mapp
 ## Current Nuances & Limitations
 
 !!! warning "Inline Code Formatting in v0.5.0-alpha01"
-    While Arranger's core model defines `InlineCodeKey` and `WysiwygEditor` supports typing `` `code` `` shortcuts, the current `arranger-richtext-markdown` parser treats code spans as plain unstyled text, and `MarkdownExporter` does not yet emit backticks for `InlineCodeKey`. Full round-trip inline code serialization is planned for an upcoming release.
+    While Arranger's core model defines `InlineCodeKey` and `WysiwygEditor` supports typing `` `code` `` shortcuts, the current `arranger-markdown` parser treats code spans as plain unstyled text, and `MarkdownExporter` does not yet emit backticks for `InlineCodeKey`. Full round-trip inline code serialization is planned for an upcoming release.
 
 !!! info "Unsupported GFM Extensions"
     GFM tables, footnotes, task list checkboxes (`- [ ]`), and mathematical expressions are parsed as fallback plain text or standard bullet lists. If your application requires structured table editing, consider implementing a custom format or storing tables as metadata.

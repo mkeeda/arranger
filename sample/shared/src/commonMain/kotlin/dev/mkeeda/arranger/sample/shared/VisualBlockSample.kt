@@ -23,18 +23,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.mkeeda.arranger.editor.DefaultBlockDecorator
+import dev.mkeeda.arranger.editor.RichTextEditor
+import dev.mkeeda.arranger.editor.RichTextState
+import dev.mkeeda.arranger.editor.material3.rememberMaterial3AttributeStyleResolver
+import dev.mkeeda.arranger.editor.material3.rememberMaterial3BlockDecorator
+import dev.mkeeda.arranger.editor.toggleFormat
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.clearCodeBlock
 import dev.mkeeda.arranger.richtext.codeBlock
-import dev.mkeeda.arranger.richtext.editor.DefaultBlockDecorator
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3BlockDecorator
-import dev.mkeeda.arranger.richtext.editor.toggleFormat
 import dev.mkeeda.arranger.richtext.rangeOf
 
 private enum class DecoratorStyle(val label: String) {

@@ -8,7 +8,7 @@ List styling in Arranger is built upon paragraph-level attributes combined with 
 
 ## Core List Attributes
 
-Arranger defines two block-level list attributes in `:richtext`:
+Arranger defines two block-level list attributes in `:arranger-richtext`:
 
 - `BulletListKey`: `BlockTypeAttributeKey<ListIndentLevel>`
 - `OrderedListKey`: `BlockTypeAttributeKey<ListIndentLevel>`

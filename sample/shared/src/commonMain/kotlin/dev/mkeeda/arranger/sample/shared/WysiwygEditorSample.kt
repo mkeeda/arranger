@@ -21,14 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.mkeeda.arranger.editor.RichTextState
+import dev.mkeeda.arranger.editor.wysiwyg.WysiwygEditor
 import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.bulletList
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.wysiwyg.WysiwygEditor
 import dev.mkeeda.arranger.richtext.headingLevel
 import dev.mkeeda.arranger.richtext.inlineCode
 import dev.mkeeda.arranger.richtext.italic

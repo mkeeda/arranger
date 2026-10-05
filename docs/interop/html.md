@@ -1,18 +1,18 @@
 # HTML Interoperability
 
-Arranger offers rich bi-directional HTML import and export capabilities via the `arranger-richtext-html` module. Utilizing [ksoup](https://github.com/fleeksoft/ksoup) — a pure Kotlin Multiplatform port of the popular jsoup HTML parsing library — this module enables full HTML round-tripping across Android, iOS, Desktop (JVM), and Web (Wasm/JS) without platform-specific webview or browser dependencies.
+Arranger offers rich bi-directional HTML import and export capabilities via the `arranger-html` module. Utilizing [ksoup](https://github.com/fleeksoft/ksoup) — a pure Kotlin Multiplatform port of the popular jsoup HTML parsing library — this module enables full HTML round-tripping across Android, iOS, Desktop (JVM), and Web (Wasm/JS) without platform-specific webview or browser dependencies.
 
 ---
 
 ## Installation
 
-Add `arranger-richtext-html` to your module's build configuration:
+Add `arranger-html` to your module's build configuration:
 
 === "Kotlin DSL (build.gradle.kts)"
     ```kotlin
     dependencies {
         // Pure KMP HTML serialization with inline CSS styling
-        implementation("dev.mkeeda.arranger:arranger-richtext-html:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-html:0.5.0-alpha01")
         implementation("dev.mkeeda.arranger:arranger-richtext:0.5.0-alpha01")
     }
     ```
@@ -23,7 +23,7 @@ Add `arranger-richtext-html` to your module's build configuration:
     arranger = "0.5.0-alpha01"
 
     [libraries]
-    arranger-richtext-html = { module = "dev.mkeeda.arranger:arranger-richtext-html", version.ref = "arranger" }
+    arranger-html = { module = "dev.mkeeda.arranger:arranger-html", version.ref = "arranger" }
     ```
 
 ---

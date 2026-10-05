@@ -464,11 +464,11 @@ class AdversarialDokkaNavigationTests(unittest.TestCase):
             target_file, _, is_internal = resolve_link_to_file(root_index, href)
             if is_internal and target_file and target_file.exists():
                 rel = str(target_file.relative_to(SITE_DIR / "api"))
-                for mod in ["richtext", "richtext-editor", "richtext-editor-material3", "richtext-markdown", "richtext-html"]:
+                for mod in ["arranger-richtext", "arranger-editor", "arranger-editor-material3", "arranger-markdown", "arranger-html"]:
                     if rel.startswith(mod):
                         modules_linked.add(mod)
 
-        expected_modules = {"richtext", "richtext-editor", "richtext-editor-material3", "richtext-markdown", "richtext-html"}
+        expected_modules = {"arranger-richtext", "arranger-editor", "arranger-editor-material3", "arranger-markdown", "arranger-html"}
         self.assertEqual(
             modules_linked,
             expected_modules,

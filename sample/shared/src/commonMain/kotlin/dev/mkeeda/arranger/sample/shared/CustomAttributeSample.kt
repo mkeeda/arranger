@@ -7,12 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import dev.mkeeda.arranger.editor.AttributeStyleResolver
+import dev.mkeeda.arranger.editor.DefaultAttributeStyleResolver
+import dev.mkeeda.arranger.editor.RichTextEditor
+import dev.mkeeda.arranger.editor.RichTextState
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.SpanAttributeKey
-import dev.mkeeda.arranger.richtext.editor.AttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.DefaultAttributeStyleResolver
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.rangeOf
 
 // 1. Define Custom Attribute Key

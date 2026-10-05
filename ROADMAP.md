@@ -32,7 +32,7 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
 *Building high-value editor capabilities that standard Compose does not provide.*
 
 - [x] **Markdown & HTML Bi-directional Conversion:**
-  - Import / Export converters between `RichString` and CommonMark Markdown / HTML representations (`:richtext-markdown` and `:richtext-html`).
+  - Import / Export converters between `RichString` and CommonMark Markdown / HTML representations (`:arranger-markdown` and `:arranger-html`).
   - Lossless parsing and serialization of inline and block formatting.
 - [x] **WYSIWYG Auto-formatting:**
   - Dedicated `WysiwygEditor` component separate from `RichTextEditor`.
@@ -55,7 +55,7 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
   - Transition the internal span-tracking engine (`shiftSpans`) to adopt Compose 1.12's native `TrackedRange` under the hood for zero-overhead index tracking.
   - *Timing Strategy:* Executed once JetBrains Compose Multiplatform fully stabilizes Compose 1.12 across all non-Android targets (iOS, Desktop JVM, WasmJs), ensuring 100% multiplatform API parity.
 - [ ] **Public API Audit & Freeze:**
-  - Finalize and freeze public API signatures across `arranger-richtext`, `arranger-richtext-editor`, and platform/design modules (`material3`).
+  - Finalize and freeze public API signatures across `arranger-richtext`, `arranger-editor`, and platform/design modules (`material3`).
 - [ ] **Cross-Platform Quality & Production Hardening:**
   - Multiplatform behavior alignment, comprehensive Roborazzi visual tests, memory footprint benchmarks, and automated regression suites.
 
@@ -94,7 +94,7 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
 <summary><b>v0.3.0 - Phase 3: Kotlin Multiplatform (KMP) Architecture Migration</b></summary>
 
 - [x] Full KMP refactoring supporting Android, Desktop (JVM), iOS, and Web (WasmJs).
-- [x] Separation of pure Kotlin core (`arranger-richtext`) and Compose UI binding layer (`arranger-richtext-editor`).
-- [x] Material 3 integration module (`arranger-richtext-editor-material3`).
+- [x] Separation of pure Kotlin core (`arranger-richtext`) and Compose UI binding layer (`arranger-editor`).
+- [x] Material 3 integration module (`arranger-editor-material3`).
 - [x] Sample app for all multiplatform targets.
 </details>

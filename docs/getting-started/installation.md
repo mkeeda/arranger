@@ -26,16 +26,16 @@ To use Arranger, ensure your development environment meets the following minimum
             commonMain.dependencies {
                 // UI editor components (RichTextEditor, WysiwygEditor)
                 // Core data models (:arranger-richtext) are included transitively
-                implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.5.0-alpha01")
+                implementation("dev.mkeeda.arranger:arranger-editor:0.5.0-alpha01")
 
                 // Optional: Material 3 style resolver (rememberMaterial3AttributeStyleResolver)
-                implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.5.0-alpha01")
+                implementation("dev.mkeeda.arranger:arranger-editor-material3:0.5.0-alpha01")
 
                 // Optional: Bidirectional Markdown conversion (toMarkdown / fromMarkdown)
-                implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.5.0-alpha01")
+                implementation("dev.mkeeda.arranger:arranger-markdown:0.5.0-alpha01")
 
                 // Optional: Bidirectional HTML conversion (toHtml / fromHtml)
-                implementation("dev.mkeeda.arranger:arranger-richtext-html:0.5.0-alpha01")
+                implementation("dev.mkeeda.arranger:arranger-html:0.5.0-alpha01")
             }
         }
     }
@@ -49,16 +49,16 @@ To use Arranger, ensure your development environment meets the following minimum
     // app/build.gradle.kts
     dependencies {
         // Core UI editor component
-        implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-editor:0.5.0-alpha01")
 
         // Optional: Material 3 integration
-        implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-editor-material3:0.5.0-alpha01")
 
         // Optional: Bidirectional Markdown conversion
-        implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-markdown:0.5.0-alpha01")
 
         // Optional: Bidirectional HTML conversion
-        implementation("dev.mkeeda.arranger:arranger-richtext-html:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-html:0.5.0-alpha01")
     }
     ```
 
@@ -72,19 +72,19 @@ To use Arranger, ensure your development environment meets the following minimum
     arranger = "0.5.0-alpha01"
 
     [libraries]
-    arranger-richtext-core = { module = "dev.mkeeda.arranger:arranger-richtext", version.ref = "arranger" }
-    arranger-richtext-editor = { module = "dev.mkeeda.arranger:arranger-richtext-editor", version.ref = "arranger" }
-    arranger-richtext-editor-material3 = { module = "dev.mkeeda.arranger:arranger-richtext-editor-material3", version.ref = "arranger" }
-    arranger-richtext-markdown = { module = "dev.mkeeda.arranger:arranger-richtext-markdown", version.ref = "arranger" }
-    arranger-richtext-html = { module = "dev.mkeeda.arranger:arranger-richtext-html", version.ref = "arranger" }
+    arranger-richtext = { module = "dev.mkeeda.arranger:arranger-richtext", version.ref = "arranger" }
+    arranger-editor = { module = "dev.mkeeda.arranger:arranger-editor", version.ref = "arranger" }
+    arranger-editor-material3 = { module = "dev.mkeeda.arranger:arranger-editor-material3", version.ref = "arranger" }
+    arranger-markdown = { module = "dev.mkeeda.arranger:arranger-markdown", version.ref = "arranger" }
+    arranger-html = { module = "dev.mkeeda.arranger:arranger-html", version.ref = "arranger" }
     ```
 
     Usage in `build.gradle.kts`:
 
     ```kotlin
     dependencies {
-        implementation(libs.arranger.richtext.editor)
-        implementation(libs.arranger.richtext.editor.material3)
+        implementation(libs.arranger.editor)
+        implementation(libs.arranger.editor.material3)
     }
     ```
 
@@ -97,13 +97,13 @@ Arranger is published as discrete artifacts so you can include only what your ap
 | Artifact | Responsibilities & Key Features | Dependencies |
 |---|---|---|
 | `arranger-richtext` | **Pure core data model layer**.<br>Independent of Compose UI. Provides immutable data structures (`RichString`, `RichSpan`), attribute systems (`AttributeKey`, `AttributeContainer`), sweep-line interval partitioning, paragraph snapping, and list extraction algorithms. | None (Kotlin stdlib only) |
-| `arranger-richtext-editor` | **Compose UI editor engine layer**.<br>Provides `RichTextEditor`, `WysiwygEditor`, state management via `RichTextState`, undo/redo history, enter key strategies, tap detection, and autocomplete support. | `arranger-richtext`, Compose UI / Foundation |
-| `arranger-richtext-editor-material3` | **Material 3 integration layer**.<br>Reads `MaterialTheme.typography` and `colorScheme`, providing `rememberMaterial3AttributeStyleResolver` to automatically align headings and blockquotes with M3 design tokens. | `arranger-richtext-editor`, Compose Material 3 |
-| `arranger-richtext-markdown` | **Bidirectional Markdown conversion layer**.<br>Leverages the JetBrains Markdown parser (GFM) to convert bidirectionally between `RichString` and Markdown text. | `arranger-richtext`, `org.jetbrains:markdown` |
-| `arranger-richtext-html` | **Bidirectional HTML conversion layer**.<br>Uses the multiplatform HTML parser `ksoup` to convert between `RichString` and HTML, with full support for inline CSS styling (colors, font sizes, alignments, etc.). | `arranger-richtext`, `ksoup` |
+| `arranger-editor` | **Compose UI editor engine layer**.<br>Provides `RichTextEditor`, `WysiwygEditor`, state management via `RichTextState`, undo/redo history, enter key strategies, tap detection, and autocomplete support. | `arranger-richtext`, Compose UI / Foundation |
+| `arranger-editor-material3` | **Material 3 integration layer**.<br>Reads `MaterialTheme.typography` and `colorScheme`, providing `rememberMaterial3AttributeStyleResolver` to automatically align headings and blockquotes with M3 design tokens. | `arranger-editor`, Compose Material 3 |
+| `arranger-markdown` | **Bidirectional Markdown conversion layer**.<br>Leverages the JetBrains Markdown parser (GFM) to convert bidirectionally between `RichString` and Markdown text. | `arranger-richtext`, `org.jetbrains:markdown` |
+| `arranger-html` | **Bidirectional HTML conversion layer**.<br>Uses the multiplatform HTML parser `ksoup` to convert between `RichString` and HTML, with full support for inline CSS styling (colors, font sizes, alignments, etc.). | `arranger-richtext`, `ksoup` |
 
 !!! tip "Using Core Artifacts Headless"
-    If you are building backend services, Ktor server-side applications, or CLI tools that only need to manipulate rich text data models or perform Markdown/HTML conversions, you can include `arranger-richtext`, `arranger-richtext-markdown`, and `arranger-richtext-html` without any Compose UI dependencies for a lightweight footprint.
+    If you are building backend services, Ktor server-side applications, or CLI tools that only need to manipulate rich text data models or perform Markdown/HTML conversions, you can include `arranger-richtext`, `arranger-markdown`, and `arranger-html` without any Compose UI dependencies for a lightweight footprint.
 
 ---
 

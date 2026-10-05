@@ -15,12 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import dev.mkeeda.arranger.editor.RichTextEditor
+import dev.mkeeda.arranger.editor.RichTextState
+import dev.mkeeda.arranger.editor.editAttributes
+import dev.mkeeda.arranger.editor.textColor
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.bold
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.editAttributes
-import dev.mkeeda.arranger.richtext.editor.textColor
 import dev.mkeeda.arranger.richtext.rangeOf
 
 @Composable

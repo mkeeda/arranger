@@ -46,18 +46,18 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import dev.mkeeda.arranger.editor.AutocompleteMatch
+import dev.mkeeda.arranger.editor.AutocompleteTrigger
+import dev.mkeeda.arranger.editor.RichTextEditor
+import dev.mkeeda.arranger.editor.RichTextState
+import dev.mkeeda.arranger.editor.applyCompletion
+import dev.mkeeda.arranger.editor.createPopupPositionProvider
+import dev.mkeeda.arranger.editor.rememberRichTextState
+import dev.mkeeda.arranger.editor.toRgbaColor
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.TextColorKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
-import dev.mkeeda.arranger.richtext.editor.AutocompleteMatch
-import dev.mkeeda.arranger.richtext.editor.AutocompleteTrigger
-import dev.mkeeda.arranger.richtext.editor.RichTextEditor
-import dev.mkeeda.arranger.richtext.editor.RichTextState
-import dev.mkeeda.arranger.richtext.editor.applyCompletion
-import dev.mkeeda.arranger.richtext.editor.createPopupPositionProvider
-import dev.mkeeda.arranger.richtext.editor.rememberRichTextState
-import dev.mkeeda.arranger.richtext.editor.toRgbaColor
 import kotlinx.coroutines.launch
 
 private data class ChatUser(

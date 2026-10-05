@@ -12,7 +12,7 @@ Arranger provides a clean, pluggable extension model via `EnterKeyStrategy` to c
 
 ## The EnterKeyStrategy Architecture
 
-The core `:richtext` module defines the strategy interface and its invocation context:
+The core `:arranger-richtext` module defines the strategy interface and its invocation context:
 
 ```kotlin
 package dev.mkeeda.arranger.richtext

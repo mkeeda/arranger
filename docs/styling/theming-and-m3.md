@@ -1,6 +1,6 @@
 # Theming and Material 3
 
-Arranger cleanly decouples data models (`AttributeContainer`) from Compose visual styling (`SpanStyle` and `ParagraphStyle`). The bridge between data and visual presentation is the `AttributeStyleResolver`, complemented by the `:richtext-editor-material3` module for seamless Material 3 integration.
+Arranger cleanly decouples data models (`AttributeContainer`) from Compose visual styling (`SpanStyle` and `ParagraphStyle`). The bridge between data and visual presentation is the `AttributeStyleResolver`, complemented by the `:arranger-editor-material3` module for seamless Material 3 integration.
 
 ---
 
@@ -69,7 +69,7 @@ val CustomStyleResolver = AttributeStyleResolver(base = DefaultAttributeStyleRes
 
 ---
 
-## Material 3 Integration (:richtext-editor-material3)
+## Material 3 Integration (:arranger-editor-material3)
 
 When building Material 3 applications, heading typography and blockquote colors should naturally align with your `MaterialTheme` design tokens.
 
@@ -78,7 +78,7 @@ When building Material 3 applications, heading typography and blockquote colors 
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.5.0-alpha01")
+    implementation("dev.mkeeda.arranger:arranger-editor-material3:0.5.0-alpha01")
 }
 ```
 
@@ -141,7 +141,7 @@ fun Material3EditorScreen() {
 
 ### Material 3 Block Decoration (Material3BlockDecorator)
 
-The `:arranger-richtext-editor-material3` module also provides `rememberMaterial3BlockDecorator()` to render theme-consistent container decorations behind multi-line blocks:
+The `:arranger-editor-material3` module also provides `rememberMaterial3BlockDecorator()` to render theme-consistent container decorations behind multi-line blocks:
 
 - **Blockquote**: Draws a vertical quote bar using `colorScheme.primary`.
 - **Code Block**: Draws a rounded container using `colorScheme.surfaceVariant` background and `colorScheme.outlineVariant` border outline.

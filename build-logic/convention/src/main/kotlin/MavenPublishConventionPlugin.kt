@@ -13,7 +13,7 @@ class MavenPublishConventionPlugin : Plugin<Project> {
             extensions.configure<MavenPublishBaseExtension> {
                 publishToMavenCentral()
                 // Dokka (K1 engine) fails to resolve opt-in annotation markers (e.g., @InternalArrangerApi)
-                // used in richtext-editor, causing the javadoc generation task to crash.
+                // used in arranger-editor, causing the javadoc generation task to crash.
                 // JavadocJar.Empty() generates an empty javadoc jar to satisfy Maven Central validation.
                 // IDE quick-docs work fine via the sources jar.
                 // TODO: Re-enable javadoc generation once migrating to Dokka K2 engine.
