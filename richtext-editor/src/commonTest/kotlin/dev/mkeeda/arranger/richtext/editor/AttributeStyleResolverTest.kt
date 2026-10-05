@@ -5,12 +5,14 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import dev.mkeeda.arranger.richtext.AlignmentAttributeKey
 import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -301,5 +303,50 @@ class AttributeStyleResolverTest {
 
         resolved.paragraphStyle?.textIndent?.firstLine shouldBe 12.sp
         resolved.paragraphStyle?.textIndent?.restLine shouldBe 12.sp
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves paragraphStyle for CodeBlockKey with lineHeight and blockLineHeightStyle`() {
+        val container = attributeContainerOf(CodeBlockKey to null)
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.paragraphStyle?.lineHeight shouldBe 24.sp
+        resolved.paragraphStyle?.lineHeightStyle?.alignment shouldBe LineHeightStyle.Alignment.Center
+        resolved.paragraphStyle?.lineHeightStyle?.trim shouldBe LineHeightStyle.Trim.None
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver resolves paragraphStyle for BlockquoteKey with lineHeight and blockLineHeightStyle`() {
+        val container = attributeContainerOf(BlockquoteKey to Unit)
+        val resolved = DefaultAttributeStyleResolver.resolve(container)
+
+        resolved.paragraphStyle?.lineHeight shouldBe 24.sp
+        resolved.paragraphStyle?.lineHeightStyle?.alignment shouldBe LineHeightStyle.Alignment.Center
+        resolved.paragraphStyle?.lineHeightStyle?.trim shouldBe LineHeightStyle.Trim.None
+    }
+
+    @Test
+    fun `AttributeStyleBuilder applies blockTypeParagraphStyle to any BlockTypeAttributeKey`() {
+        val customResolver =
+            AttributeStyleResolver {
+                blockTypeParagraphStyle {
+                    ParagraphStyle(lineHeight = 32.sp)
+                }
+            }
+        val resolved = customResolver.resolve(attributeContainerOf(TestParagraphAndSpanKey to Unit))
+        resolved.paragraphStyle?.lineHeight shouldBe 32.sp
+    }
+
+    @Test
+    fun `DefaultAttributeStyleResolver applies uniform block padding to custom BlockTypeAttributeKey`() {
+        val customBlockKey =
+            object : BlockTypeAttributeKey<Unit> {
+                override val name: String = "CustomBlock"
+                override val defaultValue: Unit = Unit
+            }
+        val resolved = DefaultAttributeStyleResolver.resolve(attributeContainerOf(customBlockKey to Unit))
+
+        resolved.paragraphStyle?.lineHeight shouldBe DefaultBlockLineHeight
+        resolved.paragraphStyle?.lineHeightStyle shouldBe DefaultBlockLineHeightStyle
     }
 }
