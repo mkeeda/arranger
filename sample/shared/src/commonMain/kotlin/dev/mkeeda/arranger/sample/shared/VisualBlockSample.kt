@@ -46,13 +46,13 @@ private enum class DecoratorStyle(val label: String) {
 @Composable
 public fun VisualBlockSample(modifier: Modifier = Modifier) {
     val initialText =
-        "Visual Block Decorations & Code Blocks\n" +
+        "Visual Block Decorations & Code Blocks\n\n" +
             "Simplicity is prerequisite for reliability.\n" +
-            "- Edsger W. Dijkstra\n" +
+            "- Edsger W. Dijkstra\n\n" +
             "fun greet(name: String) {\n" +
             "    println(\"Hello, \$name!\")\n" +
-            "}\n" +
-            "./gradlew allTests\n" +
+            "}\n\n" +
+            "./gradlew allTests\n\n" +
             "Try adding or editing blocks below."
 
     val state =
