@@ -29,7 +29,10 @@ import dev.mkeeda.arranger.richtext.TextSize
 import dev.mkeeda.arranger.richtext.UnderlineKey
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 
-internal class HtmlImporter : RichTextImporter<String> {
+/**
+ * An importer that converts an HTML [String] into a [RichString].
+ */
+public object HtmlImporter : RichTextImporter<String> {
     override fun import(input: String): RichString {
         if (input.isEmpty()) return RichString("")
 
@@ -315,10 +318,8 @@ internal class HtmlImporter : RichTextImporter<String> {
         return null
     }
 
-    private companion object {
-        val inlineTags = setOf("strong", "b", "em", "i", "s", "del", "strike", "u", "a", "span")
-        val ignoredTags = setOf("script", "style", "meta", "noscript", "template", "head", "title")
-    }
+    private val inlineTags = setOf("strong", "b", "em", "i", "s", "del", "strike", "u", "a", "span")
+    private val ignoredTags = setOf("script", "style", "meta", "noscript", "template", "head", "title")
 
     private fun extractInlineAttributes(
         element: Element,

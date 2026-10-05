@@ -25,14 +25,6 @@ public interface RichTextImporter<T> {
 }
 
 /**
- * A bi-directional format that can both export a [RichString] to type [T]
- * and import type [T] into a [RichString].
- *
- * @param T The intermediate format type (e.g., [String]).
- */
-public interface RichTextFormat<T> : RichTextExporter<T>, RichTextImporter<T>
-
-/**
  * Exports this [RichString] using the specified [exporter].
  */
 public fun <T> RichString.export(exporter: RichTextExporter<T>): T = exporter.export(this)

@@ -28,7 +28,10 @@ import org.intellij.markdown.parser.MarkdownParser
 
 private val nonCancellableToken = CancellationToken { }
 
-internal class MarkdownImporter : RichTextImporter<String> {
+/**
+ * An importer that converts a Markdown [String] into a [RichString].
+ */
+public object MarkdownImporter : RichTextImporter<String> {
     override fun import(input: String): RichString {
         if (input.isEmpty()) return RichString("")
 
@@ -62,9 +65,7 @@ internal class MarkdownImporter : RichTextImporter<String> {
         )
     }
 
-    private companion object {
-        private val flavour = GFMFlavourDescriptor()
-    }
+    private val flavour = GFMFlavourDescriptor()
 
     private class ParseContext {
         var underlineStart: Int = -1

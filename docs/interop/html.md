@@ -74,22 +74,20 @@ val state = RichTextState(initialText = richString)
 
 ---
 
-## Under the Hood: HtmlFormat
+## Under the Hood: HtmlExporter & HtmlImporter
 
-Both extension functions operate through `HtmlFormat`, which implements the `RichTextFormat<String>` contract:
+Both extension functions operate through `HtmlExporter` and `HtmlImporter`, which implement Arranger's universal serialization interfaces:
 
 ```kotlin
-public object HtmlFormat :
-    RichTextFormat<String>,
-    RichTextExporter<String> by HtmlExporter(),
-    RichTextImporter<String> by HtmlImporter()
+public object HtmlExporter : RichTextExporter<String>
+public object HtmlImporter : RichTextImporter<String>
 ```
 
-You can use `HtmlFormat` directly with generic export and import routines:
+You can use `HtmlExporter` and `HtmlImporter` directly with generic export and import routines:
 
 ```kotlin
-val html: String = richString.export(HtmlFormat)
-val restored: RichString = RichString.import(html, HtmlFormat)
+val html: String = richString.export(HtmlExporter)
+val restored: RichString = RichString.import(html, HtmlImporter)
 ```
 
 ---

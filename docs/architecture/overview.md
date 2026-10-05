@@ -45,7 +45,7 @@ The foundation of Arranger is completely decoupled from UI toolkits, Android SDK
 
 - **Immutable Data Structures:** `RichString` encapsulates the raw text string and an immutable list of `RichSpan` objects. `AttributeContainer` is a type-safe heterogeneous map holding formatting metadata.
 - **Abstract Attribute System:** Attributes are identified by typed `AttributeKey<T>` singletons (`BoldKey`, `TextColorKey`, `HeadingKey`). No UI styles (`SpanStyle`, `ParagraphStyle`) exist in this layer.
-- **Universal Format SPI:** `RichTextFormat<T>`, `RichTextExporter<T>`, and `RichTextImporter<T>` interfaces allow pluggable serialization.
+- **Universal Serialization SPI:** `RichTextExporter<T>` and `RichTextImporter<T>` interfaces allow pluggable export and import routines.
 
 !!! tip "Backend & Headless Reuse"
     Because `arranger-richtext` has zero UI dependencies, you can run document validation, formatting migrations, Markdown parsing, or HTML generation in backend services (such as Ktor on JVM), CLI tools, or serverless workers without pulling in any Compose runtime dependencies!
