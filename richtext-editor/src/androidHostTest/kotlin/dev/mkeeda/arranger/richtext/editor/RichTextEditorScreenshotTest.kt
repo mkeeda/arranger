@@ -33,6 +33,7 @@ import dev.mkeeda.arranger.richtext.backgroundColor
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.bulletList
+import dev.mkeeda.arranger.richtext.codeBlock
 import dev.mkeeda.arranger.richtext.headingLevel
 import dev.mkeeda.arranger.richtext.inlineCode
 import dev.mkeeda.arranger.richtext.italic
@@ -247,6 +248,32 @@ class RichTextEditorScreenshotTest {
             LaunchedEffect(Unit) {
                 focusRequester.requestFocus()
             }
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun `render visual block decorations`() {
+        val text =
+            "Blockquote section with accent bar\n" +
+                "val greeting = \"Hello World\"\nprintln(greeting)\n" +
+                "echo \"plain code block\""
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Blockquote section with accent bar")) { blockquote() }
+                        editAttributes(text.rangeOf("val greeting = \"Hello World\"\nprintln(greeting)")) { codeBlock("kotlin") }
+                        editAttributes(text.rangeOf("echo \"plain code block\"")) { codeBlock() }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White),
+            )
         }
 
         composeTestRule.onRoot().captureRoboImage()
