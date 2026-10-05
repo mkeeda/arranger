@@ -279,6 +279,37 @@ class RichTextEditorScreenshotTest {
         composeTestRule.onRoot().captureRoboImage()
     }
 
+    @Test
+    fun `render visual blocks adjacent to plain text without empty lines`() {
+        val text =
+            "Normal paragraph before block\n" +
+                "Blockquote without empty line\n" +
+                "Blockquote directly adjacent to code block\n" +
+                "fun hello() {\n" +
+                "    println(\"world\")\n" +
+                "}\n" +
+                "Normal paragraph after code block"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(
+                            text.rangeOf("Blockquote without empty line\nBlockquote directly adjacent to code block"),
+                        ) { blockquote() }
+                        editAttributes(text.rangeOf("fun hello() {\n    println(\"world\")\n}")) { codeBlock("kotlin") }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White),
+            )
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
     private fun createMultiLevelListState(): RichTextState {
         val text =
             "Bullet item 1\nBullet item 2\nNested bullet\nDeep nested bullet\n" +
