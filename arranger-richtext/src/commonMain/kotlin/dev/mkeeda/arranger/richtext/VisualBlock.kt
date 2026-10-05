@@ -1,55 +1,40 @@
 package dev.mkeeda.arranger.richtext
 
 /**
- * Represents a visual block container grouping one or more contiguous paragraphs sharing the same block attribute.
+ * Internal representation of a visual block grouping one or more contiguous paragraphs
+ * sharing the same block attribute [key] and [value].
  */
-public sealed interface VisualBlock {
-    /**
-     * The character index range covering all paragraphs in this block.
-     */
-    public val range: IntRange
-
-    /**
-     * Represents a visual blockquote container.
-     */
-    public data class Blockquote(
-        override val range: IntRange,
-    ) : VisualBlock
-
-    /**
-     * Represents a visual code block container with an optional programming language.
-     */
-    public data class CodeBlock(
-        override val range: IntRange,
-        public val language: String? = null,
-    ) : VisualBlock
-}
+@InternalArrangerApi
+public data class VisualBlockItem(
+    public val key: AttributeKey<*>,
+    public val value: Any?,
+    public val range: IntRange,
+)
 
 /**
- * Extracts a list of [VisualBlock]s from this [RichString] by merging contiguous paragraphs
- * that share the same visual block attribute ([BlockquoteKey] or [CodeBlockKey]).
+ * Extracts a list of [VisualBlockItem]s from this [RichString] by merging contiguous paragraphs
+ * that share the same visual block attribute in [keys] with identical values.
  */
-public fun RichString.extractVisualBlocks(): List<VisualBlock> {
-    if (spans.isEmpty() || text.isEmpty()) return emptyList()
+@InternalArrangerApi
+public fun RichString.extractVisualBlocks(
+    keys: Set<AttributeKey<*>>,
+): List<VisualBlockItem> {
+    if (spans.isEmpty() || text.isEmpty() || keys.isEmpty()) return emptyList()
 
-    val blocks = mutableListOf<VisualBlock>()
-    var currentBlock: VisualBlock? = null
+    val blocks = mutableListOf<VisualBlockItem>()
+    var currentBlock: VisualBlockItem? = null
 
     for (span in spans) {
-        val nextBlock: VisualBlock? =
-            when {
-                span.attributes.containsKey(BlockquoteKey) -> {
-                    VisualBlock.Blockquote(range = span.range)
-                }
-
-                span.attributes.containsKey(CodeBlockKey) -> {
-                    val lang = span.attributes[CodeBlockKey]
-                    VisualBlock.CodeBlock(range = span.range, language = lang)
-                }
-
-                else -> {
-                    null
-                }
+        val matchingKey = keys.firstOrNull { span.attributes.containsKey(it) }
+        val nextBlock: VisualBlockItem? =
+            if (matchingKey != null) {
+                VisualBlockItem(
+                    key = matchingKey,
+                    value = span.attributes[matchingKey],
+                    range = span.range,
+                )
+            } else {
+                null
             }
 
         if (nextBlock == null) {
@@ -65,38 +50,15 @@ public fun RichString.extractVisualBlocks(): List<VisualBlock> {
         } else {
             val isContiguous = currentBlock.range.last + 1 == nextBlock.range.first
             val canMerge =
-                when {
-                    !isContiguous -> {
-                        false
-                    }
-
-                    currentBlock is VisualBlock.Blockquote && nextBlock is VisualBlock.Blockquote -> {
-                        true
-                    }
-
-                    currentBlock is VisualBlock.CodeBlock && nextBlock is VisualBlock.CodeBlock -> {
-                        currentBlock.language == nextBlock.language
-                    }
-
-                    else -> {
-                        false
-                    }
-                }
+                isContiguous &&
+                    currentBlock.key == nextBlock.key &&
+                    currentBlock.value == nextBlock.value
 
             if (canMerge) {
                 currentBlock =
-                    when (currentBlock) {
-                        is VisualBlock.Blockquote -> {
-                            VisualBlock.Blockquote(range = currentBlock.range.first..nextBlock.range.last)
-                        }
-
-                        is VisualBlock.CodeBlock -> {
-                            VisualBlock.CodeBlock(
-                                range = currentBlock.range.first..nextBlock.range.last,
-                                language = currentBlock.language,
-                            )
-                        }
-                    }
+                    currentBlock.copy(
+                        range = currentBlock.range.first..nextBlock.range.last,
+                    )
             } else {
                 blocks.add(currentBlock)
                 currentBlock = nextBlock
@@ -110,3 +72,11 @@ public fun RichString.extractVisualBlocks(): List<VisualBlock> {
 
     return blocks
 }
+
+/**
+ * Extracts a list of [VisualBlockItem]s from this [RichString] using default visual block keys
+ * ([BlockquoteKey] and [CodeBlockKey]).
+ */
+@InternalArrangerApi
+public fun RichString.extractVisualBlocks(): List<VisualBlockItem> =
+    extractVisualBlocks(setOf(BlockquoteKey, CodeBlockKey))
