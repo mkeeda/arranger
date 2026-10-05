@@ -8,33 +8,43 @@ public class AttributeEditScope internal constructor(
     private val range: IntRange,
 ) {
     /**
-     * Sets or removes a character span attribute for the given [key].
-     * If [value] is null, the span attribute is removed from the specified range.
+     * Sets a character span attribute for the given [key] with the specified [value].
      */
-    public fun <T : Any> setSpanAttribute(
+    public fun <T> setSpanAttribute(
         key: SpanAttributeKey<T>,
-        value: T?,
+        value: T,
     ) {
-        if (value == null) {
-            buffer.removeSpanAttribute(key, range)
-        } else {
-            buffer.setSpanAttribute(key, value, range)
-        }
+        buffer.setSpanAttribute(key, value, range)
     }
 
     /**
-     * Sets or removes a paragraph-level attribute for the given [key].
+     * Removes any character span attributes associated with the specified [key] within the range.
+     */
+    public fun <T> removeSpanAttribute(
+        key: SpanAttributeKey<T>,
+    ) {
+        buffer.removeSpanAttribute(key, range)
+    }
+
+    /**
+     * Sets a paragraph-level attribute for the given [key] with the specified [value].
      * The underlying range is automatically snapped to paragraph boundaries.
      */
-    public fun <T : Any> setParagraphAttribute(
+    public fun <T> setParagraphAttribute(
         key: ParagraphAttributeKey<T>,
-        value: T?,
+        value: T,
     ) {
-        if (value == null) {
-            buffer.removeParagraphAttribute(key, range)
-        } else {
-            buffer.setParagraphAttribute(key, value, range)
-        }
+        buffer.setParagraphAttribute(key, value, range)
+    }
+
+    /**
+     * Removes any paragraph-level attributes associated with the specified [key] within the range.
+     * The underlying range is automatically snapped to paragraph boundaries.
+     */
+    public fun <T> removeParagraphAttribute(
+        key: ParagraphAttributeKey<T>,
+    ) {
+        buffer.removeParagraphAttribute(key, range)
     }
 
     /**
@@ -43,19 +53,6 @@ public class AttributeEditScope internal constructor(
      */
     public fun clearAll() {
         buffer.clearAllAttributes(range)
-    }
-
-    internal fun <T> setParagraphAttributeDirect(
-        key: ParagraphAttributeKey<T>,
-        value: T,
-    ) {
-        buffer.setParagraphAttribute(key, value, range)
-    }
-
-    internal fun <T> removeParagraphAttributeDirect(
-        key: ParagraphAttributeKey<T>,
-    ) {
-        buffer.removeParagraphAttribute(key, range)
     }
 }
 
@@ -74,7 +71,7 @@ public fun AttributeEditScope.textColor(color: RgbaColor) {
  * Convenience function to remove the text color attribute in the range.
  */
 public fun AttributeEditScope.clearTextColor() {
-    setSpanAttribute(TextColorKey, null)
+    removeSpanAttribute(TextColorKey)
 }
 
 /**
@@ -92,7 +89,7 @@ public fun AttributeEditScope.backgroundColor(color: RgbaColor) {
  * Convenience function to remove the background color attribute in the range.
  */
 public fun AttributeEditScope.clearBackgroundColor() {
-    setSpanAttribute(BackgroundColorKey, null)
+    removeSpanAttribute(BackgroundColorKey)
 }
 
 /**
@@ -110,7 +107,7 @@ public fun AttributeEditScope.fontSize(size: TextSize) {
  * Convenience function to remove the font size attribute in the range.
  */
 public fun AttributeEditScope.clearFontSize() {
-    setSpanAttribute(FontSizeKey, null)
+    removeSpanAttribute(FontSizeKey)
 }
 
 /**
@@ -124,7 +121,7 @@ public fun AttributeEditScope.bold() {
  * Convenience function to remove the bold attribute in the range.
  */
 public fun AttributeEditScope.clearBold() {
-    setSpanAttribute(BoldKey, null)
+    removeSpanAttribute(BoldKey)
 }
 
 /**
@@ -138,7 +135,7 @@ public fun AttributeEditScope.underline() {
  * Convenience function to remove the underline attribute in the range.
  */
 public fun AttributeEditScope.clearUnderline() {
-    setSpanAttribute(UnderlineKey, null)
+    removeSpanAttribute(UnderlineKey)
 }
 
 /**
@@ -152,7 +149,7 @@ public fun AttributeEditScope.italic() {
  * Convenience function to remove the italic attribute in the range.
  */
 public fun AttributeEditScope.clearItalic() {
-    setSpanAttribute(ItalicKey, null)
+    removeSpanAttribute(ItalicKey)
 }
 
 /**
@@ -166,7 +163,7 @@ public fun AttributeEditScope.strikethrough() {
  * Convenience function to remove the strikethrough attribute in the range.
  */
 public fun AttributeEditScope.clearStrikethrough() {
-    setSpanAttribute(StrikethroughKey, null)
+    removeSpanAttribute(StrikethroughKey)
 }
 
 /**
@@ -180,7 +177,7 @@ public fun AttributeEditScope.inlineCode() {
  * Convenience function to remove the inline code attribute in the range.
  */
 public fun AttributeEditScope.clearInlineCode() {
-    setSpanAttribute(InlineCodeKey, null)
+    removeSpanAttribute(InlineCodeKey)
 }
 
 /**
@@ -188,14 +185,18 @@ public fun AttributeEditScope.clearInlineCode() {
  * The applied range will automatically snap to paragraph boundaries.
  */
 public fun AttributeEditScope.headingLevel(level: HeadingLevel?) {
-    setParagraphAttribute(HeadingKey, level)
+    if (level == null || level == HeadingLevel.Unspecified) {
+        clearHeadingLevel()
+    } else {
+        setParagraphAttribute(HeadingKey, level)
+    }
 }
 
 /**
  * Convenience function to remove the heading attribute in the range.
  */
 public fun AttributeEditScope.clearHeadingLevel() {
-    setParagraphAttribute(HeadingKey, null)
+    removeParagraphAttribute(HeadingKey)
 }
 
 /**
@@ -203,14 +204,18 @@ public fun AttributeEditScope.clearHeadingLevel() {
  * The applied range will automatically snap to paragraph boundaries.
  */
 public fun AttributeEditScope.textAlignment(alignment: TextAlignment?) {
-    setParagraphAttribute(TextAlignmentKey, alignment)
+    if (alignment == null || alignment == TextAlignment.Unspecified) {
+        clearTextAlignment()
+    } else {
+        setParagraphAttribute(TextAlignmentKey, alignment)
+    }
 }
 
 /**
  * Convenience function to remove the text alignment attribute in the range.
  */
 public fun AttributeEditScope.clearTextAlignment() {
-    setParagraphAttribute(TextAlignmentKey, null)
+    removeParagraphAttribute(TextAlignmentKey)
 }
 
 /**
@@ -225,7 +230,7 @@ public fun AttributeEditScope.blockquote() {
  * Convenience function to remove the blockquote attribute in the range.
  */
 public fun AttributeEditScope.clearBlockquote() {
-    setParagraphAttribute(BlockquoteKey, null)
+    removeParagraphAttribute(BlockquoteKey)
 }
 
 /**
@@ -244,7 +249,7 @@ public fun AttributeEditScope.bulletList(level: ListIndentLevel) {
  * Convenience function to remove the bullet list attribute in the range.
  */
 public fun AttributeEditScope.clearBulletList() {
-    setParagraphAttribute(BulletListKey, null)
+    removeParagraphAttribute(BulletListKey)
 }
 
 /**
@@ -263,7 +268,7 @@ public fun AttributeEditScope.orderedList(level: ListIndentLevel) {
  * Convenience function to remove the ordered list attribute in the range.
  */
 public fun AttributeEditScope.clearOrderedList() {
-    setParagraphAttribute(OrderedListKey, null)
+    removeParagraphAttribute(OrderedListKey)
 }
 
 /**
@@ -281,7 +286,7 @@ public fun AttributeEditScope.link(url: String) {
  * Convenience function to remove the link attribute in the range.
  */
 public fun AttributeEditScope.clearLink() {
-    setSpanAttribute(LinkKey, null)
+    removeSpanAttribute(LinkKey)
 }
 
 /**
@@ -291,12 +296,12 @@ public fun AttributeEditScope.clearLink() {
  * @param language The programming language identifier for syntax highlighting or labeling, or null if none.
  */
 public fun AttributeEditScope.codeBlock(language: String? = null) {
-    setParagraphAttributeDirect(CodeBlockKey, language)
+    setParagraphAttribute(CodeBlockKey, language)
 }
 
 /**
  * Convenience function to remove the code block attribute in the range.
  */
 public fun AttributeEditScope.clearCodeBlock() {
-    removeParagraphAttributeDirect(CodeBlockKey)
+    removeParagraphAttribute(CodeBlockKey)
 }

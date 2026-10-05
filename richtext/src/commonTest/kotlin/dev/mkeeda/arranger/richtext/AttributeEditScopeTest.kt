@@ -266,4 +266,64 @@ class AttributeEditScopeTest {
 
         str.spans.isEmpty() shouldBe true
     }
+
+    @Test
+    fun `setParagraphAttribute and removeParagraphAttribute operate explicitly`() {
+        val str =
+            RichString("Paragraph text").edit {
+                editAttributes {
+                    setParagraphAttribute(HeadingKey, HeadingLevel.H1)
+                }
+            }
+        str.spans.first().attributes[HeadingKey] shouldBe HeadingLevel.H1
+
+        val cleared =
+            str.edit {
+                editAttributes {
+                    removeParagraphAttribute(HeadingKey)
+                }
+            }
+        cleared.spans.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `setSpanAttribute and removeSpanAttribute operate explicitly`() {
+        val str =
+            RichString("Span text").edit {
+                editAttributes {
+                    setSpanAttribute(BoldKey, Unit)
+                }
+            }
+        str.spans.first().attributes[BoldKey] shouldBe Unit
+
+        val cleared =
+            str.edit {
+                editAttributes {
+                    removeSpanAttribute(BoldKey)
+                }
+            }
+        cleared.spans.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `setParagraphAttribute preserves attribute when value is null for nullable key`() {
+        val str =
+            RichString("Code block line").edit {
+                editAttributes {
+                    setParagraphAttribute(CodeBlockKey, null)
+                }
+            }
+        val spans = str.spans
+        spans.size shouldBe 1
+        spans.first().attributes.containsKey(CodeBlockKey) shouldBe true
+        spans.first().attributes[CodeBlockKey].shouldBeNull()
+
+        val cleared =
+            str.edit {
+                editAttributes {
+                    removeParagraphAttribute(CodeBlockKey)
+                }
+            }
+        cleared.spans.isEmpty() shouldBe true
+    }
 }
