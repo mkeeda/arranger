@@ -87,7 +87,7 @@ public fun BlockContainer(
 
 ### 1. `DefaultBlockDecorator`
 
-The standard decorator included in `:arranger-richtext-editor` by default in both `RichTextEditor` and `WysiwygEditor`:
+The standard decorator included in `:arranger-editor` by default in both `RichTextEditor` and `WysiwygEditor`:
 
 - **Blockquote**: A `3.dp` wide rounded vertical bar using an accent color with a subtle alpha tint.
 - **Code Block**: A subtle neutral container background (`Color(0x0F000000)`) with `8.dp` rounded corners.
@@ -99,7 +99,7 @@ RichTextEditor(
 )
 ```
 
-### 2. `Material3BlockDecorator` (:arranger-richtext-editor-material3)
+### 2. `Material3BlockDecorator` (:arranger-editor-material3)
 
 For Material 3 applications, use `rememberMaterial3BlockDecorator()` to synchronize decorations with your current `ColorScheme`:
 

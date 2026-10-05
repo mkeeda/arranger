@@ -73,7 +73,7 @@ def crawl_and_verify_site() -> Tuple[bool, Dict[str, int], List[str]]:
         print(f"Error: Site directory does not exist at {SITE_DIR}")
         return False, {}, ["site/ directory not found"]
 
-    # Filter for files only, as package dirs in Dokka may end with .html (e.g. dev.mkeeda.arranger.richtext.html)
+    # Filter for files only, as package dirs in Dokka may end with .html (e.g. dev.mkeeda.arranger.html)
     html_files = sorted([p for p in SITE_DIR.rglob("*.html") if p.is_file()])
     print(f"Discovered {len(html_files)} HTML files in {SITE_DIR}")
 

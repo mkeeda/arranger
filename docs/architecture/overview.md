@@ -13,13 +13,13 @@ Arranger divides responsibilities into distinct layers, isolating pure data mani
 ```mermaid
 graph TD
     subgraph Extensions ["Tier 3: Ecosystem & Interoperability Extensions"]
-        M3["arranger-richtext-editor-material3<br/><i>Material 3 Design Tokens</i>"]
-        MD["arranger-richtext-markdown<br/><i>Markdown Import / Export</i>"]
-        HTML["arranger-richtext-html<br/><i>HTML Import / Export</i>"]
+        M3["arranger-editor-material3<br/><i>Material 3 Design Tokens</i>"]
+        MD["arranger-markdown<br/><i>Markdown Import / Export</i>"]
+        HTML["arranger-html<br/><i>HTML Import / Export</i>"]
     end
 
     subgraph UI ["Tier 2: Compose UI Editor Engine"]
-        Editor["arranger-richtext-editor<br/><i>RichTextEditor, WysiwygEditor</i>"]
+        Editor["arranger-editor<br/><i>RichTextEditor, WysiwygEditor</i>"]
         State["RichTextState<br/><i>State Management, Undo/Redo, Autocomplete</i>"]
     end
 
@@ -52,7 +52,7 @@ The foundation of Arranger is completely decoupled from UI toolkits, Android SDK
 
 ---
 
-### Tier 2: Compose UI Engine (`arranger-richtext-editor`)
+### Tier 2: Compose UI Engine (`arranger-editor`)
 
 Tier 2 brings Arranger's core data structures into Jetpack Compose:
 
@@ -71,9 +71,9 @@ Tier 2 brings Arranger's core data structures into Jetpack Compose:
 
 Pluggable modules built on top of Tiers 1 and 2:
 
-- **`arranger-richtext-editor-material3`:** Provides `rememberMaterial3AttributeStyleResolver()`, automatically mapping headings and blockquotes to `MaterialTheme.typography` and `colorScheme`.
-- **`arranger-richtext-markdown`:** Bidirectional Markdown import and export leveraging the JetBrains Markdown parser.
-- **`arranger-richtext-html`:** Bidirectional HTML import and export with full inline CSS support.
+- **`arranger-editor-material3`:** Provides `rememberMaterial3AttributeStyleResolver()`, automatically mapping headings and blockquotes to `MaterialTheme.typography` and `colorScheme`.
+- **`arranger-markdown`:** Bidirectional Markdown import and export leveraging the JetBrains Markdown parser.
+- **`arranger-html`:** Bidirectional HTML import and export with full inline CSS support.
 
 ---
 

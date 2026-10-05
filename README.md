@@ -1,7 +1,7 @@
 # Arranger - Declarative, Type-safe Rich Text Editor Engine for Compose Multiplatform
 
 [![CI](https://github.com/mkeeda/arranger/actions/workflows/ci.yml/badge.svg)](https://github.com/mkeeda/arranger/actions/workflows/ci.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-richtext-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-richtext-editor%22)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-editor%22)
 [![Documentation](https://img.shields.io/badge/docs-mkeeda.github.io%2Farranger-deep_orange)](https://mkeeda.github.io/arranger/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -57,14 +57,14 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Core editor UI (includes arranger-richtext)
-            implementation("dev.mkeeda.arranger:arranger-richtext-editor:0.5.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-editor:0.5.0-alpha01")
 
             // Optional: Markdown / HTML conversions
-            implementation("dev.mkeeda.arranger:arranger-richtext-markdown:0.5.0-alpha01")
-            implementation("dev.mkeeda.arranger:arranger-richtext-html:0.5.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-markdown:0.5.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-html:0.5.0-alpha01")
 
             // Optional: Material 3 style resolver
-            implementation("dev.mkeeda.arranger:arranger-richtext-editor-material3:0.5.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-editor-material3:0.5.0-alpha01")
         }
     }
 }
@@ -222,11 +222,11 @@ Render rich container decorations around multi-line blocks using composable `Blo
 Convert rich text to and from CommonMark Markdown (including fenced/indented code blocks) and HTML (`<pre><code>`) without data loss:
 
 ```kotlin
-// Markdown export / import (:arranger-richtext-markdown)
+// Markdown export / import (:arranger-markdown)
 val markdown: String = state.richString.toMarkdown()
 val importedString = RichString.fromMarkdown("# Hello **World**\n- Item 1\n```kotlin\nval x = 1\n```")
 
-// HTML export / import (:arranger-richtext-html)
+// HTML export / import (:arranger-html)
 val html: String = state.richString.toHtml()
 val htmlString = RichString.fromHtml("<p>Hello</p><pre><code class=\"language-kotlin\">val x = 1</code></pre>")
 ```

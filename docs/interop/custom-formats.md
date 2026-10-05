@@ -187,7 +187,7 @@ public fun RichString.Companion.fromJson(json: String): RichString = import(json
 
 ## Traversal & Parsing Strategies
 
-When designing custom formats, choose the appropriate traversal API provided by `:richtext`:
+When designing custom formats, choose the appropriate traversal API provided by `:arranger-richtext`:
 
 ### 1. Attribute Runs (`richString.runs(key)`)
 

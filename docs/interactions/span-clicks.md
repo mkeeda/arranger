@@ -31,7 +31,7 @@ public fun RichTextEditor(
 When a user taps inside the editor, Arranger maps the tap coordinate to the character index and inspects the active `RichSpan`. If a span exists at that position, `onSpanClick` is called with a `SpanClickEvent`:
 
 ```kotlin
-package dev.mkeeda.arranger.richtext.editor
+package dev.mkeeda.arranger.editor
 
 public class SpanClickEvent(
     public val span: RichSpan,

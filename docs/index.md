@@ -9,7 +9,7 @@ Type-safe Rich Text Editor Engine for Compose Multiplatform.
 </div>
 
 [![CI](https://github.com/mkeeda/arranger/actions/workflows/ci.yml/badge.svg)](https://github.com/mkeeda/arranger/actions/workflows/ci.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-richtext-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-richtext-editor%22)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-editor%22)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Arranger is a declarative, type-safe rich text editor engine and UI framework designed for Compose Multiplatform (Android, Desktop JVM, iOS, Web/WasmJs).
@@ -34,8 +34,8 @@ Much like ProseMirror and Lexical in the web ecosystem, Arranger provides the ro
 - **Exclusive Paragraph Categorization**: Automatic mutual exclusion between headings, blockquotes, and lists, as well as horizontal text alignments.
 
 ### 🌐 Interoperability & Ecosystem
-- **Bidirectional Markdown & HTML Conversion**: Reversible import and export with external formats via `:richtext-markdown` and `:richtext-html`.
-- **Material 3 Design System Integration**: Native alignment with `MaterialTheme` Typography and ColorScheme via `:richtext-editor-material3`.
+- **Bidirectional Markdown & HTML Conversion**: Reversible import and export with external formats via `:arranger-markdown` and `:arranger-html`.
+- **Material 3 Design System Integration**: Native alignment with `MaterialTheme` Typography and ColorScheme via `:arranger-editor-material3`.
 - **Full Kotlin Multiplatform Conformance**: Identical behavior and architecture across Android, macOS, Windows, Linux, iOS, and Web (WasmJs).
 
 ---
