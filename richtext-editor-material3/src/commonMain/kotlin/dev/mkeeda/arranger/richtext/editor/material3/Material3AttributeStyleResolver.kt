@@ -51,9 +51,6 @@ public fun material3AttributeStyleResolver(
         }
 
         // Blockquote maps to bodyMedium with onSurfaceVariant color
-        paragraphStyle(BlockquoteKey) {
-            typography.bodyMedium.toParagraphStyle()
-        }
         spanStyle(BlockquoteKey) {
             typography.bodyMedium.toSpanStyle().copy(color = colorScheme.onSurfaceVariant)
         }

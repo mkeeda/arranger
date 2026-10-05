@@ -15,6 +15,7 @@ import dev.mkeeda.arranger.richtext.AttributeKey
 import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.EnterKeyContext
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.InheritParagraphStrategy
@@ -284,6 +285,7 @@ public class RichTextState(
             scope.removeParagraphAttribute(BulletListKey, range)
             scope.removeParagraphAttribute(OrderedListKey, range)
             scope.removeParagraphAttribute(BlockquoteKey, range)
+            scope.removeParagraphAttribute(CodeBlockKey, range)
         }
         scope.setParagraphAttribute(key, value, range)
         spans = scope.spans.resnapParagraphSpans(currentText)

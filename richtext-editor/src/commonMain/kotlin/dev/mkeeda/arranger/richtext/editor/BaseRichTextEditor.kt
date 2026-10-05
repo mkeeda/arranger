@@ -2,6 +2,8 @@ package dev.mkeeda.arranger.richtext.editor
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,15 +32,21 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import dev.mkeeda.arranger.richtext.ListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
+import dev.mkeeda.arranger.richtext.VisualBlock
 import dev.mkeeda.arranger.richtext.extractListItems
+import dev.mkeeda.arranger.richtext.extractVisualBlocks
+import kotlin.math.roundToInt
 
 /**
  * Shared internal base text editor component encapsulating the underlying BasicTextField setup,
@@ -62,6 +70,7 @@ internal fun BaseRichTextEditor(
     decorator: TextFieldDecorator? = null,
     styleResolver: AttributeStyleResolver = DefaultAttributeStyleResolver,
     listMarkerResolver: ListMarkerResolver = DefaultListMarkerResolver,
+    blockDecorator: BlockDecorator? = DefaultBlockDecorator,
     onSpanClick: ((SpanClickEvent) -> Unit)? = null,
     autocompleteTriggers: List<AutocompleteTrigger> = emptyList(),
     onAutocompleteChange: ((AutocompleteMatch?) -> Unit)? = null,
@@ -90,6 +99,7 @@ internal fun BaseRichTextEditor(
     val effectiveCursorBrush = resolveEffectiveCursorBrush(cursorBrush = cursorBrush, textStyle = textStyle)
 
     val listItems = remember(state.richString) { state.richString.extractListItems() }
+    val visualBlocks = remember(state.richString) { state.richString.extractVisualBlocks() }
 
     val currentOnSpanClick by rememberUpdatedState(onSpanClick)
     val currentOnAutocompleteChange by rememberUpdatedState(onAutocompleteChange)
@@ -128,7 +138,12 @@ internal fun BaseRichTextEditor(
                             .coerceIn(0, it.layoutInput.text.length)
                     val rawRect = it.getCursorRect(mappedCursor)
                     val scrollY = scrollState.value.toFloat()
-                    Rect(rawRect.left, rawRect.top - scrollY, rawRect.right, rawRect.bottom - scrollY)
+                    Rect(
+                        left = rawRect.left,
+                        top = rawRect.top - scrollY,
+                        right = rawRect.right,
+                        bottom = rawRect.bottom - scrollY,
+                    )
                 }
 
             currentOnAutocompleteChange?.invoke(match.copy(cursorRect = cursorRect))
@@ -183,7 +198,30 @@ internal fun BaseRichTextEditor(
         interactionSource = interactionSource,
         cursorBrush = effectiveCursorBrush,
         outputTransformation = outputTransformation,
-        decorator = decorator,
+        decorator = { innerTextField ->
+            val decoratedContent: @Composable () -> Unit = {
+                if (decorator != null) {
+                    decorator.Decoration(innerTextField)
+                } else {
+                    innerTextField()
+                }
+            }
+            if (visualBlocks.isNotEmpty() && blockDecorator != null) {
+                Box(propagateMinConstraints = true) {
+                    BlockDecorationsOverlay(
+                        visualBlocks = visualBlocks,
+                        blockDecorator = blockDecorator,
+                        textLayoutResult = textLayoutResult,
+                        scrollState = scrollState,
+                        workarounds = workarounds,
+                        modifier = Modifier.matchParentSize(),
+                    )
+                    decoratedContent()
+                }
+            } else {
+                decoratedContent()
+            }
+        },
     )
 }
 
@@ -268,3 +306,94 @@ internal fun Modifier.spanTapHandler(
             }
         }
     }
+
+@Composable
+internal fun BlockDecorationsOverlay(
+    visualBlocks: List<VisualBlock>,
+    blockDecorator: BlockDecorator,
+    textLayoutResult: TextLayoutResult?,
+    scrollState: ScrollState,
+    workarounds: ComposeParagraphWorkarounds,
+    modifier: Modifier = Modifier,
+) {
+    val layout = textLayoutResult ?: return
+    val totalLength = layout.layoutInput.text.length
+    if (totalLength == 0 || layout.size.width <= 0) return
+
+    val density = LocalDensity.current
+
+    Layout(
+        modifier = modifier.clipToBounds(),
+        content = {
+            visualBlocks.forEach { block ->
+                val startOffset = workarounds.mapCharacterIndex(block.range.first).coerceIn(0, totalLength)
+                val rawEndOffset = workarounds.mapCharacterIndex(block.range.last).coerceIn(0, totalLength)
+                val effectiveEndOffset =
+                    if (rawEndOffset > startOffset && layout.layoutInput.text.getOrNull(rawEndOffset) == '\n') {
+                        rawEndOffset - 1
+                    } else {
+                        rawEndOffset
+                    }
+
+                val startLine = layout.getLineForOffset(startOffset)
+                val endLine = layout.getLineForOffset(effectiveEndOffset)
+                val blockTop = layout.getLineTop(startLine)
+                val blockBottom = layout.getLineBottom(endLine)
+                val lineCount = maxOf(1, endLine - startLine + 1)
+                val editorWidth = layout.size.width.toFloat()
+
+                val blockHeight = (blockBottom - blockTop).coerceAtLeast(0f)
+
+                val context =
+                    BlockDecorationContext(
+                        lineCount = lineCount,
+                        modifier =
+                            Modifier.size(
+                                width = with(density) { editorWidth.toDp() },
+                                height = with(density) { blockHeight.toDp() },
+                            ),
+                    )
+
+                blockDecorator.Decoration(block = block, context = context)
+            }
+        },
+    ) { measurables, constraints ->
+        val placeables =
+            measurables.mapIndexed { index, measurable ->
+                val block = visualBlocks.getOrNull(index)
+                val startOffset =
+                    block?.let { workarounds.mapCharacterIndex(it.range.first).coerceIn(0, totalLength) } ?: 0
+                val rawEndOffset =
+                    block?.let { workarounds.mapCharacterIndex(it.range.last).coerceIn(0, totalLength) } ?: 0
+                val effectiveEndOffset =
+                    if (rawEndOffset > startOffset && layout.layoutInput.text.getOrNull(rawEndOffset) == '\n') {
+                        rawEndOffset - 1
+                    } else {
+                        rawEndOffset
+                    }
+
+                val startLine = layout.getLineForOffset(startOffset)
+                val endLine = layout.getLineForOffset(effectiveEndOffset)
+                val blockTop = layout.getLineTop(startLine)
+                val blockBottom = layout.getLineBottom(endLine)
+
+                val blockHeight = (blockBottom - blockTop).roundToInt().coerceAtLeast(0)
+                val blockWidth = layout.size.width
+
+                val childConstraints = Constraints.fixed(width = blockWidth, height = blockHeight)
+                measurable.measure(childConstraints)
+            }
+
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            val scrollY = scrollState.value
+            placeables.forEachIndexed { index, placeable ->
+                val block = visualBlocks.getOrNull(index) ?: return@forEachIndexed
+                val startOffset = workarounds.mapCharacterIndex(block.range.first).coerceIn(0, totalLength)
+                val startLine = layout.getLineForOffset(startOffset)
+                val blockTop = layout.getLineTop(startLine)
+
+                placeable.place(x = 0, y = blockTop.roundToInt() - scrollY)
+            }
+        }
+    }
+}

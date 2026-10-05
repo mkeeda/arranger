@@ -16,6 +16,7 @@ import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bulletList
+import dev.mkeeda.arranger.richtext.codeBlock
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.headingLevel
@@ -87,6 +88,67 @@ class Material3RichTextEditorScreenshotTest {
                     RichTextEditor(
                         state = state,
                         styleResolver = rememberMaterial3AttributeStyleResolver(),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                    )
+                }
+            }
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    private fun createVisualBlockState(): RichTextState {
+        val text =
+            "Blockquote section with accent bar\n\n" +
+                "Visual Block Decorations & Code Blocks\nprintln(\"Hello\")\n\n" +
+                "plain code block"
+        return RichTextState(
+            initialText =
+                RichString(text).edit {
+                    editAttributes(text.rangeOf("Blockquote section with accent bar")) { blockquote() }
+                    editAttributes(text.rangeOf("Visual Block Decorations & Code Blocks\nprintln(\"Hello\")")) { codeBlock("kotlin") }
+                    editAttributes(text.rangeOf("plain code block")) { codeBlock() }
+                },
+        )
+    }
+
+    @Test
+    fun `render visual blocks in light theme`() {
+        val state = createVisualBlockState()
+
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = lightColorScheme()) {
+                Surface(
+                    modifier = Modifier.width(400.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                ) {
+                    RichTextEditor(
+                        state = state,
+                        styleResolver = rememberMaterial3AttributeStyleResolver(),
+                        blockDecorator = rememberMaterial3BlockDecorator(),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                    )
+                }
+            }
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun `render visual blocks in dark theme`() {
+        val state = createVisualBlockState()
+
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = darkColorScheme()) {
+                Surface(
+                    modifier = Modifier.width(400.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                ) {
+                    RichTextEditor(
+                        state = state,
+                        styleResolver = rememberMaterial3AttributeStyleResolver(),
+                        blockDecorator = rememberMaterial3BlockDecorator(),
                         textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                     )
                 }

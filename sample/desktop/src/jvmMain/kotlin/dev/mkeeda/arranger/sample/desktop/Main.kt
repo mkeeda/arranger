@@ -41,6 +41,7 @@ import dev.mkeeda.arranger.sample.shared.InteractiveSpanSample
 import dev.mkeeda.arranger.sample.shared.ListFormattingSample
 import dev.mkeeda.arranger.sample.shared.MentionAutocompleteSample
 import dev.mkeeda.arranger.sample.shared.UndoRedoSample
+import dev.mkeeda.arranger.sample.shared.VisualBlockSample
 import dev.mkeeda.arranger.sample.shared.WysiwygEditorSample
 import dev.mkeeda.arranger.sample.shared.theme.ArrangerTheme
 
@@ -57,6 +58,7 @@ private enum class SampleDestination(val title: String) {
     WysiwygEditor("WYSIWYG Editor"),
     InteractiveSpan("Interactive Spans"),
     MentionAutocomplete("Mention Autocomplete"),
+    VisualBlock("Visual Blocks"),
 }
 
 fun main() =
@@ -169,6 +171,7 @@ private fun SampleDetailPane(
                 SampleDestination.WysiwygEditor -> WysiwygEditorSample()
                 SampleDestination.InteractiveSpan -> InteractiveSpanSample(snackbarHostState = snackbarHostState)
                 SampleDestination.MentionAutocomplete -> MentionAutocompleteSample()
+                SampleDestination.VisualBlock -> VisualBlockSample()
             }
         }
     }

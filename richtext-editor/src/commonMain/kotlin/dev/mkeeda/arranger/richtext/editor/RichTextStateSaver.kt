@@ -9,6 +9,7 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -153,6 +154,10 @@ private fun serializeAttribute(
             keyName to null
         }
 
+        CodeBlockKey -> {
+            keyName to (value as? String)
+        }
+
         TextColorKey, BackgroundColorKey -> {
             val color = value as? RgbaColor ?: return null
             keyName to color.value
@@ -222,6 +227,10 @@ private fun deserializeAttribute(
 
         BlockquoteKey.name -> {
             BlockquoteKey to Unit
+        }
+
+        CodeBlockKey.name -> {
+            CodeBlockKey to (serializedValue as? String)
         }
 
         TextColorKey.name -> {

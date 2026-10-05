@@ -25,7 +25,7 @@ public fun RichTextState.toggleFormat(key: SpanAttributeKey<Unit>) {
         edit {
             editAttributes(selection) {
                 if (isActive) {
-                    setSpanAttribute(key, null)
+                    removeSpanAttribute(key)
                 } else {
                     setSpanAttribute(key, Unit)
                 }
@@ -45,7 +45,7 @@ public fun RichTextState.toggleFormat(key: ParagraphAttributeKey<Unit>) {
     edit {
         editAttributes(selection) {
             if (isActive) {
-                setParagraphAttribute(key, null)
+                removeParagraphAttribute(key)
             } else {
                 setParagraphAttribute(key, Unit)
             }
@@ -99,15 +99,8 @@ public fun RichTextState.removeFormat(key: AttributeKey<*>) {
         edit {
             editAttributes(selection) {
                 when (key) {
-                    is SpanAttributeKey<*> -> {
-                        @Suppress("UNCHECKED_CAST")
-                        setSpanAttribute(key as SpanAttributeKey<Any>, null)
-                    }
-
-                    is ParagraphAttributeKey<*> -> {
-                        @Suppress("UNCHECKED_CAST")
-                        setParagraphAttribute(key as ParagraphAttributeKey<Any>, null)
-                    }
+                    is SpanAttributeKey<*> -> removeSpanAttribute(key)
+                    is ParagraphAttributeKey<*> -> removeParagraphAttribute(key)
                 }
             }
         }

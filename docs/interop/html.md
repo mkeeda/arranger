@@ -109,6 +109,7 @@ Arranger parses and generates standard semantic HTML elements:
 | `<h1>` to `<h6>` | `HeadingKey` | Paragraph (`HeadingLevel`) | Also parses optional text alignment |
 | `<p>` | Standard paragraph | Paragraph | Splits paragraphs by `\n` |
 | `<blockquote>` | `BlockquoteKey` | Paragraph (`Unit`) | Supports nested blocks |
+| `<pre><code>` | `CodeBlockKey` | Paragraph (`String?`) | Preformatted code block; extracts language from `class="language-..."` |
 | `<ul>`, `<ol>`, `<li>` | `BulletListKey`, `OrderedListKey` | Paragraph (`ListIndentLevel`) | Nested lists up to Level 6 |
 | `<br>` | Newline character | Control | Injects `\n` without closing paragraph |
 

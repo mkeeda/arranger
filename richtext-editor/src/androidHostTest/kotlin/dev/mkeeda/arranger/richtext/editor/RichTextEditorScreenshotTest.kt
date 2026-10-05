@@ -33,6 +33,7 @@ import dev.mkeeda.arranger.richtext.backgroundColor
 import dev.mkeeda.arranger.richtext.blockquote
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.bulletList
+import dev.mkeeda.arranger.richtext.codeBlock
 import dev.mkeeda.arranger.richtext.headingLevel
 import dev.mkeeda.arranger.richtext.inlineCode
 import dev.mkeeda.arranger.richtext.italic
@@ -247,6 +248,63 @@ class RichTextEditorScreenshotTest {
             LaunchedEffect(Unit) {
                 focusRequester.requestFocus()
             }
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun `render visual block decorations`() {
+        val text =
+            "Blockquote section with accent bar\n\n" +
+                "Visual Block Decorations & Code Blocks\nprintln(\"Hello\")\n\n" +
+                "echo \"plain code block\""
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(text.rangeOf("Blockquote section with accent bar")) { blockquote() }
+                        editAttributes(text.rangeOf("Visual Block Decorations & Code Blocks\nprintln(\"Hello\")")) { codeBlock("kotlin") }
+                        editAttributes(text.rangeOf("echo \"plain code block\"")) { codeBlock() }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White),
+            )
+        }
+
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun `render visual blocks adjacent to plain text without empty lines`() {
+        val text =
+            "Normal paragraph before block\n" +
+                "Blockquote without empty line\n" +
+                "Blockquote directly adjacent to code block\n" +
+                "fun hello() {\n" +
+                "    println(\"world\")\n" +
+                "}\n" +
+                "Normal paragraph after code block"
+        val state =
+            RichTextState(
+                initialText =
+                    RichString(text).edit {
+                        editAttributes(
+                            text.rangeOf("Blockquote without empty line\nBlockquote directly adjacent to code block"),
+                        ) { blockquote() }
+                        editAttributes(text.rangeOf("fun hello() {\n    println(\"world\")\n}")) { codeBlock("kotlin") }
+                    },
+            )
+
+        composeTestRule.setContent {
+            RichTextEditor(
+                state = state,
+                modifier = Modifier.width(400.dp).background(Color.White),
+            )
         }
 
         composeTestRule.onRoot().captureRoboImage()

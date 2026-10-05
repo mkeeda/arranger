@@ -5,6 +5,7 @@ import dev.mkeeda.arranger.richtext.BackgroundColorKey
 import dev.mkeeda.arranger.richtext.BlockquoteKey
 import dev.mkeeda.arranger.richtext.BoldKey
 import dev.mkeeda.arranger.richtext.BulletListKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.FontSizeKey
 import dev.mkeeda.arranger.richtext.HeadingKey
 import dev.mkeeda.arranger.richtext.HeadingLevel
@@ -37,94 +38,135 @@ public object HtmlExporter : RichTextExporter<String> {
         // Track lists hierarchy
         data class ListContext(val isOrdered: Boolean, val level: Int)
         val listStack = mutableListOf<ListContext>()
+        var inCodeBlock = false
+        var currentCodeLang: String? = null
 
         for ((index, line) in lines.withIndex()) {
-            val lineRange = currentOffset until (currentOffset + line.length)
-            val lineSpans =
-                richString.spans.filter { span ->
-                    maxOf(lineRange.first, span.range.first) <= minOf(lineRange.last, span.range.last)
-                }
+            val lineSpans = richString.spansForLine(line = line, lineOffset = currentOffset)
 
-            val heading = lineSpans.firstNotNullOfOrNull { it.attributes[HeadingKey] }
-            val isBlockquote = lineSpans.any { it.attributes.containsKey(BlockquoteKey) }
-            val bulletList = lineSpans.firstNotNullOfOrNull { it.attributes[BulletListKey] }
-            val orderedList = lineSpans.firstNotNullOfOrNull { it.attributes[OrderedListKey] }
-            val alignment = lineSpans.firstNotNullOfOrNull { it.attributes[TextAlignmentKey] }
+            val codeBlockSpan = lineSpans.firstOrNull { it.attributes.containsKey(CodeBlockKey) }
+            val isCodeBlock = codeBlockSpan != null
+            val codeLang = if (isCodeBlock) codeBlockSpan.attributes[CodeBlockKey] else null
 
-            val listLevel =
-                when {
-                    bulletList != null && bulletList != ListIndentLevel.Unspecified -> bulletList.ordinal + 1
-                    orderedList != null && orderedList != ListIndentLevel.Unspecified -> orderedList.ordinal + 1
-                    else -> 0
-                }
-            val isOrdered = orderedList != null
+            if (inCodeBlock && (!isCodeBlock || codeLang != currentCodeLang)) {
+                out.append("</code></pre>")
+                inCodeBlock = false
+                currentCodeLang = null
+            }
 
-            if (listLevel > 0) {
-                // Adjust list stack to reach target listLevel
-                while (listStack.size > listLevel) {
-                    val top = listStack.removeAt(listStack.size - 1)
-                    val tag = if (top.isOrdered) "ol" else "ul"
-                    out.append("</li></$tag>")
-                }
-
-                // If the list type changed at the same level, close the previous list
-                if (listStack.isNotEmpty() && listStack.size == listLevel && listStack.last().isOrdered != isOrdered) {
-                    val top = listStack.removeAt(listStack.size - 1)
-                    val tag = if (top.isOrdered) "ol" else "ul"
-                    out.append("</li></$tag>")
-                }
-
-                if (listStack.size < listLevel) {
-                    for (lvl in (listStack.size + 1)..listLevel) {
-                        val tag = if (isOrdered) "ol" else "ul"
-                        out.append("<$tag><li>")
-                        listStack.add(ListContext(isOrdered, lvl))
-                    }
-                } else {
-                    out.append("</li><li>")
-                }
-
-                exportInlineHtml(line, currentOffset, lineSpans, out)
-            } else {
-                // Close any open lists
+            if (isCodeBlock) {
                 while (listStack.isNotEmpty()) {
                     val top = listStack.removeAt(listStack.size - 1)
                     val tag = if (top.isOrdered) "ol" else "ul"
                     out.append("</li></$tag>")
                 }
 
-                val alignStyle =
-                    when (alignment) {
-                        TextAlignment.Left -> " style=\"text-align: left;\""
-                        TextAlignment.Center -> " style=\"text-align: center;\""
-                        TextAlignment.Right -> " style=\"text-align: right;\""
-                        TextAlignment.Justify -> " style=\"text-align: justify;\""
-                        else -> ""
+                if (!inCodeBlock) {
+                    val classAttr = if (codeLang != null) " class=\"language-$codeLang\"" else ""
+                    out.append("<pre><code$classAttr>")
+                    inCodeBlock = true
+                    currentCodeLang = codeLang
+                }
+
+                out.append(escapeHtmlText(line))
+
+                if (index < lines.size - 1) {
+                    val nextLine = lines[index + 1]
+                    val nextLineOffset = currentOffset + line.length + 1
+                    val nextLineSpans = richString.spansForLine(line = nextLine, lineOffset = nextLineOffset)
+                    val nextCodeBlockSpan = nextLineSpans.firstOrNull { it.attributes.containsKey(CodeBlockKey) }
+                    val nextIsCodeBlock = nextCodeBlockSpan != null
+                    val nextCodeLang = if (nextIsCodeBlock) nextCodeBlockSpan.attributes[CodeBlockKey] else null
+                    if (nextIsCodeBlock && nextCodeLang == currentCodeLang) {
+                        out.append('\n')
+                    }
+                }
+            } else {
+                val heading = lineSpans.firstNotNullOfOrNull { it.attributes[HeadingKey] }
+                val isBlockquote = lineSpans.any { it.attributes.containsKey(BlockquoteKey) }
+                val bulletList = lineSpans.firstNotNullOfOrNull { it.attributes[BulletListKey] }
+                val orderedList = lineSpans.firstNotNullOfOrNull { it.attributes[OrderedListKey] }
+                val alignment = lineSpans.firstNotNullOfOrNull { it.attributes[TextAlignmentKey] }
+
+                val listLevel =
+                    when {
+                        bulletList != null && bulletList != ListIndentLevel.Unspecified -> bulletList.ordinal + 1
+                        orderedList != null && orderedList != ListIndentLevel.Unspecified -> orderedList.ordinal + 1
+                        else -> 0
+                    }
+                val isOrdered = orderedList != null
+
+                if (listLevel > 0) {
+                    // Adjust list stack to reach target listLevel
+                    while (listStack.size > listLevel) {
+                        val top = listStack.removeAt(listStack.size - 1)
+                        val tag = if (top.isOrdered) "ol" else "ul"
+                        out.append("</li></$tag>")
                     }
 
-                when {
-                    heading != null && heading != HeadingLevel.Unspecified -> {
-                        val tag = "h${heading.ordinal + 1}"
-                        out.append("<$tag$alignStyle>")
-                        exportInlineHtml(line, currentOffset, lineSpans, out)
-                        out.append("</$tag>")
+                    // If the list type changed at the same level, close the previous list
+                    if (listStack.isNotEmpty() && listStack.size == listLevel && listStack.last().isOrdered != isOrdered) {
+                        val top = listStack.removeAt(listStack.size - 1)
+                        val tag = if (top.isOrdered) "ol" else "ul"
+                        out.append("</li></$tag>")
                     }
 
-                    isBlockquote -> {
-                        out.append("<blockquote><p$alignStyle>")
-                        exportInlineHtml(line, currentOffset, lineSpans, out)
-                        out.append("</p></blockquote>")
+                    if (listStack.size < listLevel) {
+                        for (lvl in (listStack.size + 1)..listLevel) {
+                            val tag = if (isOrdered) "ol" else "ul"
+                            out.append("<$tag><li>")
+                            listStack.add(ListContext(isOrdered, lvl))
+                        }
+                    } else {
+                        out.append("</li><li>")
                     }
 
-                    else -> {
-                        out.append("<p$alignStyle>")
-                        exportInlineHtml(line, currentOffset, lineSpans, out)
-                        out.append("</p>")
+                    exportInlineHtml(line, currentOffset, lineSpans, out)
+                } else {
+                    // Close any open lists
+                    while (listStack.isNotEmpty()) {
+                        val top = listStack.removeAt(listStack.size - 1)
+                        val tag = if (top.isOrdered) "ol" else "ul"
+                        out.append("</li></$tag>")
+                    }
+
+                    val alignStyle =
+                        when (alignment) {
+                            TextAlignment.Left -> " style=\"text-align: left;\""
+                            TextAlignment.Center -> " style=\"text-align: center;\""
+                            TextAlignment.Right -> " style=\"text-align: right;\""
+                            TextAlignment.Justify -> " style=\"text-align: justify;\""
+                            else -> ""
+                        }
+
+                    when {
+                        heading != null && heading != HeadingLevel.Unspecified -> {
+                            val tag = "h${heading.ordinal + 1}"
+                            out.append("<$tag$alignStyle>")
+                            exportInlineHtml(line, currentOffset, lineSpans, out)
+                            out.append("</$tag>")
+                        }
+
+                        isBlockquote -> {
+                            out.append("<blockquote><p$alignStyle>")
+                            exportInlineHtml(line, currentOffset, lineSpans, out)
+                            out.append("</p></blockquote>")
+                        }
+
+                        else -> {
+                            out.append("<p$alignStyle>")
+                            exportInlineHtml(line, currentOffset, lineSpans, out)
+                            out.append("</p>")
+                        }
                     }
                 }
             }
 
             currentOffset += line.length + 1
+        }
+
+        if (inCodeBlock) {
+            out.append("</code></pre>")
         }
 
         // Close any remaining open lists
@@ -135,6 +177,19 @@ public object HtmlExporter : RichTextExporter<String> {
         }
 
         return out.toString()
+    }
+
+    private fun RichString.spansForLine(line: String, lineOffset: Int): List<RichSpan> {
+        return if (line.isEmpty()) {
+            spans.filter { span ->
+                lineOffset in span.range || (lineOffset == text.length && lineOffset > 0 && (lineOffset - 1) in span.range)
+            }
+        } else {
+            val lineRange = lineOffset until (lineOffset + line.length)
+            spans.filter { span ->
+                maxOf(lineRange.first, span.range.first) <= minOf(lineRange.last, span.range.last)
+            }
+        }
     }
 
     private fun exportInlineHtml(
