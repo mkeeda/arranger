@@ -2,6 +2,12 @@
 
 Arranger provides a declarative, Composable slot-based architecture for rendering rich container decorations around block-level paragraph elements—such as quote accent bars for **Blockquotes** and rounded background containers with borders for **Code Blocks**.
 
+<div align="center" markdown>
+
+![Visual Block Decorations](../images/visual-block-decorations.png){ width="500" }
+
+</div>
+
 ---
 
 ## Why Visual Block Decorations?
