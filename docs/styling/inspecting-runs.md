@@ -15,7 +15,7 @@ Arranger provides the **Runs API** (`RichString.runs(...)`), a powerful extracti
 
 Consider a document where the user applies **Bold** across an entire sentence, and then changes the **Text Color** of just one word in the middle:
 
-```
+```text
 "Hello wonderful world"
  [=== Bold ===================]
        [=== Green ===]
@@ -54,6 +54,7 @@ public data class RichRun<T>(
 ## 1. Extracting Runs by Attribute Key
 
 Signature:
+
 ```kotlin
 public fun <T : Any> RichString.runs(key: AttributeKey<T>): Sequence<RichRun<T>>
 ```
@@ -103,13 +104,14 @@ Unstyled text between formatted regions produces no runs; gaps are skipped autom
 ## 2. Filtering Runs with a Predicate
 
 Signature:
+
 ```kotlin
 public fun RichString.runs(
     predicate: (AttributeContainer) -> Boolean,
 ): Sequence<RichRun<AttributeContainer>>
 ```
 
-When you need multi-attribute queries, pass a predicate `(AttributeContainer) -> Boolean`. 
+When you need multi-attribute queries, pass a predicate `(AttributeContainer) -> Boolean`.
 
 The returned sequence yields `RichRun<AttributeContainer>`, where `run.value` is the complete attribute container for that block.
 
