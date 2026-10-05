@@ -39,7 +39,7 @@ Think of Arranger as the foundational framework (analogous to ProseMirror or Lex
   - Live typing auto-conversions (e.g., `# ` triggers H1 heading, `- ` / `* ` triggers bullet lists, `1. ` triggers ordered lists, `> ` triggers blockquotes).
   - Inline syntax auto-formatting (e.g., `*italic*`, `_italic_`, `**bold**`, `~strikethrough~`, `` `code` ``).
   - Immediate Backspace reversal and seamless Undo/Redo integration.
-- [ ] **Interactive Spans & Typing Triggers:**
+- [x] **Interactive Spans & Typing Triggers:**
   - [x] **Hyperlink Support:** `LinkKey` attribute, URL parsing (`UrlParser`), interactive tap/click navigation via `LocalUriHandler`, and `detectAndApplyLinks()` API.
   - [x] **Generic Span Tap/Click Handling:** Extensible interaction API (e.g., `onSpanClick`) allowing custom interactive attributes (such as `@mentions` and `#hashtags`) to trigger application-defined actions.
   - [x] **Typing Trigger Hooks:** Cursor and text change hooks for autocompletion (detecting prefix triggers like `@` or `#` to assist user-built suggestion popups).
