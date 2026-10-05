@@ -9,7 +9,7 @@ Type-safe Rich Text Editor Engine for Compose Multiplatform.
 </div>
 
 [![CI](https://github.com/mkeeda/arranger/actions/workflows/ci.yml/badge.svg)](https://github.com/mkeeda/arranger/actions/workflows/ci.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-editor.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.mkeeda.arranger%22%20AND%20a:%22arranger-editor%22)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.mkeeda.arranger/arranger-editor.svg?label=Maven%20Central)](https://central.sonatype.com/namespace/dev.mkeeda.arranger)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Arranger is a declarative, type-safe rich text editor engine and UI framework designed for Compose Multiplatform (Android, Desktop JVM, iOS, Web/WasmJs).
