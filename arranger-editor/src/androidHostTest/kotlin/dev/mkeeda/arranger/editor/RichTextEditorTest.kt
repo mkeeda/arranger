@@ -24,11 +24,9 @@ import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.TextColorKey
-import dev.mkeeda.arranger.richtext.VisualBlockItem
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.codeBlock
-import dev.mkeeda.arranger.richtext.extractVisualBlocks
 import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull

@@ -1,22 +1,25 @@
-package dev.mkeeda.arranger.richtext
+package dev.mkeeda.arranger.editor
+
+import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
+import dev.mkeeda.arranger.richtext.RichString
 
 /**
  * Internal representation of a visual block grouping one or more contiguous paragraphs
  * sharing the same block attribute [key] and [value].
  */
-@InternalArrangerApi
-public data class VisualBlockItem(
-    public val key: AttributeKey<*>,
-    public val value: Any?,
-    public val range: IntRange,
+internal data class VisualBlockItem(
+    val key: AttributeKey<*>,
+    val value: Any?,
+    val range: IntRange,
 )
 
 /**
  * Extracts a list of [VisualBlockItem]s from this [RichString] by merging contiguous paragraphs
  * that share the same visual block attribute in [keys] with identical values.
  */
-@InternalArrangerApi
-public fun RichString.extractVisualBlocks(
+internal fun RichString.extractVisualBlocks(
     keys: Set<AttributeKey<*>>,
 ): List<VisualBlockItem> {
     if (spans.isEmpty() || text.isEmpty() || keys.isEmpty()) return emptyList()
@@ -77,6 +80,5 @@ public fun RichString.extractVisualBlocks(
  * Extracts a list of [VisualBlockItem]s from this [RichString] using default visual block keys
  * ([BlockquoteKey] and [CodeBlockKey]).
  */
-@InternalArrangerApi
-public fun RichString.extractVisualBlocks(): List<VisualBlockItem> =
+internal fun RichString.extractVisualBlocks(): List<VisualBlockItem> =
     extractVisualBlocks(setOf(BlockquoteKey, CodeBlockKey))

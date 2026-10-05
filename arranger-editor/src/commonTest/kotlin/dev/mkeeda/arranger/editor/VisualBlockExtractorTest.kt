@@ -1,5 +1,18 @@
-package dev.mkeeda.arranger.richtext
+package dev.mkeeda.arranger.editor
 
+import dev.mkeeda.arranger.richtext.AttributeKey
+import dev.mkeeda.arranger.richtext.BlockTypeAttributeKey
+import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
+import dev.mkeeda.arranger.richtext.HeadingLevel
+import dev.mkeeda.arranger.richtext.ListIndentLevel
+import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.blockquote
+import dev.mkeeda.arranger.richtext.bold
+import dev.mkeeda.arranger.richtext.bulletList
+import dev.mkeeda.arranger.richtext.codeBlock
+import dev.mkeeda.arranger.richtext.headingLevel
+import dev.mkeeda.arranger.richtext.rangeOf
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import kotlin.test.Test

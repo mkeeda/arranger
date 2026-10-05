@@ -43,9 +43,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import dev.mkeeda.arranger.richtext.ListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
-import dev.mkeeda.arranger.richtext.VisualBlockItem
 import dev.mkeeda.arranger.richtext.extractListItems
-import dev.mkeeda.arranger.richtext.extractVisualBlocks
 import kotlin.math.roundToInt
 
 /**
