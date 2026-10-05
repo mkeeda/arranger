@@ -1,8 +1,6 @@
 package dev.mkeeda.arranger.editor
 
 import dev.mkeeda.arranger.richtext.AttributeKey
-import dev.mkeeda.arranger.richtext.BlockquoteKey
-import dev.mkeeda.arranger.richtext.CodeBlockKey
 import dev.mkeeda.arranger.richtext.RichString
 
 /**
@@ -78,7 +76,8 @@ internal fun RichString.extractVisualBlocks(
 
 /**
  * Extracts a list of [VisualBlockItem]s from this [RichString] using default visual block keys
- * ([BlockquoteKey] and [CodeBlockKey]).
+ * supported by [DefaultBlockDecorator].
  */
-internal fun RichString.extractVisualBlocks(): List<VisualBlockItem> =
-    extractVisualBlocks(setOf(BlockquoteKey, CodeBlockKey))
+internal fun RichString.extractVisualBlocks(
+    decorator: BlockDecorator = DefaultBlockDecorator,
+): List<VisualBlockItem> = extractVisualBlocks(decorator.supportedKeys)
