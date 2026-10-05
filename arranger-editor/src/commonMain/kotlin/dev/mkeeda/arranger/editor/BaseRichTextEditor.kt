@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import dev.mkeeda.arranger.richtext.ListItem
 import dev.mkeeda.arranger.richtext.RgbaColor
-import dev.mkeeda.arranger.richtext.VisualBlock
+import dev.mkeeda.arranger.richtext.VisualBlockItem
 import dev.mkeeda.arranger.richtext.extractListItems
 import dev.mkeeda.arranger.richtext.extractVisualBlocks
 import kotlin.math.roundToInt
@@ -99,7 +99,14 @@ internal fun BaseRichTextEditor(
     val effectiveCursorBrush = resolveEffectiveCursorBrush(cursorBrush = cursorBrush, textStyle = textStyle)
 
     val listItems = remember(state.richString) { state.richString.extractListItems() }
-    val visualBlocks = remember(state.richString) { state.richString.extractVisualBlocks() }
+    val visualBlocks =
+        remember(state.richString, blockDecorator) {
+            if (blockDecorator != null && blockDecorator.supportedKeys.isNotEmpty()) {
+                state.richString.extractVisualBlocks(blockDecorator.supportedKeys)
+            } else {
+                emptyList()
+            }
+        }
 
     val currentOnSpanClick by rememberUpdatedState(onSpanClick)
     val currentOnAutocompleteChange by rememberUpdatedState(onAutocompleteChange)
@@ -309,7 +316,7 @@ internal fun Modifier.spanTapHandler(
 
 @Composable
 internal fun BlockDecorationsOverlay(
-    visualBlocks: List<VisualBlock>,
+    visualBlocks: List<VisualBlockItem>,
     blockDecorator: BlockDecorator,
     textLayoutResult: TextLayoutResult?,
     scrollState: ScrollState,
@@ -346,6 +353,7 @@ internal fun BlockDecorationsOverlay(
 
                 val context =
                     BlockDecorationContext(
+                        range = block.range,
                         lineCount = lineCount,
                         modifier =
                             Modifier.size(
@@ -354,7 +362,11 @@ internal fun BlockDecorationsOverlay(
                             ),
                     )
 
-                blockDecorator.Decoration(block = block, context = context)
+                blockDecorator.Decoration(
+                    key = block.key,
+                    value = block.value,
+                    context = context,
+                )
             }
         },
     ) { measurables, constraints ->

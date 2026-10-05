@@ -24,7 +24,7 @@ import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.TextColorKey
-import dev.mkeeda.arranger.richtext.VisualBlock
+import dev.mkeeda.arranger.richtext.VisualBlockItem
 import dev.mkeeda.arranger.richtext.attributeContainerOf
 import dev.mkeeda.arranger.richtext.bold
 import dev.mkeeda.arranger.richtext.codeBlock
@@ -647,7 +647,7 @@ class RichTextEditorTest {
         state.richString.text shouldBe "val a = 1\nval b = 2"
         val blocks = state.richString.extractVisualBlocks()
         blocks shouldHaveSize 1
-        blocks.first() shouldBe VisualBlock.CodeBlock(range = 0..18, language = "kotlin")
+        blocks.first() shouldBe VisualBlockItem(key = CodeBlockKey, value = "kotlin", range = 0..18)
 
         // Press Enter after second line
         composeTestRule.onNodeWithText("val a = 1\nval b = 2").performTextInputSelection(TextRange(19))
@@ -665,7 +665,7 @@ class RichTextEditorTest {
         state.richString.text shouldBe "val a = 1\nval b = 2\nval c = 3"
         val blocksAfterExit = state.richString.extractVisualBlocks()
         blocksAfterExit shouldHaveSize 1
-        blocksAfterExit.first() shouldBe VisualBlock.CodeBlock(range = 0..19, language = "kotlin")
+        blocksAfterExit.first() shouldBe VisualBlockItem(key = CodeBlockKey, value = "kotlin", range = 0..19)
     }
 
     @Test

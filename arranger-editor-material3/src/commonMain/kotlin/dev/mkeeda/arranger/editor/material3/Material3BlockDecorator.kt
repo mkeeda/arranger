@@ -17,13 +17,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.mkeeda.arranger.editor.BlockContainer
 import dev.mkeeda.arranger.editor.BlockDecorator
-import dev.mkeeda.arranger.richtext.VisualBlock
+import dev.mkeeda.arranger.richtext.BlockquoteKey
+import dev.mkeeda.arranger.richtext.CodeBlockKey
 
 /**
  * Creates a [BlockDecorator] styled using Material 3 design tokens.
  *
- * - [VisualBlock.Blockquote]: Rendered with a vertical accent bar using [ColorScheme.outlineVariant].
- * - [VisualBlock.CodeBlock]: Rendered with a rounded container background using [ColorScheme.surfaceVariant]
+ * - [BlockquoteKey]: Rendered with a vertical accent bar using [ColorScheme.outlineVariant].
+ * - [CodeBlockKey]: Rendered with a rounded container background using [ColorScheme.surfaceVariant]
  *   and a subtle border using [ColorScheme.outlineVariant].
  *
  * @param colorScheme The Material 3 [ColorScheme] providing semantic colors.
@@ -33,49 +34,47 @@ public fun material3BlockDecorator(
     colorScheme: ColorScheme,
     @Suppress("UNUSED_PARAMETER") typography: Typography? = null,
 ): BlockDecorator =
-    BlockDecorator { block, context ->
-        when (block) {
-            is VisualBlock.Blockquote -> {
-                BlockContainer(
-                    context = context,
-                    leading = {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .width(3.dp)
-                                    .fillMaxHeight()
-                                    .background(
-                                        color = colorScheme.outlineVariant,
-                                        shape = RoundedCornerShape(1.5.dp),
-                                    )
-                                    .testTag("blockquote_bar"),
-                        )
-                    },
-                )
-            }
+    BlockDecorator {
+        on(BlockquoteKey) { _, context ->
+            BlockContainer(
+                context = context,
+                leading = {
+                    Box(
+                        modifier =
+                            Modifier
+                                .width(3.dp)
+                                .fillMaxHeight()
+                                .background(
+                                    color = colorScheme.outlineVariant,
+                                    shape = RoundedCornerShape(1.5.dp),
+                                )
+                                .testTag("blockquote_bar"),
+                    )
+                },
+            )
+        }
 
-            is VisualBlock.CodeBlock -> {
-                BlockContainer(
-                    context = context,
-                    background = {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        color = colorScheme.surfaceVariant,
-                                        shape = RoundedCornerShape(8.dp),
-                                    )
-                                    .border(
-                                        width = 1.dp,
-                                        color = colorScheme.outlineVariant,
-                                        shape = RoundedCornerShape(8.dp),
-                                    )
-                                    .testTag("code_block_background"),
-                        )
-                    },
-                )
-            }
+        on(CodeBlockKey) { _, context ->
+            BlockContainer(
+                context = context,
+                background = {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .background(
+                                    color = colorScheme.surfaceVariant,
+                                    shape = RoundedCornerShape(8.dp),
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = colorScheme.outlineVariant,
+                                    shape = RoundedCornerShape(8.dp),
+                                )
+                                .testTag("code_block_background"),
+                    )
+                },
+            )
         }
     }
 
