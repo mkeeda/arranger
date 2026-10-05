@@ -1,0 +1,42 @@
+# markdownlint-cli2 configuration for Arranger documentation (MkDocs Material)
+config:
+  # Disable line length check for prose documentation
+  MD013: false
+
+  # Allow inline HTML used in MkDocs (e.g. <div>, <br>, <kbd>, images)
+  MD033: false
+
+  # Allow indented code blocks inside MkDocs admonitions and lists
+  MD046: false
+
+  # Allow flexible table column spacing
+  MD060: false
+
+  # Allow flexible spacing inside code spans
+  MD038: false
+
+  # Allow identical heading titles under different parent sections
+  MD024:
+    siblings_only: true
+
+  # Python-Markdown / MkDocs standard list indentation (4 spaces)
+  MD007:
+    indent: 4
+
+  # Enforce blank lines around lists to prevent paragraph merging
+  MD032: true
+
+  # Enforce blank lines around fenced code blocks
+  MD031: true
+
+  # Require language specification for fenced code blocks
+  MD040: true
+
+  # Enforce blank lines around headings
+  MD022: true
+
+  # Disallow trailing whitespace
+  MD009: true
+
+  # Disallow multiple consecutive blank lines
+  MD012: true
