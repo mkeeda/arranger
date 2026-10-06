@@ -12,15 +12,15 @@ Add the `arranger-markdown` dependency to your Gradle build script alongside the
     ```kotlin
     dependencies {
         // Pure KMP Markdown serialization
-        implementation("dev.mkeeda.arranger:arranger-markdown:0.5.0-alpha01")
-        implementation("dev.mkeeda.arranger:arranger-richtext:0.5.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-markdown:1.0.0-alpha01")
+        implementation("dev.mkeeda.arranger:arranger-richtext:1.0.0-alpha01")
     }
     ```
 
 === "Version Catalog (libs.versions.toml)"
     ```toml
     [versions]
-    arranger = "0.5.0-alpha01"
+    arranger = "1.0.0-alpha01"
 
     [libraries]
     arranger-markdown = { module = "dev.mkeeda.arranger:arranger-markdown", version.ref = "arranger" }
@@ -155,7 +155,7 @@ Both fenced code blocks (```` ```lang ... ``` ````) and indented blocks are mapp
 
 ## Current Nuances & Limitations
 
-!!! warning "Inline Code Formatting in v0.5.0-alpha01"
+!!! warning "Inline Code Formatting in v1.0.0-alpha01"
     While Arranger's core model defines `InlineCodeKey` and `WysiwygEditor` supports typing `` `code` `` shortcuts, the current `arranger-markdown` parser treats code spans as plain unstyled text, and `MarkdownExporter` does not yet emit backticks for `InlineCodeKey`. Full round-trip inline code serialization is planned for an upcoming release.
 
 !!! info "Unsupported GFM Extensions"
