@@ -26,6 +26,14 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotest.assertions.core)
+                implementation(libs.jetbrains.compose.uiTest)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                // TODO: Remove and use single desktop dependency once CMP-9175 is resolved
+                // https://youtrack.jetbrains.com/issue/CMP-9175/Introduce-a-single-desktop-dependency-for-all-platforms
+                implementation(compose.desktop.currentOs)
             }
         }
         val androidHostTest by getting {
