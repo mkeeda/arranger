@@ -129,7 +129,8 @@ fun MyMaterial3Editor() {
 
 Adding a custom visual block is straightforward:
 
-1. **Define your attribute key**:
+### Step 1: Define your attribute key
+
 ```kotlin
 enum class CalloutType {
     Info,
@@ -142,7 +143,8 @@ object CalloutKey : BlockTypeAttributeKey<CalloutType> {
 }
 ```
 
-2. **Register decoration in `BlockDecorator`**:
+### Step 2: Register decoration in `BlockDecorator`
+
 ```kotlin
 val customBlockDecorator = BlockDecorator(base = rememberMaterial3BlockDecorator()) {
     on(CalloutKey) { type, context ->
@@ -176,7 +178,8 @@ val customBlockDecorator = BlockDecorator(base = rememberMaterial3BlockDecorator
 }
 ```
 
-3. **Pass to `RichTextEditor`**:
+### Step 3: Pass to `RichTextEditor`
+
 ```kotlin
 RichTextEditor(
     state = state,
