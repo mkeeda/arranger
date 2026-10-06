@@ -57,14 +57,14 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Core editor UI (includes arranger-richtext)
-            implementation("dev.mkeeda.arranger:arranger-editor:0.5.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-editor:1.0.0-alpha01")
 
             // Optional: Markdown / HTML conversions
-            implementation("dev.mkeeda.arranger:arranger-markdown:0.5.0-alpha01")
-            implementation("dev.mkeeda.arranger:arranger-html:0.5.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-markdown:1.0.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-html:1.0.0-alpha01")
 
             // Optional: Material 3 style resolver
-            implementation("dev.mkeeda.arranger:arranger-editor-material3:0.5.0-alpha01")
+            implementation("dev.mkeeda.arranger:arranger-editor-material3:1.0.0-alpha01")
         }
     }
 }
